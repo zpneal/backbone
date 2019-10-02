@@ -49,6 +49,13 @@ You can install the released version of backbone from
 install.packages("backbone")
 ```
 
+You can install from GitHub with:
+
+``` r
+library(devtools)
+install_github("domagal9/backbone", build_vignettes = TRUE)
+```
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
@@ -57,6 +64,8 @@ This is a basic example which shows you how to solve a common problem:
 library(backbone)
 data(davis)
 sdsm_props <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE"))
+#> Finding the Backbone using logit SDSM
+#> Estimated time to complete is 1.2 secs
 sdsm_bb <- backbone.extract(sdsm_props$positive, sdsm_props$negative, alpha = 0.05)
 ```
 
