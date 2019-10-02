@@ -42,6 +42,13 @@ You can install the released version of backbone from [CRAN](https://CRAN.R-proj
 install.packages("backbone")
 ```
 
+You can install from GitHub with:
+
+```r
+library(devtools)
+install_github("domagal9/backbone", build_vignettes = TRUE)
+```
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
