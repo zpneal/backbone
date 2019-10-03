@@ -37,14 +37,17 @@ fdsm <- function(B,
   #Argument Checks
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
   #Project to one-mode data
   if (sparse=="TRUE") {
-    B <- Matrix::Matrix(B,sparse=T)
-    P<-B%*%Matrix::t(B)
+    if (!is(B, "sparseMatrix")) {
+      B <- Matrix::Matrix(B, sparse = T)
     }
-  if (sparse=="FALSE") {P<-B%*%t(B)}
+    P<-B%*%Matrix::t(B)
+  } else {
+    P<-B%*%t(B)
+  }
 
   #Create Positive and Negative Matrices to hold backbone
   Positive <- matrix(0, nrow(P), ncol(P))
