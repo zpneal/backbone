@@ -53,10 +53,10 @@ sdsm <- function(B,
       if (!is(B, "sparseMatrix")) {
         B <- Matrix::Matrix(B, sparse = T)
       }
-      P <- B %*% t(B)
+      P <- Matrix::tcrossprod(B)
     }
   } else {
-    P <- B %*% t(B)
+    P <- tcrossprod(B)
   }
 
   #Create Positive and Negative Matrices to hold backbone
@@ -108,8 +108,11 @@ sdsm <- function(B,
 
 
     #Construct Pstar from Bstar
-    if (sparse=="TRUE") {Pstar<-Bstar%*%Matrix::t(Bstar)}
-    if (sparse=="FALSE") {Pstar<-Bstar%*%t(Bstar)}
+    if (sparse=="TRUE") {
+      Pstar <- Matrix::tcrossprod(Bstar)
+    } else {
+      Pstar <- tcrossprod(Bstar)
+    }
 
     #Check whether Pstar edge is larger/smaller than P edge
     Positive <- Positive + (Pstar > P)+0
