@@ -23,7 +23,7 @@ hyperg <- function(B){
   if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
   message("Finding the Backbone using Hypergeometric Distribution")
 
-  P <-B%*%t(B)
+  P <- tcrossprod(B)
   df <- data.frame(as.vector(P))
   names(df)[names(df)=="as.vector.P."] <- "projvalue"
 
