@@ -44,7 +44,7 @@ sdsm <- function(B,
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((model!="logit") & (model!="probit") & (model!="log") & (model!="cloglog")) {stop("model must be: logit | probit | log | cloglog")}
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
 
   #Project to one-mode data
