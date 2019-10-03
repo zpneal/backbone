@@ -44,9 +44,9 @@ fdsm <- function(B,
     if (!is(B, "sparseMatrix")) {
       B <- Matrix::Matrix(B, sparse = T)
     }
-    P<-B%*%Matrix::t(B)
+    P <- Matrix::tcrossprod(B)
   } else {
-    P<-B%*%t(B)
+    P <- tcrossprod(B)
   }
 
   #Create Positive and Negative Matrices to hold backbone
@@ -96,11 +96,13 @@ fdsm <- function(B,
     for (row in 1:R){rm[row,hp[[row]]]=1}
     Bstar <- rm
 
-    if (sparse=="TRUE") {Bstar <- Matrix::Matrix(Bstar,sparse=T)}
-
     #Construct Pstar from Bstar
-    if (sparse=="TRUE") {Pstar<-Bstar%*%Matrix::t(Bstar)}
-    if (sparse=="FALSE") {Pstar<-Bstar%*%t(Bstar)}
+    if (sparse=="TRUE") {
+      Bstar <- Matrix::Matrix(Bstar,sparse=T)
+      Pstar<-Matrix::tcrossprod(Bstar)
+    } else {
+      Pstar <- tcrossprod(Bstar)
+    }
 
     #Start estimation timer; print message
     if (i == 1) {
