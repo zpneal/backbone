@@ -49,10 +49,15 @@ sdsm <- function(B,
 
   #Project to one-mode data
   if (sparse=="TRUE") {
-    B <- Matrix::Matrix(B,sparse=T)
-    P<-B%*%Matrix::t(B)
+    if (sparse == "TRUE") {
+      if (!is(B, "sparseMatrix")) {
+        B <- Matrix::Matrix(B, sparse = T)
+      }
+      P <- B %*% t(B)
+    }
+  } else {
+    P <- B %*% t(B)
   }
-  if (sparse=="FALSE") {P<-B%*%t(B)}
 
   #Create Positive and Negative Matrices to hold backbone
   Positive <- matrix(0, nrow(P), ncol(P))
