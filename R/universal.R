@@ -25,7 +25,7 @@ universal <- function(M,
   if ((class(lower)!="function") & (class(lower)!="numeric") & (class(lower)!="NULL")) {stop("lower must be either function or numeric")}
 
   if (bipartite == TRUE){
-    P <- M%*%t(M)
+    P <- tcrossprod(M)
   } else {
     P <- M
   }

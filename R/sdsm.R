@@ -44,15 +44,20 @@ sdsm <- function(B,
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((model!="logit") & (model!="probit") & (model!="log") & (model!="cloglog")) {stop("model must be: logit | probit | log | cloglog")}
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
 
   #Project to one-mode data
   if (sparse=="TRUE") {
-    B <- Matrix::Matrix(B,sparse=T)
-    P<-B%*%Matrix::t(B)
+    if (sparse == "TRUE") {
+      if (!is(B, "sparseMatrix")) {
+        B <- Matrix::Matrix(B, sparse = T)
+      }
+      P <- Matrix::tcrossprod(B)
+    }
+  } else {
+    P <- tcrossprod(B)
   }
-  if (sparse=="FALSE") {P<-B%*%t(B)}
 
   #Create Positive and Negative Matrices to hold backbone
   Positive <- matrix(0, nrow(P), ncol(P))
@@ -103,8 +108,11 @@ sdsm <- function(B,
 
 
     #Construct Pstar from Bstar
-    if (sparse=="TRUE") {Pstar<-Bstar%*%Matrix::t(Bstar)}
-    if (sparse=="FALSE") {Pstar<-Bstar%*%t(Bstar)}
+    if (sparse=="TRUE") {
+      Pstar <- Matrix::tcrossprod(Bstar)
+    } else {
+      Pstar <- tcrossprod(Bstar)
+    }
 
     #Check whether Pstar edge is larger/smaller than P edge
     Positive <- Positive + (Pstar > P)+0

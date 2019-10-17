@@ -37,14 +37,17 @@ fdsm <- function(B,
   #Argument Checks
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
   #Project to one-mode data
   if (sparse=="TRUE") {
-    B <- Matrix::Matrix(B,sparse=T)
-    P<-B%*%Matrix::t(B)
+    if (!is(B, "sparseMatrix")) {
+      B <- Matrix::Matrix(B, sparse = T)
     }
-  if (sparse=="FALSE") {P<-B%*%t(B)}
+    P <- Matrix::tcrossprod(B)
+  } else {
+    P <- tcrossprod(B)
+  }
 
   #Create Positive and Negative Matrices to hold backbone
   Positive <- matrix(0, nrow(P), ncol(P))
@@ -93,11 +96,13 @@ fdsm <- function(B,
     for (row in 1:R){rm[row,hp[[row]]]=1}
     Bstar <- rm
 
-    if (sparse=="TRUE") {Bstar <- Matrix::Matrix(Bstar,sparse=T)}
-
     #Construct Pstar from Bstar
-    if (sparse=="TRUE") {Pstar<-Bstar%*%Matrix::t(Bstar)}
-    if (sparse=="FALSE") {Pstar<-Bstar%*%t(Bstar)}
+    if (sparse=="TRUE") {
+      Bstar <- Matrix::Matrix(Bstar,sparse=T)
+      Pstar<-Matrix::tcrossprod(Bstar)
+    } else {
+      Pstar <- tcrossprod(Bstar)
+    }
 
     #Start estimation timer; print message
     if (i == 1) {
