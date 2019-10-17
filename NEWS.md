@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## backbone 1.0.1
 * change < to <= in fdsm, sdsm
+* add support for sparse matrices
 
 ## backbone 1.0.0
 
