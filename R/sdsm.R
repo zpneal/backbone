@@ -46,15 +46,12 @@ sdsm <- function(B,
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
   if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
-
   #Project to one-mode data
   if (sparse=="TRUE") {
-    if (sparse == "TRUE") {
-      if (!is(B, "sparseMatrix")) {
-        B <- Matrix::Matrix(B, sparse = T)
-      }
-      P <- Matrix::tcrossprod(B)
+    if (!is(B, "sparseMatrix")) {
+      B <- Matrix::Matrix(B, sparse = T)
     }
+    P <- Matrix::tcrossprod(B)
   } else {
     P <- tcrossprod(B)
   }
