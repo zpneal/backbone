@@ -115,8 +115,8 @@ sdsm <- function(B,
     }
 
     #Check whether Pstar edge is larger/smaller than P edge
-    Positive <- Positive + (Pstar > P)+0
-    Negative <- Negative + (Pstar < P)+0
+    Positive <- Positive + (Pstar >= P)+0
+    Negative <- Negative + (Pstar <= P)+0
 
     #Save Dyad of P
     if (length(dyad) > 0){
