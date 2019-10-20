@@ -31,19 +31,22 @@
 #' @export
 #'
 #' @examples
-#'sdsm_props <- sdsm(davis, trials = 100,dyad = c("EVELYN", "CHARLOTTE" ))
+#'sdsm_mc <- sdsm(davis, trials = 100,dyad = c("EVELYN", "CHARLOTTE" ))
+#'sdsm_rna <- sdsm(davis, trials = 0, tolerance = c(.5,.5))
+#'sdsm_dft <- sdsm(davis, trials = 0, tolerance = c(2,0))
 sdsm <- function(B,
-                 trials = 1000,
+                 trials = 0,
                  model = "logit",
                  sparse = TRUE,
                  maxiter = 25,
                  dyad = NULL,
+                 tolerance = c(.5,.5),
                  progress = FALSE){
 
   #Argument Checks
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((model!="logit") & (model!="probit") & (model!="log") & (model!="cloglog")) {stop("model must be: logit | probit | log | cloglog")}
-  if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
+  if ((trials < 0) | (trials%%1!=0)) {stop("trials must be a non-negative integer")}
   if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
   #Project to one-mode data
@@ -78,75 +81,111 @@ sdsm <- function(B,
   model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
   probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
 
-  #Dyad save
-  edge_weights <- numeric(trials)
-  if (length(dyad) > 0){
-    if (class(dyad[1]) != "numeric"){
-      vec <- match(c(dyad[1], dyad[2]), rownames(B))
-    }
-    else{
-      vec <- dyad
-    }
-  }
+  #Assemble and compute probabilities
+  prob.mat <- matrix(probs, nrow = nrow(B), ncol = ncol(B))  #Probability matrix
+  rows <- dim(prob.mat)[1]
 
-  #Build null models
-  for (i in 1:trials){
-
-    #Start estimation timer; print message
-    if (i == 1) {
-      start.time <- Sys.time()
-      message("Finding the Backbone using ", model, " SDSM")
+  #Monte Carlo Method
+  if (trials > 0){
+    #Dyad save
+    edge_weights <- numeric(trials)
+    if (length(dyad) > 0){
+      if (class(dyad[1]) != "numeric"){
+        vec <- match(c(dyad[1], dyad[2]), rownames(B))
+      }
+      else{
+        vec <- dyad
+      }
     }
 
-    #Use GLM probabilities to create an SDSM Bstar
-    #Bstar <- matrix(rbinom(nrow(B) * ncol(B), 1, probs), nrow(B), ncol(B))  #Equivalent, but slightly slower
-    Bstar <- matrix(((stats::runif(nrow(B) * ncol(B)))<=probs)+0, nrow(B), ncol(B))
-    if (sparse=="TRUE") {Bstar <- Matrix::Matrix(Bstar,sparse=T)}
+    #Build null models
+    for (i in 1:trials){
+
+      #Start estimation timer; print message
+      if (i == 1) {
+        start.time <- Sys.time()
+        message("Finding the Backbone using ", model, " SDSM")
+      }
+
+      #Use GLM probabilities to create an SDSM Bstar
+      #Bstar <- matrix(rbinom(nrow(B) * ncol(B), 1, probs), nrow(B), ncol(B))  #Equivalent, but slightly slower
+      Bstar <- matrix(((stats::runif(nrow(B) * ncol(B)))<=probs)+0, nrow(B), ncol(B))
+      if (sparse=="TRUE") {Bstar <- Matrix::Matrix(Bstar,sparse=T)}
 
 
-    #Construct Pstar from Bstar
-    if (sparse=="TRUE") {
-      Pstar <- Matrix::tcrossprod(Bstar)
-    } else {
-      Pstar <- tcrossprod(Bstar)
-    }
+      #Construct Pstar from Bstar
+      if (sparse=="TRUE") {
+        Pstar <- Matrix::tcrossprod(Bstar)
+      } else {
+        Pstar <- tcrossprod(Bstar)
+      }
 
-    #Check whether Pstar edge is larger/smaller than P edge
-    Positive <- Positive + (Pstar >= P)+0
-    Negative <- Negative + (Pstar <= P)+0
+      #Check whether Pstar edge is larger/smaller than P edge
+      Positive <- Positive + (Pstar >= P)+0
+      Negative <- Negative + (Pstar <= P)+0
+
+      #Save Dyad of P
+      if (length(dyad) > 0){
+        edge_weights[i] <- Pstar[vec[1], vec[2]]
+      }
+
+      #Report estimated running time, update progress bar
+      if (i==10){
+        end.time <- Sys.time()
+        est = (round(difftime(end.time, start.time), 2) * (trials/10))
+        message("Estimated time to complete is ", est," ", units(est))
+        if (progress == "TRUE"){
+          pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)
+        }
+      } #end timer estimate
+
+      if ((progress == "TRUE") & (i>=10)) {utils::setTxtProgressBar(pb, i)}
+    } #end for loop
+    if (progress == "TRUE"){close(pb)}
+
+    #Proporition of greater than expected and less than expected
+    Positive <- (Positive/trials)
+    Negative <- (Negative/trials)
+    rownames(Positive) <- rownames(B)
+    colnames(Positive) <- rownames(B)
+    rownames(Negative) <- rownames(B)
+    colnames(Negative) <- rownames(B)
 
     #Save Dyad of P
-    if (length(dyad) > 0){
-      edge_weights[i] <- Pstar[vec[1], vec[2]]
+    if (length(dyad) == 0){
+      edge_weights <- NULL
     }
+  } #end if trials > 0
 
-    #Report estimated running time, update progress bar
-    if (i==10){
-      end.time <- Sys.time()
-      est = (round(difftime(end.time, start.time), 2) * (trials/10))
-      message("Estimated time to complete is ", est," ", units(est))
-      if (progress == "TRUE"){
-        pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)
-      }
-    } #end timer estimate
-
-    if ((progress == "TRUE") & (i>=10)) {utils::setTxtProgressBar(pb, i)}
-  } #end for loop
-  if (progress == "TRUE"){close(pb)}
-
-  #Proporition of greater than expected and less than expected
-  Positive <- (Positive/trials)
-  Negative <- (Negative/trials)
-  rownames(Positive) <- rownames(B)
-  colnames(Positive) <- rownames(B)
-  rownames(Negative) <- rownames(B)
-  colnames(Negative) <- rownames(B)
-
-  #Save Dyad of P
-  if (length(dyad) == 0){
-    edge_weights <- NULL
-  }
-
+  # Poisson Binomial Distribution Method
+  if (trials == 0){
+    message("Finding the Backbone using Poisson Binomial SDSM")
+    for (i in 1:rows){
+      for (j in i:rows){
+        prob.ij <- prob.mat[i,] * prob.mat[j,]  #Vector of probabilities for ij
+        observed <- P[i,j]
+        avg <- mean(prob.ij)
+        x <-tolerance[1]
+        y <-tolerance[2]
+        if ((avg>x-y)&(avg<x+y)){
+          rna.upper <- ppoibin(observed, prob.ij, method = "RNA")
+          rna.lower <- 1 - ppoibin((observed - 1), prob.ij, method = "RNA")
+          Positive[i,j] <- rna.upper
+          Positive[j,i] <- rna.upper
+          Negative[i,j] <- rna.lower
+          Negative[j,i] <- rna.lower
+        } #end if
+        else{
+          dft.upper <- ppoibin(observed, prob.ij, method = "DFT-CF")
+          dft.lower <- 1 - ppoibin((observed - 1), prob.ij, method = "DFT-CF")
+          Positive[i,j] <- dft.upper
+          Positive[j,i] <- dft.upper
+          Negative[i,j] <- dft.lower
+          Negative[j,i] <- dft.lower
+        } #end else
+      } #end for j in rows
+    } #end for i in rows
+  } #end if trials == 0
 
   if (length(dyad) > 0){
     return(list(positive = Positive, negative = Negative, dyad_values = edge_weights))
