@@ -84,8 +84,14 @@ sdsm <- function(B,
   A$rowcol<-A$rowmarg*A$colmarg
 
   #Estimate logit model, compute probabilities
-  model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
-  probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
+  if (requireNamespace("speedglm", quietly = TRUE)){
+    model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
+    probs <- as.vector(speedglm:::predict.speedglm(model.estimates,newdata=A,type = "response"))
+  }
+  else {
+    model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
+    probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
+  }
 
   #Assemble and compute probabilities
   prob.mat <- matrix(probs, nrow = nrow(B), ncol = ncol(B))  #Probability matrix
