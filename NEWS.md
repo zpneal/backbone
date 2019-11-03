@@ -7,8 +7,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## backbone 1.0.1
+
 * change < to <= in fdsm, sdsm
 * add support for sparse matrices
+* add support for speedglm in sdsm
 * add poisson binomial approx. in sdsm
 
 ## backbone 1.0.0
