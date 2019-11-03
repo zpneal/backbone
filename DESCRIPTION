@@ -22,8 +22,9 @@ Depends: R (>= 2.10)
 Imports: 
     Matrix,
     utils,
-    stats
-Suggests: 
+    stats,
+    poibin
+Suggests:
     knitr,
     rmarkdown,
     testthat,
