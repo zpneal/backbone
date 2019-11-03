@@ -21,14 +21,15 @@ RoxygenNote: 6.1.1
 Depends: R (>= 2.10)
 Imports: 
     Matrix,
-    utils,
+    poibin,
     stats,
-    poibin
+    utils
 Suggests:
+    igraph,
     knitr,
     rmarkdown,
-    testthat,
-    igraph
+    speedglm,
+    testthat
 VignetteBuilder: knitr
 URL: https://github.com/domagal9/backbone.git
 BugReports: https://github.com/domagal9/backbone.git/issues
