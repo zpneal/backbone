@@ -19,6 +19,9 @@
 
 hyperg <- function(B){
 
+  #Run Time
+  run.time.start <- Sys.time()
+
   #Argument Checks
   if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
   message("Finding the Backbone using Hypergeometric Distribution")
@@ -51,5 +54,18 @@ hyperg <- function(B){
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  return(list(positive = Positive, negative = Negative))
+  #Run Time
+  run.time.end <- Sys.time()
+  total.time = (round(difftime(run.time.end, run.time.start), 2))
+
+  #Compile Summary
+  model.summary <- noquote(t(as.data.frame(
+    list("Model" = "Hypergeometric",
+        "Agents" = dim(B)[1],
+        "Artifacts" = dim(B)[2],
+        "Running Time" = as.numeric(total.time)),
+    row.names = "Model Summary"
+  )))
+  return(list(positive = Positive, negative = Negative, summary = model.summary))
 }
+

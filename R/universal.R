@@ -24,6 +24,9 @@ universal <- function(M,
   if ((class(upper)!="function") & (class(upper)!="numeric")) {stop("upper must be either function or numeric")}
   if ((class(lower)!="function") & (class(lower)!="numeric") & (class(lower)!="NULL")) {stop("lower must be either function or numeric")}
 
+  #Run Time
+  run.time.start <- Sys.time()
+
   if (bipartite == TRUE){
     P <- tcrossprod(M)
   } else {
@@ -53,7 +56,21 @@ universal <- function(M,
   backbone <- backbone + positive
 
   diag(backbone) <- 0
-  return(backbone)
+
+  #Run Time
+  run.time.end <- Sys.time()
+  total.time = (round(difftime(run.time.end, run.time.start), 2))
+
+  #Compile Summary
+  model.summary <- noquote(t(as.data.frame(
+    list("Model" = "Universal Threshold",
+         "Agents" = dim(M)[1],
+         "Artifacts" = dim(M)[2],
+         "Running Time" = as.numeric(total.time)),
+    row.names = "Model Summary"
+  )))
+
+  return(list(backbone = backbone, summary = model.summary))
 }
 
 

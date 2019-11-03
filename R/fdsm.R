@@ -39,6 +39,9 @@ fdsm <- function(B,
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
   if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
+  #Run Time
+  run.time.start <- Sys.time()
+
   #Project to one-mode data
   if (sparse=="TRUE") {
     if (!is(B, "sparseMatrix")) {
@@ -140,12 +143,25 @@ fdsm <- function(B,
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
+  #Run Time
+  run.time.end <- Sys.time()
+  total.time = (round(difftime(run.time.end, run.time.start), 2))
+
+  #Compile Summary
+  model.summary <- noquote(t(as.data.frame(
+    list("Model" = "Fixed Degree Sequence Model",
+         "Agents" = dim(B)[1],
+         "Artifacts" = dim(B)[2],
+         "Running Time" = as.numeric(total.time)),
+    row.names = "Model Summary"
+  )))
+
   if (length(dyad) > 0){
-    return(list(positive = Positive, negative = Negative, dyad_values = edge_weights))
+    return(list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary))
   }
 
   else {
-    return(list(positive = Positive, negative = Negative))
+    return(list(positive = Positive, negative = Negative, summary = model.summary))
   }
 
 } #end fdsm function
