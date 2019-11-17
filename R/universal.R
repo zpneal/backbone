@@ -30,7 +30,11 @@ universal <- function(M,
   run.time.start <- Sys.time()
 
   if (bipartite == TRUE){
-    P <- tcrossprod(M)
+    if (is(M, "sparseMatrix")) {
+      P <- Matrix::tcrossprod(M)
+    } else {
+      P <- tcrossprod(M)
+    }
   } else {
     P <- M
   }
@@ -64,8 +68,15 @@ universal <- function(M,
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
+  if (is(M, "sparseMatrix")) {
+    r <- Matrix::rowSums(M)
+    c <- Matrix::colSums(M)
+  } else {
+    r <- rowSums(M)
+    c <- colSums(M)
+  }
   a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c("Universal Threshold", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
+  b <- c("Universal Threshold", dim(M)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(M)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
