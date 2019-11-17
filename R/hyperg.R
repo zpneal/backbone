@@ -24,18 +24,25 @@ hyperg <- function(B){
   run.time.start <- Sys.time()
 
   #Argument Checks
-  if (class(B)!="matrix") {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
   message("Finding the Backbone using Hypergeometric Distribution")
 
-  P <- tcrossprod(B)
+  if (is(B, "sparseMatrix")) {
+    P <- Matrix::tcrossprod(B)
+    rs <- Matrix::rowSums(B)
+  } else {
+    P <- tcrossprod(B)
+    rs <- rowSums(B)
+  }
+
   df <- data.frame(as.vector(P))
   names(df)[names(df)=="as.vector.P."] <- "projvalue"
 
   #Compute row sums
-  df$row_sum_i <- rep(rowSums(B), times = nrow(B))
+  df$row_sum_i <- rep(rs, times = nrow(B))
 
   #Match each row sum i with each row sum j and their Pij value
-  df$row_sum_j <- rep(rowSums(B), each = nrow(B))
+  df$row_sum_j <- rep(rs, each = nrow(B))
 
   #Compute different in number of artifacts and row sum
   df$diff <- ncol(B)-df$row_sum_i
@@ -60,6 +67,13 @@ hyperg <- function(B){
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
+  if (is(B, "sparseMatrix")) {
+    r <- Matrix::rowSums(B)
+    c <- Matrix::colSums(B)
+  } else {
+    r <- rowSums(B)
+    c <- colSums(B)
+  }
   a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
   b <- c("Hypergeometric Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
