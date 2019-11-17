@@ -15,10 +15,11 @@
 #'     If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected, the projected value for the corresponding row and column will be saved.
 #'     This allows the user to see the distribution of the edge weights for desired row and column.
 #'
-#' @return list(positive, negative, dyad_values).
+#' @return list(positive, negative, dyad_values, summary).
 #' positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
 #' negative: matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection.
 #' dyad_values: list of edge weight for i,j in each generated projection.
+#' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #'
 #' @references fixed degree sequence model: \href{https://doi.org/10.1007/s13278-011-0021-0}{Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218. DOI: 10.1007/s13278-011-0021-0.}
 #' @references curveball algorithm: \href{https://www.nature.com/articles/ncomms5114}{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. DOI:10.1038/ncomms5114.}
@@ -148,13 +149,10 @@ fdsm <- function(B,
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
-  model.summary <- noquote(t(as.data.frame(
-    list("Model" = "Fixed Degree Sequence Model",
-         "Agents" = dim(B)[1],
-         "Artifacts" = dim(B)[2],
-         "Running Time" = as.numeric(total.time)),
-    row.names = "Model Summary"
-  )))
+  a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
+  b <- c("Fixed Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
+  model.summary <- data.frame(a,b, row.names = 1)
+  colnames(model.summary)<-"Model Summary"
 
   if (length(dyad) > 0){
     return(list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary))

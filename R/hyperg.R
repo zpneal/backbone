@@ -7,9 +7,10 @@
 #'
 #' @param B Matrix: Bipartite network
 #'
-#' @return list(positive, negative).
+#' @return list(positive, negative, summary).
 #' positive gives matrix of probability of ties above the observed value.
 #' negative gives matrix of probability of ties below the observed value.
+#' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #'
 #' @references \href{https://doi.org/10.1007/s13278-013-0107-y}{Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. DOI:10.1007/s13278-013-0107-y.}
 #' @export
@@ -59,13 +60,11 @@ hyperg <- function(B){
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
-  model.summary <- noquote(t(as.data.frame(
-    list("Model" = "Hypergeometric",
-        "Agents" = dim(B)[1],
-        "Artifacts" = dim(B)[2],
-        "Running Time" = as.numeric(total.time)),
-    row.names = "Model Summary"
-  )))
+  a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
+  b <- c("Hypergeometric Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
+  model.summary <- data.frame(a,b, row.names = 1)
+  colnames(model.summary)<-"Model Summary"
+
   return(list(positive = Positive, negative = Negative, summary = model.summary))
 }
 

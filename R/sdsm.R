@@ -24,11 +24,11 @@
 #' These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by \link[poibin]{ppoibin}.
 #' The RNA method is used by default, unless the computed value is within the margin of 'alpha'-'tolerance' and 'alpha'+'tolerance', the DFT method is used.
 #'
-#' @return list(positive, negative, dyad_values).
+#' @return list(positive, negative, dyad_values, summary).
 #' positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
 #' negative: matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection.
 #' dyad_values: list of edge weight for i,j in each generated projection, included if 'dyad' not NULL and 'trials > 0'.
-#'
+#' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #'
 #' @references \href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97. DOI: 10.1016/j.socnet.2014.06.001}
 #'
@@ -54,6 +54,9 @@ sdsm <- function(B,
   if ((model!="logit") & (model!="probit") & (model!="log") & (model!="cloglog")) {stop("model must be: logit | probit | log | cloglog")}
   if ((trials < 0) | (trials%%1!=0)) {stop("trials must be a non-negative integer")}
   if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+
+  #If sparse matrix input, use sparse matrix operations
+  if (is(B, "sparseMatrix")) {sparse <- TRUE}
 
   #Run Time
   run.time.start <- Sys.time()
@@ -204,13 +207,19 @@ sdsm <- function(B,
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
-  model.summary <- noquote(t(as.data.frame(
-    list("Model" = "Stochastic Degree Sequence Model",
-         "Agents" = dim(B)[1],
-         "Artifacts" = dim(B)[2],
-         "Running Time" = as.numeric(total.time)),
-    row.names = "Model Summary"
-  )))
+  if (sparse=="TRUE") {
+    r <- Matrix::rowSums(B)
+    c <- Matrix::colSums(B)
+    } else {
+    r <- rowSums(B)
+    c <- colSums(B)
+    }
+  #Summary <- list("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
+
+  a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
+  b <- c("Stochastic Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
+  model.summary <- data.frame(a,b, row.names = 1)
+  colnames(model.summary)<-"Model Summary"
 
   if ((length(dyad) > 0)&(trials > 0)){
     return(list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary))
