@@ -214,7 +214,6 @@ sdsm <- function(B,
     r <- rowSums(B)
     c <- colSums(B)
     }
-  #Summary <- list("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
 
   a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
   b <- c("Stochastic Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
