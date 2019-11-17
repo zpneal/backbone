@@ -28,7 +28,7 @@ library(backbone)
 
 
 In a graph  $G$, edges are either present (i.e. $G_{ij}=1$) or absent (i.e. $G_{ij}=0$). However in a weighted or valued graph, edges can take a range of values that may capture such properties as the strength or capacity of the edge. Although weighted graphs contain a large amount of information, there are some cases (e.g. visualization, application of statistical models not developed for weighted graphs) where it is useful to reduce this information by focusing on an unweighted subgraph that contains only the most important edges. We call this subgraph the backbone of $G$, which we denote as $G’$. 
-Extracting $G’$ from $G$ requires deciding which edges to preserve. This usually involves selecting a threshold $T_{ij}$ such that edges are preserved if they are above the threshold (i.e. $G_{ij}’=1$ if $G_{ij} > T_{ij}$), and omitted if they are below the threshold (i.e. $G_{ij}’=0$ if $G_{ij} < T_{ij}$). It is also possible to extract a signed backbone by selecting upper $T_{ij}$ and lower $T’_{ij}$ thresholds such that $G_{ij}’=1$ if $G_{ij} > T_{ij}$, $G_{ij}’=-1$ if $G_{ij} < T’_{ij}$, and $G_{ij}’=0$ if $G_{ij} > T’_{ij}$ and $G_{ij} < T_{ij}$. The key to all backbone extraction methods lies in the selection of $T$. The backbone package provides several different methods for selecting $T$ and thus extracting $G’$ from $G$. 
+Extracting $G’$ from $G$ requires deciding which edges to preserve. This usually involves selecting a threshold $T_{ij}$ such that edges are preserved if they are above the threshold (i.e. $G_{ij}’=1$ if $G_{ij} > T_{ij}$), and omitted if they are below the threshold (i.e. $G_{ij}’=0$ if $G_{ij} < T_{ij}$). It is also possible to extract a signed backbone by selecting upper $T^+_{ij}$ and lower $T^-_{ij}$ thresholds such that $G_{ij}’=1$ if $G_{ij} > T^+_{ij}$, $G_{ij}’=-1$ if $G_{ij} < T^-_{ij}$, and $G_{ij}’=0$ if $G_{ij} > T^-_{ij}$ and $G_{ij} < T^+_{ij}$. The key to all backbone extraction methods lies in the selection of $T$. The backbone package provides several different methods for selecting $T$ and thus extracting $G’$ from $G$. 
 
 
 ## Example data
@@ -43,7 +43,7 @@ options(op)
 
 We see that our two sets of vertices are women and events attended.
 
-A weighted graph $G$ can be constructed from $B$ via bipartite projection, where $G = BB’$ and $G_{ij}$ contains the number of events that both woman $i$ and woman $j$ attended. 
+A weighted graph $G$ can be constructed from $B$ via bipartite projection, where $G = BB^T$ and $G_{ij}$ contains the number of events that both woman $i$ and woman $j$ attended. 
 Looking at the matrix of southern women and events attended above, we see that Evelyn and Charlotte have attended three of the same events. This means that $G_{15} = 3$ in the projection, shown below.
 
 ```{r}
@@ -58,7 +58,7 @@ In this vignette, we demonstrate using the backbone package to extract the backb
 In this section, we will describe backbone methods that can be applied to any weighted graph, whether the weights are present in a natively unipartite graph, or are the product of a bipartite projection (as is the case in our example data).
 
 ## Universal Backbone: universal( )
-The simplest approach to backbone extraction applies a single threshold $T$ to all edges, and is achieved using the `universal()` function. The `universal()` function allows the user to extract a binary backbone by selecting a single threshold $T$, or extract a signed backbone by selecting upper and lower thresholds $T$ and $T’$.  
+The simplest approach to backbone extraction applies a single threshold $T$ to all edges, and is achieved using the `universal()` function. The `universal()` function allows the user to extract a binary backbone by selecting a single threshold $T$, or extract a signed backbone by selecting upper and lower thresholds $T^+$ and $T^-$.  
 
 The `universal( )` function has four parameters, 
 
@@ -116,7 +116,7 @@ The methods described above can be applied to any weighted graph $G$. In this se
 Each method follows the same basic algorithm:
 
 1. Construct a random bipartite graph $B^*$ that preserves (to varying extents, depending on the method) one or both degree sequences [@strona2018bi]. 
-2. Project $B^*$ (i.e. $B^{*} B^{*’}$) to obtain a random weighted bipartite projection $G^*$
+2. Project $B^*$ (i.e. $B^{*} B^{*T}$) to obtain a random weighted bipartite projection $G^*$
 3. Repeat steps 1 and 2 $N$ times to build a distribution of $G^*_{ij}$
 4. Compare $G_{ij}$ to the distribution of $G^*_{ij}$. Define a binary backbone $G’$ such that $G’_{ij}=1$ if $G^*_{ij}$ is larger than $G_{ij}$ in no more than $\alpha \times N$ cases, and otherwise is 0. Or define a signed backbone $G’$ such that $G’_{ij}=1$ if $G^*_{ij}$ is larger than $G_{ij}$ in no more than $(\alpha / 2) \times N$ cases, that $G’_{ij}=-1$ if $G^*_{ij}$ is smaller than $G_{ij}$ in no more than $(\alpha / 2) \times N$ cases, and otherwise is 0.
 
