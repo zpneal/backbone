@@ -31,6 +31,6 @@ Suggests:
     speedglm,
     testthat
 VignetteBuilder: knitr
-URL: https://github.com/domagal9/backbone.git
-BugReports: https://github.com/domagal9/backbone.git/issues
+URL: https://github.com/domagal9/backbone, https://www.zacharyneal.com/backbone
+BugReports: https://github.com/domagal9/backbone/issues
 
