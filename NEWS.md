@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 * add support for sparse matrices
 * add support for speedglm in sdsm
 * add poisson binomial approx. in sdsm
+* add summary output to sdsm, fdsm, hyperg, universal
 
 ## backbone 1.0.0
 
