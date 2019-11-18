@@ -24,10 +24,10 @@ hyperg <- function(B){
   run.time.start <- Sys.time()
 
   #Argument Checks
-  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
   message("Finding the Backbone using Hypergeometric Distribution")
 
-  if (is(B, "sparseMatrix")) {
+  if (methods::is(B, "sparseMatrix")) {
     P <- Matrix::tcrossprod(B)
     rs <- Matrix::rowSums(B)
   } else {
@@ -67,7 +67,7 @@ hyperg <- function(B){
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
-  if (is(B, "sparseMatrix")) {
+  if (methods::is(B, "sparseMatrix")) {
     r <- Matrix::rowSums(B)
     c <- Matrix::colSums(B)
   } else {
@@ -75,7 +75,7 @@ hyperg <- function(B){
     c <- colSums(B)
   }
   a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c("Hypergeometric Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
+  b <- c("Hypergeometric Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 

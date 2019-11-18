@@ -5,8 +5,8 @@
 #'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
-#' @param B Matrix: Bipartite network
-#' @param trials Integer: Number of random bipartite graphs generated
+#' @param B Matrix: Bipartite adjacency matrix
+#' @param trials Integer: Number of random bipartite graphs generated. Default is 0.
 #' @param model String: A generalized linear model (glm) used to generate random bipartite graphs.
 #' @param sparse Boolean: If sparse matrix manipulations should be used
 #' @param maxiter Integer: Maximum number of iterations if "model" is a glm.
@@ -16,8 +16,8 @@
 #' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #'
 #' @details The 'model' parameter can take in a 'link' function, as described by \link[stats]{glm} and \link[stats]{family}. This can be one of c('logit', 'probit', 'cauchit', 'log', 'cloglog').
-#' @details If 'trials'>0, the function uses a Monte Carlo method to compute the proportions, using the following steps:
-#' During each iteration, sdsm computes a new B* matrix. This is a random bipartite matrix with about the same row and column sums as the original matrix B.
+#' @details If 'trials'>0, the function uses repeat Bernoulli trials to compute the proportions, using the following steps:
+#' During each iteration, sdsm computes a new B* matrix using probabilities computed using the `glm`. This is a random bipartite matrix with about the same row and column sums as the original matrix B.
 #' If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected, the projected value for the corresponding row and column will be saved.
 #' This allows the user to see the distribution of the edge weights for desired row and column.
 #' @details If 'trials'=0, the proportion of edges above or below the observed values are computed using the Poisson Binomial distribution.
@@ -36,7 +36,7 @@
 #' @export
 #'
 #' @examples
-#'sdsm_mc <- sdsm(davis, trials = 100,dyad = c("EVELYN", "CHARLOTTE" ))
+#'sdsm_bt <- sdsm(davis, trials = 100,dyad = c("EVELYN", "CHARLOTTE" ))
 #'sdsm_rna <- sdsm(davis, trials = 0, tolerance = 0)
 #'sdsm_dft <- sdsm(davis, trials = 0, tolerance = 1)
 sdsm <- function(B,
@@ -53,17 +53,17 @@ sdsm <- function(B,
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((model!="logit") & (model!="probit") & (model!="log") & (model!="cloglog")) {stop("model must be: logit | probit | log | cloglog")}
   if ((trials < 0) | (trials%%1!=0)) {stop("trials must be a non-negative integer")}
-  if (class(B) != "matrix" & !(is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+  if (class(B) != "matrix" & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
   #If sparse matrix input, use sparse matrix operations
-  if (is(B, "sparseMatrix")) {sparse <- TRUE}
+  if (methods::is(B, "sparseMatrix")) {sparse <- TRUE}
 
   #Run Time
   run.time.start <- Sys.time()
 
   #Project to one-mode data
   if (sparse=="TRUE") {
-    if (!is(B, "sparseMatrix")) {
+    if (!methods::is(B, "sparseMatrix")) {
       B <- Matrix::Matrix(B, sparse = T)
     }
     P <- Matrix::tcrossprod(B)
@@ -92,7 +92,7 @@ sdsm <- function(B,
   #Estimate logit model, compute probabilities
   if (requireNamespace("speedglm", quietly = TRUE)){
     model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
-    probs <- as.vector(speedglm:::predict.speedglm(model.estimates,newdata=A,type = "response"))
+    probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
   }
   else {
     model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
@@ -216,7 +216,7 @@ sdsm <- function(B,
     }
 
   a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c("Stochastic Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((sd(c))**3)), 5), as.numeric(total.time))
+  b <- c("Stochastic Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
