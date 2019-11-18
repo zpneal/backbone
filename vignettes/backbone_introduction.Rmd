@@ -68,13 +68,17 @@ The `universal( )` function has four parameters,
 * bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
 
 
-The function `universal()` returns the backbone matrix, a signed (or binary) adjacency matrix of a graph. It has a variety of different uses which are demonstrated in the following examples. 
+The function `universal()` returns a list containing the backbone matrix, a signed (or binary) adjacency matrix of a graph, and a data frame `$summary`, containing the model name (universal threshold), number of rows in M, skew of row sums of M, number of columns of M, skew of column sums of M, and running time. The `universal()` function can be used in a variety of different ways, demonstrated in the following examples. 
 Using the `davis` dataset, if we input the projected matrix `G <- davis%*%t(davis)`, we can use the universal threshold on the weighted matrix `G`. If we set an upper threshold of 0, then if two women have attended any event together (co-attendance > 0), there will be an edge between the two. We can plot this graph with the `igraph` package. 
 
 ```{r}
 G <- davis%*%t(davis) #projected davis dataset, a weighted graph
 universal_bb <- universal(G, upper = 0)
-graph <- igraph::graph_from_adjacency_matrix(universal_bb, mode = "undirected")
+universal_bb$backbone
+universal_bb$summary
+```
+```{r}
+graph <- igraph::graph_from_adjacency_matrix(universal_bb$backbone, mode = "undirected")
 op <- par(mar=c(0,0,0,0))
 lo <- igraph::layout_(graph, igraph::with_fr())
 plot(graph, vertex.label = 1:18, layout = lo)
@@ -85,7 +89,8 @@ We can also use the `universal()` function on the original bipartite data. When 
 
 ```{r}
 universal_bb <- universal(davis, upper = 0, bipartite = TRUE)
-graph <- igraph::graph_from_adjacency_matrix(universal_bb, mode = "undirected")
+universal_bb$summary
+graph <- igraph::graph_from_adjacency_matrix(universal_bb$backbone, mode = "undirected")
 op <- par(mar=c(0,0,0,0))
 plot(graph, vertex.label = 1:18, layout = lo)
 par(op)
@@ -95,7 +100,7 @@ To create a signed backbone, we can apply both an upper and lower threshold valu
 
 ```{r}
 universal_bb <- universal(davis, upper = 4, lower = 2, bipartite = TRUE)
-universal_bb
+universal_bb$backbone
 ```
 
 We can also choose a threshold that is a multiple of some function, such as mean, max, or min. The function is applied to the edge weights, and then multiplied by the upper and lower thresholds. Any $G_{ij}$ values above the upper threshold are counted as a positive $+1$ value in the backbone, and any below the lower threshold are counted as a negative $-1$ value in the backbone. The following code will return a backbone where the positive edges indicate two women attended more than 1 standard deviation above the mean number of events and negative edges indicate two women attended less than 1 standard deviation below the mean number of events. 
@@ -147,6 +152,7 @@ The `hyperg()` function returns a list of the following:
 
 * positive: matrix of the proportion of times $G_{ij}$ is above the corresponding entry in $G^*$
 * negative: matrix of the proportion of times $G_{ij}$ is below the corresponding entry in $G^*$
+* summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 Following the `hyperg()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
 
@@ -172,6 +178,7 @@ The `fdsm()` function returns a list of the following:
 * positive: matrix of the proportion of times $G_{ij}$ is above the corresponding entry in $G^*$
 * negative: matrix of the proportion of times $G_{ij}$ is below the corresponding entry in $G^*$
 * dyad_values: list of edge weights for $i,j$ in each $G^*$
+* summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 We can find the backbone using the fixed degree sequence model as follows:
 
@@ -191,37 +198,49 @@ The stochastic degree sequence model compares an edge's observed weight, $G_{ij}
 
 1. The $\beta$ parameters in $Pr(B_{ij}=1) = \beta_0 +\beta_1 B_i + \beta_2 B_j +\beta_3 (B_i \times B_j)$ are estimated using a binomial regression (e.g. logit, probit, complementary log-log, etc.), where $B_i$ and $B_j$ are the row vertex and column vertex degrees in $B$, respectively.
 2. The fitted parameters are used to compute the predicted probability that $B_{ij}=1$.
-3. $B^*$ is constructed such that $B_{ij}^*$ is the outcome of a single Bernouilli trial with $Pr(B_{ij}=1)$ probability of success.
+3. Either $B^*$ is constructed via the Poisson-Binomial distribution, 
+or $B^*$ is constructed such that $B_{ij}^*$ is the outcome of a single Bernouilli trial with $Pr(B_{ij}=1)$ probability of success.
 
-The `sdsm( )` function has seven parameters,
+The `sdsm( )` function has nine parameters,
 
 * B, Matrix: Bipartite adjacency matrix
-* trials, Integer: Number of random bipartite graphs generated. Default is 1000. 
+* trials, Integer: Number of random bipartite graphs generated. Default is 0.  
 * model, String: A generalized linear model (glm) used to generate random bipartite graphs. The `model` parameter can take in a `link` function, as described by the `stats` package under `stats::glm` and `stats::family`. This can be one of `c('logit', 'probit', 'cauchit', 'log', 'cloglog')`. Default is 'logit'. 
 * sparse, Boolean: If sparse matrix manipulations should be used. Default is TRUE. 
 * maxiter, Integer: Maximum number of iterations if "model" is a glm. Default is 25. 
-* dyad, vector length 2: two row entries i,j. Saves each value of $G^*_{ij}$, which is useful for visualizing an example of the empirical null edge weight distribution generated by the model. These correspond to the row and column indices of a cell in the projected matrix , and can be written as their string row names or as numeric values. Default is NULL. 
+* dyad, vector length 2: two row entries i,j. Saves each value of $G^*_{ij}$, which is useful for visualizing an example of the empirical null edge weight distribution generated by the model. These correspond to the row and column indices of a cell in the projected matrix , and can be written as their string row names or as numeric values. Default is NULL. Only included if `trials` > 0.
+* alpha Real: proposed alpha threshold to be used for determining statistical significance of edges. Default is 0.05.
+* tolerance Real: tolerance for p-value computation using RNA poisson-binomial approximation. Default is 0. 
 * progress, Boolean: If `utils::txtProgressBar` should be used to measure progress. Default is FALSE. 
+
+If 'trials' > 0, the function uses repeat Bernoulli trials to compute the proportions, using the following steps: During each iteration, sdsm computes a new B* matrix using probabilities computed in the `glm`. This is a random bipartite matrix with about the same row and column sums as the original matrix B. If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected, the projected value for the corresponding row and column will be saved.
+This allows the user to see the distribution of the edge weights for desired row and column.
+
+If 'trials' = 0, the proportion of edges above or below the observed values are computed using the Poisson Binomial distribution.
+These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by \link[poibin]{ppoibin}. The RNA method is used by default, unless the computed value is within the margin of 'alpha'-'tolerance' and 'alpha'+'tolerance', the DFT method is used.
 
 The `sdsm()` function returns a list of the following:
 
 * positive: matrix of the proportion of times $G_{ij}$ is above the corresponding entry in $G^*$
 * negative: matrix of the proportion of times $G_{ij}$ is below the corresponding entry in $G^*$
 * dyad_values: list of edge weights for $i,j$ in each $G^*$
+* summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
-We can find the backbone via sdsm as follows: 
+Below are three different ways to compute the backbone using the stochastic degree sequence model. The first computes each proportion using the RNA Poisson Binomial method. The second computes each proportion using the DFT Poisson Binomial method. The third computes each proportion using repeat Bernoulli trials. 
 
 ```{r echo=T, results='hide'}
-sdsm_props <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE")) 
+sdsm_rna <- sdsm(davis, trials = 0, tolerance = 0)
+sdsm_dft <- sdsm(davis, trials = 0, tolerance = 1)
+sdsm_bt <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE")) 
 ```
 
 ```{r}
-sdsm_props$dyad_values
-sdsm_bb <- backbone.extract(sdsm_props$positive, alpha = 0.05) 
+sdsm_bt$dyad_values
+sdsm_bb <- backbone.extract(sdsm_bt$positive, alpha = 0.05) 
 sdsm_bb
 ```
 
-The `sdsm_props$dyad_values` output is a list of the $G_{Evelyn,Charlotte}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was approximately fixed, (b) the number of parties attended by Charlotte was approximately fixed, and (c) the number of attendees at each party was approximately fixed. Because we have provided only a `positive` matrix, backbone.extract() returns a binary backbone matrix by conducting a one-tailed significance test in which `alpha` is $0.05$.
+The `sdsm_bt$dyad_values` output is a list of the $G_{Evelyn,Charlotte}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was approximately fixed, (b) the number of parties attended by Charlotte was approximately fixed, and (c) the number of attendees at each party was approximately fixed. Because we have provided only a `positive` matrix, backbone.extract() returns a binary backbone matrix by conducting a one-tailed significance test in which `alpha` is $0.05$.
 
 # Future 
 The `backbone` package will be updated to contain additional backbone extraction methods that are used in the current literature. 
