@@ -10,9 +10,10 @@ hyperg(B)
 \item{B}{Matrix: Bipartite network}
 }
 \value{
-list(positive, negative).
+list(positive, negative, summary).
 positive gives matrix of probability of ties above the observed value.
 negative gives matrix of probability of ties below the observed value.
+summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
 `hyperg` computes the probability of observing

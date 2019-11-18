@@ -16,7 +16,9 @@ universal(M, upper = 0, lower = NULL, bipartite = FALSE)
 \item{bipartite}{Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.}
 }
 \value{
-backbone Matrix: Signed (or positive) adjacency matrix of backbone
+list(backbone, summary).
+backbone: a matrix, Signed (or positive) adjacency matrix of backbone
+summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
 `universal` returns a unipartite backbone matrix in which
