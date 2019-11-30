@@ -191,7 +191,7 @@ sdsm <- function(B,
 
         #If probabilities close to alpha value, use DFT method
         if ((upper > (alpha - tolerance))&(upper < (alpha + tolerance))) {upper <- poibin::ppoibin(observed, prob.ij, method = "DFT-CF")}
-        if ((lower > (alpha - tolerance))&(upper < (alpha + tolerance))) {lower <- poibin::ppoibin(observed, prob.ij, method = "DFT-CF")}
+        if ((lower > (alpha - tolerance))&(upper < (alpha + tolerance))) {lower <- 1- poibin::ppoibin(observed - 1, prob.ij, method = "DFT-CF")}
 
         #Assign values to matrix
         Positive[i,j] <- upper
@@ -201,6 +201,8 @@ sdsm <- function(B,
       } #end for j in rows
     } #end for i in rows
   } #end if trials == 0
+
+
 
   #Run Time
   run.time.end <- Sys.time()
