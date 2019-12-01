@@ -179,22 +179,30 @@ sdsm <- function(B,
   if (trials == 0){
     message("Finding the Backbone using Poisson Binomial SDSM with alpha = ", alpha, " and tolerance = ", tolerance)
     for (i in 1:rows){
+      #Compute prob.mat[i,]*prob.mat[j,] for each j
       prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
 
-      positive <- as.array(mapply(poibin::ppoibin, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat)), method = "RNA"))
-      negative <- as.array((1- mapply(poibin::ppoibin, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)), method = "RNA")))
-      wp <- which((positive > (alpha - tolerance)) & (positive < (alpha + tolerance)), arr.ind = TRUE)
+      #Find cdf, below or equal to value for negative, above or equal to value for positive
+      #Using RNA approximation
+      negative <- as.array(mapply(poibin::ppoibin, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat)), method = "RNA"))
+      positive <- as.array((1- mapply(poibin::ppoibin, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)), method = "RNA")))
+
+      #Find which values are within a tolerance distance from alpha
       wn <- which((negative > (alpha - tolerance)) & (negative < (alpha + tolerance)), arr.ind = TRUE)
-      for (j in wp){
-        positive[j] <- poibin::ppoibin(P[i,j], prob.imat[j,], method = "DFT-CF")
-      }
-      #positive[wp]<- mapply(poibin::ppoibin, kk = as.data.frame(t(P[i,wp])), pp = as.data.frame(t(prob.imat[wp,])), method = "RNA")
+      wp <- which((positive > (alpha - tolerance)) & (positive < (alpha + tolerance)), arr.ind = TRUE)
+
+      #Change these values to DFT approximation
       for (j in wn){
-        negative[j] <- (1-(poibin::ppoibin(P[i,j]-1, prob.imat[j,], method = "DFT-CF")))
+        negative[j] <- poibin::ppoibin(P[i,j], prob.imat[j,], method = "DFT-CF")
       }
+      for (j in wp){
+        positive[j] <- (1-(poibin::ppoibin(P[i,j]-1, prob.imat[j,], method = "DFT-CF")))
+      }
+
+      #Set values in Positive & Negative matrices
       Positive[i,] <- positive
       Negative[i,] <- negative
-      
+
     } #end for i in rows
     rownames(Positive) <- rownames(B)
     colnames(Positive) <- rownames(B)
