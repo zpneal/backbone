@@ -179,30 +179,23 @@ sdsm <- function(B,
   if (trials == 0){
     message("Finding the Backbone using Poisson Binomial SDSM with alpha = ", alpha, " and tolerance = ", tolerance)
     for (i in 1:rows){
-      for (j in i:rows){
+      prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
 
-        #Compute vector of probabilities for ij to compare to observed value
-        prob.ij <- prob.mat[i,] * prob.mat[j,]
-        observed <- P[i,j]
-
-        #Compute poisson binomial probabilities using RNA method
-        upper <- poibin::ppoibin(observed, prob.ij, method = "RNA")
-        lower <- 1 - poibin::ppoibin((observed - 1), prob.ij, method = "RNA")
-
-        #If probabilities close to alpha value, use DFT method
-        if ((upper > (alpha - tolerance))&(upper < (alpha + tolerance))) {upper <- poibin::ppoibin(observed, prob.ij, method = "DFT-CF")}
-        if ((lower > (alpha - tolerance))&(upper < (alpha + tolerance))) {lower <- 1- poibin::ppoibin(observed - 1, prob.ij, method = "DFT-CF")}
-
-        #Assign values to matrix
-        Positive[i,j] <- upper
-        Positive[j,i] <- upper
-        Negative[i,j] <- lower
-        Negative[j,i] <- lower
-      } #end for j in rows
+      positive <- as.array(mapply(poibin::ppoibin, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat)), method = "RNA"))
+      negative <- as.array((1- mapply(poibin::ppoibin, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)), method = "RNA")))
+      wp <- which((positive > (alpha - tolerance)) & (positive < (alpha + tolerance)), arr.ind = TRUE)
+      wn <- which((negative > (alpha - tolerance)) & (negative < (alpha + tolerance)), arr.ind = TRUE)
+      for (j in wp){
+        positive[j] <- poibin::ppoibin(P[i,j], prob.imat[j,], method = "DFT-CF")
+      }
+      #positive[wp]<- mapply(poibin::ppoibin, kk = as.data.frame(t(P[i,wp])), pp = as.data.frame(t(prob.imat[wp,])), method = "RNA")
+      for (j in wn){
+        negative[j] <- (1-(poibin::ppoibin(P[i,j]-1, prob.imat[j,], method = "DFT-CF")))
+      }
+      Positive[i,] <- positive
+      Negative[i,] <- negative
     } #end for i in rows
   } #end if trials == 0
-
-
 
   #Run Time
   run.time.end <- Sys.time()
