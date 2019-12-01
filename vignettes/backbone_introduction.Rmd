@@ -187,11 +187,11 @@ fdsm_props <- fdsm(davis, trials = 100, sparse = TRUE, dyad=c(1,5))
 ```
 ```{r}
 fdsm_props$dyad_values
-fdsm_bb <- backbone.extract(fdsm_props$positive, fdsm_props$negative, alpha = 0.02)
+fdsm_bb <- backbone.extract(fdsm_props$positive, fdsm_props$negative, alpha = 0.1)
 fdsm_bb
 ```
 
-The `fdsm_props$dyad_values` output is a list of the $G_{1,5}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was fixed, (b) the number of parties attended by Charlotte was fixed, and (c) the number of attendees at each party was fixed.  Because we have provided both a `positive` and `negative` matrix, `backbone.extract()` returns a signed backbone matrix by conducting a two-tailed significance test in which `alpha` is $0.01$ on each end of the distribution. 
+The `fdsm_props$dyad_values` output is a list of the $G_{1,5}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was fixed, (b) the number of parties attended by Charlotte was fixed, and (c) the number of attendees at each party was fixed.  Because we have provided both a `positive` and `negative` matrix, `backbone.extract()` returns a signed backbone matrix by conducting a two-tailed significance test in which `alpha` is $0.05$ on each end of the distribution. 
 
 ## The Stochastic Degree Sequence Model: sdsm( )
 The stochastic degree sequence model compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are *approximately* fixed. This method of backbone extraction was developed in [@neal2014backbone]. The construction of $B^*$ involves a series of steps:
@@ -236,11 +236,11 @@ sdsm_bt <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE"))
 
 ```{r}
 sdsm_bt$dyad_values
-sdsm_bb <- backbone.extract(sdsm_bt$positive, alpha = 0.01) 
+sdsm_bb <- backbone.extract(sdsm_bt$positive, alpha = 0.1) 
 sdsm_bb
 ```
 
-The `sdsm_bt$dyad_values` output is a list of the $G_{Evelyn,Charlotte}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was approximately fixed, (b) the number of parties attended by Charlotte was approximately fixed, and (c) the number of attendees at each party was approximately fixed. Because we have provided only a `positive` matrix, backbone.extract() returns a binary backbone matrix by conducting a one-tailed significance test in which `alpha` is $0.01$.
+The `sdsm_bt$dyad_values` output is a list of the $G_{Evelyn,Charlotte}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was approximately fixed, (b) the number of parties attended by Charlotte was approximately fixed, and (c) the number of attendees at each party was approximately fixed. Because we have provided only a `positive` matrix, backbone.extract() returns a binary backbone matrix by conducting a one-tailed significance test in which `alpha` is $0.1$.
 
 # Future 
 The `backbone` package will be updated to contain additional backbone extraction methods that are used in the current literature. 

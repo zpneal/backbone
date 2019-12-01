@@ -200,6 +200,10 @@ sdsm <- function(B,
         Negative[j,i] <- lower
       } #end for j in rows
     } #end for i in rows
+    rownames(Positive) <- rownames(B)
+    colnames(Positive) <- rownames(B)
+    rownames(Negative) <- rownames(B)
+    colnames(Negative) <- rownames(B)
   } #end if trials == 0
 
   #Run Time
