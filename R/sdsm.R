@@ -93,8 +93,7 @@ sdsm <- function(B,
   if (requireNamespace("speedglm", quietly = TRUE)){
     model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
     probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
-  }
-  else {
+  } else {
     model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link=model), data=A, control = list(maxit = maxiter))
     probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
   }
@@ -188,21 +187,30 @@ sdsm <- function(B,
       positive <- as.array((1- mapply(poibin::ppoibin, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)), method = "RNA")))
 
       #Find which values are within a tolerance distance from alpha
-      wn <- which((negative > (alpha - tolerance)) & (negative < (alpha + tolerance)), arr.ind = TRUE)
-      wp <- which((positive > (alpha - tolerance)) & (positive < (alpha + tolerance)), arr.ind = TRUE)
+      wn <- as.vector(which((negative > (alpha - tolerance)) & (negative < (alpha + tolerance)), arr.ind = TRUE))
+      wp <- as.vector(which((positive > (alpha - tolerance)) & (positive < (alpha + tolerance)), arr.ind = TRUE))
 
       #Change these values to DFT approximation
-      for (j in wn){
-        negative[j] <- poibin::ppoibin(P[i,j], prob.imat[j,], method = "DFT-CF")
+      if (length(wn)>1){
+        dft.negative <- as.array(mapply(poibin::ppoibin, kk = as.data.frame(t(P[i,wn])), pp = as.data.frame(t(prob.imat[wn,])), method = "DFT-CF"))
+        negative[wn] <- dft.negative
       }
-      for (j in wp){
-        positive[j] <- (1-(poibin::ppoibin(P[i,j]-1, prob.imat[j,], method = "DFT-CF")))
+      if (length(wp)>1){
+        dft.positive <- as.array((1 - mapply(poibin::ppoibin, kk = as.data.frame(t(P[i, wp])-1), pp = as.data.frame(t(prob.imat[wp,])), method = "DFT-CF")))
+        positive[wp] <- dft.positive
+      }
+      if (length(wn)==1){
+        dft.negative <- poibin::ppoibin(kk = as.data.frame(t(P[i,wn])), pp = as.data.frame(t(prob.imat[wn,])), method = "DFT-CF")
+        negative[wn] <- dft.negative
+      }
+      if (length(wp)==1){
+        dft.positive <- 1 - poibin::ppoibin(kk = as.data.frame(t(P[i, wp])-1), pp = as.data.frame(t(prob.imat[wp,])), method = "DFT-CF")
+        positive[wp] <- dft.positive
       }
 
       #Set values in Positive & Negative matrices
       Positive[i,] <- positive
       Negative[i,] <- negative
-
     } #end for i in rows
     rownames(Positive) <- rownames(B)
     colnames(Positive) <- rownames(B)
