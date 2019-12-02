@@ -38,7 +38,7 @@ fdsm <- function(B,
   #Argument Checks
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if ((class(B) != "matrix") & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
   #If sparse matrix input, use sparse matrix operations
   if (methods::is(B, "sparseMatrix")) {sparse <- TRUE}
