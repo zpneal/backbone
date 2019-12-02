@@ -53,7 +53,7 @@ sdsm <- function(B,
   if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((model!="logit") & (model!="probit") & (model!="log") & (model!="cloglog")) {stop("model must be: logit | probit | log | cloglog")}
   if ((trials < 0) | (trials%%1!=0)) {stop("trials must be a non-negative integer")}
-  if (class(B) != "matrix" & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+  if ((class(B) != "matrix") & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
   #If sparse matrix input, use sparse matrix operations
   if (methods::is(B, "sparseMatrix")) {sparse <- TRUE}
