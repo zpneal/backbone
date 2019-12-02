@@ -24,7 +24,7 @@ hyperg <- function(B){
   run.time.start <- Sys.time()
 
   #Argument Checks
-  if (class(B) != "matrix" & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+  if ((class(B) != "matrix") & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
   message("Finding the Backbone using Hypergeometric Distribution")
 
   if (methods::is(B, "sparseMatrix")) {
