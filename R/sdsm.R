@@ -6,11 +6,14 @@
 #'
 #' @param kk The values where the cdf or pmf to be evaluated.
 #' @param pp The vector for `p_j`'s which are the success probabilities for indicators.
-#' @param method "DFT-CF" for the "DFT-CF" method, "RF" for the recursive formula, "RNA" for the refined normal approximation, "NA" for the normal approximation.
+#' @param method "DFT-CF" for the DFT-CF method, "RF" for the recursive formula, "RNA" for the refined normal approximation, "NA" for the normal approximation, and "PA" for the Poisson approximation.
 #' @param wts The weights for `p_j`'s.
 #'
-#' @return
-ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
+#' @details The `poibin` package was created by Yili Hong (2013). Since the package has been archived, the ppoibin function source code is used in the sdsm function, via GPL-2 license agreement. The reference to Hong's paper is below.
+#' @details The function is used in the \link[backbone]{sdsm} function.
+#' @references \href{https://linkinghub.elsevier.com/retrieve/pii/S0167947312003568}{Hong, Yili (2013). On computing the distribution function of the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51. DOI: 10.1016/j.csda.2012.10.006}
+#' @return the entire cdf, pmf, quantiles, and random numbers
+ppoibin <- function (kk, pp, method = "RNA", wts = NULL) {
   if (any(pp < 0) | any(pp > 1)) {
     stop("invalid values in pp.")
   }
@@ -29,7 +32,7 @@ ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
     tmp = .C("multi_bin_dft_cf", as.double(res), as.integer(kk),
              as.integer(mm), as.integer(n), as.double(pp), as.double(avec),
              as.double(bvec), as.integer(funcate), as.double(ex),
-             as.integer(npp), as.integer(wts), PACKAGE = "poibin")
+             as.integer(npp), as.integer(wts), PACKAGE = "backbone")
     res = tmp[[1]]
     res[res < 0] = 0
     res[res > 1] = 1
@@ -45,7 +48,7 @@ ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
     mat = rep(0, (n + 1) * (n + 2))
     tmp = .C("multi_bin_bh", as.double(res), as.integer(kk),
              as.integer(mm), as.integer(n), as.double(pp), as.double(mat),
-             PACKAGE = "poibin")
+             PACKAGE = "backbone")
     res = tmp[[1]]
     res[kk1 < 0] = 0
     res[kk1 >= sum(wts)] = 1
@@ -56,8 +59,8 @@ ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
     gammak = sum(pp * (1 - pp) * (1 - 2 * pp))
     ind = gammak/(6 * sigmak^3)
     kk1 = (kk + 0.5 - muk)/sigmak
-    vkk.r = pnorm(kk1) + gammak/(6 * sigmak^3) * (1 - kk1^2) *
-      dnorm(kk1)
+    vkk.r = stats::pnorm(kk1) + gammak/(6 * sigmak^3) * (1 - kk1^2) *
+      stats::dnorm(kk1)
     vkk.r[vkk.r < 0] = 0
     vkk.r[vkk.r > 1] = 1
     res = vkk.r
@@ -67,7 +70,11 @@ ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
     sigmak = sqrt(sum(pp * (1 - pp)))
     gammak = sum(pp * (1 - pp) * (1 - 2 * pp))
     kk1 = (kk + 0.5 - muk)/sigmak
-    res = pnorm(kk1)
+    res = stats::pnorm(kk1)
+  }, PA = {
+    pp = rep(pp, wts)
+    muk = sum(pp)
+    res = stats::ppois(q = kk, lambda = muk)
   })
   return(res)
 }
@@ -78,7 +85,9 @@ ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
 #' `sdsm` computes the proportion of generated edges
 #'     above or below the observed value using the stochastic degree sequence model.
 #'     Once computed, use \code{\link{backbone.extract}} to return
-#'     the backbone matrix for a given alpha value.
+#'     the backbone matrix for a given alpha value. The `sdsm` function uses the
+#'    `ppoibin` function source code and C code from the archived `poibin` package,
+#'    created by Yili Hong (2013).
 #'
 #' @param B Matrix: Bipartite adjacency matrix
 #' @param trials Integer: Number of random bipartite graphs generated. Default is 0.
@@ -96,7 +105,7 @@ ppoibin <- function (kk, pp, method = "DFT-CF", wts = NULL) {
 #' If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected, the projected value for the corresponding row and column will be saved.
 #' This allows the user to see the distribution of the edge weights for desired row and column.
 #' @details If 'trials'=0, the proportion of edges above or below the observed values are computed using the Poisson Binomial distribution.
-#' These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by \link[poibin]{ppoibin}.
+#' These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by the now archived `poibin` package.
 #' The RNA method is used by default, unless the computed value is within the margin of 'alpha'-'tolerance' and 'alpha'+'tolerance', the DFT method is used.
 #' @details The `poibin` package was created by Yili Hong (2013). Since the package has been archived, the ppoibin function source code is used in the sdsm function, via GPL-2 license agreement. The reference to Hong's paper is below.
 #'
