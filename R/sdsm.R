@@ -1,9 +1,93 @@
+#' The Poisson Binomial Distribution
+#'
+#' `ppoibin` is a function from the now archived package poibin.
+#'     It computes the cdf, pmf, quantile function, and random number generation for the
+#'     Poisson Binomial Distribution.
+#'
+#' @param kk The values where the cdf or pmf to be evaluated.
+#' @param pp The vector for `p_j`'s which are the success probabilities for indicators.
+#' @param method "DFT-CF" for the DFT-CF method, "RF" for the recursive formula, "RNA" for the refined normal approximation, "NA" for the normal approximation, and "PA" for the Poisson approximation.
+#' @param wts The weights for `p_j`'s.
+#'
+#' @details The `poibin` package was created by Yili Hong (2013). Since the package has been archived, the ppoibin function source code is used in the sdsm function, via GPL-2 license agreement. The reference to Hong's paper is below.
+#' @details The function is used in the \link[backbone]{sdsm} function.
+#' @references \href{https://linkinghub.elsevier.com/retrieve/pii/S0167947312003568}{Hong, Yili (2013). On computing the distribution function of the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51. DOI: 10.1016/j.csda.2012.10.006}
+#' @return the entire cdf, pmf, quantiles, and random numbers
+ppoibin <- function (kk, pp, method = "RNA", wts = NULL) {
+  if (any(pp < 0) | any(pp > 1)) {
+    stop("invalid values in pp.")
+  }
+  if (is.null(wts)) {
+    wts = rep(1, length(pp))
+  }
+  switch(method, `DFT-CF` = {
+    mm = length(kk)
+    res = double(mm)
+    npp = length(pp)
+    n = sum(wts)
+    avec = double(n + 1)
+    bvec = double(n + 1)
+    funcate = 1
+    ex = 0
+    tmp = .C("multi_bin_dft_cf", as.double(res), as.integer(kk),
+             as.integer(mm), as.integer(n), as.double(pp), as.double(avec),
+             as.double(bvec), as.integer(funcate), as.double(ex),
+             as.integer(npp), as.integer(wts), PACKAGE = "backbone")
+    res = tmp[[1]]
+    res[res < 0] = 0
+    res[res > 1] = 1
+    res[kk < 0] = 0
+    res[kk >= sum(wts)] = 1
+  }, RF = {
+    kk1 = kk
+    kk[kk < 0] = 0
+    pp = rep(pp, wts)
+    mm = length(kk)
+    res = double(mm)
+    n = length(pp)
+    mat = rep(0, (n + 1) * (n + 2))
+    tmp = .C("multi_bin_bh", as.double(res), as.integer(kk),
+             as.integer(mm), as.integer(n), as.double(pp), as.double(mat),
+             PACKAGE = "backbone")
+    res = tmp[[1]]
+    res[kk1 < 0] = 0
+    res[kk1 >= sum(wts)] = 1
+  }, RNA = {
+    pp = rep(pp, wts)
+    muk = sum(pp)
+    sigmak = sqrt(sum(pp * (1 - pp)))
+    gammak = sum(pp * (1 - pp) * (1 - 2 * pp))
+    ind = gammak/(6 * sigmak^3)
+    kk1 = (kk + 0.5 - muk)/sigmak
+    vkk.r = stats::pnorm(kk1) + gammak/(6 * sigmak^3) * (1 - kk1^2) *
+      stats::dnorm(kk1)
+    vkk.r[vkk.r < 0] = 0
+    vkk.r[vkk.r > 1] = 1
+    res = vkk.r
+  }, `NA` = {
+    pp = rep(pp, wts)
+    muk = sum(pp)
+    sigmak = sqrt(sum(pp * (1 - pp)))
+    gammak = sum(pp * (1 - pp) * (1 - 2 * pp))
+    kk1 = (kk + 0.5 - muk)/sigmak
+    res = stats::pnorm(kk1)
+  }, PA = {
+    pp = rep(pp, wts)
+    muk = sum(pp)
+    res = stats::ppois(q = kk, lambda = muk)
+  })
+  return(res)
+}
+
+
 #' The stochastic degree sequence model (sdsm)
 #'
 #' `sdsm` computes the proportion of generated edges
 #'     above or below the observed value using the stochastic degree sequence model.
 #'     Once computed, use \code{\link{backbone.extract}} to return
-#'     the backbone matrix for a given alpha value.
+#'     the backbone matrix for a given alpha value. The `sdsm` function uses the
+#'    `ppoibin` function source code and C code from the archived `poibin` package,
+#'    created by Yili Hong (2013).
 #'
 #' @param B Matrix: Bipartite adjacency matrix
 #' @param trials Integer: Number of random bipartite graphs generated. Default is 0.
@@ -21,8 +105,10 @@
 #' If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected, the projected value for the corresponding row and column will be saved.
 #' This allows the user to see the distribution of the edge weights for desired row and column.
 #' @details If 'trials'=0, the proportion of edges above or below the observed values are computed using the Poisson Binomial distribution.
-#' These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by \link[poibin]{ppoibin}.
+#' These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by the now archived `poibin` package.
 #' The RNA method is used by default, unless the computed value is within the margin of 'alpha'-'tolerance' and 'alpha'+'tolerance', the DFT method is used.
+#' @details The `poibin` package was created by Yili Hong (2013). Since the package has been archived, the ppoibin function source code is used in the sdsm function, via GPL-2 license agreement. The reference to Hong's paper is below.
+#'
 #'
 #' @return list(positive, negative, dyad_values, summary).
 #' positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
@@ -31,6 +117,7 @@
 #' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #'
 #' @references \href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97. DOI: 10.1016/j.socnet.2014.06.001}
+#' @references \href{https://linkinghub.elsevier.com/retrieve/pii/S0167947312003568}{Hong, Yili (2013). On computing the distribution function of the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51. DOI: 10.1016/j.csda.2012.10.006}
 #'
 #'
 #' @export
@@ -183,8 +270,8 @@ sdsm <- function(B,
 
       #Find cdf, below or equal to value for negative, above or equal to value for positive
       #Using RNA approximation
-      negative <- as.array(mapply(poibin::ppoibin, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat)), method = "RNA"))
-      positive <- as.array((1- mapply(poibin::ppoibin, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)), method = "RNA")))
+      negative <- as.array(mapply(ppoibin, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat)), method = "RNA"))
+      positive <- as.array((1- mapply(ppoibin, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)), method = "RNA")))
 
       #Find which values are within a tolerance distance from alpha
       wn <- as.vector(which((negative > (alpha - tolerance)) & (negative < (alpha + tolerance)), arr.ind = TRUE))
@@ -192,19 +279,19 @@ sdsm <- function(B,
 
       #Change these values to DFT approximation
       if (length(wn)>1){
-        dft.negative <- as.array(mapply(poibin::ppoibin, kk = as.data.frame(t(P[i,wn])), pp = as.data.frame(t(prob.imat[wn,])), method = "DFT-CF"))
+        dft.negative <- as.array(mapply(ppoibin, kk = as.data.frame(t(P[i,wn])), pp = as.data.frame(t(prob.imat[wn,])), method = "DFT-CF"))
         negative[wn] <- dft.negative
       }
       if (length(wp)>1){
-        dft.positive <- as.array((1 - mapply(poibin::ppoibin, kk = as.data.frame(t(P[i, wp])-1), pp = as.data.frame(t(prob.imat[wp,])), method = "DFT-CF")))
+        dft.positive <- as.array((1 - mapply(ppoibin, kk = as.data.frame(t(P[i, wp])-1), pp = as.data.frame(t(prob.imat[wp,])), method = "DFT-CF")))
         positive[wp] <- dft.positive
       }
       if (length(wn)==1){
-        dft.negative <- poibin::ppoibin(kk = as.data.frame(t(P[i,wn])), pp = as.data.frame(t(prob.imat[wn,])), method = "DFT-CF")
+        dft.negative <- ppoibin(kk = as.data.frame(t(P[i,wn])), pp = as.data.frame(t(prob.imat[wn,])), method = "DFT-CF")
         negative[wn] <- dft.negative
       }
       if (length(wp)==1){
-        dft.positive <- 1 - poibin::ppoibin(kk = as.data.frame(t(P[i, wp])-1), pp = as.data.frame(t(prob.imat[wp,])), method = "DFT-CF")
+        dft.positive <- 1 - ppoibin(kk = as.data.frame(t(P[i, wp])-1), pp = as.data.frame(t(prob.imat[wp,])), method = "DFT-CF")
         positive[wp] <- dft.positive
       }
 
