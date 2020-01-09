@@ -21,9 +21,7 @@ Some features of the package are:
 \item '\code{\link{universal}}': returns a unipartite backbone matrix in which
 values are set to 1 if above the given upper parameter threshold,
 and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
-\item '\code{\link{sdsm}}': computes the proportion of generated edges above or below the observed value using the stochastic degree sequence model. Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value. The `sdsm` function uses the
-   `ppoibin` function source code and C code from the archived `poibin` package,
-   created by Yili Hong (2013).
+\item '\code{\link{sdsm}}': computes the proportion of generated edges above or below the observed value using the stochastic degree sequence model. Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
 \item '\code{\link{fdsm}}': computes the proportion of generated edges above or below the observed value using the fixed degree sequence model. Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
 \item '\code{\link{hyperg}}': returns a binary or signed adjacency matrix
  containing the backbone that retains only the significant edges.

@@ -37,9 +37,7 @@ summary: a data frame summary of the inputted matrix and the model used includin
 `sdsm` computes the proportion of generated edges
     above or below the observed value using the stochastic degree sequence model.
     Once computed, use \code{\link{backbone.extract}} to return
-    the backbone matrix for a given alpha value. The `sdsm` function uses the
-   `ppoibin` function source code and C code from the archived `poibin` package,
-   created by Yili Hong (2013).
+    the backbone matrix for a given alpha value.
 }
 \details{
 The 'model' parameter can take in a 'link' function, as described by \link[stats]{glm} and \link[stats]{family}. This can be one of c('logit', 'probit', 'cauchit', 'log', 'cloglog').
@@ -50,10 +48,8 @@ If the dyad_parameter is indicated to be used in the parameters, when the B* mat
 This allows the user to see the distribution of the edge weights for desired row and column.
 
 If 'trials'=0, the proportion of edges above or below the observed values are computed using the Poisson Binomial distribution.
-These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by the now archived `poibin` package.
+These values are approximated using either a Discrete Fourier Transform (DFT method) or a Refined Normal Approximation (RNA method). These functions are described by \link[poibin]{ppoibin}.
 The RNA method is used by default, unless the computed value is within the margin of 'alpha'-'tolerance' and 'alpha'+'tolerance', the DFT method is used.
-
-The `poibin` package was created by Yili Hong (2013). Since the package has been archived, the ppoibin function source code is used in the sdsm function, via GPL-2 license agreement. The reference to Hong's paper is below.
 }
 \examples{
 sdsm_bt <- sdsm(davis, trials = 100,dyad = c("EVELYN", "CHARLOTTE" ))
@@ -62,6 +58,4 @@ sdsm_dft <- sdsm(davis, trials = 0, tolerance = 1)
 }
 \references{
 \href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97. DOI: 10.1016/j.socnet.2014.06.001}
-
-\href{https://linkinghub.elsevier.com/retrieve/pii/S0167947312003568}{Hong, Yili (2013). On computing the distribution function of the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51. DOI: 10.1016/j.csda.2012.10.006}
 }
