@@ -46,6 +46,11 @@ fdsm <- function(B,
   #Run Time
   run.time.start <- Sys.time()
 
+  #Class Conversion
+  convert <- graph_to_adjacency(B)
+  class <- convert[[1]]
+  B <- convert[[2]]
+
   #Project to one-mode data
   if (sparse=="TRUE") {
     if (!methods::is(B, "sparseMatrix")) {
@@ -159,8 +164,8 @@ fdsm <- function(B,
     r <- rowSums(B)
     c <- colSums(B)
   }
-  a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c("Fixed Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+  a <- c("Input Class", "Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
+  b <- c(class, "Fixed Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
