@@ -12,12 +12,17 @@
 #'
 #' @examples
 #' probs <- sdsm(davis, 100)
-#' bb <- backbone.extract(probs$positive, probs$negative)
-backbone.extract <- function(positive, negative = NULL, alpha = 0.05){
+#' bb <- backbone.extract(probs, alpha = .1)
+backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05){
 
   #Argument Checks
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
-  if (length(negative) != 0) {alpha <- alpha / 2}  #Use a two-tailed test for signed backbones
+  #if (length(negative) != 0) {alpha <- alpha / 2}  #Use a two-tailed test for signed backbones
+
+  positive <- matrix[[1]]
+  negative <- matrix[[2]]
+  summary <- matrix[[3]]
+  class <- as.character(summary[1,1])
 
   #Convert values to matrix
   SignedPositive <- as.matrix((positive<=alpha)+0)
@@ -25,10 +30,11 @@ backbone.extract <- function(positive, negative = NULL, alpha = 0.05){
   SignedNegative[SignedNegative==1] <- -1
 
   #Create backbone matrix
-  if (length(negative) == 0) {backbone <- SignedPositive
+  if (signed == "FALSE") {backbone <- SignedPositive
   } else {backbone <- SignedPositive + SignedNegative}
   diag(backbone) <- 0
   rownames(backbone) <- rownames(positive)
   colnames(backbone) <- rownames(positive)
+  backbone <- adjacency_to_graph(backbone, class)
   return(backbone)
 }
