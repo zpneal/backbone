@@ -1,7 +1,7 @@
 Package: backbone
 Type: Package
 Title: Extracts the Backbone from Weighted Graphs
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(
     person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = c("aut", "cre")), 
     person("Zachary", "Neal", email = "zpneal@msu.edu", role = "aut"),
@@ -22,11 +22,12 @@ Depends: R (>= 2.10)
 Imports: 
     Matrix,
     methods,
-    poibin,
     stats,
-    utils
-Suggests:
+    utils,
+    CVXR,
     igraph,
+    network
+Suggests:
     knitr,
     rmarkdown,
     speedglm,
