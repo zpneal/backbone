@@ -30,7 +30,7 @@ universal <- function(M,
   run.time.start <- Sys.time()
 
   #Class Conversion
-  convert <- graph_to_adjacency(M)
+  convert <- class.convert(M)
   class <- convert[[1]]
   M <- convert[[2]]
 
@@ -84,7 +84,7 @@ universal <- function(M,
   b <- c(class, "Universal Threshold", dim(M)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(M)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
-
+  bb <- class.convert(backbone, class)
   return(list(backbone = backbone, summary = model.summary))
 }
 

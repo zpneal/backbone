@@ -24,7 +24,7 @@ hyperg <- function(B){
   run.time.start <- Sys.time()
 
   #Class Conversion
-  convert <- graph_to_adjacency(B)
+  convert <- class.convert(B)
   class <- convert[[1]]
   B <- convert[[2]]
 
