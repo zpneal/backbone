@@ -4,8 +4,7 @@
 \alias{fdsm}
 \title{The fixed degree sequence model (fdsm)}
 \usage{
-fdsm(B, trials = 1000, sparse = TRUE, dyad = NULL,
-  progress = FALSE)
+fdsm(B, trials = 1000, sparse = TRUE, dyad = NULL, progress = FALSE)
 }
 \arguments{
 \item{B}{Matrix: Bipartite adjacency matrix}

@@ -3,7 +3,6 @@
 \docType{package}
 \name{backbone}
 \alias{backbone}
-\alias{backbone-package}
 \title{backbone: Extracts the Backbone from Weighted Graphs}
 \description{
 Provides methods for extracting from a weighted graph
