@@ -40,16 +40,16 @@ fdsm <- function(B,
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
-  #If sparse matrix input, use sparse matrix operations
-  if (methods::is(B, "sparseMatrix")) {sparse <- TRUE}
-
   #Run Time
   run.time.start <- Sys.time()
 
   #Class Conversion
-  convert <- graph_to_adjacency(B)
+  convert <- class.convert(B, "matrix")
   class <- convert[[1]]
   B <- convert[[2]]
+
+  #If sparse matrix input, use sparse matrix operations
+  if (methods::is(B, "sparseMatrix")) {sparse <- TRUE}
 
   #Project to one-mode data
   if (sparse=="TRUE") {
@@ -81,32 +81,7 @@ fdsm <- function(B,
 
     #Algorithm credit to: Strona, G., Nappo, D., Boccacci, F., Fattorini, S., San-Miguel-Ayanz, J. (2014). A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. Nature Communications, 5, 4114
     #Use curveball to create an FDSM Bstar
-    m <- B
-    RC=dim(m) #matrix dimensions
-    R=RC[1]   #number of rows
-    C=RC[2]   #number of columns
-    hp=list() #create a list
-    for (row in 1:dim(m)[1]) {hp[[row]]=(which(m[row,]==1))}
-    l_hp=length(hp)
-    for (rep in 1:(5*l_hp)){
-      AB=sample(1:l_hp,2)
-      a=hp[[AB[1]]]
-      b=hp[[AB[2]]]
-      ab=intersect(a,b)
-      l_ab=length(ab)
-      l_a=length(a)
-      l_b=length(b)
-      if ((l_ab %in% c(l_a,l_b))==F){
-        tot=setdiff(c(a,b),ab)
-        l_tot=length(tot)
-        tot=sample(tot, l_tot, replace = FALSE, prob = NULL)
-        L=l_a-l_ab
-        hp[[AB[1]]] = c(ab,tot[1:L])
-        hp[[AB[2]]] = c(ab,tot[(L+1):l_tot])}
-    }
-    rm=matrix(0,R,C)
-    for (row in 1:R){rm[row,hp[[row]]]=1}
-    Bstar <- rm
+    Bstar <- curveball(B)
 
     #Construct Pstar from Bstar
     if (sparse=="TRUE") {
