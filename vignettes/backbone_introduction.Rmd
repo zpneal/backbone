@@ -158,7 +158,7 @@ Following the `hyperg()` function, the user must use the `backbone.extract()` fu
 
 ```{r}
 hyperg_probs <- hyperg(davis)
-hyperg_bb <- backbone.extract(hyperg_probs$positive, hyperg_probs$negative)
+hyperg_bb <- backbone.extract(hyperg_probs, signed = TRUE)
 ```
 
 ## The Fixed Degree Sequence Model: fdsm( )
@@ -187,7 +187,7 @@ fdsm_props <- fdsm(davis, trials = 100, sparse = TRUE, dyad=c(1,5))
 ```
 ```{r}
 fdsm_props$dyad_values
-fdsm_bb <- backbone.extract(fdsm_props$positive, fdsm_props$negative, alpha = 0.1)
+fdsm_bb <- backbone.extract(fdsm_props, signed = TRUE, alpha = 0.1)
 fdsm_bb
 ```
 
@@ -229,14 +229,11 @@ The `sdsm()` function returns a list of the following:
 Below are three different ways to compute the backbone using the stochastic degree sequence model. The first computes each proportion using the RNA Poisson Binomial method. The second computes each proportion using the DFT Poisson Binomial method. The third computes each proportion using repeat Bernoulli trials. 
 
 ```{r echo=T, results='hide'}
-sdsm_rna <- sdsm(davis, trials = 0, tolerance = 0)
-sdsm_dft <- sdsm(davis, trials = 0, tolerance = 1)
-sdsm_bt <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE")) 
+sdsm_rna <- sdsm(davis)
 ```
 
 ```{r}
-sdsm_bt$dyad_values
-sdsm_bb <- backbone.extract(sdsm_bt$positive, alpha = 0.1) 
+sdsm_bb <- backbone.extract(sdsm_rna, signed = FALSE, alpha = 0.1) 
 sdsm_bb
 ```
 
