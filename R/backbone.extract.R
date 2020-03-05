@@ -21,7 +21,7 @@ backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05){
 
   positive <- matrix[[1]]
   negative <- matrix[[2]]
-  summary <- matrix[[3]]
+  summary <- matrix$summary
   class <- as.character(summary[1,1])
 
   #Convert values to matrix
