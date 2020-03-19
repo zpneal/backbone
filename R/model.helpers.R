@@ -22,7 +22,14 @@
 class.convert <- function(graph, convert = "matrix"){
   class <- class(graph)
   if (convert == "matrix"){
-    if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix"))) {G <- graph}
+    if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix"))) {
+      if (dim(graph)[2] == 2){ # for edgelists, assumes bipartite!
+        g <- igraph::graph.data.frame(graph, directed = F)
+        igraph::V(g)$type <- igraph::V(g)$name %in% graph[,2] #second column of edges is TRUE type
+        G <- igraph::get.incidence(g)
+        class <- "edgelist"}
+      else{G <- graph}
+    }
     if (methods::is(graph, "igraph")) {
       if (igraph::is.bipartite(graph)){
         G <- igraph::get.incidence(graph)
@@ -43,6 +50,10 @@ class.convert <- function(graph, convert = "matrix"){
   }
   if (convert == "network"){
     G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = FALSE)
+  }
+  if (convert == "edgelist"){
+    g <- igraph::graph.adjacency(graph, weighted = TRUE)
+    G <- igraph::get.data.frame(g)
   }
   return(list(class, G))
 }
