@@ -4,7 +4,7 @@
 \alias{sdsm}
 \title{The stochastic degree sequence model (sdsm)}
 \usage{
-sdsm(B, trials = 10000, model = "polytope", sparse = TRUE, progress = FALSE)
+sdsm(B, trials = 1000, model = "polytope", sparse = TRUE, progress = FALSE)
 }
 \arguments{
 \item{B}{Matrix: Bipartite adjacency matrix}
@@ -36,7 +36,7 @@ If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'clogl
 If 'trials'>0, and 'model' == 'curveball', probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
 }
 \examples{
-sdsm <- sdsm(davis)
+sdsm_probs <- sdsm(davis)
 }
 \references{
 \href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97. DOI: 10.1016/j.socnet.2014.06.001}
