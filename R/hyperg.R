@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' hypergeometric_bb <- hyperg(davis)
+#' hyperg_probs <- hyperg(davis)
 
 hyperg <- function(B){
 
@@ -30,7 +30,7 @@ hyperg <- function(B){
 
   #Argument Checks
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
-  message("Finding the Backbone using Hypergeometric Distribution")
+  message("Finding the distribution using hypergeometric distribution")
 
   if (methods::is(B, "sparseMatrix")) {
     P <- Matrix::tcrossprod(B)
@@ -79,8 +79,8 @@ hyperg <- function(B){
     r <- rowSums(B)
     c <- colSums(B)
   }
-  a <- c("Input Class", "Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c(class, "Hypergeometric Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+  a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time")
+  b <- c(class, "Hypergeometric Model", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 

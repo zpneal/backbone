@@ -26,9 +26,10 @@
 #' @export
 #'
 #' @examples
-#'sdsm <- sdsm(davis)
+#'sdsm_probs <- sdsm(davis)
+
 sdsm <- function(B,
-                 trials = 10000,
+                 trials = 1000,
                  model = "polytope",
                  sparse = TRUE,
                  progress = FALSE){
@@ -46,7 +47,7 @@ sdsm <- function(B,
       (model!="curveball") &
       (model!="polytope"))
   {stop("incorrect model type")}
-  if ((trials < 0) | (trials%%1!=0)) {stop("trials must be a non-negative integer")}
+  if ((trials < 1000)) {stop("trials must be at least 1000 to get reasonable approximations for curveball algorithm.")}
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
 
   #Run Time
@@ -142,7 +143,7 @@ sdsm <- function(B,
   rows <- dim(prob.mat)[1]
 
   #Compute null edge weight distributions using Poisson Binomial RNA
-  message("Finding the Backbone using SDSM")
+  message(paste0("Finding the distribution using SDSM with ", model, " model."))
   for (i in 1:rows){
     #Compute prob.mat[i,]*prob.mat[j,] for each j
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
@@ -174,8 +175,8 @@ sdsm <- function(B,
     c <- colSums(B)
   }
 
-  a <- c("Input Class", "Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c(class, "Stochastic Degree Sequence Model", dim(B)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+  a <- c("Input Class", "Model", "Method", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time")
+  b <- c(class, "Stochastic Degree Sequence Model", model, dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
