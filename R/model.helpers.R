@@ -1,7 +1,7 @@
 #' Convert graph object to adjacency matrix
 #'
 #' @param graph, matrix, sparse matrix, igraph, edgelist, or network object
-#' @param convert, class to convert to, one of "matrix", "sparseMatrix", "igraph", or "network"
+#' @param convert, class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
 #'
 #' @return list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph
 #' @export
