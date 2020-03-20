@@ -5,17 +5,16 @@
 #'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
-#' @param B Matrix: Bipartite adjacency matrix
+#' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param trials Integer: Number of random bipartite graphs generated. Default is 0.
 #' @param model String: A method used to compute probabilities for generating random bipartite graphs. Can be c("logit", "probit", "cauchit", "log", "cloglog", "lpm", "chi2", "curveball", "polytope").
-#' @param sparse Boolean: If sparse matrix manipulations should be used
 #' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #
 #' @details If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'), then this model is used as a 'link' function, as described by \link[stats]{glm} and \link[stats]{family}.
 #' @details If 'trials'>0, and 'model' == 'curveball', probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
 #'
 #'
-#' @return list(positive, negative, dyad_values, summary).
+#' @return backbone, a list(positive, negative, dyad_values, summary).
 #' positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
 #' negative: matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection.
 #' dyad_values: list of edge weight for i,j in each generated projection, included if 'dyad' not NULL and 'trials > 0'.
@@ -31,11 +30,9 @@
 sdsm <- function(B,
                  trials = 1000,
                  model = "polytope",
-                 sparse = TRUE,
                  progress = FALSE){
 
   #Argument Checks
-  if ((sparse!="TRUE") & (sparse!="FALSE")) {stop("sparse must be either TRUE or FALSE")}
   if ((model!="logit") &
       (model!="probit") &
       (model!="log") &
@@ -59,17 +56,10 @@ sdsm <- function(B,
   B <- convert[[2]]
 
   #If sparse matrix input, use sparse matrix operations
-  if (methods::is(B, "sparseMatrix")) {sparse <- TRUE}
-
-  #Project to one-mode data
-  if (sparse=="TRUE") {
-    if (!methods::is(B, "sparseMatrix")) {
-      B <- Matrix::Matrix(B, sparse = T)
-    }
-    P <- Matrix::tcrossprod(B)
-  } else {
-    P <- tcrossprod(B)
+  if (!methods::is(B, "sparseMatrix")) {
+    B <- Matrix::Matrix(B, sparse = T)
   }
+    P <- Matrix::tcrossprod(B)
 
   #Create Positive and Negative Matrices to hold backbone
   Positive <- matrix(0, nrow(P), ncol(P))
@@ -167,13 +157,8 @@ sdsm <- function(B,
   total.time = (round(difftime(run.time.end, run.time.start), 2))
 
   #Compile Summary
-  if (sparse=="TRUE") {
-    r <- Matrix::rowSums(B)
-    c <- Matrix::colSums(B)
-  } else {
-    r <- rowSums(B)
-    c <- colSums(B)
-  }
+  r <- Matrix::rowSums(B)
+  c <- Matrix::colSums(B)
 
   a <- c("Input Class", "Model", "Method", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time")
   b <- c(class, "Stochastic Degree Sequence Model", model, dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
