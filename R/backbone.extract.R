@@ -3,11 +3,11 @@
 #' `backbone.extract` returns a binary or signed adjacency matrix
 #'      containing the backbone that retains only the significant edges.
 #'
-#' @param matrix list: list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.
+#' @param matrix backbone: backbone class which is a list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 #' @param signed Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned
 #' @param alpha Real: Precision of significance test (one-tailed if only the positive matrix supplied, two-tailed if positive and negative matrices supplied)
 #'
-#' @return backbone Matrix: Binary or signed adjacency matrix of backbone graph.
+#' @return backbone graph: Binary or signed backbone graph, of same class as inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 #' @export
 #'
 #' @examples
