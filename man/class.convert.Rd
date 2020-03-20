@@ -9,7 +9,7 @@ class.convert(graph, convert = "matrix")
 \arguments{
 \item{graph, }{matrix, sparse matrix, igraph, edgelist, or network object}
 
-\item{convert, }{class to convert to, one of "matrix", "sparseMatrix", "igraph", or "network"}
+\item{convert, }{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
 }
 \value{
 list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph

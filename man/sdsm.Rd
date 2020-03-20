@@ -4,21 +4,19 @@
 \alias{sdsm}
 \title{The stochastic degree sequence model (sdsm)}
 \usage{
-sdsm(B, trials = 1000, model = "polytope", sparse = TRUE, progress = FALSE)
+sdsm(B, trials = 1000, model = "polytope", progress = FALSE)
 }
 \arguments{
-\item{B}{Matrix: Bipartite adjacency matrix}
+\item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
 
 \item{trials}{Integer: Number of random bipartite graphs generated. Default is 0.}
 
 \item{model}{String: A method used to compute probabilities for generating random bipartite graphs. Can be c("logit", "probit", "cauchit", "log", "cloglog", "lpm", "chi2", "curveball", "polytope").}
 
-\item{sparse}{Boolean: If sparse matrix manipulations should be used}
-
 \item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 }
 \value{
-list(positive, negative, dyad_values, summary).
+backbone, a list(positive, negative, dyad_values, summary).
 positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
 negative: matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection.
 dyad_values: list of edge weight for i,j in each generated projection, included if 'dyad' not NULL and 'trials > 0'.

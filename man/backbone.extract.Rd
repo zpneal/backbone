@@ -7,14 +7,14 @@
 backbone.extract(matrix, signed = TRUE, alpha = 0.05)
 }
 \arguments{
-\item{matrix}{list: list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
+\item{matrix}{backbone: backbone class which is a list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
 
 \item{signed}{Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned}
 
 \item{alpha}{Real: Precision of significance test (one-tailed if only the positive matrix supplied, two-tailed if positive and negative matrices supplied)}
 }
 \value{
-backbone Matrix: Binary or signed adjacency matrix of backbone graph.
+backbone graph: Binary or signed backbone graph, of same class as inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 }
 \description{
 `backbone.extract` returns a binary or signed adjacency matrix
