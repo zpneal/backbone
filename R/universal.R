@@ -84,8 +84,10 @@ universal <- function(M,
   b <- c(class, "Universal Threshold", dim(M)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(M)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
-  bb <- class.convert(backbone, class)
-  return(list(backbone = backbone, summary = model.summary))
+  backbone_converted <- class.convert(backbone, class)
+  bb <- list(backbone = backbone_converted[[2]], summary = model.summary)
+  class(bb) <- "backbone"
+  return(bb)
 }
 
 

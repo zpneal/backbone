@@ -180,8 +180,9 @@ sdsm <- function(B,
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
-
-  return(list(positive = Positive, negative = Negative, summary = model.summary))
+  bb <- list(positive = Positive, negative = Negative, summary = model.summary)
+  class(bb) <- "backbone"
+  return(bb)
 
 } #end sdsm function
 

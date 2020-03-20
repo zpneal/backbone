@@ -145,11 +145,15 @@ fdsm <- function(B,
   colnames(model.summary)<-"Model Summary"
 
   if (length(dyad) > 0){
-    return(list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary))
+    bb <- list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary)
+    class(bb) <- "backbone"
+    return(bb)
   }
 
   else {
-    return(list(positive = Positive, negative = Negative, summary = model.summary))
+    bb <- list(positive = Positive, negative = Negative, summary = model.summary)
+    class(bb) <- "backbone"
+    return(bb)
   }
 
 } #end fdsm function

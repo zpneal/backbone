@@ -83,7 +83,8 @@ hyperg <- function(B){
   b <- c(class, "Hypergeometric Model", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
-
-  return(list(positive = Positive, negative = Negative, summary = model.summary))
+  bb <- list(positive = Positive, negative = Negative, summary = model.summary)
+  class(bb) <- "backbone"
+  return(bb)
 }
 
