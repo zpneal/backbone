@@ -4,12 +4,12 @@
 #'     values are set to 1 if above the given upper parameter threshold,
 #'     and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 #'
-#' @param M Matrix: a weighted adjacency matrix or a bipartite adjacency matrix.
+#' @param M graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param upper Real or FUN: upper threshold value or function to be applied to the edge weights. Default is 0.
 #' @param lower Real or FUN: lower threshold value or function to be applied to the edge weights. Default is NULL.
 #' @param bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
 #'
-#' @return list(backbone, summary).
+#' @return backbone, a list(backbone, summary).
 #' backbone: a matrix, Signed (or positive) adjacency matrix of backbone
 #' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #' @export

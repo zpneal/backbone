@@ -5,13 +5,13 @@
 #'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
-#' @param B Matrix: Bipartite network
+#' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'
-#' @return list(positive, negative, summary).
+#' @return backbone, a list(positive, negative, summary).
 #' positive gives matrix of probability of ties above the observed value.
 #' negative gives matrix of probability of ties below the observed value.
 #' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
-#'
+#' @references \href{http://dx.doi.org/10.1371/journal.pone.0017994}{Tumminello, Michele and Miccichè, Salvatore and Lillo, Fabrizio and Piilo, Jyrki and Mantegna, Rosario N. 2011. "Statistically Validated Networks in Bipartite Complex Systems." PLOS ONE, 6(3), DOI:10.1371/journal.pone.0017994.}
 #' @references \href{https://doi.org/10.1007/s13278-013-0107-y}{Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. DOI:10.1007/s13278-013-0107-y.}
 #' @export
 #'
