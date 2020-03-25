@@ -6,14 +6,14 @@
 #' @param matrix backbone: backbone class which is a list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 #' @param signed Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned
 #' @param alpha Real: Precision of significance test (one-tailed if only the positive matrix supplied, two-tailed if positive and negative matrices supplied)
-#'
+#' @param hb Boolean: TRUE if Holm Bonferroni Family-wise Error Rate \link{fwer} test should be used, FALSE if not.
 #' @return backbone graph: Binary or signed backbone graph, of same class as inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 #' @export
 #'
 #' @examples
 #' probs <- sdsm(davis)
-#' bb <- backbone.extract(probs, alpha = .1)
-backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05){
+#' bb <- backbone.extract(probs, alpha = .1, signed = TRUE, hb = FALSE)
+backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05, hb = TRUE){
 
   #Argument Checks
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
@@ -24,17 +24,27 @@ backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05){
   summary <- matrix$summary
   class <- as.character(summary[1,1])
 
-  #Convert values to matrix
-  SignedPositive <- as.matrix((positive<=alpha)+0)
-  SignedNegative <- as.matrix((negative<=alpha)+0)
-  SignedNegative[SignedNegative==1] <- -1
+  if (hb == TRUE){
+    if (signed == TRUE){
+      backbone <- fwer(matrix, alpha = alpha, signed = TRUE)
+    }
+    else{
+      backbone <- fwer(matrix, alpha = alpha, signed = FALSE)
+    }
+  }
+  else{
+    #Convert values to matrix
+    SignedPositive <- as.matrix((positive<=alpha)+0)
+    SignedNegative <- as.matrix((negative<=alpha)+0)
+    SignedNegative[SignedNegative==1] <- -1
 
-  #Create backbone matrix
-  if (signed == "FALSE") {backbone <- SignedPositive
-  } else {backbone <- SignedPositive + SignedNegative}
-  diag(backbone) <- 0
-  rownames(backbone) <- rownames(positive)
-  colnames(backbone) <- rownames(positive)
+    #Create backbone matrix
+    if (signed == "FALSE") {backbone <- SignedPositive
+    } else {backbone <- SignedPositive + SignedNegative}
+    diag(backbone) <- 0
+    rownames(backbone) <- rownames(positive)
+    colnames(backbone) <- rownames(positive)
+  }
 
   if ((class == "dgCMatrix") | (class == "dgRMatrix")){
     class <- "sparseMatrix"

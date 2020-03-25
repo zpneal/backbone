@@ -4,7 +4,7 @@
 \alias{backbone.extract}
 \title{Extracts the backbone of a weighted network using results from a null model}
 \usage{
-backbone.extract(matrix, signed = TRUE, alpha = 0.05)
+backbone.extract(matrix, signed = TRUE, alpha = 0.05, hb = TRUE)
 }
 \arguments{
 \item{matrix}{backbone: backbone class which is a list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
@@ -12,6 +12,8 @@ backbone.extract(matrix, signed = TRUE, alpha = 0.05)
 \item{signed}{Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned}
 
 \item{alpha}{Real: Precision of significance test (one-tailed if only the positive matrix supplied, two-tailed if positive and negative matrices supplied)}
+
+\item{hb}{Boolean: TRUE if Holm Bonferroni Family-wise Error Rate \link{fwer} test should be used, FALSE if not.}
 }
 \value{
 backbone graph: Binary or signed backbone graph, of same class as inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.
@@ -22,5 +24,5 @@ backbone graph: Binary or signed backbone graph, of same class as inputted in on
 }
 \examples{
 probs <- sdsm(davis)
-bb <- backbone.extract(probs, alpha = .1)
+bb <- backbone.extract(probs, alpha = .1, signed = TRUE, hb = FALSE)
 }
