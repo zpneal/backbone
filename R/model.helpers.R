@@ -181,3 +181,85 @@ rna <-function(kk,pp,wts=NULL)
   res=vkk.r
   return(res)
 }
+
+#' Family-wise Error Rates: Holm-Bonferroni method
+#'
+#' @param mat_pos, a matrix of probabilities
+#' @param mat_neg, a matrix of probabilities
+#' @param alpha, an alpha value for significance testing
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fwer <- function(mat_pos, mat_neg, alpha){
+  #Read in data
+  matrix_positive <- mat_pos
+  matrix_negative <- mat_neg
+
+  #For the loop, not needed for a single run
+  order <- dim(matrix_positive)[1]
+
+  #Matrix of smallest pvalues
+  pvalue_matrix <- pmin(matrix_positive, matrix_negative)
+  #True if positive value wins, false if negative value wins
+  sign <- matrix_positive < matrix_negative
+
+  #Create df to hold p values and keep track of row and col of edges
+  df <- data.frame(as.vector(pvalue_matrix))
+  df$row <- rep(1:nrow(pvalue_matrix), times=ncol(pvalue_matrix))
+  df$col <- rep(1:ncol(pvalue_matrix), each=nrow(pvalue_matrix))
+
+  #Separate sorted matrix, just to be extra careful
+  #Sort based on p-value, smallest to largest
+  df_sorted <- df[order(df$as.vector.pvalue_matrix.),]
+  #Add sign
+  df_sorted$sign <- as.vector(sign)
+  #Add empty col for the edge weights after FWER
+  df_sorted$newvalues <- NA
+
+  #Compute the rank
+  independent_analysis <- ((order[[1]])*(order[[1]]-1))/2
+  #For iterations
+  j = 0
+  #Alpha value
+  FWER = alpha
+
+  #Run over all edges
+  for (i in 1:dim(df_sorted)[1]){
+    #If row index less than col index (so we only have to run upper triangle)
+    if (df_sorted$row[i]<df_sorted$col[i]){
+      #If value less than the fwer fraction, reject the null hyp
+      if (df_sorted$as.vector.pvalue_matrix.[i] < ((FWER/2)/(independent_analysis-j))){
+        #The new edge weight should be 1 if pos smaller, -1 if neg smaller
+        df_sorted$newvalues[i] <- 2*sign[i]-1
+        print(paste0(j, ": Edge (", df_sorted$row[i], ",", df_sorted$col[i], ") created with weight:", df_sorted$newvalues[i]," p-value was:", df_sorted$as.vector.pvalue_matrix.[i]))
+        #Increase iteration
+        j <- j+1
+      } #end if pvalue < fwer
+      else{
+        #If value NOT less than fwer fraction, fail to reject everything further, save current values
+        u <- df_sorted$row[i]
+        v <- df_sorted$col[i]
+        weight <- 2*sign[i]-1
+        pval <- df_sorted$as.vector.pvalue_matrix.[i]
+        val <- j-1
+        break
+      }
+    } #end if row<col
+  } #end for i in 1:dim[1]
+
+  print(paste0("Added ", val, " edges to network"))
+  print(paste0("Failed to reject H0 for pair (",u, ",", v, ") created with weight: ",pval, " and threshold ",((FWER/2)/(independent_analysis-i))))
+
+  #Construct the backbone matrix
+  new_mat_values <- df_sorted[order(df_sorted$row, df_sorted$col),]
+  backbone_ut <- t(matrix(new_mat_values$newvalues, nrow = nrow(matrix_positive), ncol = ncol(matrix_positive)))+0
+  backbone_lt <- matrix(new_mat_values$newvalues, nrow = nrow(matrix_positive), ncol = ncol(matrix_positive))
+  backbone_ut[is.na(backbone_ut)]<-0
+  backbone_lt[is.na(backbone_lt)]<-0
+  backbone <- backbone_ut+backbone_lt
+  row.names(backbone) <- colnames(matrix_positive)
+  colnames(backbone) <- colnames(matrix_positive)
+  return(backbone)
+}
