@@ -184,26 +184,37 @@ rna <-function(kk,pp,wts=NULL)
 
 #' Family-wise Error Rates: Holm-Bonferroni method
 #'
-#' @param mat_pos, a matrix of probabilities
-#' @param mat_neg, a matrix of probabilities
-#' @param alpha, an alpha value for significance testing
+#' @param backbone, backbone class object
+#' @param alpha, numeric, an alpha value for significance testing
+#' @param signed, Boolean, if a signed backbone should be returned instead of a binary backbone
 #'
-#' @return
+#' @return backbone, a binary or signed matrix
 #' @export
 #'
 #' @examples
-fwer <- function(mat_pos, mat_neg, alpha){
+#' probs <- sdsm(davis)
+#' fwer(probs, alpha = .4, signed = FALSE)
+fwer <- function(backbone, alpha = 0.05, signed = TRUE){
   #Read in data
-  matrix_positive <- mat_pos
-  matrix_negative <- mat_neg
+  matrix_positive <- backbone$positive
+  matrix_negative <- backbone$negative
 
   #For the loop, not needed for a single run
   order <- dim(matrix_positive)[1]
 
   #Matrix of smallest pvalues
-  pvalue_matrix <- pmin(matrix_positive, matrix_negative)
-  #True if positive value wins, false if negative value wins
-  sign <- matrix_positive < matrix_negative
+  if (signed == TRUE){
+    pvalue_matrix <- pmin(matrix_positive, matrix_negative)
+    #True if positive value wins, false if negative value wins
+    sign <- matrix_positive < matrix_negative
+  }
+  else{
+    #pvalue all positive p values
+    pvalue_matrix <- matrix_positive
+    #sign matrix is all trues
+    sign <- matrix_positive
+    sign[sign>-1]<-TRUE
+  }
 
   #Create df to hold p values and keep track of row and col of edges
   df <- data.frame(as.vector(pvalue_matrix))
@@ -223,14 +234,19 @@ fwer <- function(mat_pos, mat_neg, alpha){
   #For iterations
   j = 0
   #Alpha value
-  FWER = alpha
+  if (signed == TRUE){
+    FWER <- (alpha/2)
+  }
+  else{
+    FWER = alpha
+  }
 
   #Run over all edges
   for (i in 1:dim(df_sorted)[1]){
     #If row index less than col index (so we only have to run upper triangle)
     if (df_sorted$row[i]<df_sorted$col[i]){
       #If value less than the fwer fraction, reject the null hyp
-      if (df_sorted$as.vector.pvalue_matrix.[i] < ((FWER/2)/(independent_analysis-j))){
+      if (df_sorted$as.vector.pvalue_matrix.[i] < ((FWER)/(independent_analysis-j))){
         #The new edge weight should be 1 if pos smaller, -1 if neg smaller
         df_sorted$newvalues[i] <- 2*sign[i]-1
         print(paste0(j, ": Edge (", df_sorted$row[i], ",", df_sorted$col[i], ") created with weight:", df_sorted$newvalues[i]," p-value was:", df_sorted$as.vector.pvalue_matrix.[i]))
