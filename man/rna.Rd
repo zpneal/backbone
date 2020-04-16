@@ -14,7 +14,7 @@ rna(kk, pp, wts = NULL)
 \item{wts, }{the weights for each probability}
 }
 \value{
-cdf
+cdf, cumulative distribution function
 }
 \description{
 Poisson Binomial distribution computed with Refined Normal Approximation

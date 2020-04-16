@@ -1,17 +1,17 @@
 #' Compute universal threshold backbone
 #'
-#' `universal` returns a unipartite backbone matrix in which
-#'     values are set to 1 if above the given upper parameter threshold,
-#'     and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
+#' `universal` returns a backbone graph in which edge weights are set to
+#'    1 if above the given upper parameter threshold,
+#'    set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 #'
 #' @param M graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param upper Real or FUN: upper threshold value or function to be applied to the edge weights. Default is 0.
 #' @param lower Real or FUN: lower threshold value or function to be applied to the edge weights. Default is NULL.
 #' @param bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
 #'
-#' @return backbone, a list(backbone, summary).
-#' backbone: a matrix, Signed (or positive) adjacency matrix of backbone
-#' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+#' @return backbone, a list(backbone, summary). The `backbone` object is a graph object of the same class as M.
+#'     The `summary` contains a data frame summary of the inputted matrix and the model used including:
+#'     model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #' @export
 #'
 #' @examples

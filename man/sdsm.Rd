@@ -11,27 +11,38 @@ sdsm(B, trials = 1000, model = "polytope", progress = FALSE)
 
 \item{trials}{Integer: Number of random bipartite graphs generated. Default is 0.}
 
-\item{model}{String: A method used to compute probabilities for generating random bipartite graphs. Can be c("logit", "probit", "cauchit", "log", "cloglog", "lpm", "chi2", "curveball", "polytope").}
+\item{model}{String: A method used to compute probabilities for generating random bipartite graphs.
+Can be c("logit", "probit", "cauchit", "log", "cloglog", "lpm", "chi2", "curveball", "polytope").}
 
 \item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 }
 \value{
-backbone, a list(positive, negative, dyad_values, summary).
-positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
-negative: matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection.
-dyad_values: list of edge weight for i,j in each generated projection, included if 'dyad' not NULL and 'trials > 0'.
-summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+backbone, a list(positive, negative, dyad_values, summary). Here
+    `positive` is a matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection,
+    `negative` is a matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection,
+    `dyad_values` is a list of edge weight for i,j in each generated projection, included if 'dyad' not NULL and 'trials > 0', and
+     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
-`sdsm` computes the proportion of generated edges
-    above or below the observed value using the stochastic degree sequence model.
+`sdsm` computes the probability of edge weights being
+    above or below the observed edge weights in a bipartite projection
+    using the stochastic degree sequence model.
     Once computed, use \code{\link{backbone.extract}} to return
     the backbone matrix for a given alpha value.
 }
 \details{
-If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'), then this model is used as a 'link' function, as described by \link[stats]{glm} and \link[stats]{family}.
+Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
+   to the distribution of weights expected in a projection obtained from a random bipartite network where
+   both the row vertex degrees and column vertex degrees are approximately fixed.
+
+If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'),
+    then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
+    as described by \link[stats]{glm} and \link[stats]{family}.
+    If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product.
+    If 'model = lpm', a linear probability model is used. If 'model = chi2', a chi-squared model is used.
 
 If 'trials'>0, and 'model' == 'curveball', probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
+    If 'model = polytope', the \link{polytope} function is used to find a matrix of probabilities that maximizes the entropy function, with same row and column sums.
 }
 \examples{
 sdsm_probs <- sdsm(davis)

@@ -7,7 +7,7 @@
 class.convert(graph, convert = "matrix")
 }
 \arguments{
-\item{graph, }{matrix, sparse matrix, igraph, edgelist, or network object}
+\item{graph, }{matrix, sparse matrix, \link[igraph]{igraph}, edgelist, or \link[network]{network} object}
 
 \item{convert, }{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
 }
@@ -16,6 +16,10 @@ list(class, adjacency), a list containing the class of parameter graph, and the 
 }
 \description{
 Convert graph object to adjacency matrix
+}
+\details{
+An object is considered an edgelist if it is (1) a matrix or sparse matrix, and (2) has only two columns.
+    Each column is understood as a bipartite set, with edges only going between members of column 1 and members of column 2.
 }
 \examples{
 davis.sp <- as(davis, "sparseMatrix")

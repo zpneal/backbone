@@ -1,8 +1,9 @@
 #' Convert graph object to adjacency matrix
 #'
-#' @param graph, matrix, sparse matrix, igraph, edgelist, or network object
+#' @param graph, matrix, sparse matrix, \link[igraph]{igraph}, edgelist, or \link[network]{network} object
 #' @param convert, class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
-#'
+#' @details An object is considered an edgelist if it is (1) a matrix or sparse matrix, and (2) has only two columns.
+#'     Each column is understood as a bipartite set, with edges only going between members of column 1 and members of column 2.
 #' @return list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph
 #' @export
 #' @examples
@@ -58,11 +59,18 @@ class.convert <- function(graph, convert = "matrix"){
   return(list(class, G))
 }
 
-#' Polytope Method for
+#' Polytope method for finding a matrix that maximizes entropy function
 #'
 #' @param G matrix, an adjacency matrix representing a graph
-#'
-#' @return matrix of probabilities
+#' @details Uses convex optimization via the \link[CVXR]{CVXR-package} to find a matrix \eqn{M}{M} that maximizes the entropy function
+#'     where \eqn{M}{M} satisfies the following constraints:
+#'     (1) the values of \eqn{M}{M} are between 0 & 1, (2) the row sums of the matrix
+#'     are equal to the row sums of the original matrix, (3) the column sums of the matrix
+#'     are equal to the column sums of the original matrix.
+#' @details This method is utilized in the function \link{sdsm} to compute probabilities of an edge existing in a graph.
+#'    Method is called polytope as it is optimizing over the convex hull of the set of matrices (thought of as vectors) with
+#'    the same row and column sums as the input.
+#' @return matrix containing optimal solution to entropy function under constraints
 #' @export
 #'
 #' @examples
@@ -94,10 +102,15 @@ polytope <- function(G){
   #Solve the problem
   result <- CVXR::psolve(problem, warm_start = TRUE)
 
+  #Stop if not optimal
+  if (result$status != "optimal"){
+    stop("polytope result not optimal")
+  }
+
   #Results
   new_matrix <- result$getValue(matrix)
 
-  #FORCE BETWEEN 0 & 1, NOT SOLVING UNDERLYING ISSUE
+  #Restrict values between 0 and 1
   gr <- which(new_matrix>1)
   new_matrix[gr] <- 1
   le <- which(new_matrix<0)
@@ -112,7 +125,7 @@ polytope <- function(G){
 #'
 #' @param m, matrix
 #'
-#' @return rm, random matrix with same row sums and column sums as m
+#' @return rm, matrix with same row sums and column sums as m, but randomized 0/1 entries.
 #' @export
 #'
 #' @references Strona, G., Nappo, D., Boccacci, F., Fattorini, S., San-Miguel-Ayanz, J. (2014). A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. Nature Communications, 5, 4114
@@ -152,7 +165,7 @@ curveball<-function(m){
 #' @param pp, vector of success probabilities for indicators
 #' @param wts, the weights for each probability
 #'
-#' @return cdf
+#' @return cdf, cumulative distribution function
 #' @export
 #'
 #' @references Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51.
@@ -199,8 +212,8 @@ rna <-function(kk,pp,wts=NULL)
 #'
 #' @examples
 #' probs <- sdsm(davis)
-#' fwer(probs, alpha = .4, signed = FALSE)
-fwer <- function(backbone, alpha = 0.05, signed = TRUE){
+#' holm.bonferroni(probs, alpha = .4, signed = FALSE)
+holm.bonferroni <- function(backbone, alpha = 0.05, signed = TRUE){
   #Read in data
   matrix_positive <- backbone$positive
   matrix_negative <- backbone$negative

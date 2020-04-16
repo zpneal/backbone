@@ -6,14 +6,14 @@
 #' @param matrix backbone: backbone class which is a list containing two matrices, positive and negative, and a summary list as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 #' @param signed Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned
 #' @param alpha Real: Precision of significance test (one-tailed if only the positive matrix supplied, two-tailed if positive and negative matrices supplied)
-#' @param hb Boolean: TRUE if Holm Bonferroni Family-wise Error Rate \link{fwer} test should be used, FALSE if not.
+#' @param fwer character: "holm" if Holm Bonferroni Family-wise Error Rate \link{holm.bonferroni} test should be used. "bonferroni" if Bonferroni Family-wise Error Rate test should be used.
 #' @return backbone graph: Binary or signed backbone graph, of same class as inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.
 #' @export
 #'
 #' @examples
 #' probs <- sdsm(davis)
-#' bb <- backbone.extract(probs, alpha = .1, signed = TRUE, hb = FALSE)
-backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05, hb = TRUE){
+#' bb <- backbone.extract(probs, alpha = .1, signed = TRUE, fwer = NULL)
+backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05, fwer = NULL){
 
   #Argument Checks
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
@@ -24,15 +24,35 @@ backbone.extract <- function(matrix, signed = TRUE, alpha = 0.05, hb = TRUE){
   summary <- matrix$summary
   class <- as.character(summary[1,1])
 
-  if (hb == TRUE){
-    if (signed == TRUE){
-      backbone <- fwer(matrix, alpha = alpha, signed = TRUE)
+  if(is.null(fwer)!= "TRUE"){
+    if (fwer == "holm"){
+      if (signed == TRUE){
+        backbone <- holm.bonferroni(matrix, alpha = alpha, signed = TRUE)
+      }
+      else{
+        backbone <- holm.bonferroni(matrix, alpha = alpha, signed = FALSE)
+      }
     }
-    else{
-      backbone <- fwer(matrix, alpha = alpha, signed = FALSE)
+
+    if (fwer == "bonferroni"){
+      tests <- (dim(positive)[1]*(dim(positive)[1]-1))/2
+      alpha <- alpha/tests
+
+      #Convert values to matrix
+      SignedPositive <- as.matrix((positive<=alpha)+0)
+      SignedNegative <- as.matrix((negative<=alpha)+0)
+      SignedNegative[SignedNegative==1] <- -1
+
+      #Create backbone matrix
+      if (signed == "FALSE") {backbone <- SignedPositive
+      } else {backbone <- SignedPositive + SignedNegative}
+      diag(backbone) <- 0
+      rownames(backbone) <- rownames(positive)
+      colnames(backbone) <- rownames(positive)
     }
   }
-  else{
+
+  if(is.null(fwer)){
     #Convert values to matrix
     SignedPositive <- as.matrix((positive<=alpha)+0)
     SignedNegative <- as.matrix((negative<=alpha)+0)

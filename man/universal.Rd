@@ -16,14 +16,14 @@ universal(M, upper = 0, lower = NULL, bipartite = FALSE)
 \item{bipartite}{Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.}
 }
 \value{
-backbone, a list(backbone, summary).
-backbone: a matrix, Signed (or positive) adjacency matrix of backbone
-summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+backbone, a list(backbone, summary). The `backbone` object is a graph object of the same class as M.
+    The `summary` contains a data frame summary of the inputted matrix and the model used including:
+    model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
-`universal` returns a unipartite backbone matrix in which
-    values are set to 1 if above the given upper parameter threshold,
-    and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
+`universal` returns a backbone graph in which edge weights are set to
+   1 if above the given upper parameter threshold,
+   set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 }
 \examples{
 test <- universal(davis\%*\%t(davis), upper = function(x)mean(x)+sd(x), lower=function(x)mean(x))

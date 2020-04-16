@@ -16,11 +16,11 @@ fdsm(B, trials = 1000, dyad = NULL, progress = FALSE)
 \item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 }
 \value{
-backbone, a list(positive, negative, dyad_values, summary).
-positive: matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection.
-negative: matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection.
-dyad_values: list of edge weight for i,j in each generated projection.
-summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+backbone, a list(positive, negative, dyad_values, summary). Here
+    `positive` is a matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection,
+    `negative` is a matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection,
+    `dyad_values` is a list of edge weight for i,j in each generated projection, and
+    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
 `fdsm` computes the proportion of generated edges above
@@ -29,8 +29,8 @@ summary: a data frame summary of the inputted matrix and the model used includin
     return the backbone matrix for a given alpha value.
 }
 \details{
-During each iteration, fdsm computes a new B* matrix using the Curveball algorithm. This is a random bipartite matrix with the same row and column sums as the original matrix B.
-    If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected, the projected value for the corresponding row and column will be saved.
+During each iteration, fdsm computes a new B* matrix using the \link{curveball} algorithm. This is a random bipartite matrix with the same row and column sums as the original matrix B.
+    If the dyad_parameter is indicated to be used in the parameters, when the B* matrix is projected (multiplied by its transpose), the projected value for the corresponding row and column will be saved.
     This allows the user to see the distribution of the edge weights for desired row and column.
 }
 \examples{

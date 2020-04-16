@@ -10,7 +10,7 @@ curveball(m)
 \item{m, }{matrix}
 }
 \value{
-rm, random matrix with same row sums and column sums as m
+rm, matrix with same row sums and column sums as m, but randomized 0/1 entries.
 }
 \description{
 curveball algorithm

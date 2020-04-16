@@ -2,7 +2,7 @@
 % Please edit documentation in R/model.helpers.R
 \name{polytope}
 \alias{polytope}
-\title{Polytope Method for}
+\title{Polytope method for finding a matrix that maximizes entropy function}
 \usage{
 polytope(G)
 }
@@ -10,10 +10,21 @@ polytope(G)
 \item{G}{matrix, an adjacency matrix representing a graph}
 }
 \value{
-matrix of probabilities
+matrix containing optimal solution to entropy function under constraints
 }
 \description{
-Polytope Method for
+Polytope method for finding a matrix that maximizes entropy function
+}
+\details{
+Uses convex optimization via the \link[CVXR]{CVXR-package} to find a matrix \eqn{M}{M} that maximizes the entropy function
+    where \eqn{M}{M} satisfies the following constraints:
+    (1) the values of \eqn{M}{M} are between 0 & 1, (2) the row sums of the matrix
+    are equal to the row sums of the original matrix, (3) the column sums of the matrix
+    are equal to the column sums of the original matrix.
+
+This method is utilized in the function \link{sdsm} to compute probabilities of an edge existing in a graph.
+   Method is called polytope as it is optimizing over the convex hull of the set of matrices (thought of as vectors) with
+   the same row and column sums as the input.
 }
 \examples{
 polytope(davis)
