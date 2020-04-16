@@ -268,7 +268,7 @@ holm.bonferroni <- function(backbone, alpha = 0.05, signed = TRUE){
       if (df_sorted$as.vector.pvalue_matrix.[i] < ((FWER)/(independent_analysis-j))){
         #The new edge weight should be 1 if pos smaller, -1 if neg smaller
         df_sorted$newvalues[i] <- 2*sign[i]-1
-        message(paste0(j, ": Edge (", df_sorted$row[i], ",", df_sorted$col[i], ") created with weight:", df_sorted$newvalues[i]," p-value was:", df_sorted$as.vector.pvalue_matrix.[i]))
+        #message(paste0(j, ": Edge (", df_sorted$row[i], ",", df_sorted$col[i], ") created with weight:", df_sorted$newvalues[i]," p-value was:", df_sorted$as.vector.pvalue_matrix.[i]))
         #Increase iteration
         j <- j+1
       } #end if pvalue < fwer
@@ -284,8 +284,8 @@ holm.bonferroni <- function(backbone, alpha = 0.05, signed = TRUE){
     } #end if row<col
   } #end for i in 1:dim[1]
 
-  message(paste0("Added ", val, " edges to network"))
-  message(paste0("Failed to reject H0 for pair (",u, ",", v, ") created with weight: ",pval, " and threshold ",((FWER/2)/(independent_analysis-i))))
+  #message(paste0("Added ", val, " edges to network"))
+  #message(paste0("Failed to reject H0 for pair (",u, ",", v, ") created with weight: ",pval, " and threshold ",((FWER/2)/(independent_analysis-i))))
 
   #Construct the backbone matrix
   new_mat_values <- df_sorted[order(df_sorted$row, df_sorted$col),]
