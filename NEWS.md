@@ -6,6 +6,16 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+## backbone 1.2.0
+
+* add support for igraph, network, and edgelist objects
+* remove poibin dependency
+* add family-wise error rate test corrections
+* sdsm: add multiple methods for computing initial probabilities, update poisson binomial computation method 
+* add more descriptives to summary output
+* update documentation
+
 ## backbone 1.1.0
 
 * add support for sparse matrices
