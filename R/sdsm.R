@@ -25,8 +25,8 @@
 #'
 #'
 #' @return backbone, a list(positive, negative, dyad_values, summary). Here
-#'     `positive` is a matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection,
-#'     `negative` is a matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection,
+#'     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
+#'     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection,
 #'     `dyad_values` is a list of edge weight for i,j in each generated projection, included if 'dyad' not NULL and 'trials > 0', and
 #'      `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #'

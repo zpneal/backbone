@@ -10,10 +10,10 @@ hyperg(B)
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
 }
 \value{
-backbone, a list(positive, negative, summary).
-positive gives matrix of probability of ties above the observed value.
-negative gives matrix of probability of ties below the observed value.
-summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+backbone, a list(positive, negative, summary). Here
+    `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
+    `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
+    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
 `hyperg` computes the probability of observing
