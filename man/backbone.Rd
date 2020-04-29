@@ -9,10 +9,13 @@ Provides methods for extracting from a weighted graph
     a binary or signed backbone that retains only the significant edges.
     The user may input a weighted graph, or a bipartite graph
     from which a weighted graph is first constructed via projection.
-    Backbone extraction methods include the stochastic degree sequence model (Neal, Z. P. (2014). <doi:10.1016/j.socnet.2014.06.001>),
-    hypergeometric model (Neal, Z. (2013). <doi:10.1007/s13278-013-0107-y>),
-    the fixed degree sequence model (Zweig, K. A., and Kaufmann, M. (2011). <doi:10.1007/s13278-011-0021-0>),
-    as well as a universal threshold method.
+    Backbone extraction methods include:
+    \itemize{
+    \item the stochastic degree sequence model (\href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97.}),
+    \item hypergeometric model (\href{https://doi.org/10.1007/s13278-013-0107-y}{Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. DOI:10.1007/s13278-013-0107-y.}),
+    \item the fixed degree sequence model (\href{https://doi.org/10.1007/s13278-011-0021-0}{Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218.}),
+    \item  as well as a universal threshold method.
+    }
 }
 \details{
 Some features of the package are:
@@ -31,12 +34,11 @@ Some features of the package are:
 
 Additional functions that aid in the use of the above models are exported:
 \itemize{
-\item '\code{\link{class.convert}}': converts graph objects into adjacency matrices and vice versa
+\item '\code{\link{class.convert}}': (internal) converts graph objects into adjacency matrices and vice versa
 \item '\code{\link{polytope}}': finds a matrix that maximizes the entropy function, used in \code{\link{sdsm}}.
 \item '\code{\link{curveball}}': generates a random 0/1 matrix with the same row and column sums as the input, used in \code{\link{sdsm}} and \code{\link{fdsm}}.
-\item '\code{\link{rna}}': computes the Poisson binomial distribution using the refined normal approximation, used in \code{\link{sdsm}}.
-\item '\code{\link{holm.bonferroni}}': helps with family-wise error rates for multiple hypothesis tests, used in \code{\link{backbone.extract}}.
+\item '\code{\link{rna}}': (internal) computes the Poisson binomial distribution using the refined normal approximation, used in \code{\link{sdsm}}.
 }
 
-For additional documentation and background on the package functions, see \code{browseVignettes("backbone")}.
+For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
 }
