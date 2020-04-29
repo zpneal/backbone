@@ -8,7 +8,7 @@ output:
 bibliography: backbone_bib.bib
 link-citations: yes
 vignette: >
-  %\VignetteIndexEntry{backbone_introduction}
+  %\VignetteIndexEntry{backbone}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -125,7 +125,6 @@ The backbone package implements three ways to construct the distribution of time
 For two of the models, `hyperg()` and `sdsm()`, the probability distribution is known for the chosen restrictions. The `hyperg()` model fixes the row marginals but allows the column marginals to vary. The distribution of the $G^*_{ij}$ values in this case is given by the hypergeometric distribution. The `sdsm()` model approximately fixes the row and column marginals. This scenario is described by the Poisson binomial distribution. 
 
 Since the distribution that describes having fixed row and column marginals, as in `fdsm()` is unknown, we use the following algorithm: 
-
 1. Construct a random bipartite graph $B^*$ that preserves (to varying extents, depending on the method) one or both degree sequences [@strona2018bi]. 
 2. Project $B^*$ (i.e. $B^{*} B^{*T}$) to obtain a random weighted bipartite projection $G^*$
 3. Repeat steps 1 and 2 $N$ times to build a distribution of $G^*_{ij}$
@@ -139,11 +138,11 @@ The `hyperg(), fdsm(),` and `sdsm()` functions return two matrices: a `positive`
 
 The `backbone.extract()` function has four parameters: `matrix`, `signed`, a significant test value `alpha`, and `fwer`. The `matrix` parameter takes in the entire backbone object which is the output of `hyperg(), fdsm(),` or `sdsm()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
 
-One can adjust the precision of the significance test, `alpha`, to refine their backbone results. The value of `alpha` should be between `0` and `1`. The default is `alpha=0.05`. If `signed = FALSE`, then the `alpha` value is equal to the user's input, and the statistical test is one-tailed yielding a binary backbone. If the `signed = TRUE`, the `alpha` value is equal to the user's input divided by two, and the statistical test is two-tailed yielding a signed backbone. 
+One can adjust the precision of the significance test, `alpha`, to refine their backbone results. The value of `alpha` should be between `0` and `1`. The default is `alpha=0.05`. The statistical test is two-tailed with an area of `alpha/2` in each tail. 
 
-The `fwer` parameter is set by default to `NULL` but can take two character values: "holm" if Holm Bonferroni Family-wise Error Rate test should be used; or "bonferroni" if Bonferroni Family-wise Error Rate test should be used.
+Extracting the backbone of a bipartite projection involves applying this significance test to each of the N(N-1)/2 edges in the projection. Because each of these tests is independent, this can inflate the familywise error rate beyond the desired `alpha`. The `fwer` parameter, which is set to NULL by default, offers two ways to correct for this. When `fwer = bonferroni`, the classical Bonferroni correction is applied. When `fwer = holm`, the more powerful Holm-Bonferroni correction is applied.
 
-If an entry in the `positive` matrix is greater than the `alpha` value, it is considered a `+1` edge in the backbone. If an entry in the `negative` matrix is greater than the `alpha` value, it is considered a `-1` edge in the backbone. All other values are `0` in the backbone graph. The `backbone.extract()` function will return a backbone graph of the same class as the input object in `hyperg()`, `sdsm()`, or `fdsm()`, i.e. a matrix, sparse matrix, igraph object, edgelist, or network object. 
+If an entry in the `positive` matrix is less than or equal to the `alpha`/2 value, it is considered a `+1` edge in the backbone. If an entry in the `negative` matrix is less than or equal to the `alpha`/2 value, it is considered a `-1` edge in the backbone. All other values are `0` in the backbone graph. The `backbone.extract()` function will return a backbone graph of the same class as the input object in `hyperg()`, `sdsm()`, or `fdsm()`, i.e. a matrix, sparse matrix, igraph object, edgelist, or network object. 
 
 We demonstrate this function's use in the following sections. 
 
@@ -164,8 +163,8 @@ The `hyperg()` function returns a backbone object of the following:
 Following the `hyperg()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
 
 ```{r}
-hyperg_probs <- hyperg(davis)
-hyperg_bb <- backbone.extract(hyperg_probs, signed = TRUE)
+hyperg <- hyperg(davis)
+hyperg_bb <- backbone.extract(hyperg, signed = TRUE)
 ```
 
 
@@ -181,7 +180,7 @@ The `sdsm( )` function has four parameters,
 
 * B, graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 * trials, Integer: Number of random bipartite graphs generated. Default is 0. 
-* model, String: A method used to compute probabilities for generating random bipartite graphs. Can be c("logit", "probit", "cauchit", "log", "cloglog", "lpm", "chi2", "curveball", "polytope"). If the `model` paramter is a `link` function (one of `c('logit', 'probit', 'cauchit', 'log', 'cloglog')`) these are the functions described by the `stats` package under `stats::glm` and `stats::family`.
+* model, String: A method used to compute probabilities for generating random bipartite graphs. Can be c("logit", "probit", "cauchit", "log", "cloglog", "oldlogit", "lpm", "chi2", "curveball", "polytope"). If the `model` paramter is a `link` function (one of `c('logit', 'probit', 'cauchit', 'log', 'cloglog')`) these are the functions described by the `stats` package under `stats::glm` and `stats::family`.
 * progress, Boolean: If `utils::txtProgressBar` should be used to measure progress. Default is FALSE. 
 
 If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'), then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees, as described by \link[stats]{glm} and \link[stats]{family}. If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product. If 'model = lpm', a linear probability model is used. If 'model = chi2', a chi-squared model is used. If 'trials'>0, and 'model = curveball', probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability. If 'model = polytope', the \link{polytope} function is used to find a matrix of probabilities that maximizes the entropy function, with same row and column sums.
@@ -197,13 +196,13 @@ The `sdsm()` function returns a backbone object of the following:
 
 
 ```{r echo=T, results='hide'}
-sdsm_rna <- sdsm(davis)
+sdsm <- sdsm(davis)
 ```
 
 The backbone package allows for two different types of family-wise error rate correction: Holm-Bonferroni and Bonferroni. To use Holm-Bonferroni correction, add parameter `fwer = "holm"` to `backbone.extract()`, and to use Bonferroni correction, add `fwer = "bonferroni"`. Note in this case, the Holm-Bonferroni is too restrictive and leaves us with no edges in our backbone graph.  
 
 ```{r}
-sdsm_bb <- backbone.extract(sdsm_rna, signed = FALSE, alpha = 0.1, fwer = "bonferroni") 
+sdsm_bb <- backbone.extract(sdsm, signed = FALSE, alpha = 0.1, fwer = "bonferroni") 
 sdsm_bb
 ```
 
@@ -228,18 +227,15 @@ The `fdsm()` function returns a backbone object of the following:
 We can find the backbone using the fixed degree sequence model as follows:
 
 ```{r echo=T, results='hide'}
-fdsm_props <- fdsm(davis, trials = 100, dyad=c(1,5))
+fdsm <- fdsm(davis, trials = 100, dyad=c(1,5))
 ```
 ```{r}
-fdsm_props$dyad_values
-fdsm_bb <- backbone.extract(fdsm_props, signed = TRUE, alpha = 0.1)
+fdsm$dyad_values
+fdsm_bb <- backbone.extract(fdsm, signed = TRUE, alpha = 0.1)
 fdsm_bb
 ```
 
 The `fdsm_props$dyad_values` output is a list of the $G_{1,5}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was fixed, (b) the number of parties attended by Charlotte was fixed, and (c) the number of attendees at each party was fixed.  Because we have provided both a `positive` and `negative` matrix, `backbone.extract()` returns a signed backbone matrix by conducting a two-tailed significance test in which `alpha` is $0.05$ on each end of the distribution. 
-
-# Future 
-The `backbone` package will be updated to contain additional backbone extraction methods that are used in the current literature. 
 
 # References
 
