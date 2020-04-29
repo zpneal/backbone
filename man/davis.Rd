@@ -4,7 +4,9 @@
 \name{davis}
 \alias{davis}
 \title{Davis Southern Women Data Set}
-\format{An object of class \code{matrix} with 18 rows and 14 columns.}
+\format{
+An object of class \code{matrix} with 18 rows and 14 columns.
+}
 \source{
 \href{https://networkdata.ics.uci.edu/netdata/html/davis.html}{UCI Network Data Repository}
 }
