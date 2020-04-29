@@ -45,7 +45,7 @@ The "backbone" S3 class object returned is composed of two matrices, a summary d
 }
 \examples{
 sdsm_probs <- sdsm(davis)
-sdsm_probs2 <- sdsm(davis, model = "curveball", trials = 1000)
+\dontrun{sdsm_probs2 <- sdsm(davis, model = "curveball", trials = 1000)}
 }
 \references{
 \href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97. DOI: 10.1016/j.socnet.2014.06.001}
