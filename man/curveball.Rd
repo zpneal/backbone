@@ -4,13 +4,13 @@
 \alias{curveball}
 \title{curveball algorithm}
 \usage{
-curveball(m)
+curveball(M)
 }
 \arguments{
-\item{m, }{matrix}
+\item{M}{matrix}
 }
 \value{
-rm, matrix with same row sums and column sums as m, but randomized 0/1 entries.
+rm, a matrix with same row sums and column sums as M, but randomized 0/1 entries.
 }
 \description{
 curveball algorithm
@@ -19,5 +19,5 @@ curveball algorithm
 curveball(davis)
 }
 \references{
-Strona, G., Nappo, D., Boccacci, F., Fattorini, S., San-Miguel-Ayanz, J. (2014). A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. Nature Communications, 5, 4114
+Algorithm and R implementation: \href{https://www.nature.com/articles/ncomms5114}{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. DOI:10.1038/ncomms5114.}
 }
