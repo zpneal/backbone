@@ -7,11 +7,11 @@
 rna(kk, pp, wts = NULL)
 }
 \arguments{
-\item{kk, }{values where the cdf is to be computed}
+\item{kk}{values where the cdf is to be computed}
 
-\item{pp, }{vector of success probabilities for indicators}
+\item{pp}{vector of success probabilities for indicators}
 
-\item{wts, }{the weights for each probability}
+\item{wts}{the weights for each probability}
 }
 \value{
 cdf, cumulative distribution function
@@ -24,12 +24,13 @@ These values are approximated using the Refined Normal Approximation (RNA method
     These functions are originally described by \link[poibin]{ppoibin} and used here under GPL-2 License.
 }
 \examples{
-probs <- polytope(davis)
-P <- davis \%*\% t(davis)
-prob.mat <- matrix(probs, nrow = nrow(davis), ncol = ncol(davis))
-prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[1,], `*`)
-mapply(rna, kk= as.data.frame(t(P[1,])), pp = as.data.frame(t(prob.imat)))
+\dontrun{probs <- polytope(davis)}
+\dontrun{P <- davis \%*\% t(davis)}
+\dontrun{prob.mat <- matrix(probs, nrow = nrow(davis), ncol = ncol(davis))}
+\dontrun{prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[1,], `*`)}
+\dontrun{mapply(backbone:::rna, kk= as.data.frame(t(P[1,])), pp = as.data.frame(t(prob.imat)))}
 }
 \references{
 Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51.
 }
+\keyword{internal}

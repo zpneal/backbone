@@ -7,9 +7,9 @@
 class.convert(graph, convert = "matrix")
 }
 \arguments{
-\item{graph, }{matrix, sparse matrix, \link[igraph]{igraph}, edgelist, or \link[network]{network} object}
+\item{graph}{matrix, sparse matrix, \link{igraph}, edgelist, or \link[network]{network} object}
 
-\item{convert, }{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
+\item{convert}{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
 }
 \value{
 list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph
@@ -22,17 +22,19 @@ An object is considered an edgelist if it is (1) a matrix or sparse matrix, and 
     Each column is understood as a bipartite set, with edges only going between members of column 1 and members of column 2.
 }
 \examples{
-davis.sp <- as(davis, "sparseMatrix")
-davis.graph <- igraph::graph.incidence(davis)
-davis.nw <- network::network(davis, ignore.eval = FALSE, names.eval = "weight", loops = TRUE)
-class.convert(davis, "matrix")
-class.convert(davis.sp, "matrix")
-class.convert(davis.graph, "matrix")
-class.convert(davis.nw, "matrix")
-bb.sdsm <- sdsm(davis)
-bb <- backbone.extract(bb.sdsm, signed = TRUE, alpha = .2)
-class.convert(bb, "matrix")
-class.convert(bb, "sparseMatrix")
-class.convert(bb, "igraph")
-class.convert(bb, "network")
+\dontrun{davis.sp <- as(davis, "sparseMatrix")}
+\dontrun{davis.graph <- igraph::graph.incidence(davis)}
+\dontrun{davis.nw <- network::network(davis, ignore.eval = FALSE,
+    names.eval = "weight", loops = TRUE)}
+\dontrun{backbone:::class.convert(davis, "matrix")}
+\dontrun{backbone:::class.convert(davis.sp, "matrix")}
+\dontrun{backbone:::class.convert(davis.graph, "matrix")}
+\dontrun{backbone:::class.convert(davis.nw, "matrix")}
+\dontrun{bb.sdsm <- sdsm(davis)}
+\dontrun{bb <- backbone.extract(bb.sdsm, signed = TRUE, alpha = .2)}
+\dontrun{backbone:::class.convert(bb, "matrix")}
+\dontrun{backbone:::class.convert(bb, "sparseMatrix")}
+\dontrun{backbone:::class.convert(bb, "igraph")}
+\dontrun{backbone:::class.convert(bb, "network")}
 }
+\keyword{internal}
