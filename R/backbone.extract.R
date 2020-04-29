@@ -27,8 +27,8 @@ backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
 
   #Extract components of backbone object
-  positive <- backbone[[1]]
-  negative <- backbone[[2]]
+  positive <- as.matrix(backbone[[1]])
+  negative <- as.matrix(backbone[[2]])
   summary <- backbone$summary
   class <- as.character(summary[1,1])
 
@@ -73,10 +73,15 @@ backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none
   if(signed==FALSE) {backbone[backbone==-1] <- 0}  #if binary backbone requested, change -1s to 0s
   diag(backbone) <- 0  #fill diagonal with 0s
 
-  if ((class == "dgCMatrix") | (class == "dgRMatrix")){
+  if ((class == "dgCMatrix") | (class == "dgRMatrix") | (class == "ngRMatrix")){
     class <- "sparseMatrix"
   }
-  backbone <- class.convert(backbone, class)
+
+  if (class == "dgeMatrix"){
+    class <- "matrix"
+  }
+
+  backbone <- class.convert(backbone, class[1])
   return(backbone[[2]])
 }
 
