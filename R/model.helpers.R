@@ -1,29 +1,32 @@
 #' Convert graph object to adjacency matrix
 #'
-#' @param graph, matrix, sparse matrix, \link[igraph]{igraph}, edgelist, or \link[network]{network} object
-#' @param convert, class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
+#' @param graph matrix, sparse matrix, \link{igraph}, edgelist, or \link[network]{network} object
+#' @param convert class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
 #' @details An object is considered an edgelist if it is (1) a matrix or sparse matrix, and (2) has only two columns.
 #'     Each column is understood as a bipartite set, with edges only going between members of column 1 and members of column 2.
 #' @return list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph
-#' @export
+#'
+#' @keywords internal
+#'
 #' @examples
-#' davis.sp <- as(davis, "sparseMatrix")
-#' davis.graph <- igraph::graph.incidence(davis)
-#' davis.nw <- network::network(davis, ignore.eval = FALSE, names.eval = "weight", loops = TRUE)
-#' class.convert(davis, "matrix")
-#' class.convert(davis.sp, "matrix")
-#' class.convert(davis.graph, "matrix")
-#' class.convert(davis.nw, "matrix")
-#' bb.sdsm <- sdsm(davis)
-#' bb <- backbone.extract(bb.sdsm, signed = TRUE, alpha = .2)
-#' class.convert(bb, "matrix")
-#' class.convert(bb, "sparseMatrix")
-#' class.convert(bb, "igraph")
-#' class.convert(bb, "network")
+#' \dontrun{davis.sp <- as(davis, "sparseMatrix")}
+#' \dontrun{davis.graph <- igraph::graph.incidence(davis)}
+#' \dontrun{davis.nw <- network::network(davis, ignore.eval = FALSE,
+#'     names.eval = "weight", loops = TRUE)}
+#' \dontrun{backbone:::class.convert(davis, "matrix")}
+#' \dontrun{backbone:::class.convert(davis.sp, "matrix")}
+#' \dontrun{backbone:::class.convert(davis.graph, "matrix")}
+#' \dontrun{backbone:::class.convert(davis.nw, "matrix")}
+#' \dontrun{bb.sdsm <- sdsm(davis)}
+#' \dontrun{bb <- backbone.extract(bb.sdsm, signed = TRUE, alpha = .2)}
+#' \dontrun{backbone:::class.convert(bb, "matrix")}
+#' \dontrun{backbone:::class.convert(bb, "sparseMatrix")}
+#' \dontrun{backbone:::class.convert(bb, "igraph")}
+#' \dontrun{backbone:::class.convert(bb, "network")}
 class.convert <- function(graph, convert = "matrix"){
   class <- class(graph)
   if (convert == "matrix"){
-    if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix"))) {
+    if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix"))) {
       if (dim(graph)[2] == 2){ # for edgelists, assumes bipartite!
         g <- igraph::graph.data.frame(graph, directed = F)
         igraph::V(g)$type <- igraph::V(g)$name %in% graph[,2] #second column of edges is TRUE type
@@ -123,20 +126,20 @@ polytope <- function(G){
 
 #' curveball algorithm
 #'
-#' @param m, matrix
+#' @param M matrix
 #'
-#' @return rm, matrix with same row sums and column sums as m, but randomized 0/1 entries.
+#' @return rm, a matrix with same row sums and column sums as M, but randomized 0/1 entries.
 #' @export
 #'
-#' @references Strona, G., Nappo, D., Boccacci, F., Fattorini, S., San-Miguel-Ayanz, J. (2014). A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. Nature Communications, 5, 4114
+#' @references Algorithm and R implementation: \href{https://www.nature.com/articles/ncomms5114}{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. DOI:10.1038/ncomms5114.}
 #' @examples
 #' curveball(davis)
-curveball<-function(m){
-  RC=dim(m)
+curveball<-function(M){
+  RC=dim(M)
   R=RC[1]
   C=RC[2]
   hp=list()
-  for (row in 1:dim(m)[1]) {hp[[row]]=(which(m[row,]==1))}
+  for (row in 1:dim(M)[1]) {hp[[row]]=(which(M[row,]==1))}
   l_hp=length(hp)
   for (rep in 1:(5*l_hp)){
     AB=sample(1:l_hp,2)
@@ -161,23 +164,22 @@ curveball<-function(m){
 
 #' Poisson Binomial distribution computed with Refined Normal Approximation
 #'
-#' @param kk, values where the cdf is to be computed
-#' @param pp, vector of success probabilities for indicators
-#' @param wts, the weights for each probability
+#' @param kk values where the cdf is to be computed
+#' @param pp vector of success probabilities for indicators
+#' @param wts the weights for each probability
 #'
 #' @return cdf, cumulative distribution function
-#' @export
 #'
 #' @references Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51.
 #' @details These values are approximated using the Refined Normal Approximation (RNA method).
 #'     These functions are originally described by \link[poibin]{ppoibin} and used here under GPL-2 License.
-#'
+#' @keywords internal
 #' @examples
-#' probs <- polytope(davis)
-#' P <- davis %*% t(davis)
-#' prob.mat <- matrix(probs, nrow = nrow(davis), ncol = ncol(davis))
-#' prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[1,], `*`)
-#' mapply(rna, kk= as.data.frame(t(P[1,])), pp = as.data.frame(t(prob.imat)))
+#' \dontrun{probs <- polytope(davis)}
+#' \dontrun{P <- davis %*% t(davis)}
+#' \dontrun{prob.mat <- matrix(probs, nrow = nrow(davis), ncol = ncol(davis))}
+#' \dontrun{prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[1,], `*`)}
+#' \dontrun{mapply(backbone:::rna, kk= as.data.frame(t(P[1,])), pp = as.data.frame(t(prob.imat)))}
 rna <-function(kk,pp,wts=NULL)
 {
   if(any(pp<0)|any(pp>1))
@@ -201,100 +203,3 @@ rna <-function(kk,pp,wts=NULL)
   return(res)
 }
 
-#' Family-wise Error Rates: Holm-Bonferroni method
-#'
-#' @param backbone, backbone class object
-#' @param alpha, numeric, an alpha value for significance testing
-#' @param signed, Boolean, if a signed backbone should be returned instead of a binary backbone
-#'
-#' @return backbone, a binary or signed matrix
-#' @export
-#'
-#' @examples
-#' probs <- sdsm(davis)
-#' holm.bonferroni(probs, alpha = .4, signed = FALSE)
-holm.bonferroni <- function(backbone, alpha = 0.05, signed = TRUE){
-  #Read in data
-  matrix_positive <- backbone$positive
-  matrix_negative <- backbone$negative
-
-  #For the loop, not needed for a single run
-  order <- dim(matrix_positive)[1]
-
-  #Matrix of smallest pvalues
-  if (signed == TRUE){
-    pvalue_matrix <- pmin(matrix_positive, matrix_negative)
-    #True if positive value wins, false if negative value wins
-    sign <- matrix_positive < matrix_negative
-  }
-  else{
-    #pvalue all positive p values
-    pvalue_matrix <- matrix_positive
-    #sign matrix is all trues
-    sign <- matrix_positive
-    sign[sign>-1]<-TRUE
-  }
-
-  #Create df to hold p values and keep track of row and col of edges
-  df <- data.frame(as.vector(pvalue_matrix))
-  df$row <- rep(1:nrow(pvalue_matrix), times=ncol(pvalue_matrix))
-  df$col <- rep(1:ncol(pvalue_matrix), each=nrow(pvalue_matrix))
-
-  #Separate sorted matrix, just to be extra careful
-  #Sort based on p-value, smallest to largest
-  df_sorted <- df[order(df$as.vector.pvalue_matrix.),]
-  #Add sign
-  df_sorted$sign <- as.vector(sign)
-  #Add empty col for the edge weights after FWER
-  df_sorted$newvalues <- NA
-
-  #Compute the rank
-  independent_analysis <- ((order[[1]])*(order[[1]]-1))/2
-  #For iterations
-  j = 0
-  #Alpha value
-  if (signed == TRUE){
-    FWER <- (alpha/2)
-  }
-  else{
-    FWER = alpha
-  }
-
-  #Run over all edges
-  for (i in 1:dim(df_sorted)[1]){
-    #If row index less than col index (so we only have to run upper triangle)
-    if (df_sorted$row[i]<df_sorted$col[i]){
-      #If value less than the fwer fraction, reject the null hyp
-      if (df_sorted$as.vector.pvalue_matrix.[i] < ((FWER)/(independent_analysis-j))){
-        #The new edge weight should be 1 if pos smaller, -1 if neg smaller
-        df_sorted$newvalues[i] <- 2*sign[i]-1
-        #message(paste0(j, ": Edge (", df_sorted$row[i], ",", df_sorted$col[i], ") created with weight:", df_sorted$newvalues[i]," p-value was:", df_sorted$as.vector.pvalue_matrix.[i]))
-        #Increase iteration
-        j <- j+1
-      } #end if pvalue < fwer
-      else{
-        #If value NOT less than fwer fraction, fail to reject everything further, save current values
-        u <- df_sorted$row[i]
-        v <- df_sorted$col[i]
-        weight <- 2*sign[i]-1
-        pval <- df_sorted$as.vector.pvalue_matrix.[i]
-        val <- j-1
-        break
-      }
-    } #end if row<col
-  } #end for i in 1:dim[1]
-
-  #message(paste0("Added ", val, " edges to network"))
-  #message(paste0("Failed to reject H0 for pair (",u, ",", v, ") created with weight: ",pval, " and threshold ",((FWER/2)/(independent_analysis-i))))
-
-  #Construct the backbone matrix
-  new_mat_values <- df_sorted[order(df_sorted$row, df_sorted$col),]
-  backbone_ut <- t(matrix(new_mat_values$newvalues, nrow = nrow(matrix_positive), ncol = ncol(matrix_positive)))+0
-  backbone_lt <- matrix(new_mat_values$newvalues, nrow = nrow(matrix_positive), ncol = ncol(matrix_positive))
-  backbone_ut[is.na(backbone_ut)]<-0
-  backbone_lt[is.na(backbone_lt)]<-0
-  backbone <- backbone_ut+backbone_lt
-  row.names(backbone) <- colnames(matrix_positive)
-  colnames(backbone) <- colnames(matrix_positive)
-  return(backbone)
-}
