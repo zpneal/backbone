@@ -61,3 +61,37 @@ test_that("backbone.extract fwer = bonferroni", {
   hyperg.positive.none <- backbone.extract(hyperg, signed = FALSE, alpha = 0.4, fwer = "bonferroni")
   expect_equal(hyperg.signed.none,hyperg.positive.none)
 })
+
+test_that("backbone.extract class outputs", {
+  probs <- sdsm(davis)
+  bb <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none")
+  bb.matrix <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none", class = "matrix")
+  bb.spmatrix <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none", class = "sparseMatrix")
+  bb.igraph <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none", class = "igraph")
+  bb.network <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none", class = "network")
+  bb.edgelist <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none", class = "edgelist")
+
+  expect_equal(bb, bb.matrix)
+  expect_equal(class.convert(bb, "sparseMatrix")[[2]], bb.spmatrix)
+  expect_true(igraph::identical_graphs(class.convert(bb, "igraph")[[2]], bb.igraph))
+  expect_equal(class.convert(bb, "network")[[2]], bb.network)
+  expect_equal(class.convert(bb, "edgelist")[[2]], bb.edgelist)
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
