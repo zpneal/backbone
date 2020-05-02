@@ -23,7 +23,7 @@ backbone.extract(
 if "bonferroni", Bonferroni Family-wise Error Rate test should be used.
 By default, the given 'alpha' value is used for all tests with no correction for family-wise error rates.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist"). If "original", the backbone graph returned is of the same class as the data inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{class.convert}. If "original", the backbone graph returned is of the same class as the data inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
 }
 \value{
 backbone graph: Binary or signed backbone graph of class given in parameter `class`.
