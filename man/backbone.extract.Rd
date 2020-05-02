@@ -4,7 +4,13 @@
 \alias{backbone.extract}
 \title{Extracts the backbone of a weighted network using results from a null model}
 \usage{
-backbone.extract(backbone, signed = TRUE, alpha = 0.05, fwer = "none")
+backbone.extract(
+  backbone,
+  signed = TRUE,
+  alpha = 0.05,
+  fwer = "none",
+  class = "original"
+)
 }
 \arguments{
 \item{backbone}{backbone: backbone S3 class object, as returned by \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
@@ -16,9 +22,11 @@ backbone.extract(backbone, signed = TRUE, alpha = 0.05, fwer = "none")
 \item{fwer}{string: type of familywise error rate correction to be applied; c("none","bonferroni",holm"). If "holm", Holm Bonferroni Family-wise Error Rate test is used,
 if "bonferroni", Bonferroni Family-wise Error Rate test should be used.
 By default, the given 'alpha' value is used for all tests with no correction for family-wise error rates.}
+
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist"). If "original", the backbone graph returned is of the same class as the data inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.}
 }
 \value{
-backbone graph: Binary or signed backbone graph. This function uses \link{class.convert} to output the graph as the same class as the data inputted in one of \link{sdsm}, \link{fdsm}, or \link{hyperg}.
+backbone graph: Binary or signed backbone graph of class given in parameter `class`.
 }
 \description{
 `backbone.extract` returns a binary or signed adjacency matrix
