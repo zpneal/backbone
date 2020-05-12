@@ -17,7 +17,7 @@
 #' @details If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'),
 #'     then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
 #'     as described by \link[stats]{glm} and \link[stats]{family}.
-#'     If 'model = ldm', a linear discriminant model is used, via the \href{https://statisticalhorizons.com/better-predicted-probabilities}{R code} provided by Paul Allison and Stephen Vaisey. If 'model = chi2', a chi-squared model is used.
+#'     If 'model = lpm', a linear probability model is used. If 'model = chi2', a chi-squared model is used.
 #' @details If 'model' = 'curveball' and 'trials' > 0, the probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
 #'     If 'model = polytope', the \link{polytope} function is used to find a matrix of probabilities that maximizes the entropy function, with same row and column sums.
 #' @details This function uses the refined normal approximation \link{rna} to compute the Poisson binomial distribution.
@@ -45,7 +45,7 @@ sdsm <- function(B,
       (model!="cloglog") &
       (model!="cauchit") &
       (model!="oldlogit") &
-      (model!="ldm") &
+      (model!="lpm") &
       (model!="chi2") &
       (model!="curveball") &
       (model!="polytope"))
@@ -66,26 +66,29 @@ sdsm <- function(B,
   if (!methods::is(B, "sparseMatrix")) {
     B <- Matrix::Matrix(B, sparse = T)
   }
-    P <- Matrix::tcrossprod(B)
+  P <- Matrix::tcrossprod(B)
 
   #Create Positive and Negative Matrices to hold backbone
   Positive <- matrix(0, nrow(P), ncol(P))
   Negative <- matrix(0, nrow(P), ncol(P))
 
-  #Compute probabilities for SDSM (alternative is in star)
-  #Vectorize the bipartite data
-  A <- data.frame(as.vector(B))
-  names(A)[names(A)=="as.vector.B."] <- "value"
+  #Reshape data for these probability model
+  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="lpm" | model=="chi2") {
+    #Vectorize the bipartite data
+    A <- data.frame(as.vector(B))
+    names(A)[names(A)=="as.vector.B."] <- "value"
 
-  #Assign row and column IDs in the vectorized data
-  A$row <- rep(1:nrow(B), times=ncol(B))
-  A$col <- rep(1:ncol(B), each=nrow(B))
+    #Assign row and column IDs in the vectorized data
+    A$row <- rep(1:nrow(B), times=ncol(B))
+    A$col <- rep(1:ncol(B), each=nrow(B))
 
-  #Compute and attach rowsums, columnsums
-  A$rowmarg <- stats::ave(A$value,A$row,FUN=sum)
-  A$colmarg <- stats::ave(A$value,A$col,FUN=sum)
-  A$rowcol <- A$rowmarg * A$colmarg
+    #Compute and attach rowsums, columnsums
+    A$rowmarg <- stats::ave(A$value,A$row,FUN=sum)
+    A$colmarg <- stats::ave(A$value,A$col,FUN=sum)
+    A$rowcol <- A$rowmarg * A$colmarg
+  }
 
+  #Compute probabilities for SDSM
   #Binomial Models
   if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit") {
     if (requireNamespace("speedglm", quietly = TRUE)){
@@ -107,17 +110,12 @@ sdsm <- function(B,
     }
   }
 
-  #Linear discriminant model
-  if (model=="ldm") {
+  #Linear probability model
+  if (model=="lpm") {
     model.estimates <- stats::lm(formula= value ~ rowmarg + colmarg, data=A)
-    c <- model.estimates$coefficients[1]
-    k <- nrow( model.estimates$model ) / stats::deviance(model.estimates)
-    m <- mean( model.estimates$model[,1] )
-    a <- log(m/(1-m) ) + k*( c-.5 ) + .5*(1/m - 1/(1-m) )
-    lin_preds <- stats::predict(model.estimates)
-    my_preds_logit <- k*(lin_preds-c) + a
-    my_preds <- 1/(1 + exp(-my_preds_logit))
-    probs <- my_preds
+    probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
+    probs[probs<0] <- 0 #Truncate out-of-bounds estimates
+    probs[probs>1] <- 1
   }
 
   #Chi-Square model
