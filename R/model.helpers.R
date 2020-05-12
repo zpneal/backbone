@@ -31,16 +31,15 @@ class.convert <- function(graph, convert = "matrix"){
         g <- igraph::graph.data.frame(graph, directed = F)
         igraph::V(g)$type <- igraph::V(g)$name %in% graph[,2] #second column of edges is TRUE type
         G <- igraph::get.incidence(g)
-        class <- "edgelist"}
-      else{G <- graph}
+        class <- "edgelist"} else {G <- graph}
     }
     if (methods::is(graph, "igraph")) {
       if (igraph::is.bipartite(graph)){
         G <- igraph::get.incidence(graph)
-      }
-      else {
-        if (length(igraph::edge.attributes(graph)) > 0){G <- igraph::get.adjacency(graph,attr = "weight")}
-        else G <- igraph::get.adjacency(graph)
+      } else {
+        if (length(igraph::edge.attributes(graph)) > 0){
+          G <- igraph::get.adjacency(graph,attr = "weight")
+          } else{G <- igraph::get.adjacency(graph)}
       }
     }
     if (methods::is(graph, "network")) {G <- as.matrix(graph, attr = "weight")}
@@ -49,8 +48,9 @@ class.convert <- function(graph, convert = "matrix"){
     G <- methods::as(graph, "sparseMatrix")
   }
   if (convert == "igraph"){
-    if (-1 %in% graph){G <- igraph::graph.adjacency(graph,mode = "undirected", weighted = TRUE)}
-    else G <- igraph::graph.adjacency(graph, mode = "undirected")
+    if (-1 %in% graph){
+      G <- igraph::graph.adjacency(graph,mode = "undirected", weighted = TRUE)
+      } else {G <- igraph::graph.adjacency(graph, mode = "undirected")}
   }
   if (convert == "network"){
     G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = FALSE)

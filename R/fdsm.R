@@ -60,8 +60,7 @@ fdsm <- function(B,
   if (length(dyad) > 0){
     if (class(dyad[1]) != "numeric"){
       vec <- match(c(dyad[1], dyad[2]), rownames(B))
-    }
-    else{
+    } else {
       vec <- dyad
     }
   }
@@ -130,9 +129,7 @@ fdsm <- function(B,
     bb <- list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary)
     class(bb) <- "backbone"
     return(bb)
-  }
-
-  else {
+  } else {
     bb <- list(positive = Positive, negative = Negative, summary = model.summary)
     class(bb) <- "backbone"
     return(bb)
