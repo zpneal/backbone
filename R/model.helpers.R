@@ -90,10 +90,10 @@ polytope <- function(G){
   #Define constraints
   constraint1 <- matrix >= 0
   constraint2 <- matrix <= 1
-  if (methods::is(G, "sparseMatrix")) {constraint3 <- (matrix%*%mat1) == Matrix::rowSums(G)}
-  else {constraint3 <- (matrix%*%mat1) == rowSums(G)}
-  if (methods::is(G, "sparseMatrix")) {constraint4 <- t(matrix)%*%mat2 == Matrix::colSums(G)}
-  else {constraint4 <- t(matrix)%*%mat2 == colSums(G)}
+  if (methods::is(G, "sparseMatrix")) {constraint3 <- (matrix%*%mat1) == Matrix::rowSums(G)
+  } else {constraint3 <- (matrix%*%mat1) == rowSums(G)}
+  if (methods::is(G, "sparseMatrix")) {constraint4 <- t(matrix)%*%mat2 == Matrix::colSums(G)
+  } else {constraint4 <- t(matrix)%*%mat2 == colSums(G)}
   constraints <- list(constraint1, constraint2, constraint3, constraint4)
 
   #Define Objective, the function to solve
@@ -103,12 +103,11 @@ polytope <- function(G){
   problem <- CVXR::Problem(objective, constraints)
 
   #Solve the problem
-  result <- CVXR::psolve(problem, warm_start = TRUE)
+  result <- CVXR::psolve(problem)
 
-  #Stop if not optimal
-  if (result$status != "optimal"){
-    stop("polytope result not optimal")
-  }
+  #Warning/Stop if not optimal
+  if (result$status == "optimal_inaccurate") {warning("polytope result not optimal")}
+  if (result$status != "optimal" & result$status != "optimal_inaccurate") {stop("unable to compute SDSM-Polytope")}
 
   #Results
   new_matrix <- result$getValue(matrix)
