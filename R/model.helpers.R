@@ -25,6 +25,9 @@
 #' \dontrun{backbone:::class.convert(bb, "network")}
 class.convert <- function(graph, convert = "matrix"){
   class <- class(graph)
+  if (is.factor(graph)){
+    stop("Input data is class 'factor', please use 'numeric'.")
+  }
   if (convert == "matrix"){
     if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix"))) {
       if (dim(graph)[2] == 2){ # for edgelists, assumes bipartite!
