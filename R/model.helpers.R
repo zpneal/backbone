@@ -25,27 +25,32 @@
 #' \dontrun{backbone:::class.convert(bb, "network")}
 class.convert <- function(graph, convert = "matrix"){
   class <- class(graph)
-  if (is.factor(graph)){
-    stop("Input data is class 'factor', please use 'numeric'.")
-  }
   if (convert == "matrix"){
     if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix"))) {
       if (dim(graph)[2] == 2){ # for edgelists, assumes bipartite!
         g <- igraph::graph.data.frame(graph, directed = F)
         igraph::V(g)$type <- igraph::V(g)$name %in% graph[,2] #second column of edges is TRUE type
         G <- igraph::get.incidence(g)
-        class <- "edgelist"} else {G <- graph}
+        class <- "edgelist"} else {
+          if (is.numeric(graph[1]) != TRUE){
+            class(graph)<-"numeric"
+          }
+          G <- graph}
     }
     if (methods::is(graph, "igraph")) {
       if (igraph::is.bipartite(graph)){
         G <- igraph::get.incidence(graph)
       } else {
         if (length(igraph::edge.attributes(graph)) > 0){
-          G <- igraph::get.adjacency(graph,attr = "weight")
+          G <- igraph::get.adjacency(graph, attr = "weight")
           } else{G <- igraph::get.adjacency(graph)}
       }
     }
-    if (methods::is(graph, "network")) {G <- as.matrix(graph, attr = "weight")}
+    if (methods::is(graph, "network")) {
+      if ("weight" %in% network::list.edge.attributes(graph)){
+        G <- as.matrix(graph, attr = "weight")
+      } else {G <- as.matrix(graph)}
+    }
   }
   if (convert == "sparseMatrix"){
     G <- methods::as(graph, "sparseMatrix")
@@ -106,7 +111,7 @@ polytope <- function(G){
   problem <- CVXR::Problem(objective, constraints)
 
   #Solve the problem
-  result <- CVXR::psolve(problem)
+  result <- suppressWarnings(CVXR::psolve(problem))
 
   #Warning/Stop if not optimal
   if (result$status == "optimal_inaccurate") {warning("polytope result not optimal")}
