@@ -136,7 +136,7 @@ sdsm <- function(B,
   }
   #Polytopes model
   if (model=="polytope") {
-    probs <- as.vector(suppressWarnings(polytope(B)))
+    probs <- as.vector(polytope(B))
   }
 
   #Assemble and compute probabilities
