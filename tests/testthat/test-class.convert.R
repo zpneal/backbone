@@ -32,6 +32,7 @@ test_that("class.convert classes match", {
   davis.nw <- network::network(davis, ignore.eval = FALSE, names.eval = "weight", loops = TRUE)
   class(davis.nw)
   G.nw <- network::network(G, ignore.eval = FALSE, names.eval = "weight", directed = FALSE, loops = TRUE)
+  davis.sn <- network::network(davis, bipartite = TRUE)
 
   ## test file
 
@@ -40,18 +41,22 @@ test_that("class.convert classes match", {
   a3<-class.convert(davis.graph)
   a4<-class.convert(davis.nw)
   a5<-class.convert(davis.el)
+  a6<-class.convert(davis.sn)
 
   b1<-a1[[2]]
   b2<-a2[[2]]
   b3<-a3[[2]]
   b4<-a4[[2]]
   b5<-a5[[2]]
+  b6<-a6[[2]]
 
   expect_equal(davis,b1)
   expect_equal(davis.sp, b2)
   expect_equal(davis, b3)
   expect_equal(davis, b4)
   expect_equal(davis[,order(colnames(davis))], b5[, order(colnames(b5))])
+  expect_equal(davis, b6)
+  expect_equal(b4,b6)
 
   c1<-class.convert(G)
   c2<-class.convert(G.sp)
