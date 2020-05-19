@@ -68,4 +68,4 @@ sdsm_bb <- backbone.extract(sdsm)
 ```
 
 For more detailed examples and background on the topic, see
-`vignette("backbone_introduction", package = "backbone")`.
+`vignette("backbone", package = "backbone")`.
