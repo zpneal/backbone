@@ -56,8 +56,8 @@ This is a basic example which shows you how to solve a common problem:
 ```{r echo=T, results='hide'}
 library(backbone)
 data(davis)
-sdsm_props <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE"))
-sdsm_bb <- backbone.extract(sdsm_props$positive, sdsm_props$negative, alpha = 0.05)
+sdsm_props <- sdsm(davis)
+sdsm_bb <- backbone.extract(sdsm_props, signed = TRUE, alpha = 0.05)
 ```
 
 For more detailed examples and background on the topic, see `vignette("backbone_introduction", package = "backbone")`.

@@ -1,17 +1,17 @@
 #' Compute universal threshold backbone
 #'
-#' `universal` returns a unipartite backbone matrix in which
-#'     values are set to 1 if above the given upper parameter threshold,
-#'     and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
+#' `universal` returns a backbone graph in which edge weights are set to
+#'    1 if above the given upper parameter threshold,
+#'    set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 #'
-#' @param M Matrix: a weighted adjacency matrix or a bipartite adjacency matrix.
+#' @param M graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param upper Real or FUN: upper threshold value or function to be applied to the edge weights. Default is 0.
 #' @param lower Real or FUN: lower threshold value or function to be applied to the edge weights. Default is NULL.
 #' @param bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
 #'
-#' @return list(backbone, summary).
-#' backbone: a matrix, Signed (or positive) adjacency matrix of backbone
-#' summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+#' @return backbone, a list(backbone, summary). The `backbone` object is a graph object of the same class as M.
+#'     The `summary` contains a data frame summary of the inputted matrix and the model used including:
+#'     model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #' @export
 #'
 #' @examples
@@ -29,6 +29,11 @@ universal <- function(M,
   #Run Time
   run.time.start <- Sys.time()
 
+  #Class Conversion
+  convert <- class.convert(M)
+  class <- convert[[1]]
+  M <- convert[[2]]
+
   if (bipartite == TRUE){
     if (methods::is(M, "sparseMatrix")) {
       P <- Matrix::tcrossprod(M)
@@ -42,13 +47,11 @@ universal <- function(M,
   #Set threshold values
   if (class(upper) == "function"){
     ut <- upper(P)
-  }
-  else{ut <- upper}
+  } else {ut <- upper}
 
   if (class(lower) == "function"){
     lt <- lower(P)
-  }
-  else{lt <- lower}
+  } else {lt <- lower}
 
   #Create backbone matrix
   backbone <- matrix(0, nrow(P), ncol(P))
@@ -75,12 +78,14 @@ universal <- function(M,
     r <- rowSums(M)
     c <- colSums(M)
   }
-  a <- c("Model", "Number of Rows", "Skew of Row Sums", "Number of Columns", "Skew of Column Sums", "Running Time")
-  b <- c("Universal Threshold", dim(M)[1], round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(M)[2], round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+  a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time")
+  b <- c(class[1], "Universal Threshold", dim(M)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(M)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
-
-  return(list(backbone = backbone, summary = model.summary))
+  backbone_converted <- class.convert(backbone, class[1])
+  bb <- list(backbone = backbone_converted[[2]], summary = model.summary)
+  class(bb) <- "backbone"
+  return(bb)
 }
 
 
