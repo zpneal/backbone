@@ -63,10 +63,8 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 library(backbone)
 data(davis)
-sdsm_props <- sdsm(davis, trials = 100, dyad = c("EVELYN", "CHARLOTTE"))
-#> Finding the Backbone using logit SDSM
-#> Estimated time to complete is 1.2 secs
-sdsm_bb <- backbone.extract(sdsm_props$positive, sdsm_props$negative, alpha = 0.05)
+sdsm <- sdsm(davis)
+sdsm_bb <- backbone.extract(sdsm)
 ```
 
 For more detailed examples and background on the topic, see
