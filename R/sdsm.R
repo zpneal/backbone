@@ -45,7 +45,7 @@ sdsm <- function(B,
       (model!="cloglog") &
       (model!="cauchit") &
       (model!="oldlogit") &
-      (model!="oldscobit") &
+      (model!="scobit") &
       (model!="lpm") &
       (model!="chi2") &
       (model!="curveball") &
@@ -76,7 +76,7 @@ sdsm <- function(B,
   #Compute probabilities for SDSM
 
   #Compute row and column sums if necessary
-  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="oldscobit" | model=="lpm" | model=="chi2") {
+  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="scobit" | model=="lpm" | model=="chi2") {
     #Vectorize the bipartite data
     A <- data.frame(as.vector(B))
     names(A)[names(A)=="as.vector.B."] <- "value"
@@ -111,7 +111,7 @@ sdsm <- function(B,
       probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
     }
   }
-  if (model == "oldscobit") {
+  if (model == "scobit") {
     params <- list(b0=0.1,b1=0.00005,b2=0.00005,a=0.01)
     model.estimates <- stats::optim(params,scobit_loglike_cpp,gr=scobit_loglike_gr_cpp,method="BFGS",x1=A$rowmarg,x2=A$colmarg,y=A$value)
     pars <- c(model.estimates$par[1],model.estimates$par[2],model.estimates$par[3])
