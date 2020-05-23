@@ -8,17 +8,16 @@
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param model String: A method used to compute probabilities for generating random bipartite graphs.
-#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "oldlogit","oldscobit","lpm", "chi2", "curveball", "polytope").
+#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "chi2", "curveball", "polytope").
 #' @param trials Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.
 #'
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
 #'    to the distribution of weights expected in a projection obtained from a random bipartite network where
 #'    both the row vertex degrees and column vertex degrees are approximately fixed.
-#' @details If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'),
+#' @details If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog','scobit'),
 #'     then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
 #'     as described by \link[stats]{glm} and \link[stats]{family}.
 #'     If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product.
-#'     If the 'model' parameter is 'oldscobit', then a scobit link function is used with the same condition as 'oldlogit'.
 #'     If 'model = lpm', a linear probability model is used. If 'model = chi2', a chi-squared model is used.
 #' @details If 'model' = 'curveball' and 'trials' > 0, the probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
 #'     If 'model = polytope', the \link{polytope} function is used to find a matrix of probabilities that maximizes the entropy function, with same row and column sums.
@@ -113,10 +112,10 @@ sdsm <- function(B,
     }
   }
   if (model == "oldscobit") {
-    params <- list(b0=0.1,b1=0.00005,b2=0.00005,b3=0.00005,a=0.01)
+    params <- list(b0=0.1,b1=0.00005,b2=0.00005,a=0.01)
     model.estimates <- stats::optim(params,scobit_loglike_cpp,gr=scobit_loglike_gr_cpp,method="BFGS",x1=A$rowmarg,x2=A$colmarg,y=A$value)
-    pars <- c(model.estimates$par[1],model.estimates$par[2],model.estimates$par[3],model.estimates$par[4])
-    probs <- scobit_fct(A$rowmarg,A$colmarg,pars,model.estimates$par[5])
+    pars <- c(model.estimates$par[1],model.estimates$par[2],model.estimates$par[3])
+    probs <- scobit_fct(A$rowmarg,A$colmarg,pars,model.estimates$par[4])
 
   }
   #Linear probability model
@@ -196,6 +195,6 @@ sdsm <- function(B,
 # scobit helper ----
 ###########################################
 scobit_fct <- function(x1,x2,beta,alpha){
-  fct <- 1-1/(1+exp(beta[1]+beta[2]*x1+beta[3]*x2+beta[4]*x1*x2))^alpha
+  fct <- 1-1/(1+exp(beta[1]+beta[2]*x1+beta[3]*x2))^alpha
   fct
 }

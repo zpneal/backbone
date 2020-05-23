@@ -10,7 +10,7 @@ sdsm(B, model = "polytope", trials = 1000)
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
 
 \item{model}{String: A method used to compute probabilities for generating random bipartite graphs.
-Can be c("logit", "probit", "cauchit", "log", "cloglog", "oldlogit","oldscobit","lpm", "chi2", "curveball", "polytope").}
+Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "chi2", "curveball", "polytope").}
 
 \item{trials}{Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.}
 }
@@ -32,7 +32,7 @@ Specifically, the sdsm function compares an edge's observed weight in the projec
    to the distribution of weights expected in a projection obtained from a random bipartite network where
    both the row vertex degrees and column vertex degrees are approximately fixed.
 
-If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'),
+If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog','scobit'),
     then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
     as described by \link[stats]{glm} and \link[stats]{family}.
     If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product.
