@@ -189,12 +189,3 @@ sdsm <- function(B,
   return(bb)
 
 } #end sdsm function
-
-
-###########################################
-# scobit helper ----
-###########################################
-scobit_fct <- function(x1,x2,beta,alpha){
-  fct <- 1-1/(1+exp(beta[1]+beta[2]*x1+beta[3]*x2))^alpha
-  fct
-}
