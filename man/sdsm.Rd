@@ -10,7 +10,7 @@ sdsm(B, model = "polytope", trials = 1000)
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
 
 \item{model}{String: A method used to compute probabilities for generating random bipartite graphs.
-Can be c("logit", "probit", "cauchit", "log", "cloglog", "oldlogit", "lpm", "chi2", "curveball", "polytope").}
+Can be c("logit", "probit", "cauchit", "log", "cloglog", "oldlogit","oldscobit","lpm", "chi2", "curveball", "polytope").}
 
 \item{trials}{Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.}
 }
