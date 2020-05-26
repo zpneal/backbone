@@ -8,13 +8,13 @@
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param model String: A method used to compute probabilities for generating random bipartite graphs.
-#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "oldlogit", "lpm", "chi2", "curveball", "polytope").
+#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "chi2", "curveball", "polytope").
 #' @param trials Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.
 #'
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
 #'    to the distribution of weights expected in a projection obtained from a random bipartite network where
 #'    both the row vertex degrees and column vertex degrees are approximately fixed.
-#' @details If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog'),
+#' @details If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'cloglog','scobit'),
 #'     then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
 #'     as described by \link[stats]{glm} and \link[stats]{family}.
 #'     If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product.
@@ -45,6 +45,7 @@ sdsm <- function(B,
       (model!="cloglog") &
       (model!="cauchit") &
       (model!="oldlogit") &
+      (model!="scobit") &
       (model!="lpm") &
       (model!="chi2") &
       (model!="curveball") &
@@ -75,7 +76,7 @@ sdsm <- function(B,
   #Compute probabilities for SDSM
 
   #Compute row and column sums if necessary
-  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="lpm" | model=="chi2") {
+  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="scobit" | model=="lpm" | model=="chi2") {
     #Vectorize the bipartite data
     A <- data.frame(as.vector(B))
     names(A)[names(A)=="as.vector.B."] <- "value"
@@ -109,6 +110,13 @@ sdsm <- function(B,
       if (model == "oldlogit") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link="logit"), data=A)}
       probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
     }
+  }
+  if (model == "scobit") {
+    params <- list(b0=0.1,b1=0.00005,b2=0.00005,a=0.01)
+    model.estimates <- stats::optim(params,scobit_loglike_cpp,gr=scobit_loglike_gr_cpp,method="BFGS",x1=A$rowmarg,x2=A$colmarg,y=A$value)
+    pars <- c(model.estimates$par[1],model.estimates$par[2],model.estimates$par[3])
+    probs <- scobit_fct(A$rowmarg,A$colmarg,pars,model.estimates$par[4])
+
   }
   #Linear probability model
   if (model=="lpm") {
@@ -181,5 +189,3 @@ sdsm <- function(B,
   return(bb)
 
 } #end sdsm function
-
-

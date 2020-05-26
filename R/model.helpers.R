@@ -210,3 +210,13 @@ rna <-function(kk,pp,wts=NULL)
   return(res)
 }
 
+
+#---------------------------------#
+# scobit helper
+# (n need to export the function)
+#---------------------------------#
+scobit_fct <- function(x1,x2,beta,alpha){
+  fct <- 1-1/(1+exp(beta[1]+beta[2]*x1+beta[3]*x2))^alpha
+  fct
+}
+

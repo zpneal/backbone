@@ -26,7 +26,8 @@ Imports:
     utils,
     CVXR,
     igraph,
-    network
+    network,
+    Rcpp
 Suggests:
     knitr,
     rmarkdown,
@@ -35,3 +36,5 @@ Suggests:
 VignetteBuilder: knitr
 URL: https://github.com/domagal9/backbone, https://www.zacharyneal.com/backbone
 BugReports: https://github.com/domagal9/backbone/issues
+LinkingTo: 
+    Rcpp
