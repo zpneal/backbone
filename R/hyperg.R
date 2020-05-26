@@ -73,7 +73,7 @@ hyperg <- function(B){
 
   #Run Time
   run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start), 2))
+  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
   #Compile Summary
   if (methods::is(B, "sparseMatrix")) {
