@@ -23,7 +23,7 @@
 #' bb <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none")
 backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none", class = "original"){
 
-  #Argument Checks
+  #### Argument Checks ####
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
   if ((class != "original")
       & (class != "matrix")
@@ -33,33 +33,42 @@ backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none
       & (class != "edgelist"))
   {stop("incorrect class type, must be one of c(original, matrix, sparseMatrix, igraph, network, edgelist)")}
 
-  #Extract components of backbone object
+  #### Extract Components of Backbone Object ####
   positive <- as.matrix(backbone[[1]])
   negative <- as.matrix(backbone[[2]])
   summary <- backbone$summary
+  model <- summary[2,1]
+
+  if ((model == "Fixed Degree Sequence Model") & (fwer != "none")){
+    warning("Use caution when applying Holm-Bonferroni or Bonferroni correction to backbones
+             found via the Fixed Degree Sequence Method as the precision of the proportions
+             depends on the number of trials.")
+  }
 
   if (class == "original"){
     class <- as.character(summary[1,1])
   }
 
-  #Find p-value in the more extreme tail
-  backbone <- pmin(positive,negative)  #matrix of smaller p-value from positive and negative
-  diag(backbone) <- NA  #remove diagonal
-
-  #Auxiliary values
+  ### Auxiliary Values ###
   alpha <- alpha/2  #Alpha for each tail
   m <- sum(lower.tri(positive)==TRUE)  #Number of independent tests
 
-  #FWER: No correction
+  #### Find p-value in the More Extreme Tail ####
+  backbone <- pmin(positive,negative)  #matrix of smaller p-value from positive and negative
+  diag(backbone) <- NA  #remove diagonal
+
+  #### FWER Computations ####
+
+  ### FWER: No correction ###
   if(fwer=="none"){backbone <- (backbone < alpha)*1}  #significant edges
 
-  #FWER: Bonferroni correction
+  ### FWER: Bonferroni correction ###
   if(fwer=="bonferroni"){
     alpha <- alpha/m  #bonferroni correction
     backbone <- (backbone < alpha)*1  #significant edges
   }
 
-  #FWER: Holm-Bonferroni correction
+  ### FWER: Holm-Bonferroni correction ###
   if(fwer=="holm"){
     backbone[upper.tri(backbone)] <- NA  #remove upper triangle
     rank <- matrix(rank(backbone,na.last="keep",ties.method="random"),  #rank of pvalue
@@ -76,13 +85,14 @@ backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none
     backbone <- backbone + t(backbone)  #fill the upper triangle with the lower triangle
   }
 
-  #Inserting edge signs, filling diagonal
+  #### Insert Edge Signs, Fill Diagonal of Backbone Matrix ####
   sign <- (negative<positive)*-1  #sign of edge, if it were significant
   sign[sign==0] <- 1
   backbone <- backbone*sign  #apply appropriate sign to significant edges
   if(signed==FALSE) {backbone[backbone==-1] <- 0}  #if binary backbone requested, change -1s to 0s
   diag(backbone) <- 0  #fill diagonal with 0s
 
+  #### Return Backbone Graph of Correct Class ####
   if ((class == "dgCMatrix") | (class == "dgRMatrix") | (class == "ngRMatrix")){
     class <- "sparseMatrix"
   }

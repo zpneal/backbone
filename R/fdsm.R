@@ -33,29 +33,30 @@ fdsm <- function(B,
                  dyad = NULL,
                  progress = FALSE){
 
-  #Argument Checks
+  #### Argument Checks ####
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
 
-  #Run Time
+  ### Run Time ###
   run.time.start <- Sys.time()
 
-  #Class Conversion
+  #### Class Conversion ####
   convert <- class.convert(B, "matrix")
   class <- convert[[1]]
   B <- convert[[2]]
 
-  #Use sparse matrix operations
+  #### Bipartite Projection ####
+  ### Use sparse matrix operations ###
   if (!methods::is(B, "sparseMatrix")) {
       B <- Matrix::Matrix(B, sparse = T)
   }
   P <- Matrix::tcrossprod(B)
 
-  #Create Positive and Negative Matrices to hold backbone
+  ### Create Positive and Negative Matrices to hold backbone ###
   Positive <- matrix(0, nrow(P), ncol(P))
   Negative <- matrix(0, nrow(P), ncol(P))
 
-  #Dyad save
+  ### Dyad save ###
   edge_weights <- numeric(trials)
   if (length(dyad) > 0){
     if (class(dyad[1]) != "numeric"){
@@ -65,33 +66,33 @@ fdsm <- function(B,
     }
   }
 
-  #Build null models
+  #### Build Null Models ####
   for (i in 1:trials){
 
     #Algorithm credit to: Strona, G., Nappo, D., Boccacci, F., Fattorini, S., San-Miguel-Ayanz, J. (2014). A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. Nature Communications, 5, 4114
-    #Use curveball to create an FDSM Bstar
+    ### Use curveball to create an FDSM Bstar ###
     Bstar <- curveball(B)
 
-    #Construct Pstar from Bstar
+    ### Construct Pstar from Bstar ###
     Bstar <- Matrix::Matrix(Bstar,sparse=T)
     Pstar<-Matrix::tcrossprod(Bstar)
 
-    #Start estimation timer; print message
+    ### Start estimation timer; print message ###
     if (i == 1) {
       start.time <- Sys.time()
       message("Approximating the distribution using Curveball FDSM")
     }
 
-    #Check whether Pstar edge is larger/smaller than P edge
+    ### Check whether Pstar edge is larger/smaller than P edge ###
     Positive <- Positive + (Pstar >= P)+0
     Negative <- Negative + (Pstar <= P)+0
 
-    #Save Dyad of P
+    ### Save Dyad of P ###
     if (length(dyad) > 0){
       edge_weights[i] <- Pstar[vec[1], vec[2]]
     }
 
-    #Report estimated running time, update progress bar
+    ### Report estimated running time, update progress bar ###
     if (i==10){
       end.time <- Sys.time()
       est = (round(difftime(end.time, start.time, units = "auto"), 2) * (trials/10))
@@ -104,7 +105,8 @@ fdsm <- function(B,
   } #end for loop
   if (progress == "TRUE"){close(pb)}
 
-  #Proporition of greater than expected and less than expected
+  #### Find Proportions ####
+  ### Proporition of greater than expected and less than expected ###
   Positive <- (Positive/trials)
   Negative <- (Negative/trials)
   rownames(Positive) <- rownames(B)
@@ -112,11 +114,11 @@ fdsm <- function(B,
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  #Run Time
+  ### Run Time ###
   run.time.end <- Sys.time()
   total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
-  #Compile Summary
+  #### Compile Summary ####
   r <- Matrix::rowSums(B)
   c <- Matrix::colSums(B)
 
@@ -125,6 +127,7 @@ fdsm <- function(B,
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
+  #### Return Backbone Object ####
   if (length(dyad) > 0){
     bb <- list(positive = Positive, negative = Negative, dyad_values = edge_weights, summary = model.summary)
     class(bb) <- "backbone"

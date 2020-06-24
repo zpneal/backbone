@@ -38,7 +38,7 @@ sdsm <- function(B,
                  model = "polytope",
                  trials = 1000){
 
-  #Argument Checks
+  #### Argument Checks ####
   if ((model!="logit") &
       (model!="probit") &
       (model!="log") &
@@ -54,44 +54,45 @@ sdsm <- function(B,
   if ((trials < 1000)) {stop("trials must be at least 1000 to get reasonable approximations for curveball algorithm.")}
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
 
-  #Run Time
+  ### Run Time ###
   run.time.start <- Sys.time()
   message(paste0("Finding the distribution using SDSM with ", model, " model."))
 
-  #Class Conversion
+  #### Class Conversion ####
   convert <- class.convert(B, "matrix")
   class <- convert[[1]]
   B <- convert[[2]]
 
-  #If sparse matrix input, use sparse matrix operations
+  #### Bipartite Projection ####
+  ### If sparse matrix input, use sparse matrix operations ###
   if (!methods::is(B, "sparseMatrix")) {
     B <- Matrix::Matrix(B, sparse = T)
   }
   P <- Matrix::tcrossprod(B)
 
-  #Create Positive and Negative Matrices to hold backbone
+  ### Create Positive and Negative Matrices to hold backbone ###
   Positive <- matrix(0, nrow(P), ncol(P))
   Negative <- matrix(0, nrow(P), ncol(P))
 
-  #Compute probabilities for SDSM
+  #### Compute Probabilities for SDSM ####
 
-  #Compute row and column sums if necessary
+  ### Compute row and column sums if necessary ###
   if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="scobit" | model=="lpm" | model=="chi2") {
-    #Vectorize the bipartite data
+    ## Vectorize the bipartite data ##
     A <- data.frame(as.vector(B))
     names(A)[names(A)=="as.vector.B."] <- "value"
 
-    #Assign row and column IDs in the vectorized data
+    ## Assign row and column IDs in the vectorized data ##
     A$row <- rep(1:nrow(B), times=ncol(B))
     A$col <- rep(1:ncol(B), each=nrow(B))
 
-    #Compute and attach rowsums, columnsums
+    ## Compute and attach rowsums, columnsums ##
     A$rowmarg <- stats::ave(A$value,A$row,FUN=sum)
     A$colmarg <- stats::ave(A$value,A$col,FUN=sum)
     A$rowcol <- A$rowmarg * A$colmarg
   }
 
-  #Binomial Models
+  ### Binomial Models ###
   if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit") {
     if (requireNamespace("speedglm", quietly = TRUE)){
       if (model == "logit") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="logit"), data=A)}
@@ -111,6 +112,7 @@ sdsm <- function(B,
       probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
     }
   }
+  ### Scobit model ###
   if (model == "scobit") {
     params <- list(b0=0.1,b1=0.00005,b2=0.00005,a=0.01)
     model.estimates <- stats::optim(params,scobit_loglike_cpp,gr=scobit_loglike_gr_cpp,method="BFGS",x1=A$rowmarg,x2=A$colmarg,y=A$value)
@@ -118,20 +120,20 @@ sdsm <- function(B,
     probs <- scobit_fct(A$rowmarg,A$colmarg,pars,model.estimates$par[4])
 
   }
-  #Linear probability model
+  ### Linear probability model ###
   if (model=="lpm") {
     model.estimates <- stats::lm(formula= value ~ rowmarg + colmarg, data=A)
     probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
     probs[probs<0] <- 0 #Truncate out-of-bounds estimates
     probs[probs>1] <- 1
   }
-  #Chi-Square model
+  ### Chi-Square model ###
   if (model=="chi2") {
     probs <- as.vector((A$rowmarg * A$colmarg)/sum(A$value))
     probs[probs<0] <- 0 #Truncate out-of-bounds estimates
     probs[probs>1] <- 1
   }
-  #Curveball model
+  ### Curveball model ###
   if (model=="curveball") {
     probs <- data.frame(as.vector(B))  #Vectorized original
     probs[probs==1] <- 0  #Make it only 0s
@@ -142,27 +144,27 @@ sdsm <- function(B,
     probs <- (probs/trials)
     probs <- as.vector(probs$as.vector.B.)
   }
-  #Polytopes model
+  ### Polytopes model ###
   if (model=="polytope") {
     probs <- as.vector(polytope(B))
   }
 
-  #Assemble and compute probabilities
+  #### Assemble and Probabilities ####
   prob.mat <- matrix(probs, nrow = nrow(B), ncol = ncol(B))  #Probability matrix
   rows <- dim(prob.mat)[1]
 
-  #Compute null edge weight distributions using Poisson Binomial RNA
+  #### Compute Null Edge Weight Distributions Using Poisson Binomial RNA ####
 
   for (i in 1:rows){
-    #Compute prob.mat[i,]*prob.mat[j,] for each j
+    ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
 
-    #Find cdf, below or equal to value for negative, above or equal to value for positive
-    #Using RNA approximation
+    ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
+    ### Using RNA approximation ###
     negative <- as.array(mapply(rna, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat))))
     positive <- as.array((1- mapply(rna, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)))))
 
-    #Set values in Positive & Negative matrices
+    ### Set values in Positive & Negative matrices ###
     Positive[i,] <- positive
     Negative[i,] <- negative
   } #end for i in rows
@@ -171,11 +173,11 @@ sdsm <- function(B,
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  #Run Time
+  ### Run Time ###
   run.time.end <- Sys.time()
   total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
-  #Compile Summary
+  #### Compile Summary ####
   r <- Matrix::rowSums(B)
   c <- Matrix::colSums(B)
 
@@ -184,6 +186,7 @@ sdsm <- function(B,
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
+  #### Return Backbone Object ####
   bb <- list(positive = Positive, negative = Negative, summary = model.summary)
   class(bb) <- "backbone"
   return(bb)
