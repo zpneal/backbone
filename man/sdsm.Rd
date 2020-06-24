@@ -15,7 +15,7 @@ Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","l
 \item{trials}{Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.}
 }
 \value{
-backbone, a list(positive, negative, dyad_values, summary). Here
+backbone, a list(positive, negative, summary). Here
     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
