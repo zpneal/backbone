@@ -3,6 +3,11 @@ title: "NEWS"
 output: html_document
 ---
 
+## backbone 1.2.1
+
+* add scobit model to sdsm
+* add time unit to runtime calculation
+* minor spelling and comment fixes
 
 ## backbone 1.2.0
 
