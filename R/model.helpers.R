@@ -232,16 +232,3 @@ rna <-function(kk,pp,wts=NULL)
   return(res)
 }
 
-#' Scobit Helper
-#'
-#' @param x1 vector
-#' @param x2 vector
-#' @param beta list
-#' @param alpha value
-#' @keywords internal
-#' @return fct
-scobit_fct <- function(x1,x2,beta,alpha){
-  fct <- 1-1/(1+exp(beta[1]+beta[2]*x1+beta[3]*x2))^alpha
-  fct
-}
-

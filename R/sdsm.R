@@ -117,8 +117,7 @@ sdsm <- function(B,
     params <- list(b0=0.1,b1=0.00005,b2=0.00005,a=0.01)
     model.estimates <- stats::optim(params,scobit_loglike_cpp,gr=scobit_loglike_gr_cpp,method="BFGS",x1=A$rowmarg,x2=A$colmarg,y=A$value)
     pars <- c(model.estimates$par[1],model.estimates$par[2],model.estimates$par[3])
-    probs <- scobit_fct(A$rowmarg,A$colmarg,pars,model.estimates$par[4])
-
+    probs <- 1-1/(1+exp(pars[1]+pars[2]*A$rowmarg+pars[3]*A$colmarg))^model.estimates$par[4]
   }
   ### Linear probability model ###
   if (model=="lpm") {
