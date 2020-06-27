@@ -134,7 +134,7 @@ In all cases, after finding or empirically generating the distribution, the back
 
 ## Extracting the Backbone: backbone.extract( )
 
-The `hyperg(), fdsm(),` and `sdsm()` functions return two matrices: a `positive` matrix containing the number of times $G_{ij}$ was larger than $G^*_{ij}$, and a `negative` matrix containing the number of times $G_{ij}$ was smaller than $G^*_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
+The `hyperg(), fdsm(),` and `sdsm()` functions return two matrices: a `positive` matrix containing the probability that (or in the case of `fdsm()`, the proportion of times that) $G^*_{ij}$ was greater than or equal to $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was less than or equal to $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
 
 The `backbone.extract()` function has five parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, and `class`. The `matrix` parameter takes in the entire backbone object which is the output of `hyperg(), fdsm(),` or `sdsm()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
 
@@ -156,8 +156,8 @@ The `hyperg()` function has one parameter,
 
 The `hyperg()` function returns a backbone object of the following:
 
-* positive: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}$ is equal to or above the corresponding entry $G_{ij}^*$.
-* negative: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}$ is equal to or below the corresponding entry $G_{ij}^*$.
+* positive: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or above the corresponding entry $G_{ij}$.
+* negative: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or below the corresponding entry $G_{ij}$.
 * summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 Following the `hyperg()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
@@ -190,8 +190,8 @@ These values are approximated using a Refined Normal Approximation (RNA method).
 
 The `sdsm()` function returns a backbone object of the following:
 
-* positive: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}$ is equal to or above the corresponding entry $G_{ij}^*$.
-* negative: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}$ is equal to or below the corresponding entry $G_{ij}^*$.
+* positive: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or above the corresponding entry $G_{ij}$.
+* negative: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or below the corresponding entry $G_{ij}$.
 * summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 
@@ -219,8 +219,8 @@ The `fdsm( )` function has four parameters,
 
 The `fdsm()` function returns a backbone object of the following:
 
-* positive: matrix of the proportion of times $G_{ij}$ is above the corresponding entry in $G^*$
-* negative: matrix of the proportion of times $G_{ij}$ is below the corresponding entry in $G^*$
+* positive: matrix of the proportion of times $G^*_{ij}$ is above the corresponding entry in $G$
+* negative: matrix of the proportion of times $G^*_{ij}$ is below the corresponding entry in $G$
 * dyad_values: list of edge weights for $i,j$ in each $G^*$
 * summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
