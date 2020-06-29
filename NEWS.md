@@ -5,6 +5,7 @@ output: html_document
 
 ## backbone 1.2.1
 
+* add narrative parameter to backbone.extract for suggested manuscript text
 * add scobit model to sdsm
 * add time unit to runtime calculation
 * minor spelling and comment fixes
