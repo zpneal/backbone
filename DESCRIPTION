@@ -1,7 +1,7 @@
 Package: backbone
 Type: Package
 Title: Extracts the Backbone from Weighted Graphs
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: c(
     person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = c("aut", "cre")), 
     person("Zachary", "Neal", email = "zpneal@msu.edu", role = "aut"),
@@ -26,7 +26,8 @@ Imports:
     utils,
     CVXR,
     igraph,
-    network
+    network,
+    Rcpp
 Suggests:
     knitr,
     rmarkdown,
@@ -35,3 +36,5 @@ Suggests:
 VignetteBuilder: knitr
 URL: https://github.com/domagal9/backbone, https://www.zacharyneal.com/backbone
 BugReports: https://github.com/domagal9/backbone/issues
+LinkingTo: 
+    Rcpp

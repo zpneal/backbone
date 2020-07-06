@@ -35,7 +35,7 @@ Extracting $G’$ from $G$ requires deciding which edges to preserve. This usual
 ## Example data
 We outline the use of the backbone package with Davis, Gardner, and Gardner's Southern Women Dataset [@davis1941deep], which can be accessed via [@ucinet]. This data takes the form of a bipartite graph $B$ containing 18 women (rows) and 14 social events (columns) taking place over a nine month period. In $B$, $B_{ij} = 1$ if women $i$ attended event $j$, and otherwise is 0. Let's take a look at the Davis dataset included in this package to see that it is bipartite. 
 
-```{r}
+```{r load data}
 data(davis) #load the dataset
 op <- options(width = 100)
 davis #view the dataset
@@ -47,7 +47,7 @@ We see that our two sets of vertices are women and events attended.
 A weighted graph $G$ can be constructed from $B$ via bipartite projection, where $G = BB^T$ and $G_{ij}$ contains the number of events that both woman $i$ and woman $j$ attended. 
 Looking at the matrix of southern women and events attended above, we see that Evelyn and Charlotte have attended three of the same events. This means that $G_{15} = 3$ in the projection, shown below.
 
-```{r}
+```{r projected data}
 davis%*%t(davis) #The projected davis dataset
 ```
 
@@ -72,13 +72,13 @@ The `universal( )` function has four parameters,
 The function `universal()` returns a `backbone` object containing the backbone graph, with either signed (or binary) edge weights, and a data frame called `summary`, containing the model name (universal threshold), number of rows in M, skew of row sums of M, number of columns of M, skew of column sums of M, and running time. The `universal()` function can be used in a variety of different ways, demonstrated in the following examples. 
 Using the `davis` dataset, if we input the projected matrix `G <- davis%*%t(davis)`, we can use the universal threshold on the weighted matrix `G`. If we set an upper threshold of 0, then if two women have attended any event together (co-attendance > 0), there will be an edge between the two. We can plot this graph with the `igraph` package. 
 
-```{r}
+```{r universal threshold of G}
 G <- davis%*%t(davis) #projected davis dataset, a weighted graph
 universal_bb <- universal(G, upper = 0)
 universal_bb$backbone
 universal_bb$summary
 ```
-```{r}
+```{r graph of backbone}
 graph <- igraph::graph_from_adjacency_matrix(universal_bb$backbone, mode = "undirected")
 op <- par(mar=c(0,0,0,0))
 lo <- igraph::layout_(graph, igraph::with_fr())
@@ -88,7 +88,7 @@ par(op)
 
 We can also use the `universal()` function on the original bipartite data. When inputting bipartite data, we set parameter `bipartite = TRUE`. The bipartite matrix will be multiplied by its transpose before the threshold is applied. Below, we input the bipartite matrix `davis` with the same threshold values as before, returning the same backbone matrix. 
 
-```{r}
+```{r universal on bipartite}
 universal_bb <- universal(davis, upper = 0, bipartite = TRUE)
 universal_bb$summary
 graph <- igraph::graph_from_adjacency_matrix(universal_bb$backbone, mode = "undirected")
@@ -99,14 +99,14 @@ par(op)
 
 To create a signed backbone, we can apply both an upper and lower threshold value. For instance, we could choose to retain a positive edge if the women attended more than 4 events together, and a negative edge if they attended less than 2 events together (co-attendance of 0 or 1 events). We can do this with the following code. Note that the returned backbone matrix now has both $+1$ and $-1$ values. 
 
-```{r}
+```{r signed universal}
 universal_bb <- universal(davis, upper = 4, lower = 2, bipartite = TRUE)
 universal_bb$backbone
 ```
 
 We can also choose a threshold that is a multiple of some function, such as mean, max, or min. The function is applied to the edge weights, and then multiplied by the upper and lower thresholds. Any $G_{ij}$ values above the upper threshold are counted as a positive $+1$ value in the backbone, and any below the lower threshold are counted as a negative $-1$ value in the backbone. The following code will return a backbone where the positive edges indicate two women attended more than 1 standard deviation above the mean number of events and negative edges indicate two women attended less than 1 standard deviation below the mean number of events. 
 
-```{r}
+```{r signed universal with functions}
 universal_bb <- universal(davis, 
                           upper = function(x)mean(x)+sd(x), 
                           lower=function(x)mean(x)-sd(x), 
@@ -134,15 +134,17 @@ In all cases, after finding or empirically generating the distribution, the back
 
 ## Extracting the Backbone: backbone.extract( )
 
-The `hyperg(), fdsm(),` and `sdsm()` functions return two matrices: a `positive` matrix containing the number of times $G^*_{ij}$ was larger than $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was smaller than $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
+The `hyperg(), fdsm(),` and `sdsm()` functions return two matrices: a `positive` matrix containing the probability that (or in the case of `fdsm()`, the proportion of times that) $G^*_{ij}$ was greater than or equal to $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was less than or equal to $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
 
-The `backbone.extract()` function has five parameters: `matrix`, `signed`, a significant test value `alpha`, `fwer`, and `class`. The `matrix` parameter takes in the entire backbone object which is the output of `hyperg(), fdsm(),` or `sdsm()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
+The `backbone.extract()` function has six parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, `class`, and `narrative`. The `matrix` parameter takes in the entire backbone object which is the output of `hyperg(), fdsm(),` or `sdsm()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
 
 One can adjust the precision of the significance test, `alpha`, to refine their backbone results. The value of `alpha` should be between `0` and `1`. The default is `alpha=0.05`. The statistical test is two-tailed with an area of `alpha/2` in each tail. 
 
 Extracting the backbone of a bipartite projection involves applying this significance test to each of the N(N-1)/2 edges in the projection. Because each of these tests is independent, this can inflate the familywise error rate beyond the desired `alpha`. The `fwer` parameter, which is set to NULL by default, offers two ways to correct for this. When `fwer = bonferroni`, the classical Bonferroni correction is applied. When `fwer = holm`, the more powerful Holm-Bonferroni correction is applied.
 
 If an entry in the `positive` matrix is less than or equal to the `alpha`/2 value, it is considered a `+1` edge in the backbone. If an entry in the `negative` matrix is less than or equal to the `alpha`/2 value, it is considered a `-1` edge in the backbone. All other values are `0` in the backbone graph. The `backbone.extract()` function will return a backbone graph of the same class and input parameter `class`. This can be one of "original", "matrix", "sparseMatrix", "igraph", "network", or "edgelist". If "original", the backbone graph returned is of the same class as the data inputted in one of `sdsm()`, `fdsm()`, or `hyperg()`. 
+
+When `narrative` is set to `TRUE`, `backbone.extract()` will provide text describing the generated backbone graph that could be included in a manuscript. This text includes citations for the applied backbone methods. 
 
 We demonstrate this function's use in the following sections. 
 
@@ -156,13 +158,13 @@ The `hyperg()` function has one parameter,
 
 The `hyperg()` function returns a backbone object of the following:
 
-* positive: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}^*$ is equal to or above the corresponding entry in $G$.
-* negative: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}^*$ is equal to or below the corresponding entry in $G$.
+* positive: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or above the corresponding entry $G_{ij}$.
+* negative: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or below the corresponding entry $G_{ij}$.
 * summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 Following the `hyperg()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
 
-```{r}
+```{r hypergeometric model}
 hyperg <- hyperg(davis)
 hyperg_bb <- backbone.extract(hyperg, signed = TRUE)
 ```
@@ -190,18 +192,18 @@ These values are approximated using a Refined Normal Approximation (RNA method).
 
 The `sdsm()` function returns a backbone object of the following:
 
-* positive: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}^*$ is equal to or above the corresponding entry in $G$.
-* negative: a matrix with $(i,j)$ entry equal to the probability that $G_{ij}^*$ is equal to or below the corresponding entry in $G$.
+* positive: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or above the corresponding entry $G_{ij}$.
+* negative: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or below the corresponding entry $G_{ij}$.
 * summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 
-```{r echo=T, results='hide'}
+```{r sdsm, echo=T, results='hide'}
 sdsm <- sdsm(davis)
 ```
 
 The backbone package allows for two different types of family-wise error rate correction: Holm-Bonferroni and Bonferroni. To use Holm-Bonferroni correction, add parameter `fwer = "holm"` to `backbone.extract()`, and to use Bonferroni correction, add `fwer = "bonferroni"`. Note in this case, the Holm-Bonferroni is too restrictive and leaves us with no edges in our backbone graph.  
 
-```{r}
+```{r sdsm backbone}
 sdsm_bb <- backbone.extract(sdsm, signed = FALSE, alpha = 0.1, fwer = "bonferroni") 
 sdsm_bb
 ```
@@ -219,17 +221,17 @@ The `fdsm( )` function has four parameters,
 
 The `fdsm()` function returns a backbone object of the following:
 
-* positive: matrix of the proportion of times $G_{ij}$ is above the corresponding entry in $G^*$
-* negative: matrix of the proportion of times $G_{ij}$ is below the corresponding entry in $G^*$
+* positive: matrix of the proportion of times $G^*_{ij}$ is above the corresponding entry in $G$
+* negative: matrix of the proportion of times $G^*_{ij}$ is below the corresponding entry in $G$
 * dyad_values: list of edge weights for $i,j$ in each $G^*$
 * summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 
 We can find the backbone using the fixed degree sequence model as follows:
 
-```{r echo=T, results='hide'}
+```{r fdsm, echo=T, results='hide'}
 fdsm <- fdsm(davis, trials = 100, dyad=c(1,5))
 ```
-```{r}
+```{r fdsm backbone}
 fdsm$dyad_values
 fdsm_bb <- backbone.extract(fdsm, signed = TRUE, alpha = 0.1)
 fdsm_bb

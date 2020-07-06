@@ -23,17 +23,19 @@ universal <- function(M,
                       upper = 0,
                       lower = NULL,
                       bipartite = FALSE){
-  if ((class(upper)!="function") & (class(upper)!="numeric")) {stop("upper must be either function or numeric")}
-  if ((class(lower)!="function") & (class(lower)!="numeric") & (class(lower)!="NULL")) {stop("lower must be either function or numeric")}
+  #### Argument Checks ####
+  if (!(methods::is(upper, "function")) & (!(methods::is(upper, "numeric")))) {stop("upper must be either function or numeric")}
+  if (!(methods::is(lower, "function")) & (!(methods::is(lower, "numeric"))) & (!(methods::is(lower, "NULL")))) {stop("lower must be either function or numeric")}
 
-  #Run Time
+  ### Run Time ###
   run.time.start <- Sys.time()
 
-  #Class Conversion
+  ### Class Conversion ###
   convert <- class.convert(M)
   class <- convert[[1]]
   M <- convert[[2]]
 
+  #### Bipartite Projection ####
   if (bipartite == TRUE){
     if (methods::is(M, "sparseMatrix")) {
       P <- Matrix::tcrossprod(M)
@@ -44,7 +46,7 @@ universal <- function(M,
     P <- M
   }
 
-  #Set threshold values
+  #### Set Threshold Values ####
   if (class(upper) == "function"){
     ut <- upper(P)
   } else {ut <- upper}
@@ -53,7 +55,7 @@ universal <- function(M,
     lt <- lower(P)
   } else {lt <- lower}
 
-  #Create backbone matrix
+  #### Create Backbone Matrix ####
   backbone <- matrix(0, nrow(P), ncol(P))
   negative <- (P<lt)+0
   positive <- (P>ut)+0
@@ -66,11 +68,11 @@ universal <- function(M,
 
   diag(backbone) <- 0
 
-  #Run Time
+  ### Run Time ###
   run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start), 2))
+  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
-  #Compile Summary
+  #### Compile Summary ####
   if (methods::is(M, "sparseMatrix")) {
     r <- Matrix::rowSums(M)
     c <- Matrix::colSums(M)
@@ -78,11 +80,15 @@ universal <- function(M,
     r <- rowSums(M)
     c <- colSums(M)
   }
-  a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time")
+  a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
   b <- c(class[1], "Universal Threshold", dim(M)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(M)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
+
+  #### Convert to Indicated Class Object ####
   backbone_converted <- class.convert(backbone, class[1])
+
+  #### Return Backbone and Summary ####
   bb <- list(backbone = backbone_converted[[2]], summary = model.summary)
   class(bb) <- "backbone"
   return(bb)
