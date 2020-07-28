@@ -35,8 +35,7 @@ fdsm <- function(B,
 
   #### Argument Checks ####
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
-
+  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
   ### Run Time ###
   run.time.start <- Sys.time()
 
