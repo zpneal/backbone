@@ -14,6 +14,8 @@ universal(M, upper = 0, lower = NULL, bipartite = FALSE, narrative = FALSE)
 \item{lower}{Real, FUN, or NULL: lower threshold value or function to be applied to the edge weights. Default is NULL.}
 
 \item{bipartite}{Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.}
+
+\item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned}
 }
 \value{
 backbone, a list(backbone, summary). The `backbone` object is a graph object of the same class as M.

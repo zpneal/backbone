@@ -8,6 +8,7 @@
 #' @param upper Real, FUN, or NULL: upper threshold value or function to be applied to the edge weights. Default is 0.
 #' @param lower Real, FUN, or NULL: lower threshold value or function to be applied to the edge weights. Default is NULL.
 #' @param bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
+#' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned
 #'
 #' @details If both `upper` and `lower` are `NULL`, a weighted projection is returned.
 #' @return backbone, a list(backbone, summary). The `backbone` object is a graph object of the same class as M.
