@@ -11,3 +11,15 @@ citEntry(
   https://CRAN.R-project.org/package=backbone"
   )
 )
+
+citEntry(
+  entry    = "article",
+  title    = "{backbone}: An R package for extracting the backbone of bipartite projections",
+  author   = c(person("Rachel","Domagalski"), person("Zachary", "Neal"), person("Bruce", "Sagan")),
+  year     = 2020,
+  journal     = "arXiv",
+  number = {1912.12779},
+  url      = "https://arxiv.org/abs/1912.12779",
+  textVersion = paste("Rachel Domagalski, Zachary Neal, and Bruce Sagan (2020). backbone: An R package for extracting the backbone of bipartite projections. https://arxiv.org/abs/1912.12779"
+  )
+)
