@@ -8,7 +8,7 @@
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #' @param model String: A method used to compute probabilities for generating random bipartite graphs.
-#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "chi2", "curveball", "polytope").
+#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "rcn", "curveball", "polytope").
 #' @param trials Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.
 #'
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
@@ -18,7 +18,7 @@
 #'     then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
 #'     as described by \link[stats]{glm} and \link[stats]{family}.
 #'     If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product.
-#'     If 'model = lpm', a linear probability model is used. If 'model = chi2', a chi-squared model is used.
+#'     If 'model = lpm', a linear probability model is used. If 'model = rcn', the probabilities are given by (row degree * column degree)/(total number of edges).
 #' @details If 'model' = 'curveball' and 'trials' > 0, the probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
 #'     If 'model = polytope', the \link{polytope} function is used to find a matrix of probabilities that maximizes the entropy function, with same row and column sums.
 #'
@@ -47,6 +47,7 @@ sdsm <- function(B,
       (model!="oldlogit") &
       (model!="scobit") &
       (model!="lpm") &
+      (model!="rcn") &
       (model!="chi2") &
       (model!="curveball") &
       (model!="polytope"))
@@ -77,7 +78,7 @@ sdsm <- function(B,
   #### Compute Probabilities for SDSM ####
 
   ### Compute row and column sums if necessary ###
-  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="scobit" | model=="lpm" | model=="chi2") {
+  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="scobit" | model=="lpm" | model=="chi2" | model=="rcn") {
     ## Vectorize the bipartite data ##
     A <- data.frame(as.vector(B))
     names(A)[names(A)=="as.vector.B."] <- "value"
@@ -132,6 +133,14 @@ sdsm <- function(B,
     probs[probs<0] <- 0 #Truncate out-of-bounds estimates
     probs[probs>1] <- 1
   }
+
+  ### Chi-Square model ###
+  if (model=="rcn") {
+    probs <- as.vector((A$rowmarg * A$colmarg)/sum(A$value))
+    probs[probs<0] <- 0 #Truncate out-of-bounds estimates
+    probs[probs>1] <- 1
+  }
+
   ### Curveball model ###
   if (model=="curveball") {
     probs <- data.frame(as.vector(B))  #Vectorized original
