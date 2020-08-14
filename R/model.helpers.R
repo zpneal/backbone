@@ -2,6 +2,7 @@
 #'
 #' @param graph matrix, sparse matrix, \link{igraph}, edgelist, or \link[network]{network} object
 #' @param convert class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
+#' @param extract Boolean, TRUE if using function within backbone.extract, FALSE if not.
 #' @details An object is considered an edgelist if it is (1) a matrix or sparse matrix, and (2) has only two columns.
 #'     Each column is understood as a bipartite set, with edges only going between members of column 1 and members of column 2.
 #' @return list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph
@@ -23,7 +24,7 @@
 #' \dontrun{backbone:::class.convert(bb, "sparseMatrix")}
 #' \dontrun{backbone:::class.convert(bb, "igraph")}
 #' \dontrun{backbone:::class.convert(bb, "network")}
-class.convert <- function(graph, convert = "matrix"){
+class.convert <- function(graph, convert = "matrix", extract = FALSE){
   class <- class(graph)
 
   #### Converting to "matrix" ####
@@ -53,7 +54,23 @@ class.convert <- function(graph, convert = "matrix"){
         G <- as.matrix(graph, attr = "weight")
       } else {G <- as.matrix(graph)}
     }
-  }
+  ### Remove rows/cols with zero sums ###
+    if (extract == FALSE){
+      R <- rowSums(G)
+      C <- colSums(G)
+      r <- which(R == 0)
+      c <- which(C == 0)
+      if (length(r)>0){
+        G <- G[-r,]
+        warning("Rows with a zero sum have been removed from the data. The rows removed were: ",
+        paste0(r, " "))
+      }
+      if (length(c)>0){
+        G <- G[,-c]
+        warning("Columns with a zero sum have been removed from the data. The columns removed were: ", paste0(c, " "))
+      }
+    }
+  }#end convert to matrix
 
   #### Converting to "sparseMatrix ####
   if (convert == "sparseMatrix"){
