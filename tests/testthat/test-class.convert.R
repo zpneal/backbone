@@ -82,15 +82,15 @@ test_that("class.convert classes match", {
   class(davis)
   class(bb)
 
-  e1 <- class.convert(bb, "matrix")
-  e2 <- class.convert(bb, "sparseMatrix")
-  e3 <- class.convert(bb, "igraph")
-  e4 <- class.convert(bb, "network")
+  e1 <- class.convert(bb, "matrix", extract = TRUE)
+  e2 <- class.convert(bb, "sparseMatrix", extract = TRUE)
+  e3 <- class.convert(bb, "igraph", extract = TRUE)
+  e4 <- class.convert(bb, "network", extract = TRUE)
 
-  f1<-class.convert(e1[[2]])
-  f2<-class.convert(e2[[2]])
-  f3<-class.convert(e3[[2]])
-  f4<-class.convert(e4[[2]])
+  f1<-class.convert(e1[[2]], extract = TRUE)
+  f2<-class.convert(e2[[2]], extract = TRUE)
+  f3<-class.convert(e3[[2]], extract = TRUE)
+  f4<-class.convert(e4[[2]], extract = TRUE)
 
   expect_equal(bb,f1[[2]])
   expect_equal(bb.sp,f2[[2]])
