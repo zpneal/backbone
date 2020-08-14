@@ -56,8 +56,8 @@ class.convert <- function(graph, convert = "matrix", extract = FALSE){
     }
   ### Remove rows/cols with zero sums ###
     if (extract == FALSE){
-      R <- rowSums(G)
-      C <- colSums(G)
+      R <- Matrix::rowSums(G)
+      C <- Matrix::colSums(G)
       r <- which(R == 0)
       c <- which(C == 0)
       if (length(r)>0){
