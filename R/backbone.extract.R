@@ -133,7 +133,7 @@ backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none
     if (model == "Fixed Degree Sequence Model") {message("Zweig, K. A. and Kaufmann, M. (2011). A systematic approach to the one-mode projection of bipartite graphs. Social Network Analysis and Mining, 1, 187-218. https://doi.org/10.1007/s13278-011-0021-0")}
   }
 
-  backbone <- class.convert(backbone, class[1])
+  backbone <- class.convert(backbone, class[1], extract = TRUE)
   return(backbone[[2]])
 }
 
