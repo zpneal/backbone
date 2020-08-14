@@ -69,17 +69,16 @@ The `universal( )` function has four parameters,
 * bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
 
 
-The function `universal()` returns a `backbone` object containing the backbone graph, with either signed (or binary) edge weights, and a data frame called `summary`, containing the model name (universal threshold), number of rows in M, skew of row sums of M, number of columns of M, skew of column sums of M, and running time. The `universal()` function can be used in a variety of different ways, demonstrated in the following examples. 
+The function `universal()` returns a `backbone` object containing the backbone graph, with either signed (or binary) edge weights. The `universal()` function can be used in a variety of different ways, demonstrated in the following examples. 
 Using the `davis` dataset, if we input the projected matrix `G <- davis%*%t(davis)`, we can use the universal threshold on the weighted matrix `G`. If we set an upper threshold of 0, then if two women have attended any event together (co-attendance > 0), there will be an edge between the two. We can plot this graph with the `igraph` package. 
 
 ```{r universal threshold of G}
 G <- davis%*%t(davis) #projected davis dataset, a weighted graph
 universal_bb <- universal(G, upper = 0)
-universal_bb$backbone
-universal_bb$summary
+universal_bb
 ```
 ```{r graph of backbone}
-graph <- igraph::graph_from_adjacency_matrix(universal_bb$backbone, mode = "undirected")
+graph <- igraph::graph_from_adjacency_matrix(universal_bb, mode = "undirected")
 op <- par(mar=c(0,0,0,0))
 lo <- igraph::layout_(graph, igraph::with_fr())
 plot(graph, vertex.label = 1:18, layout = lo)
@@ -90,8 +89,7 @@ We can also use the `universal()` function on the original bipartite data. When 
 
 ```{r universal on bipartite}
 universal_bb <- universal(davis, upper = 0, bipartite = TRUE)
-universal_bb$summary
-graph <- igraph::graph_from_adjacency_matrix(universal_bb$backbone, mode = "undirected")
+graph <- igraph::graph_from_adjacency_matrix(universal_bb, mode = "undirected")
 op <- par(mar=c(0,0,0,0))
 plot(graph, vertex.label = 1:18, layout = lo)
 par(op)
@@ -101,7 +99,7 @@ To create a signed backbone, we can apply both an upper and lower threshold valu
 
 ```{r signed universal}
 universal_bb <- universal(davis, upper = 4, lower = 2, bipartite = TRUE)
-universal_bb$backbone
+universal_bb
 ```
 
 We can also choose a threshold that is a multiple of some function, such as mean, max, or min. The function is applied to the edge weights, and then multiplied by the upper and lower thresholds. Any $G_{ij}$ values above the upper threshold are counted as a positive $+1$ value in the backbone, and any below the lower threshold are counted as a negative $-1$ value in the backbone. The following code will return a backbone where the positive edges indicate two women attended more than 1 standard deviation above the mean number of events and negative edges indicate two women attended less than 1 standard deviation below the mean number of events. 
