@@ -11,12 +11,12 @@ The `backbone` package provides methods for extracting from a weighted
 graph a binary or signed backbone that retains only the significant
 edges. The user may input a weighted graph, or a bipartite graph from
 which a weighted graph is first constructed via projection. Backbone
-extraction methods include the stochastic degree sequence model ([Neal,
-Z. P. (2014)](https://doi.org/10.1016/j.socnet.2014.06.001)),
-hypergeometric model ([Neal, Z.
-(2013)](https://doi.org/10.1007/s13278-013-0107-y)), the fixed degree
-sequence model ([Zweig, K. A., and Kaufmann, M.
-(2011)](https://doi.org/10.1007/s13278-011-0021-0)), as well as a
+extraction methods include the stochastic degree sequence model [(Neal,
+Z. P. (2014))](https://doi.org/10.1016/j.socnet.2014.06.001),
+hypergeometric model [(Neal, Z.
+(2013))](https://doi.org/10.1007/s13278-013-0107-y), the fixed degree
+sequence model [(Zweig, K. A., and Kaufmann, M.
+(2011))](https://doi.org/10.1007/s13278-011-0021-0), as well as a
 universal threshold method.
 
 In a graph `G`, edges are either present (i.e. `G_{ij}=1`) or absent
@@ -69,4 +69,5 @@ sdsm_bb <- backbone.extract(sdsm_props, signed = TRUE, alpha = 0.05)
 ```
 
 For more detailed examples and background on the topic, see
-`vignette("backbone_introduction", package = "backbone")`.
+`vignette("backbone_introduction", package = "backbone")` or our
+manuscript on the backbone package: <https://arxiv.org/abs/1912.12779>
