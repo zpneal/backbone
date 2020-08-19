@@ -9,7 +9,6 @@ output: html_document
 * rename sdsm "chi2" model to "rcn"
 * universal function can now return weighted projection
 * universal function now has a narrative parameter
-* universal function no longer returns a summary
 * class.convert now drops (with warning) rows and columns with zero sum before sending output to universal, sdsm, fdsm, or hyperg.
 * update citations
 
