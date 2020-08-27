@@ -10,7 +10,7 @@ sdsm(B, model = "polytope", trials = 1000)
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
 
 \item{model}{String: A method used to compute probabilities for generating random bipartite graphs.
-Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "chi2", "curveball", "polytope").}
+Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "rcn", "curveball", "polytope").}
 
 \item{trials}{Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.}
 }
@@ -36,7 +36,7 @@ If the 'model' parameter is one of c('logit', 'probit', 'cauchit', 'log', 'clogl
     then this model is used as a 'link' function for a binary outcome model conditioned on the row degrees and column degrees,
     as described by \link[stats]{glm} and \link[stats]{family}.
     If the 'model' parameter is 'oldlogit', then a logit link function is used but the model is conditioned on the row degrees, column degrees, and their product.
-    If 'model = lpm', a linear probability model is used. If 'model = chi2', a chi-squared model is used.
+    If 'model = lpm', a linear probability model is used. If 'model = rcn', the probabilities are given by (row degree * column degree)/(total number of edges).
 
 If 'model' = 'curveball' and 'trials' > 0, the probabilities are computed by using \link[backbone]{curveball} function `trials` times. The proportion of each cell being 1 is used as its probability.
     If 'model = polytope', the \link{polytope} function is used to find a matrix of probabilities that maximizes the entropy function, with same row and column sums.

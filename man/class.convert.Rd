@@ -4,12 +4,14 @@
 \alias{class.convert}
 \title{Convert graph object to adjacency matrix}
 \usage{
-class.convert(graph, convert = "matrix")
+class.convert(graph, convert = "matrix", extract = FALSE)
 }
 \arguments{
 \item{graph}{matrix, sparse matrix, \link{igraph}, edgelist, or \link[network]{network} object}
 
 \item{convert}{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
+
+\item{extract}{Boolean, TRUE if using function within backbone.extract, FALSE if not.}
 }
 \value{
 list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph

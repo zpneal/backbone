@@ -3,6 +3,15 @@ title: "NEWS"
 output: html_document
 ---
 
+## backbone 1.2.2
+
+* fix fdsm to accept all graph inputs
+* rename sdsm "chi2" model to "rcn"
+* universal function can now return weighted projection
+* universal function now has a narrative parameter
+* class.convert now drops (with warning) rows and columns with zero sum before sending output to universal, sdsm, fdsm, or hyperg.
+* update citations
+
 ## backbone 1.2.1
 
 * add narrative parameter to backbone.extract for suggested manuscript text
