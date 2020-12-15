@@ -1,14 +1,12 @@
 #' old_bicm
 #'
-#' @param graph
-#' @param tol
-#' @param eps
-#' @param max_steps
+#' @param graph temp desc
+#' @param tol temp desc
+#' @param eps temp desc
+#' @param max_steps temp desc
 #'
 #' @return
 #' @export
-#'
-#' @examples
 old_bicm <- function(graph, tol = 1e-8, eps = 1e-3, max_steps = 200){
 
   #### initialize_graph ####
@@ -144,6 +142,13 @@ old_bicm <- function(graph, tol = 1e-8, eps = 1e-3, max_steps = 200){
 
 
 
+#' Title
+#'
+#' @param x0 temp desc
+#' @param args temp desc
+#'
+#' @return
+#' @export
 old_iterative_bicm <- function(x0, args){
   # return the next iterative step for the BICM reduced version
 
@@ -172,6 +177,14 @@ old_iterative_bicm <- function(x0, args){
   return(ff)
 }
 
+#' Title
+#'
+#' @param x0 temp desc
+#' @param args temp desc
+#'
+#' @return
+#' @export
+#'
 old_loglikelihood_bicm <- function(x0, args){
   #loglikelihood for reduced bicm
   # x0 fitnesses vector
