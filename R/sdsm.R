@@ -7,9 +7,6 @@
 #'     the backbone matrix for a given alpha value.
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-#' @param model String: A method used to compute probabilities for generating random bipartite graphs.
-#'     Can be c("logit", "probit", "cauchit", "log", "cloglog", "scobit", "oldlogit","lpm", "rcn", "curveball", "polytope").
-#' @param trials Integer: If ‘model’ = ‘curveball’, number of random bipartite graphs generated using curveball to compute probabilities. Default is 1000.
 #'
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
 #'    to the distribution of weights expected in a projection obtained from a random bipartite network where
@@ -35,29 +32,21 @@
 #'\dontrun{sdsm_probs2 <- sdsm(davis, model = "curveball", trials = 1000)}
 
 sdsm <- function(B,
-                 model = "polytope",
-                 trials = 1000){
+                 model = "bicm"){
 
   #### Argument Checks ####
-  if ((model!="logit") &
-      (model!="probit") &
-      (model!="log") &
-      (model!="cloglog") &
-      (model!="cauchit") &
-      (model!="oldlogit") &
-      (model!="scobit") &
-      (model!="lpm") &
-      (model!="rcn") &
-      (model!="chi2") &
-      (model!="curveball") &
-      (model!="polytope"))
-  {stop("incorrect model type")}
-  if ((trials < 1000)) {stop("trials must be at least 1000 to get reasonable approximations for curveball algorithm.")}
+  if (model!="bicm"){
+    stop("This model is depreciated. SDSM now uses the 'bicm' model.
+             To run an older model, you must install a previous version of backbone.
+             This can be done by using:
+            ''require(devtools)'' and
+            ''install_version(''backbone'', version = '1.2.2')")
+  }
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
 
   ### Run Time ###
   run.time.start <- Sys.time()
-  message(paste0("Finding the distribution using SDSM with ", model, " model."))
+  message(paste0("Finding the distribution using SDSM with bicm model."))
 
   #### Class Conversion ####
   convert <- class.convert(B, "matrix")
@@ -66,7 +55,7 @@ sdsm <- function(B,
 
   #### Bipartite Projection ####
   ### If sparse matrix input, use sparse matrix operations ###
-  if (!methods::is(B, "sparseMatrix")) {
+  if (methods::is(B, "sparseMatrix")) {
     B <- Matrix::Matrix(B, sparse = T)
   }
   P <- Matrix::tcrossprod(B)
@@ -76,89 +65,10 @@ sdsm <- function(B,
   Negative <- matrix(0, nrow(P), ncol(P))
 
   #### Compute Probabilities for SDSM ####
-
-  ### Compute row and column sums if necessary ###
-  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit" | model=="scobit" | model=="lpm" | model=="chi2" | model=="rcn") {
-    ## Vectorize the bipartite data ##
-    A <- data.frame(as.vector(B))
-    names(A)[names(A)=="as.vector.B."] <- "value"
-
-    ## Assign row and column IDs in the vectorized data ##
-    A$row <- rep(1:nrow(B), times=ncol(B))
-    A$col <- rep(1:ncol(B), each=nrow(B))
-
-    ## Compute and attach rowsums, columnsums ##
-    A$rowmarg <- stats::ave(A$value,A$row,FUN=sum)
-    A$colmarg <- stats::ave(A$value,A$col,FUN=sum)
-    A$rowcol <- A$rowmarg * A$colmarg
-  }
-
-  ### Binomial Models ###
-  if (model=="logit" | model=="probit" | model=="log" | model=="cloglog" | model=="cauchit" | model=="oldlogit") {
-    if (requireNamespace("speedglm", quietly = TRUE)){
-      if (model == "logit") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="logit"), data=A)}
-      if (model == "probit") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="probit"), data=A)}
-      if (model == "log") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="log"), data=A)}
-      if (model == "cloglog") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="cloglog"), data=A)}
-      if (model == "cauchit") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="cauchit"), data=A)}
-      if (model == "oldlogit") {model.estimates <- speedglm::speedglm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link="logit"), data=A)}
-      probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
-    } else {
-      if (model == "logit") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="logit"), data=A)}
-      if (model == "probit") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="probit"), data=A)}
-      if (model == "log") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="log"), data=A)}
-      if (model == "cloglog") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="cloglog"), data=A)}
-      if (model == "cauchit") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg, family = stats::binomial(link="cauchit"), data=A)}
-      if (model == "oldlogit") {model.estimates <- stats::glm(formula= value ~  rowmarg + colmarg + rowcol, family = stats::binomial(link="logit"), data=A)}
-      probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
-    }
-  }
-  ### Scobit model ###
-  if (model == "scobit") {
-    params <- list(b0=0.1,b1=0.00005,b2=0.00005,a=0.01)
-    model.estimates <- stats::optim(params,scobit_loglike_cpp,gr=scobit_loglike_gr_cpp,method="BFGS",x1=A$rowmarg,x2=A$colmarg,y=A$value)
-    pars <- c(model.estimates$par[1],model.estimates$par[2],model.estimates$par[3])
-    probs <- 1-1/(1+exp(pars[1]+pars[2]*A$rowmarg+pars[3]*A$colmarg))^model.estimates$par[4]
-  }
-  ### Linear probability model ###
-  if (model=="lpm") {
-    model.estimates <- stats::lm(formula= value ~ rowmarg + colmarg, data=A)
-    probs <- as.vector(stats::predict(model.estimates,newdata=A,type = "response"))
-    probs[probs<0] <- 0 #Truncate out-of-bounds estimates
-    probs[probs>1] <- 1
-  }
-  ### Chi-Square model ###
-  if (model=="chi2") {
-    probs <- as.vector((A$rowmarg * A$colmarg)/sum(A$value))
-    probs[probs<0] <- 0 #Truncate out-of-bounds estimates
-    probs[probs>1] <- 1
-  }
-
-  ### Chi-Square model ###
-  if (model=="rcn") {
-    probs <- as.vector((A$rowmarg * A$colmarg)/sum(A$value))
-    probs[probs<0] <- 0 #Truncate out-of-bounds estimates
-    probs[probs>1] <- 1
-  }
-
-  ### Curveball model ###
-  if (model=="curveball") {
-    probs <- data.frame(as.vector(B))  #Vectorized original
-    probs[probs==1] <- 0  #Make it only 0s
-    for (i in 1:trials) {
-      Bstar <- curveball(B)
-      probs <- probs + data.frame(as.vector(Bstar))
-    }
-    probs <- (probs/trials)
-    probs <- as.vector(probs$as.vector.B.)
-  }
-  ### Polytopes model ###
-  if (model=="polytope") {
-    probs <- as.vector(polytope(B))
-  }
+  print(B)
+  prob.mat <- bicm(B)
 
   #### Assemble and Probabilities ####
-  prob.mat <- matrix(probs, nrow = nrow(B), ncol = ncol(B))  #Probability matrix
   rows <- dim(prob.mat)[1]
 
   #### Compute Null Edge Weight Distributions Using Poisson Binomial RNA ####
@@ -190,7 +100,7 @@ sdsm <- function(B,
   c <- Matrix::colSums(B)
 
   a <- c("Input Class", "Model", "Method", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
-  b <- c(class[1], "Stochastic Degree Sequence Model", model, dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+  b <- c(class[1], "Stochastic Degree Sequence Model", "bicm", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
