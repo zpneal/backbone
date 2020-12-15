@@ -2,9 +2,9 @@
 
 export(backbone.extract)
 export(curveball)
+export(extract)
 export(fdsm)
 export(hyperg)
-export(polytope)
 export(sdsm)
 export(universal)
 importFrom(Rcpp,sourceCpp)
