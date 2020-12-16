@@ -64,8 +64,8 @@ This is a basic example which shows you how to solve a common problem:
 library(backbone)
 data(davis)
 sdsm_props <- sdsm(davis)
-#> Finding the distribution using SDSM with polytope model.
-sdsm_bb <- backbone.extract(sdsm_props, signed = TRUE, alpha = 0.05)
+#> Finding the distribution using SDSM with bicm model.
+sdsm_bb <- extract(sdsm_props, signed = TRUE, alpha = 0.05)
 ```
 
 For more detailed examples and background on the topic, see
