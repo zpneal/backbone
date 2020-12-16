@@ -24,14 +24,12 @@ Imports:
     methods,
     stats,
     utils,
-    CVXR,
     igraph,
     network,
     Rcpp
 Suggests:
     knitr,
     rmarkdown,
-    speedglm,
     testthat
 VignetteBuilder: knitr
 URL: https://github.com/domagal9/backbone, https://www.zacharyneal.com/backbone
