@@ -63,7 +63,9 @@ extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none", class 
 
   ### Auxiliary Values ###
   alpha <- alpha/2  #Alpha for each tail
-  m <- sum(lower.tri(positive)==TRUE)  #Number of independent tests
+  #m <- sum(lower.tri(positive)==TRUE)  #Number of independent tests
+  n <- dim(positive)[1]
+  m <- (n*(n-1))/2
 
   #### Find p-value in the More Extreme Tail ####
   backbone <- pmin(positive,negative)  #matrix of smaller p-value from positive and negative
