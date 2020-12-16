@@ -98,51 +98,6 @@ class.convert <- function(graph, convert = "matrix", extract = FALSE){
 }
 
 
-#' curveball algorithm
-#'
-#' @param M matrix
-#'
-#' @return rm, a matrix with same row sums and column sums as M, but randomized 0/1 entries.
-#' @export
-#'
-#' @references Algorithm and R implementation: \href{https://www.nature.com/articles/ncomms5114}{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. DOI:10.1038/ncomms5114.}
-#' @examples
-#' curveball(davis)
-curveball<-function(M){
-  #### Define Variables ####
-  RC=dim(M)
-  R=RC[1]
-  C=RC[2]
-  hp=list()
-
-  #### Mark Locations of One's ####
-  for (row in 1:dim(M)[1]) {hp[[row]]=(which(M[row,]==1))}
-  l_hp=length(hp)
-
-  #### Curveball Swaps ####
-  for (rep in 1:(5*l_hp)){
-    AB=sample(1:l_hp,2)
-    a=hp[[AB[1]]]
-    b=hp[[AB[2]]]
-    ab=intersect(a,b)
-    l_ab=length(ab)
-    l_a=length(a)
-    l_b=length(b)
-    if ((l_ab %in% c(l_a,l_b))==F){
-      tot=setdiff(c(a,b),ab)
-      l_tot=length(tot)
-      tot=sample(tot, l_tot, replace = FALSE, prob = NULL)
-      L=l_a-l_ab
-      hp[[AB[1]]] = c(ab,tot[1:L])
-      hp[[AB[2]]] = c(ab,tot[(L+1):l_tot])}
-  }
-
-  #### Define and Return Random Matrix ####
-  rm=matrix(0,R,C)
-  for (row in 1:R){rm[row,hp[[row]]]=1}
-  rm
-}
-
 #' Poisson Binomial distribution computed with Refined Normal Approximation
 #'
 #' @param kk values where the cdf is to be computed
@@ -206,7 +161,7 @@ rna <-function(kk,pp,wts=NULL){
 bipartite <- function(B,
                       rows = TRUE,
                       cols = TRUE,
-                      trials){
+                      trials = NULL){
  if ((rows==TRUE)&(cols==TRUE)){
    if (is.null(trials)){
      return(sdsm(B))
