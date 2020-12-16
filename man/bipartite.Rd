@@ -4,7 +4,7 @@
 \alias{bipartite}
 \title{bipartite: generates a backbone object where rows and columns are}
 \usage{
-bipartite(B, rows = TRUE, cols = TRUE, trials)
+bipartite(B, rows = TRUE, cols = TRUE, trials = NULL)
 }
 \arguments{
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
