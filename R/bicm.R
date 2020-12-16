@@ -1,3 +1,10 @@
+#' Computes the loglikelihood for the \link{bicm} function
+#'
+#' @param x0 vector, probabilities given by current step in bicm function
+#' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
+#'
+#' @return loglikelihood, numeric
+#' @keywords internal
 loglikelihood_bicm <- function(x0, args){
   r_dseq_rows <- args[[1]]
   r_dseq_cols <- args[[2]]
@@ -12,6 +19,13 @@ loglikelihood_bicm <- function(x0, args){
   return(f)
 }
 
+#' Computes the updated probabilities for the bicm function
+#'
+#' @param x0 vector, probabilities given by current step in bicm function
+#' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
+#'
+#' @return matrix
+#' @keywords internal
 iterative_bicm <- function(x0, args){
   # return the next iterative step for the BICM
   r_dseq_rows = args[[1]]
@@ -31,12 +45,27 @@ iterative_bicm <- function(x0, args){
   a <- (1/sweep(denom,MARGIN = 2, FUN = "/", STATS = cm))
   b <- rm/denom
   c <- c(Matrix::rowSums(a),Matrix::colSums(b))
-  tmp = c(r_dseq_rows, r_dseq_cols)
-  f <- f+tmp/c
+  d = c(r_dseq_rows, r_dseq_cols)
+  f <- f+d/c
   return(f)
 }
 
-bicm <- function(graph, tol = 1e-8, eps = 1e-3, max_steps = 200){
+#' bicm: Bipartite Configuration Model.
+#'
+#' @param graph matrix, a bipartite adjacency matrix of a graph
+#' @param tol numeric, tolerance of algorithm
+#' @param max_steps numeric, number of times to run \link{iterative_bicm} algorithm
+#'
+#' @details The Bipartite Configuration Model (Saracco et. al. 2015, 2017) produces a matrix of edge specific probabilities which are used in \link{sdsm} to find the p-values of the edges in the bipartite projection. This R code is adapted from the python BiCM package by Matteo Bruno under the MIT license.
+#' @references python bicm: \href{https://github.com/mat701/BiCM}{Matteo Bruno, matteo.bruno<at>imtlucca.it, https://github.com/mat701/BiCM}
+#' @references bicm: \href{https://doi.org/10.1088/1367-2630/aa6b38}{Saracco, F., Straka, M. J., Clemente, R. D., Gabrielli, A., Caldarelli, G., & Squartini, T. (2017). Inferring monopartite projections of bipartite networks: An entropy-based approach. New Journal of Physics, 19(5), 053022. DOI: 10.1088/1367-2630/aa6b38}
+#' @references bicm: \href{https://doi.org/10.1038/srep10595}{Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. Scientific Reports, 5(1), 10595. DOI: 10.1038/srep10595}
+#'
+#' @return matrix containing probabilities
+#' @export
+#'
+#' @examples bicm(davis)
+bicm <- function(graph, tol = 1e-8, max_steps = 200){
 
   #### initialize_graph ####
   n_rows <- dim(graph)[1]
