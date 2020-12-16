@@ -138,10 +138,6 @@ old_bicm <- function(graph, tol = 1e-8, eps = 1e-3, max_steps = 200){
   probs[nonfixed_rows,nonfixed_cols] <- r_probs
   return(probs)
 }
-
-
-
-
 #' Title
 #'
 #' @param x0 temp desc
@@ -213,4 +209,22 @@ old_loglikelihood_bicm <- function(x0, args){
     flag <- FALSE
   }#end for i
   return(f)
+}
+
+
+#' Title
+#'
+#' @param f_old temp desc
+#' @param f_new temp desc
+#' @param alpha temp desc
+#' @param grad_f temp desc
+#' @param p temp desc
+#' @param c1 temp desc
+#'
+#' @return
+#' @export
+sufficient_decrease_condition <- function(f_old, f_new, alpha, grad_f, p, c1=0){
+  # return boolean indicator if upper wolfe condition is respected
+  sup = f_old + c1*alpha*(grad_f%*%(p))
+  return(f_new < sup)
 }
