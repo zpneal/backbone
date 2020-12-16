@@ -28,8 +28,8 @@
 #'
 #' @details Additional functions that aid in the use of the above models are exported:
 #' \itemize{
-#' \item '\code{\link{polytope}}': finds a matrix that maximizes the entropy function, used in \code{\link{sdsm}}.
-#' \item '\code{\link{curveball}}': generates a random 0/1 matrix with the same row and column sums as the input, used in \code{\link{sdsm}} and \code{\link{fdsm}}.
+#' \item '\code{\link{bicm}}': finds a matrix that maximizes the entropy function, used in \code{\link{sdsm}}.
+#' \item '\code{\link{curveball}}': generates a random 0/1 matrix with the same row and column sums as the input, used in \code{\link{fdsm}}.
 #' }
 #'
 #' @details For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
