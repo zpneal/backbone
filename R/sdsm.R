@@ -31,7 +31,7 @@ sdsm <- function(B,
 
   #### Argument Checks ####
   if ((model!="bicm")&(model!="oldbicm")){
-    message("This model is depreciated. SDSM now uses the 'bicm' model.
+    message("This model is deprecated. SDSM now uses the 'bicm' model.
              To run an older model, you must install a previous version of backbone.
              This can be done by using:
             ''require(devtools)'' and
