@@ -24,12 +24,12 @@ Some features of the package are:
     are set to 1 if above the given upper parameter threshold,
     and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 \item '\code{\link{sdsm}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the stochastic degree sequence model.
-    Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
+    Once computed, use \code{\link{extract}} to return the backbone matrix for a given alpha value.
 \item '\code{\link{hyperg}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the hypergeometric model.
-    Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
+    Once computed, use \code{\link{extract}} to return the backbone matrix for a given alpha value.
 \item '\code{\link{fdsm}}': computes the proportion of edge weights above or below the observed edge weights in a bipartite projection using the fixed degree sequence model.
-    Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
-\item '\code{\link{backbone.extract}}': returns a backbone graph object that retains only the significant edges.
+    Once computed, use \code{\link{extract}} to return the backbone matrix for a given alpha value.
+\item '\code{\link{extract}}': returns a backbone graph object that retains only the significant edges.
 }
 
 Additional functions that aid in the use of the above models are exported:
@@ -39,4 +39,7 @@ Additional functions that aid in the use of the above models are exported:
 }
 
 For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
+}
+\references{
+\href{https://doi.org/10.1371/journal.pone.0244363}{Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. DOI: 10.1371/journal.pone.0244363}
 }
