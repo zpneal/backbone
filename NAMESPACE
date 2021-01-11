@@ -2,7 +2,7 @@
 
 export(backbone.extract)
 export(bicm)
-export(bipartite)
+export(bipartite.null)
 export(curveball)
 export(extract)
 export(fdsm)
