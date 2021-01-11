@@ -144,21 +144,22 @@ rna <-function(kk,pp,wts=NULL){
 }
 
 
-#' bipartite: generates a backbone object where rows and columns are
-#'
+#' bipartite.null: generates a backbone object from a bipartite matrix using a null model defined by constraining row and/or column sums.
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-#' @param rows boolean: TRUE if the model should constrain the row sums, FALSE if not.
-#' @param cols boolean: TRUE if the model should constrain the column sums, FALSE if not.
-#' @param trials integer: number of trials to be ran in the case where fdsm is used (rows = TRUE, cols = TRUE)
-#'
+#' @param rows boolean: TRUE if the row sums should be constrained by the null model, FALSE if not.
+#' @param cols boolean: TRUE if the column sums should be constrained by the null model, FALSE if not.
+#' @param trials integer: number of monte carlo trials used to estimate the \link{fdsm} null model (rows = TRUE, cols = TRUE)
+#' @details When only rows are constrained, the hypergeometric null model (\link{hyperg}) is used.
+#'     When rows and columns are constrained, the stochastic degree sequence model (\link{sdsm}) is used.
+#'     When rows and columns are constrained and trials are specified, the fixed degree sequence model (\link{fdsm}) is used.
 #' @return backbone, a list(positive, negative, summary). Here
 #'     `positive` is a matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection,
 #'     `negative` is a matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection,
 #'     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 #' @export
 #'
-#' @examples bipartite(davis, rows = TRUE, cols = FALSE) #runs hyperg on davis data
-bipartite <- function(B,
+#' @examples bipartite.null(davis, rows = TRUE, cols = FALSE) #runs hyperg on davis data
+bipartite.null <- function(B,
                       rows = TRUE,
                       cols = TRUE,
                       trials = NULL){
@@ -166,15 +167,17 @@ bipartite <- function(B,
    if (is.null(trials)){
      return(sdsm(B))
    } else {
-     return(fdsm(B,trials = trials))
+     return(fdsm(B,trials = trials, progress = TRUE))
    } #end else
  } #end if r/c T
  else if ((rows == TRUE)&(cols == FALSE)){
    return(hyperg(B))
  }
- #else if ((rows == FALSE) & (cols == TRUE)){
-   #return(pbdm(B)) #poisson binomial distribution model?
- #}
-} #end bipartite
+ else if ((rows == FALSE) & (cols == TRUE)){
+   stop("This null model is not currently implemented.")
+ } else if ((rows == FALSE) & (cols == FALSE)){
+   stop("This null model does not exist.")
+ }
+} #end bipartite.null
 
 
