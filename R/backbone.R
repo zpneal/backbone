@@ -38,7 +38,3 @@
 #' @docType package
 #' @name backbone
 NULL
-
-#' @useDynLib backbone
-#' @importFrom Rcpp sourceCpp
-NULL
