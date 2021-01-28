@@ -3,7 +3,7 @@
 #' `sdsm` computes the probability of edge weights being
 #'     above or below the observed edge weights in a bipartite projection
 #'     using the stochastic degree sequence model.
-#'     Once computed, use \code{\link{extract}} to return
+#'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
@@ -30,7 +30,7 @@ sdsm <- function(B,
                  model = "bicm"){
 
   #### Argument Checks ####
-  if ((model!="bicm")&(model!="oldbicm")){
+  if (model!="bicm"){
     message("This model is deprecated. SDSM now uses the 'bicm' model.
              To run an older model, you must install a previous version of backbone.
              This can be done by using:
@@ -60,11 +60,7 @@ sdsm <- function(B,
   Negative <- matrix(0, nrow(P), ncol(P))
 
   #### Compute Probabilities for SDSM ####
-  if (model == "oldbicm"){
-    prob.mat <- old_bicm(B)
-  } else if (model != "oldbicm"){
-    prob.mat <- bicm(B)
-  }
+  prob.mat <- bicm(B)
 
   #### Assemble and Probabilities ####
   rows <- dim(prob.mat)[1]
