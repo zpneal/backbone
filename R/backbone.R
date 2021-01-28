@@ -18,12 +18,12 @@
 #'     are set to 1 if above the given upper parameter threshold,
 #'     and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 #' \item '\code{\link{sdsm}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the stochastic degree sequence model.
-#'     Once computed, use \code{\link{extract}} to return the backbone matrix for a given alpha value.
+#'     Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
 #' \item '\code{\link{hyperg}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the hypergeometric model.
-#'     Once computed, use \code{\link{extract}} to return the backbone matrix for a given alpha value.
+#'     Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
 #' \item '\code{\link{fdsm}}': computes the proportion of edge weights above or below the observed edge weights in a bipartite projection using the fixed degree sequence model.
-#'     Once computed, use \code{\link{extract}} to return the backbone matrix for a given alpha value.
-#' \item '\code{\link{extract}}': returns a backbone graph object that retains only the significant edges.
+#'     Once computed, use \code{\link{backbone.extract}} to return the backbone matrix for a given alpha value.
+#' \item '\code{\link{backbone.extract}}': returns a backbone graph object that retains only the significant edges.
 #' }
 #'
 #' @details Additional functions that aid in the use of the above models are exported:
@@ -38,3 +38,13 @@
 #' @docType package
 #' @name backbone
 NULL
+
+onAttach <- function() {
+  packageStartupMessage(" ____  ")
+  packageStartupMessage(paste0("|  _ \\   backbone v"),utils::packageVersion("backbone"))
+  packageStartupMessage("|#|_) |  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021). ")
+  packageStartupMessage("|# _ <   Backbone: An R package for extracting the backbone of bipartite projections. ")
+  packageStartupMessage("|#|_) |  PLoS ONE. https://doi.org/10.1371/journal.pone.0244363")
+  packageStartupMessage("|____/   For help: type vignette(\"backbone\"); email zpneal@msu.edu; github domagal9/backbone")
+}
+
