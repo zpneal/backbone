@@ -165,10 +165,11 @@ rna <-function(kk,pp,wts=NULL){
 bipartite.null <- function(B,
                       rows = TRUE,
                       cols = TRUE,
-                      trials = NULL){
+                      trials = NULL,
+                      ...){
  if ((rows==TRUE)&(cols==TRUE)){
    if (is.null(trials)){
-     return(sdsm(B))
+     return(sdsm(B,...))
    } else {
      return(fdsm(B,trials = trials, progress = TRUE))
    } #end else
