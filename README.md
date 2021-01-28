@@ -58,14 +58,17 @@ install_github("domagal9/backbone", build_vignettes = TRUE)
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to solve a common problem
+using the included Davis’ Southern Women dataset. Using the
+`bipartite.null` function, one can decide if the null model should be
+constricted based on the row and/or column sums.
 
 ``` r
 library(backbone)
 data(davis)
-sdsm_props <- sdsm(davis)
-#> Finding the distribution using SDSM with bicm model.
-sdsm_bb <- extract(sdsm_props, signed = TRUE, alpha = 0.05)
+null_model_probabilities <- bipartite.null(davis, rows = TRUE, cols = FALSE)
+#> Finding the distribution using hypergeometric distribution
+backbone <- extract(null_model_probabilities, signed = TRUE, alpha = 0.05)
 ```
 
 For more detailed examples and background on the topic, see

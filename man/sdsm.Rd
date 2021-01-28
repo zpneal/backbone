@@ -21,7 +21,7 @@ backbone, a list(positive, negative, summary). Here
 `sdsm` computes the probability of edge weights being
     above or below the observed edge weights in a bipartite projection
     using the stochastic degree sequence model.
-    Once computed, use \code{\link{extract}} to return
+    Once computed, use \code{\link{backbone.extract}} to return
     the backbone matrix for a given alpha value.
 }
 \details{

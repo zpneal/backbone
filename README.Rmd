@@ -51,13 +51,13 @@ install_github("domagal9/backbone", build_vignettes = TRUE)
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to solve a common problem using the included Davis' Southern Women dataset. Using the `bipartite.null` function, one can decide if the null model should be constrained based on the row and/or column sums. 
 
 ```{r echo=T, results='hide'}
 library(backbone)
 data(davis)
-sdsm_props <- sdsm(davis)
-sdsm_bb <- extract(sdsm_props, signed = TRUE, alpha = 0.05)
+null_model_probabilities <- bipartite.null(davis, rows = TRUE, cols = FALSE)
+backbone <- backbone.extract(null_model_probabilities, signed = TRUE, alpha = 0.05)
 ```
 
 For more detailed examples and background on the topic, see `vignette("backbone_introduction", package = "backbone")` or our manuscript on the backbone package: [https://arxiv.org/abs/1912.12779](https://arxiv.org/abs/1912.12779)

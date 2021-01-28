@@ -2,7 +2,7 @@
 #'
 #' `hyperg` computes the probability of observing
 #'     a higher or lower edge weight using the hypergeometric distribution.
-#'     Once computed, use \code{\link{extract}} to return
+#'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.

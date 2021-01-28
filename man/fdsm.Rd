@@ -25,7 +25,7 @@ backbone, a list(positive, negative, dyad_values, summary). Here
 \description{
 `fdsm` computes the proportion of generated edges above
     or below the observed value using the fixed degree sequence model.
-    Once computed, use \code{\link{extract}} to
+    Once computed, use \code{\link{backbone.extract}} to
     return the backbone matrix for a given alpha value.
 }
 \details{
