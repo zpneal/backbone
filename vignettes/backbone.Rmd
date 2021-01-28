@@ -1,5 +1,5 @@
 ---
-title: "Overview of the backbone package"
+title: "backbone"
 author: "Rachel Domagalski, Zachary Neal, Bruce Sagan"
 output: 
   rmarkdown::html_vignette:
@@ -130,7 +130,7 @@ Since the distribution that describes having fixed row and column marginals, as 
 3. Repeat steps 1 and 2 $N$ times to build a distribution of $G^*_{ij}$
 4. Compute the proportion of times $G^*{ij}$ is equal to or above the corresponding entry $G_{ij}$ and the proportion of times $G_{ij}^*$ is equal to or below the corresponding entry $G_{ij}$. 
 
-In all cases, after finding or empirically generating the distribution, the backbone can then be extracted for a given $\alpha$ level using the `extract()` function. In this section, we first describe `extract()`, then illustrate its use in the context of `hyperg(), fdsm(),` and `sdsm()`.
+In all cases, after finding or empirically generating the distribution, the backbone can then be extracted for a given $\alpha$ level using the `backbone.extract()` function. In this section, we first describe `backbone.extract()`, then illustrate its use in the context of `hyperg(), fdsm(),` and `sdsm()`.
 
 Each of these functions can be used through the `bipartite()` function. The `bipartite()` function has four parameters: `B` a bipartite graph object, `rows`, `cols` and `trials`. The user can specify which parameters (rows or columns), they would like their probability distribution to restrict. The `bipartite()` function returns the following results for a bipartite graph $B$: 
 
@@ -138,19 +138,19 @@ Each of these functions can be used through the `bipartite()` function. The `bip
 * `bipartite(B, rows = TRUE, cols = TRUE, trials != NULL) = fdsm(B, trials = trials)`
 * `bipartite(B, rows = TRUE, cols = FALSE) = hyperg(B)`
 
-## Extracting the Backbone: extract( )
+## Extracting the Backbone: backbone.extract( )
 
 The `hyperg(), fdsm(),` and `sdsm()` functions (as well as `bipartite()`) return two matrices: a `positive` matrix containing the probability that (or in the case of `fdsm()`, the proportion of times that) $G^*_{ij}$ was greater than or equal to $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was less than or equal to $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
 
-The `extract()` function has six parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, `class`, and `narrative`. The `matrix` parameter takes in the entire backbone object which is the output of `hyperg(), fdsm(),` or `sdsm()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
+The `backbone.extract()` function has six parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, `class`, and `narrative`. The `matrix` parameter takes in the entire backbone object which is the output of `hyperg(), fdsm(),` or `sdsm()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
 
 One can adjust the precision of the significance test, `alpha`, to refine their backbone results. The value of `alpha` should be between `0` and `1`. The default is `alpha=0.05`. The statistical test is two-tailed with an area of `alpha/2` in each tail. 
 
 Extracting the backbone of a bipartite projection involves applying this significance test to each of the N(N-1)/2 edges in the projection. Because each of these tests is independent, this can inflate the familywise error rate beyond the desired `alpha`. The `fwer` parameter, which is set to NULL by default, offers two ways to correct for this. When `fwer = bonferroni`, the classical Bonferroni correction is applied. When `fwer = holm`, the more powerful Holm-Bonferroni correction is applied.
 
-If an entry in the `positive` matrix is less than or equal to the `alpha`/2 value, it is considered a `+1` edge in the backbone. If an entry in the `negative` matrix is less than or equal to the `alpha`/2 value, it is considered a `-1` edge in the backbone. All other values are `0` in the backbone graph. The `extract()` function will return a backbone graph of the same class and input parameter `class`. This can be one of "original", "matrix", "sparseMatrix", "igraph", "network", or "edgelist". If "original", the backbone graph returned is of the same class as the data inputted in one of `sdsm()`, `fdsm()`, or `hyperg()`. 
+If an entry in the `positive` matrix is less than or equal to the `alpha`/2 value, it is considered a `+1` edge in the backbone. If an entry in the `negative` matrix is less than or equal to the `alpha`/2 value, it is considered a `-1` edge in the backbone. All other values are `0` in the backbone graph. The `backbone.extract()` function will return a backbone graph of the same class and input parameter `class`. This can be one of "original", "matrix", "sparseMatrix", "igraph", "network", or "edgelist". If "original", the backbone graph returned is of the same class as the data inputted in one of `sdsm()`, `fdsm()`, or `hyperg()`. 
 
-When `narrative` is set to `TRUE`, `extract()` will provide text describing the generated backbone graph that could be included in a manuscript. This text includes citations for the applied backbone methods. 
+When `narrative` is set to `TRUE`, `backbone.extract()` will provide text describing the generated backbone graph that could be included in a manuscript. This text includes citations for the applied backbone methods. 
 
 We demonstrate this function's use in the following sections. 
 
@@ -178,7 +178,7 @@ hyperg_bb <- backbone.extract(hyperg, signed = TRUE)
 
 
 ## The Stochastic Degree Sequence Model: sdsm( )
-The stochastic degree sequence model compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are *approximately* fixed. This method of backbone extraction was developed in [@neal2014backbone]. The distribution of $G^*_{ij}$ is given by the Poisson binomial distribution [@Hong_2013]. In order to apply the Poisson binomial distribution we need to have $P(B_{ij}=1)$ for all values of $B$. These probabilities are given by the Bipartite Configuration Model (bicm) [@Saracco2015, @Saracco2017]. The matrix $G^*$ is then constructed via the Poisson-Binomial distribution, where the $(i,j)$ entry of $G$ is the probability of an edge weight begin above or below the observed value in the projection of $B$. 
+The stochastic degree sequence model compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are *approximately* fixed. This method of backbone extraction was developed in [@neal2014backbone]. The distribution of $G^*_{ij}$ is given by the Poisson binomial distribution [@Hong_2013]. In order to apply the Poisson binomial distribution we need to have $P(B_{ij}=1)$ for all values of $B$. These probabilities are given by the Bipartite Configuration Model (BiCM) [@Saracco2015, @Saracco2017]. The matrix $G^*$ is then constructed via the Poisson-Binomial distribution, where the $(i,j)$ entry of $G$ is the probability of an edge weight begin above or below the observed value in the projection of $B$. 
 
 The `sdsm( )` function has one parameter,
 
