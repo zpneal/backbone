@@ -1,3 +1,69 @@
+#' Computes the loglikelihood gradient for the \link{bicm} function
+#'
+#' @param x0 vector, probabilities given by current step in bicm function
+#' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
+#'
+#' @return loglikelihood
+#' @keywords internal
+loglikelihood_prime_bicm <- function(x0, args){
+  #iterative function for loglikelihood gradient BiCM
+  # x0 is fitnesses vector
+  # args is list of argments needed (a list)
+  # returns the loglikelihood of the system (a numpy array)
+  r_dseq_rows <- args[[1]] #originally 0, have to shift everything by 1
+  r_dseq_cols <- args[[2]]
+  rows_multiplicity = args[[3]]
+  cols_multiplicity = args[[4]]
+  num_rows = length(r_dseq_rows)
+  num_cols = length(r_dseq_cols)
+  x = x0[1:num_rows]
+  y = x0[(num_rows+1):length(x0)]
+  rm <- rows_multiplicity*x
+  cm <- cols_multiplicity*y
+  denom <- outer(x,y)+1
+
+  a <- -rowSums(1/sweep(denom, MARGIN = 2, FUN = "/", STATS = cm))
+  b <- -colSums(rm/denom)
+  a <- a + (r_dseq_rows/x)
+  b <- b + (r_dseq_cols/y)
+  c <- c(a,b)
+
+  return(c)
+}
+
+
+#' Computes the loglikelihood hessian for the \link{bicm} function
+#'
+#' @param x0 vector, probabilities given by current step in bicm function
+#' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
+#'
+#' @return hessian matrix
+#' @keywords internal
+loglikelihood_hessian_diag_bicm <- function(x0, args){
+  r_dseq_rows <- args[[1]] #originally 0, have to shift everything by 1
+  r_dseq_cols <- args[[2]]
+  rows_multiplicity = args[[3]]
+  cols_multiplicity = args[[4]]
+  num_rows = length(r_dseq_rows)
+  num_cols = length(r_dseq_cols)
+  x = x0[1:num_rows]
+  y = x0[(num_rows+1):length(x0)]
+
+  x2 = x**2
+  y2 = y**2
+  rm <- rows_multiplicity*x2
+  cm <- cols_multiplicity*y2
+  denom <- (outer(x,y)+1)**2
+
+  a <- rowSums(1/sweep(denom, MARGIN = 2, FUN = "/", STATS = cm))
+  b <- colSums(rm/denom)
+  a <- a - (r_dseq_rows/x2)
+  b <- b - (r_dseq_cols/y2)
+  c <- matrix(c(a,b), 1, (num_rows+num_cols))
+
+  return(c)
+}
+
 #' Computes the loglikelihood for the \link{bicm} function
 #'
 #' @param x0 vector, probabilities given by current step in bicm function
@@ -19,42 +85,12 @@ loglikelihood_bicm <- function(x0, args){
   return(f)
 }
 
-#' Computes the updated probabilities for the bicm function
-#'
-#' @param x0 vector, probabilities given by current step in bicm function
-#' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
-#'
-#' @return matrix
-#' @keywords internal
-iterative_bicm <- function(x0, args){
-  # return the next iterative step for the BICM
-  r_dseq_rows = args[[1]]
-  r_dseq_cols = args[[2]]
-  rows_multiplicity = args[[3]]
-  cols_multiplicity = args[[4]]
-  num_rows = length(r_dseq_rows)
-  num_cols = length(r_dseq_cols)
-  x = x0[1:num_rows]
-  y = x0[(num_rows+1):length(x0)]
-  f = matrix(0,1,length(x0))
-
-  rm <- rows_multiplicity*x
-  cm <- cols_multiplicity*y
-  denom <- outer(x,y)+1
-  #a <- as.numeric((1/denom)%*%cm)
-  a <- (1/sweep(denom,MARGIN = 2, FUN = "/", STATS = cm))
-  b <- rm/denom
-  c <- c(Matrix::rowSums(a),Matrix::colSums(b))
-  d = c(r_dseq_rows, r_dseq_cols)
-  f <- f+d/c
-  return(f)
-}
 
 #' bicm: Bipartite Configuration Model.
 #'
 #' @param graph matrix, a bipartite adjacency matrix of a graph
 #' @param tol numeric, tolerance of algorithm
-#' @param max_steps numeric, number of times to run \link{iterative_bicm} algorithm
+#' @param max_steps numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm
 #'
 #' @details The Bipartite Configuration Model (Saracco et. al. 2015, 2017) produces a matrix of edge specific probabilities which are used in \link{sdsm} to find the p-values of the edges in the bipartite projection. This R code is adapted from the python BiCM package by Matteo Bruno under the MIT license.
 #' @references python bicm: \href{https://github.com/mat701/BiCM}{Matteo Bruno, matteo.bruno<at>imtlucca.it, https://github.com/mat701/BiCM}
@@ -151,24 +187,26 @@ bicm <- function(graph, tol = 1e-8, max_steps = 200){
   args = list(r_rows_deg, r_cols_deg, rows_multiplicity, cols_multiplicity)
 
   n_steps <- 0
-  f_x <- iterative_bicm(x,args)
+  f_x <- loglikelihood_prime_bicm(x,args)
   norm <- norm(as.matrix(f_x), type = "F")
   diff <- 1
 
   while ((norm > tol) & (diff > tol) & (n_steps < max_steps)){
     x_old <- x
-    dx <- f_x-x
+
+    B <- loglikelihood_hessian_diag_bicm(x,args)
+    dx <- -f_x/B
 
     alpha <- 1
     i <- 0
     while ((!(-loglikelihood_bicm(x,args)>-loglikelihood_bicm(x + alpha * dx,args)))&
-            (i<50)){
+           (i<50)){
       alpha <- alpha*.05
       i <- i+1
     } #end while sdc
 
     x <- x+alpha*dx
-    f_x <- iterative_bicm(x,args)
+    f_x <- loglikelihood_prime_bicm(x,args)
     norm <- norm(as.matrix(f_x), type = "F")
     diff <- norm(as.matrix(x-x_old), type = "F")
     n_steps <- n_steps + 1
@@ -196,4 +234,6 @@ bicm <- function(graph, tol = 1e-8, max_steps = 200){
   probs[nonfixed_rows,nonfixed_cols] <- r_probs
   return(probs)
 }
+
+
 

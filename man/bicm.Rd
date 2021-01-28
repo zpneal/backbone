@@ -11,7 +11,7 @@ bicm(graph, tol = 1e-08, max_steps = 200)
 
 \item{tol}{numeric, tolerance of algorithm}
 
-\item{max_steps}{numeric, number of times to run \link{iterative_bicm} algorithm}
+\item{max_steps}{numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm}
 }
 \value{
 matrix containing probabilities
