@@ -103,13 +103,6 @@ loglikelihood_bicm <- function(x0, args){
   return(f)
 }
 
-sufficient_decrease_condition <- function(f_old, f_new, alpha, grad_f, p, c1=0){
-  # return boolean indicator if upper wolfe condition is respected
-  sup = f_old + c1*alpha*(grad_f%*%(p))
-  return(f_new < sup)
-}
-
-
 #' bicm: Bipartite Configuration Model.
 #'
 #' @param graph matrix, a bipartite adjacency matrix of a graph
