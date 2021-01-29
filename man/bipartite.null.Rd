@@ -4,7 +4,7 @@
 \alias{bipartite.null}
 \title{bipartite.null: generates a backbone object from a bipartite matrix using a null model defined by constraining row and/or column sums.}
 \usage{
-bipartite.null(B, rows = TRUE, cols = TRUE, trials = NULL)
+bipartite.null(B, rows = TRUE, cols = TRUE, trials = NULL, ...)
 }
 \arguments{
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}

@@ -27,7 +27,8 @@
 #'sdsm_probs <- sdsm(davis)
 
 sdsm <- function(B,
-                 model = "bicm"){
+                 model = "bicm",
+                 ...){
 
   #### Argument Checks ####
   if (model!="bicm"){
