@@ -6,11 +6,7 @@
 #' @return loglikelihood
 #' @keywords internal
 loglikelihood_prime_bicm <- function(x0, args){
-  #iterative function for loglikelihood gradient BiCM
-  # x0 is fitnesses vector
-  # args is list of argments needed (a list)
-  # returns the loglikelihood of the system (a numpy array)
-  r_dseq_rows <- args[[1]] #originally 0, have to shift everything by 1
+  r_dseq_rows <- args[[1]]
   r_dseq_cols <- args[[2]]
   rows_multiplicity = args[[3]]
   cols_multiplicity = args[[4]]
@@ -18,17 +14,23 @@ loglikelihood_prime_bicm <- function(x0, args){
   num_cols = length(r_dseq_cols)
   x = x0[1:num_rows]
   y = x0[(num_rows+1):length(x0)]
-  rm <- rows_multiplicity*x
-  cm <- cols_multiplicity*y
-  denom <- outer(x,y)+1
 
-  a <- -rowSums(1/sweep(denom, MARGIN = 2, FUN = "/", STATS = cm))
-  b <- -colSums(rm/denom)
-  a <- a + (r_dseq_rows/x)
-  b <- b + (r_dseq_cols/y)
-  c <- c(a,b)
+  f = integer(length(x0))
+  flag = TRUE
 
-  return(c)
+  for (i in 1:num_rows){
+    for (j in 1:num_cols){
+      denom = 1+x[i]*y[j]
+      f[i] <- f[i] - ((y[j]*cols_multiplicity[j])/denom)
+      f[(j+num_rows)] = f[(j+num_rows)] - ((x[i]*rows_multiplicity[i])/denom)
+      if (flag == TRUE){
+        f[(j+num_rows)] = f[(j+num_rows)] + (r_dseq_cols[j]/y[j])
+      }#end flag
+    }#end for j
+    f[i] = f[i]+(r_dseq_rows[i]/x[i])
+    flag <- FALSE
+  }#end for i
+  return(f)
 }
 
 
@@ -49,19 +51,24 @@ loglikelihood_hessian_diag_bicm <- function(x0, args){
   x = x0[1:num_rows]
   y = x0[(num_rows+1):length(x0)]
 
+  f = matrix(0, 1, (num_rows+num_cols))
   x2 = x**2
   y2 = y**2
-  rm <- rows_multiplicity*x2
-  cm <- cols_multiplicity*y2
-  denom <- (outer(x,y)+1)**2
+  flag <- TRUE
 
-  a <- rowSums(1/sweep(denom, MARGIN = 2, FUN = "/", STATS = cm))
-  b <- colSums(rm/denom)
-  a <- a - (r_dseq_rows/x2)
-  b <- b - (r_dseq_cols/y2)
-  c <- matrix(c(a,b), 1, (num_rows+num_cols))
-
-  return(c)
+  for (i in 1:num_rows){
+    for (j in 1:num_cols){
+      denom = (1+x[i]*y[j])**2
+      f[i] = f[i] + (cols_multiplicity[j]*y2[j])/denom
+      f[(j+num_rows)] = f[(j+num_rows)] + ((rows_multiplicity[i]*x2[i])/denom)
+      if (flag == TRUE){
+        f[j+num_rows] = f[j+num_rows] - (r_dseq_cols[j]/y2[j])
+      }
+    }
+    f[i] = f[i] - (r_dseq_rows[i]/x2[i])
+    flag <- FALSE
+  }
+  return(f)
 }
 
 #' Computes the loglikelihood for the \link{bicm} function
@@ -72,7 +79,7 @@ loglikelihood_hessian_diag_bicm <- function(x0, args){
 #' @return loglikelihood, numeric
 #' @keywords internal
 loglikelihood_bicm <- function(x0, args){
-  r_dseq_rows <- args[[1]]
+  r_dseq_rows <- args[[1]] #originally 0, have to shift everything by 1
   r_dseq_cols <- args[[2]]
   rows_multiplicity = args[[3]]
   cols_multiplicity = args[[4]]
@@ -80,9 +87,26 @@ loglikelihood_bicm <- function(x0, args){
   num_cols = length(r_dseq_cols)
   x = x0[1:num_rows]
   y = x0[(num_rows+1):length(x0)]
-  f = sum(rows_multiplicity*r_dseq_rows*log(x))+sum(cols_multiplicity*r_dseq_cols*log(y))
-  f = f-sum((rows_multiplicity%o%cols_multiplicity)*log(x%o%y+1))
+  flag <- TRUE
+
+  f = 0
+  for (i in 1:num_rows){
+    f = f+ (rows_multiplicity[i]*r_dseq_rows[i]*log(x[i]))
+    for (j in 1:num_cols){
+      if (flag == TRUE){
+        f = f + (cols_multiplicity[j]*r_dseq_cols[j]*log(y[j]))
+      }#end if flag
+      f = f - (rows_multiplicity[i]*cols_multiplicity[j]*log((1+x[i]*y[j])))
+    }#end for j
+    flag <- FALSE
+  }#end for i
   return(f)
+}
+
+sufficient_decrease_condition <- function(f_old, f_new, alpha, grad_f, p, c1=0){
+  # return boolean indicator if upper wolfe condition is respected
+  sup = f_old + c1*alpha*(grad_f%*%(p))
+  return(f_new < sup)
 }
 
 
@@ -91,6 +115,7 @@ loglikelihood_bicm <- function(x0, args){
 #' @param graph matrix, a bipartite adjacency matrix of a graph
 #' @param tol numeric, tolerance of algorithm
 #' @param max_steps numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm
+#' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #'
 #' @details The Bipartite Configuration Model (Saracco et. al. 2015, 2017) produces a matrix of edge specific probabilities which are used in \link{sdsm} to find the p-values of the edges in the bipartite projection. This R code is adapted from the python BiCM package by Matteo Bruno under the MIT license.
 #' @references python bicm: \href{https://github.com/mat701/BiCM}{Matteo Bruno, matteo.bruno<at>imtlucca.it, https://github.com/mat701/BiCM}
@@ -101,7 +126,7 @@ loglikelihood_bicm <- function(x0, args){
 #' @export
 #'
 #' @examples bicm(davis)
-bicm <- function(graph, tol = 1e-8, max_steps = 200){
+bicm <- function(graph, tol = 1e-8, max_steps = 200, progress = FALSE){
 
   #### initialize_graph ####
   n_rows <- dim(graph)[1]
@@ -191,10 +216,11 @@ bicm <- function(graph, tol = 1e-8, max_steps = 200){
   norm <- norm(as.matrix(f_x), type = "F")
   diff <- 1
 
+
   while ((norm > tol) & (diff > tol) & (n_steps < max_steps)){
     x_old <- x
 
-    B <- loglikelihood_hessian_diag_bicm(x,args)
+    B <- as.array(loglikelihood_hessian_diag_bicm(x,args))
     dx <- -f_x/B
 
     alpha <- 1
@@ -203,15 +229,24 @@ bicm <- function(graph, tol = 1e-8, max_steps = 200){
            (i<50)){
       alpha <- alpha*.05
       i <- i+1
-    } #end while sdc
+    }#end while sdc
 
     x <- x+alpha*dx
     f_x <- loglikelihood_prime_bicm(x,args)
     norm <- norm(as.matrix(f_x), type = "F")
     diff <- norm(as.matrix(x-x_old), type = "F")
     n_steps <- n_steps + 1
-
+    if (n_steps == 1){
+      if (progress == TRUE){
+      pb <- utils::txtProgressBar(min = -log(abs(max(diff,norm)-tol)),
+                                  max = tol,
+                                  style = 3)
+      }
+    }
+    if (progress==TRUE){
+      utils::setTxtProgressBar(pb, -log(abs(max(diff,norm)-tol)))}
   }#end while
+  if (progress == "TRUE"){close(pb)}
 
   #### set solved problem ####
   sx <- as.vector(rep(0,n_rows))
