@@ -4,7 +4,7 @@
 \alias{sdsm}
 \title{The stochastic degree sequence model (sdsm) for backbone probabilities}
 \usage{
-sdsm(B, progress, ...)
+sdsm(B, progress = FALSE, ...)
 }
 \arguments{
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}

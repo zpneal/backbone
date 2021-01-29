@@ -27,7 +27,7 @@
 #' @examples
 #'sdsm_probs <- sdsm(davis)
 sdsm <- function(B,
-                 progress,
+                 progress = FALSE,
                  ...){
 
   #### Argument Checks ####
