@@ -4,12 +4,14 @@
 \alias{sdsm}
 \title{The stochastic degree sequence model (sdsm) for backbone probabilities}
 \usage{
-sdsm(B, model = "bicm", ...)
+sdsm(B, progress, ...)
 }
 \arguments{
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
 
-\item{model}{string: sdsm is using the bicm model to compute the probabilities. If an older model is in}
+\item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
+
+\item{...}{optional arguments}
 }
 \value{
 backbone, a list(positive, negative, summary). Here

@@ -7,7 +7,8 @@
 #'     the backbone matrix for a given alpha value.
 #'
 #' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-#' @param model string: sdsm is using the bicm model to compute the probabilities. If an older model is in
+#' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
+#' @param ... optional arguments
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
 #'    to the distribution of weights expected in a projection obtained from a random bipartite network where
 #'    both the row vertex degrees and column vertex degrees are approximately fixed.
@@ -25,19 +26,21 @@
 #'
 #' @examples
 #'sdsm_probs <- sdsm(davis)
-
 sdsm <- function(B,
-                 model = "bicm",
+                 progress,
                  ...){
 
   #### Argument Checks ####
-  if (model!="bicm"){
-    message("This model is deprecated. SDSM now uses the 'bicm' model.
+  args <- match.call()
+  exist <- ("model" %in% names(args))
+  if (exist == TRUE){
+      message("This model is deprecated. SDSM now uses the 'bicm' model.
              To run an older model, you must install a previous version of backbone.
              This can be done by using:
             ''require(devtools)'' and
             ''install_version(''backbone'', version = '1.2.2')")
   }
+
   if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
 
   ### Run Time ###
@@ -61,7 +64,7 @@ sdsm <- function(B,
   Negative <- matrix(0, nrow(P), ncol(P))
 
   #### Compute Probabilities for SDSM ####
-  prob.mat <- bicm(B)
+  prob.mat <- bicm(B,progress,...)
 
   #### Assemble and Probabilities ####
   rows <- dim(prob.mat)[1]
