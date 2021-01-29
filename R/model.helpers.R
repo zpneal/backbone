@@ -152,6 +152,7 @@ rna <-function(kk,pp,wts=NULL){
 #' @param rows boolean: TRUE if the row sums should be constrained by the null model, FALSE if not.
 #' @param cols boolean: TRUE if the column sums should be constrained by the null model, FALSE if not.
 #' @param trials integer: number of monte carlo trials used to estimate the \link{fdsm} null model (rows = TRUE, cols = TRUE)
+#' @param ... optional arguments
 #' @details When only rows are constrained, the hypergeometric null model (\link{hyperg}) is used.
 #'     When rows and columns are constrained, the stochastic degree sequence model (\link{sdsm}) is used.
 #'     When rows and columns are constrained and trials are specified, the fixed degree sequence model (\link{fdsm}) is used.
@@ -169,7 +170,7 @@ bipartite.null <- function(B,
                       ...){
  if ((rows==TRUE)&(cols==TRUE)){
    if (is.null(trials)){
-     return(sdsm(B,...))
+     return(sdsm(B,progress = TRUE,...))
    } else {
      return(fdsm(B,trials = trials, progress = TRUE))
    } #end else
