@@ -14,6 +14,8 @@ bipartite.null(B, rows = TRUE, cols = TRUE, trials = NULL, ...)
 \item{cols}{boolean: TRUE if the column sums should be constrained by the null model, FALSE if not.}
 
 \item{trials}{integer: number of monte carlo trials used to estimate the \link{fdsm} null model (rows = TRUE, cols = TRUE)}
+
+\item{...}{optional arguments}
 }
 \value{
 backbone, a list(positive, negative, summary). Here
