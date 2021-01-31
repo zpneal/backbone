@@ -172,7 +172,7 @@ bipartite.null <- function(B,
    if (is.null(trials)){
      return(sdsm(B,progress = TRUE,...))
    } else {
-     return(fdsm(B,trials = trials, progress = TRUE))
+     return(fdsm(B,trials = trials, progress = TRUE, ...))
    } #end else
  } #end if r/c T
  else if ((rows == TRUE)&(cols == FALSE)){
