@@ -4,7 +4,14 @@
 \alias{bipartite.null}
 \title{bipartite.null: generates a backbone object from a bipartite matrix using a null model defined by constraining row and/or column sums.}
 \usage{
-bipartite.null(B, rows = TRUE, cols = TRUE, trials = NULL, ...)
+bipartite.null(
+  B,
+  rows = TRUE,
+  cols = TRUE,
+  trials = NULL,
+  progress = TRUE,
+  ...
+)
 }
 \arguments{
 \item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
@@ -14,6 +21,8 @@ bipartite.null(B, rows = TRUE, cols = TRUE, trials = NULL, ...)
 \item{cols}{boolean: TRUE if the column sums should be constrained by the null model, FALSE if not.}
 
 \item{trials}{integer: number of monte carlo trials used to estimate the \link{fdsm} null model (rows = TRUE, cols = TRUE)}
+
+\item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 
 \item{...}{optional arguments}
 }
