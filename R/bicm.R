@@ -109,6 +109,7 @@ loglikelihood_bicm <- function(x0, args){
 #' @param tol numeric, tolerance of algorithm
 #' @param max_steps numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm
 #' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
+#' @param ... optional arguments
 #'
 #' @details The Bipartite Configuration Model (Saracco et. al. 2015, 2017) produces a matrix of edge specific probabilities which are used in \link{sdsm} to find the p-values of the edges in the bipartite projection. This R code is adapted from the python BiCM package by Matteo Bruno under the MIT license.
 #' @references python bicm: \href{https://github.com/mat701/BiCM}{Matteo Bruno, matteo.bruno<at>imtlucca.it, https://github.com/mat701/BiCM}
@@ -119,7 +120,11 @@ loglikelihood_bicm <- function(x0, args){
 #' @export
 #'
 #' @examples bicm(davis)
-bicm <- function(graph, tol = 1e-8, max_steps = 200, progress = FALSE){
+bicm <- function(graph,
+                 tol = 1e-8,
+                 max_steps = 200,
+                 progress = FALSE,
+                 ...){
 
   #### initialize_graph ####
   n_rows <- dim(graph)[1]
@@ -228,18 +233,22 @@ bicm <- function(graph, tol = 1e-8, max_steps = 200, progress = FALSE){
     f_x <- loglikelihood_prime_bicm(x,args)
     norm <- norm(as.matrix(f_x), type = "F")
     diff <- norm(as.matrix(x-x_old), type = "F")
-    n_steps <- n_steps + 1
-    if (n_steps == 1){
-      if (progress == TRUE){
-      pb <- utils::txtProgressBar(min = -log(abs(max(diff,norm)-tol)),
-                                  max = tol,
+
+    if ((progress == TRUE)&(n_steps == 1)){
+      mx <- max(diff, norm)
+      pb <- utils::txtProgressBar(min = n_steps,
+                                  max = max_steps,
                                   style = 3)
-      }
     }
-    if (progress==TRUE){
-      utils::setTxtProgressBar(pb, -log(abs(max(diff,norm)-tol)))}
+    if ((progress==TRUE)&(n_steps>1)){
+      utils::setTxtProgressBar(pb, n_steps)
+    }
+    n_steps <- n_steps + 1
   }#end while
-  if (progress == "TRUE"){close(pb)}
+  if (progress == "TRUE"){
+    utils::setTxtProgressBar(pb,max_steps)
+    close(pb)
+  }
 
   #### set solved problem ####
   sx <- as.vector(rep(0,n_rows))
