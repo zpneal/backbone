@@ -42,7 +42,7 @@ loglikelihood_prime_bicm <- function(x0, args){
 #' @return hessian matrix
 #' @keywords internal
 loglikelihood_hessian_diag_bicm <- function(x0, args){
-  r_dseq_rows <- args[[1]] #originally 0, have to shift everything by 1
+  r_dseq_rows <- args[[1]]
   r_dseq_cols <- args[[2]]
   rows_multiplicity = args[[3]]
   cols_multiplicity = args[[4]]
@@ -225,7 +225,7 @@ bicm <- function(graph,
     i <- 0
     while ((!(-loglikelihood_bicm(x,args)>-loglikelihood_bicm(x + alpha * dx,args)))&
            (i<50)){
-      alpha <- alpha*.05
+      alpha <- alpha*.5
       i <- i+1
     }#end while sdc
 
