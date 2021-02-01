@@ -64,7 +64,7 @@ sdsm <- function(B,
   Negative <- matrix(0, nrow(P), ncol(P))
 
   #### Compute Probabilities for SDSM ####
-  prob.mat <- bicm(B,progress,...)
+  prob.mat <- bicm(graph=B,progress=progress,...)
 
   #### Assemble and Probabilities ####
   rows <- dim(prob.mat)[1]
