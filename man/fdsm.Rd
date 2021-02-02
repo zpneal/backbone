@@ -41,7 +41,7 @@ The "backbone" S3 class object returned is composed of two matrices, a summary d
 fdsm_props <- fdsm(davis, trials = 100, dyad=c(3,6))
 }
 \references{
-fixed degree sequence model: \href{https://doi.org/10.1007/s13278-011-0021-0}{Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218. DOI: 10.1007/s13278-011-0021-0.}
+fixed degree sequence model: {Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218. \doi{10.1007/s13278-011-0021-0}}
 
-curveball algorithm: \href{https://www.nature.com/articles/ncomms5114}{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. DOI:10.1038/ncomms5114.}
+curveball algorithm: {Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. \doi{10.1038/ncomms5114}}
 }

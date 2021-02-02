@@ -6,9 +6,9 @@
 #'     from which a weighted graph is first constructed via projection.
 #'     Backbone extraction methods include:
 #'     \itemize{
-#'     \item the stochastic degree sequence model (\href{https://www.sciencedirect.com/science/article/abs/pii/S0378873314000343}{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97.}),
-#'     \item hypergeometric model (\href{https://doi.org/10.1007/s13278-013-0107-y}{Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. DOI:10.1007/s13278-013-0107-y.}),
-#'     \item the fixed degree sequence model (\href{https://doi.org/10.1007/s13278-011-0021-0}{Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218.}),
+#'     \item the stochastic degree sequence model ({Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97.}\doi{10.1016/j.socnet.2014.06.001}),
+#'     \item hypergeometric model ({Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24.}\doi{10.1007/s13278-013-0107-y}),
+#'     \item the fixed degree sequence model ({Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218.}\doi{10.1007/s13278-011-0021-0}),
 #'     \item  as well as a universal threshold method.
 #'     }
 #'
@@ -33,7 +33,7 @@
 #' }
 #'
 #' @details For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
-#' @references \href{https://doi.org/10.1371/journal.pone.0244363}{Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. DOI: 10.1371/journal.pone.0244363}
+#' @references {Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. \doi{10.1371/journal.pone.0244363}}
 #'
 #' @docType package
 #' @name backbone
