@@ -74,6 +74,7 @@ sdsm <- function(B,
   for (i in 1:rows){
     ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
+    # prob.imat <- prob.mat*matrix(prob.mat[i,],nrow = nrow(prob.mat),ncol=ncol(prob.mat),byrow = TRUE)
 
     ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
     ### Using RNA approximation ###
