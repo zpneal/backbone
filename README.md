@@ -9,6 +9,22 @@
 
 <!-- badges: end -->
 
+## Welcome
+
+Thank you for your interest in the backbone package\! Here you will find
+a short example of how to use this package to extract the backbone of a
+bipartite projection. For more details on these functions and methods,
+please see our latest manuscript on backbone here:
+
+“Domagalski R, Neal ZP, Sagan B (2021) Backbone: an R package for
+extracting the backbone of bipartite projections. PLoS ONE 16(1):
+e0244363.” <https://doi.org/10.1371/journal.pone.0244363>
+
+For additional resources on how to use the backbone package, please see
+<https://www.zacharyneal.com/backbone>
+
+## The Backbone of a Graph
+
 The `backbone` package provides methods for extracting from a weighted
 graph a binary or signed backbone that retains only the significant
 edges. The user may input a weighted graph, or a bipartite graph from
@@ -60,16 +76,26 @@ install_github("domagal9/backbone", build_vignettes = TRUE)
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to solve a common problem
+using the included Davis’ Southern Women dataset. Using the
+`bipartite.null()` function, one can decide if the null model should be
+constrained based on the row and/or column sums.
 
 ``` r
 library(backbone)
+#>  ____
+#> |  _ \   backbone v1.3.0
+#> |#|_) |  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021).
+#> |# _ <   Backbone: An R package for extracting the backbone of bipartite projections.
+#> |#|_) |  PLoS ONE. https://doi.org/10.1371/journal.pone.0244363
+#> |____/   For help: type vignette("backbone"); email zpneal@msu.edu; github domagal9/backbone
 data(davis)
-sdsm_props <- sdsm(davis)
-#> Finding the distribution using SDSM with polytope model.
-sdsm_bb <- backbone.extract(sdsm_props, signed = TRUE, alpha = 0.05)
+null_model_probabilities <- bipartite.null(davis, rows = TRUE, cols = FALSE)
+#> Finding the distribution using hypergeometric distribution
+backbone <- backbone.extract(null_model_probabilities, signed = TRUE, alpha = 0.05)
 ```
 
 For more detailed examples and background on the topic, see
 `vignette("backbone_introduction", package = "backbone")` or our
-manuscript on the backbone package: <https://arxiv.org/abs/1912.12779>
+manuscript on the backbone package:
+<https://doi.org/10.1371/journal.pone.0244363>

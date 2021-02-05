@@ -81,7 +81,10 @@ class.convert <- function(graph, convert = "matrix", extract = FALSE){
   if (convert == "igraph"){
     if (-1 %in% graph){
       G <- igraph::graph.adjacency(graph,mode = "undirected", weighted = TRUE)
-      } else {G <- igraph::graph.adjacency(graph, mode = "undirected")}
+    } else {G <- igraph::graph.adjacency(graph, mode = "undirected")}
+    if (igraph::is.weighted(G) == T){
+      igraph::E(G)$sign <- igraph::E(G)$weight
+    }
   }
 
   #### Converting to "network" ####
@@ -97,111 +100,6 @@ class.convert <- function(graph, convert = "matrix", extract = FALSE){
   return(list(class, G))
 }
 
-#' Polytope method for finding a matrix that maximizes entropy function
-#'
-#' @param G matrix, an adjacency matrix representing a graph
-#' @details Uses convex optimization via the \link[CVXR]{CVXR-package} to find a matrix \eqn{M}{M} that maximizes the entropy function
-#'     where \eqn{M}{M} satisfies the following constraints:
-#'     (1) the values of \eqn{M}{M} are between 0 & 1, (2) the row sums of the matrix
-#'     are equal to the row sums of the original matrix, (3) the column sums of the matrix
-#'     are equal to the column sums of the original matrix.
-#' @details This method is utilized in the function \link{sdsm} to compute probabilities of an edge existing in a graph.
-#'    Method is called polytope as it is optimizing over the convex hull of the set of matrices (thought of as vectors) with
-#'    the same row and column sums as the input.
-#' @return matrix containing optimal solution to entropy function under constraints
-#' @export
-#'
-#' @examples
-#' polytope(davis)
-polytope <- function(G){
-
-  #### Define Variable to solve for ####
-  matrix <- CVXR::Variable(dim(G)[1], dim(G)[2])
-
-  #### Define row & column sums ####
-  mat1 <- matrix(1, dim(G)[2], 1)
-  mat2 <- matrix(1, dim(G)[1], 1)
-
-  #### Define Constraints ####
-  constraint1 <- matrix >= 0
-  constraint2 <- matrix <= 1
-  if (methods::is(G, "sparseMatrix")) {constraint3 <- (matrix%*%mat1) == Matrix::rowSums(G)
-  } else {constraint3 <- (matrix%*%mat1) == rowSums(G)}
-  if (methods::is(G, "sparseMatrix")) {constraint4 <- t(matrix)%*%mat2 == Matrix::colSums(G)
-  } else {constraint4 <- t(matrix)%*%mat2 == colSums(G)}
-  constraints <- list(constraint1, constraint2, constraint3, constraint4)
-
-  #### Define Objective, the function to solve ####
-  objective <- CVXR::Maximize(sum(CVXR::entr(matrix)+CVXR::entr(1-matrix)))
-
-  #### Define Problem: objective with the constrants ####
-  problem <- CVXR::Problem(objective, constraints)
-
-  #### Solve the problem ####
-  result <- suppressWarnings(CVXR::psolve(problem))
-
-  ### Warning/Stop if not optimal ###
-  if (result$status == "optimal_inaccurate") {warning("polytope result not optimal")}
-  if (result$status != "optimal" & result$status != "optimal_inaccurate") {stop("unable to compute SDSM-Polytope")}
-
-  #### Results ####
-  new_matrix <- result$getValue(matrix)
-
-  ### Restrict values between 0 and 1 ###
-  gr <- which(new_matrix>1)
-  new_matrix[gr] <- 1
-  le <- which(new_matrix<0)
-  new_matrix[le] <- 0
-
-  #### Return Matrix of Probabilities ####
-  return(new_matrix)
-}
-
-
-#' curveball algorithm
-#'
-#' @param M matrix
-#'
-#' @return rm, a matrix with same row sums and column sums as M, but randomized 0/1 entries.
-#' @export
-#'
-#' @references Algorithm and R implementation: \href{https://www.nature.com/articles/ncomms5114}{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. DOI:10.1038/ncomms5114.}
-#' @examples
-#' curveball(davis)
-curveball<-function(M){
-  #### Define Variables ####
-  RC=dim(M)
-  R=RC[1]
-  C=RC[2]
-  hp=list()
-
-  #### Mark Locations of One's ####
-  for (row in 1:dim(M)[1]) {hp[[row]]=(which(M[row,]==1))}
-  l_hp=length(hp)
-
-  #### Curveball Swaps ####
-  for (rep in 1:(5*l_hp)){
-    AB=sample(1:l_hp,2)
-    a=hp[[AB[1]]]
-    b=hp[[AB[2]]]
-    ab=intersect(a,b)
-    l_ab=length(ab)
-    l_a=length(a)
-    l_b=length(b)
-    if ((l_ab %in% c(l_a,l_b))==F){
-      tot=setdiff(c(a,b),ab)
-      l_tot=length(tot)
-      tot=sample(tot, l_tot, replace = FALSE, prob = NULL)
-      L=l_a-l_ab
-      hp[[AB[1]]] = c(ab,tot[1:L])
-      hp[[AB[2]]] = c(ab,tot[(L+1):l_tot])}
-  }
-
-  #### Define and Return Random Matrix ####
-  rm=matrix(0,R,C)
-  for (row in 1:R){rm[row,hp[[row]]]=1}
-  rm
-}
 
 #' Poisson Binomial distribution computed with Refined Normal Approximation
 #'
@@ -221,9 +119,8 @@ curveball<-function(M){
 #' \dontrun{prob.mat <- matrix(probs, nrow = nrow(davis), ncol = ncol(davis))}
 #' \dontrun{prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[1,], `*`)}
 #' \dontrun{mapply(backbone:::rna, kk= as.data.frame(t(P[1,])), pp = as.data.frame(t(prob.imat)))}
-rna <-function(kk,pp,wts=NULL)
+rna <-function(kk,pp,wts=NULL){
   #### Check Arguments ####
-{
   if(any(pp<0)|any(pp>1))
   {
     stop("invalid values in pp.")
@@ -248,4 +145,46 @@ rna <-function(kk,pp,wts=NULL)
   res=vkk.r
   return(res)
 }
+
+
+#' bipartite.null: generates a backbone object from a bipartite matrix using a null model defined by constraining row and/or column sums.
+#' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#' @param rows boolean: TRUE if the row sums should be constrained by the null model, FALSE if not.
+#' @param cols boolean: TRUE if the column sums should be constrained by the null model, FALSE if not.
+#' @param trials integer: number of monte carlo trials used to estimate the \link{fdsm} null model (rows = TRUE, cols = TRUE)
+#' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
+#' @param ... optional arguments
+#' @details When only rows are constrained, the hypergeometric null model (\link{hyperg}) is used.
+#'     When rows and columns are constrained, the stochastic degree sequence model (\link{sdsm}) is used.
+#'     When rows and columns are constrained and trials are specified, the fixed degree sequence model (\link{fdsm}) is used.
+#' @return backbone, a list(positive, negative, summary). Here
+#'     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
+#'     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
+#'     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+#' @export
+#'
+#' @examples bipartite.null(davis, rows = TRUE, cols = FALSE) #runs hyperg on davis data
+bipartite.null <- function(B,
+                      rows = TRUE,
+                      cols = TRUE,
+                      trials = NULL,
+                      progress = TRUE,
+                      ...){
+ if ((rows==TRUE)&(cols==TRUE)){
+   if (is.null(trials)){
+     return(sdsm(B,progress = progress,...))
+   } else {
+     return(fdsm(B,trials = trials, progress = progress))
+   } #end else
+ } #end if r/c T
+ else if ((rows == TRUE)&(cols == FALSE)){
+   return(hyperg(B))
+ }
+ else if ((rows == FALSE) & (cols == TRUE)){
+   stop("This null model is not currently implemented.")
+ } else if ((rows == FALSE) & (cols == FALSE)){
+   stop("This null model does not exist.")
+ }
+} #end bipartite.null
+
 
