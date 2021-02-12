@@ -260,13 +260,18 @@ bicm <- function(graph,
   sy[nonfixed_cols] <- sr_y[r_invert_cols_deg]
 
   #### plug everything into probability matrix ####
-  r_probs <- matrix(0, length(sx[nonfixed_rows]), length(sy[nonfixed_cols]))
-  for (i in 1:length(sx[nonfixed_rows])){
-    for (j in 1:length(sy[nonfixed_cols])){
-      xy <- sx[nonfixed_rows][i]*sy[nonfixed_cols][j]
-      r_probs[i,j] <- xy/(1+xy)
-    }#end j
-  }#end i
+  f <- function(x,y){
+    z <- x*y
+    z/(1+z)
+  }
+  r_probs <- outer(sx[nonfixed_rows],sy[nonfixed_cols],f)
+  # r_probs <- matrix(0, length(sx[nonfixed_rows]), length(sy[nonfixed_cols]))
+  # for (i in 1:length(sx[nonfixed_rows])){
+  #   for (j in 1:length(sy[nonfixed_cols])){
+  #     xy <- sx[nonfixed_rows][i]*sy[nonfixed_cols][j]
+  #     r_probs[i,j] <- xy/(1+xy)
+  #   }#end j
+  # }#end i
 
   probs[nonfixed_rows,nonfixed_cols] <- r_probs
   return(probs)
