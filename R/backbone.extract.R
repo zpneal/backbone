@@ -6,7 +6,7 @@
 #' @param backbone backbone: backbone S3 class object, as returned by \link{bipartite.null}.
 #' @param signed Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned
 #' @param alpha Real: significance level of hypothesis test(s)
-#' @param fwer string: type of familywise error rate correction to be applied; c("none","bonferroni",holm"). If "holm", Holm Bonferroni Family-wise Error Rate test is used,
+#' @param fwer string: type of familywise error rate correction to be applied; c("none","bonferroni","holm"). If "holm", Holm Bonferroni Family-wise Error Rate test is used,
 #'     if "bonferroni", Bonferroni Family-wise Error Rate test should be used.
 #'     By default, the given 'alpha' value is used for all tests with no correction for family-wise error rates.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{class.convert}.
