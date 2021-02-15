@@ -3,13 +3,16 @@ title: "NEWS"
 output: html_document
 ---
 
+## backbone 1.3.1
+
+* speedups to sdsm
+
 ## backbone 1.3.0
 
 * update sdsm to use the bicm model - a new, fast, approximation of the probabilities
 * remove all other models from sdsm
 * if an older model is called in sdsm, show warning that model has changed
-* add new function extract, used the same way as backbone.extract
-* add new function bipartite which lets the user pick if they want rows/cols to be fixed or vary
+* add new function bipartite.null which lets the user pick if they want rows/cols to be fixed or vary
 * update fwer m parameter
 
 ## backbone 1.2.2
