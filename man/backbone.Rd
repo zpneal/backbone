@@ -38,6 +38,8 @@ Additional functions that aid in the use of the above models are exported:
 \item '\code{\link{curveball}}': generates a random 0/1 matrix with the same row and column sums as the input, used in \code{\link{fdsm}}.
 }
 
+In each model, it is assumed that the provided data does not have any zero rows or columns. If present, they are removed before running each model.
+
 For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
 }
 \references{
