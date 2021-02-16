@@ -32,8 +32,6 @@
 #' \item '\code{\link{curveball}}': generates a random 0/1 matrix with the same row and column sums as the input, used in \code{\link{fdsm}}.
 #' }
 #'
-#' @details In each model, it is assumed that the provided data does not have any zero rows or columns. If present, they are removed before running each model.
-#'
 #' @details For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
 #' @references {Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. \doi{10.1371/journal.pone.0244363}}
 #'
