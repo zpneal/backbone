@@ -4,10 +4,11 @@
 #'    1 if above the given upper parameter threshold,
 #'    set to -1 if below the given lower parameter threshold, and are 0 otherwise.
 #'
-#' @param M graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#' @param M graph: Graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param upper Real, FUN, or NULL: upper threshold value or function to be applied to the edge weights. Default is NULL.
 #' @param lower Real, FUN, or NULL: lower threshold value or function to be applied to the edge weights. Default is NULL.
-#' @param bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is NULL.
+#' @param bipartite Boolean: TRUE if bipartite graph, FALSE if weighted graph. Default is NULL. If TRUE, input graph should be unweighted.
 #' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned
 #'
 #' @details If both `upper` and `lower` are `NULL`, a weighted projection is returned.

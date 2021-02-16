@@ -7,13 +7,14 @@
 universal(M, upper = NULL, lower = NULL, bipartite = NULL, narrative = FALSE)
 }
 \arguments{
-\item{M}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
+\item{M}{graph: Graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
 \item{upper}{Real, FUN, or NULL: upper threshold value or function to be applied to the edge weights. Default is NULL.}
 
 \item{lower}{Real, FUN, or NULL: lower threshold value or function to be applied to the edge weights. Default is NULL.}
 
-\item{bipartite}{Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is NULL.}
+\item{bipartite}{Boolean: TRUE if bipartite graph, FALSE if weighted graph. Default is NULL. If TRUE, input graph should be unweighted.}
 
 \item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned}
 }

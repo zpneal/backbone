@@ -20,7 +20,7 @@ backbone.extract(
 
 \item{alpha}{Real: significance level of hypothesis test(s)}
 
-\item{fwer}{string: type of familywise error rate correction to be applied; c("none","bonferroni",holm"). If "holm", Holm Bonferroni Family-wise Error Rate test is used,
+\item{fwer}{string: type of familywise error rate correction to be applied; c("none","bonferroni","holm"). If "holm", Holm Bonferroni Family-wise Error Rate test is used,
 if "bonferroni", Bonferroni Family-wise Error Rate test should be used.
 By default, the given 'alpha' value is used for all tests with no correction for family-wise error rates.}
 

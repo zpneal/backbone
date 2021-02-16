@@ -29,9 +29,9 @@ test_that("backbone.extract fwer = holm", {
   sdsm.positive.none <- backbone.extract(sdsm, signed = FALSE, alpha = 0.4, fwer = "holm")
   expect_equal(sdsm.signed.none,sdsm.positive.none)
 
-  fdsm.signed.none <- backbone.extract(fdsm, signed = TRUE, alpha = 0.4, fwer = "holm")
+  fdsm.signed.none <- suppressWarnings(backbone.extract(fdsm, signed = TRUE, alpha = 0.4, fwer = "holm"))
   fdsm.signed.none[fdsm.signed.none < 0] <- 0
-  fdsm.positive.none <- backbone.extract(fdsm, signed = FALSE, alpha = 0.4, fwer = "holm")
+  fdsm.positive.none <- suppressWarnings(backbone.extract(fdsm, signed = FALSE, alpha = 0.4, fwer = "holm"))
   expect_equal(fdsm.signed.none,fdsm.positive.none)
 
   hyperg.signed.none <- backbone.extract(hyperg, signed = TRUE, alpha = 0.4, fwer = "holm")
@@ -51,9 +51,9 @@ test_that("backbone.extract fwer = bonferroni", {
   sdsm.positive.none <- backbone.extract(sdsm, signed = FALSE, alpha = 0.4, fwer = "bonferroni")
   expect_equal(sdsm.signed.none,sdsm.positive.none)
 
-  fdsm.signed.none <- backbone.extract(fdsm, signed = TRUE, alpha = 0.4, fwer = "bonferroni")
+  fdsm.signed.none <- suppressWarnings(backbone.extract(fdsm, signed = TRUE, alpha = 0.4, fwer = "bonferroni"))
   fdsm.signed.none[fdsm.signed.none < 0] <- 0
-  fdsm.positive.none <- backbone.extract(fdsm, signed = FALSE, alpha = 0.4, fwer = "bonferroni")
+  fdsm.positive.none <- suppressWarnings(backbone.extract(fdsm, signed = FALSE, alpha = 0.4, fwer = "bonferroni"))
   expect_equal(fdsm.signed.none,fdsm.positive.none)
 
   hyperg.signed.none <- backbone.extract(hyperg, signed = TRUE, alpha = 0.4, fwer = "bonferroni")

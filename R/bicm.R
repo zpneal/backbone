@@ -14,23 +14,17 @@ loglikelihood_prime_bicm <- function(x0, args){
   num_cols = length(r_dseq_cols)
   x = x0[1:num_rows]
   y = x0[(num_rows+1):length(x0)]
+  rm <- rows_multiplicity*x
+  cm <- cols_multiplicity*y
+  denom <- outer(x,y)+1
 
-  f = integer(length(x0))
-  flag = TRUE
+  a <- -rowSums(1/sweep(denom, MARGIN = 2, FUN = "/", STATS = cm))
+  b <- -colSums(rm/denom)
+  a <- a + (r_dseq_rows/x)
+  b <- b + (r_dseq_cols/y)
+  c <- c(a,b)
 
-  for (i in 1:num_rows){
-    for (j in 1:num_cols){
-      denom = 1+x[i]*y[j]
-      f[i] <- f[i] - ((y[j]*cols_multiplicity[j])/denom)
-      f[(j+num_rows)] = f[(j+num_rows)] - ((x[i]*rows_multiplicity[i])/denom)
-      if (flag == TRUE){
-        f[(j+num_rows)] = f[(j+num_rows)] + (r_dseq_cols[j]/y[j])
-      }#end flag
-    }#end for j
-    f[i] = f[i]+(r_dseq_rows[i]/x[i])
-    flag <- FALSE
-  }#end for i
-  return(f)
+  return(c)
 }
 
 
@@ -50,25 +44,19 @@ loglikelihood_hessian_diag_bicm <- function(x0, args){
   num_cols = length(r_dseq_cols)
   x = x0[1:num_rows]
   y = x0[(num_rows+1):length(x0)]
-
-  f = matrix(0, 1, (num_rows+num_cols))
   x2 = x**2
   y2 = y**2
-  flag <- TRUE
+  rm <- rows_multiplicity*x2
+  cm <- cols_multiplicity*y2
+  denom <- (outer(x,y)+1)**2
 
-  for (i in 1:num_rows){
-    for (j in 1:num_cols){
-      denom = (1+x[i]*y[j])**2
-      f[i] = f[i] + (cols_multiplicity[j]*y2[j])/denom
-      f[(j+num_rows)] = f[(j+num_rows)] + ((rows_multiplicity[i]*x2[i])/denom)
-      if (flag == TRUE){
-        f[j+num_rows] = f[j+num_rows] - (r_dseq_cols[j]/y2[j])
-      }
-    }
-    f[i] = f[i] - (r_dseq_rows[i]/x2[i])
-    flag <- FALSE
-  }
-  return(f)
+  a <- rowSums(1/sweep(denom, MARGIN = 2, FUN = "/", STATS = cm))
+  b <- colSums(rm/denom)
+  a <- a - (r_dseq_rows/x2)
+  b <- b - (r_dseq_cols/y2)
+  c <- matrix(c(a,b), 1, (num_rows+num_cols))
+
+  return(c)
 }
 
 #' Computes the loglikelihood for the \link{bicm} function
@@ -87,19 +75,8 @@ loglikelihood_bicm <- function(x0, args){
   num_cols = length(r_dseq_cols)
   x = x0[1:num_rows]
   y = x0[(num_rows+1):length(x0)]
-  flag <- TRUE
-
-  f = 0
-  for (i in 1:num_rows){
-    f = f+ (rows_multiplicity[i]*r_dseq_rows[i]*log(x[i]))
-    for (j in 1:num_cols){
-      if (flag == TRUE){
-        f = f + (cols_multiplicity[j]*r_dseq_cols[j]*log(y[j]))
-      }#end if flag
-      f = f - (rows_multiplicity[i]*cols_multiplicity[j]*log((1+x[i]*y[j])))
-    }#end for j
-    flag <- FALSE
-  }#end for i
+  f = sum(rows_multiplicity*r_dseq_rows*log(x))+sum(cols_multiplicity*r_dseq_cols*log(y))
+  f = f-sum((rows_multiplicity%o%cols_multiplicity)*log(x%o%y+1))
   return(f)
 }
 
@@ -260,13 +237,11 @@ bicm <- function(graph,
   sy[nonfixed_cols] <- sr_y[r_invert_cols_deg]
 
   #### plug everything into probability matrix ####
-  r_probs <- matrix(0, length(sx[nonfixed_rows]), length(sy[nonfixed_cols]))
-  for (i in 1:length(sx[nonfixed_rows])){
-    for (j in 1:length(sy[nonfixed_cols])){
-      xy <- sx[nonfixed_rows][i]*sy[nonfixed_cols][j]
-      r_probs[i,j] <- xy/(1+xy)
-    }#end j
-  }#end i
+  f <- function(x,y){
+    z <- x*y
+    z/(1+z)
+  }
+  r_probs <- outer(sx[nonfixed_rows],sy[nonfixed_cols],f)
 
   probs[nonfixed_rows,nonfixed_cols] <- r_probs
   return(probs)
