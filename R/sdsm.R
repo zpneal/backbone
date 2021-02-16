@@ -6,7 +6,8 @@
 #'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
-#' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #' @param ... optional arguments
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
@@ -51,6 +52,8 @@ sdsm <- function(B,
   convert <- class.convert(B, "matrix")
   class <- convert[[1]]
   B <- convert[[2]]
+
+  if ((max(B)>1)|(min(B)<0)){stop("Graph must be unweighted.")}
 
   #### Bipartite Projection ####
   ### If sparse matrix input, use sparse matrix operations ###

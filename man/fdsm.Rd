@@ -7,7 +7,8 @@
 fdsm(B, trials = 1000, dyad = NULL, progress = FALSE, ...)
 }
 \arguments{
-\item{B}{graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
+\item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
 \item{trials}{Integer: Number of random bipartite graphs generated}
 

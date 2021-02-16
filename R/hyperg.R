@@ -5,7 +5,8 @@
 #'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
 #'
-#' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #'
 #' @details Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
 #'     distribution of weights expected in a projection obtained from a random bipartite graph where
@@ -23,6 +24,9 @@
 
 hyperg <- function(B){
 
+  #### Argument Checks ####
+  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
+
   ### Run Time ###
   run.time.start <- Sys.time()
 
@@ -31,8 +35,8 @@ hyperg <- function(B){
   class <- convert[[1]]
   B <- convert[[2]]
 
-  #### Argument Checks ####
-  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix"))) {stop("input bipartite data must be a matrix")}
+  if ((max(B)>1)|(min(B)<0)){stop("Graph must be unweighted.")}
+
   message("Finding the distribution using hypergeometric distribution")
 
   #### Bipartite Projection ####
