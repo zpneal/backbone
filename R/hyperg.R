@@ -35,7 +35,7 @@ hyperg <- function(B){
   class <- convert[[1]]
   B <- convert[[2]]
 
-  if ((max(B)>1)|(min(B)<0)){stop("Graph must be unweighted.")}
+  if (any(!B%in%c(0,1))){stop("Graph must be unweighted.")}
 
   message("Finding the distribution using hypergeometric distribution")
 
