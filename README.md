@@ -1,12 +1,13 @@
-[![](https://www.r-pkg.org/badges/version/backbone?color=orange)](https://cran.r-project.org/package=backbone)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/backbone?color=blue)](https://cran.r-project.org/package=backbone)
-[![](http://cranlogs.r-pkg.org/badges/last-month/backbone?color=green)](https://cran.r-project.org/package=backbone)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# backbone
+# backbone <img src='man/figures/logo.png' align="right" height="139" />
 
 <!-- badges: start -->
 
+[![](https://www.r-pkg.org/badges/version/backbone?color=orange)](https://cran.r-project.org/package=backbone)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/backbone?color=blue)](https://cran.r-project.org/package=backbone)
+[![](http://cranlogs.r-pkg.org/badges/last-month/backbone?color=green)](https://cran.r-project.org/package=backbone)
 <!-- badges: end -->
 
 ## Welcome
@@ -84,10 +85,10 @@ constrained based on the row and/or column sums.
 ``` r
 library(backbone)
 #>  ____
-#> |  _ \   backbone v1.3.0
-#> |#|_) |  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021).
-#> |# _ <   Backbone: An R package for extracting the backbone of bipartite projections.
-#> |#|_) |  PLoS ONE. https://doi.org/10.1371/journal.pone.0244363
+#> |  _ \   backbone v1.3.1
+#> |#|_) |  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021). Backbone: An
+#> |# _ <         R package for extracting the backbone of bipartite projections.
+#> |#|_) |        PLoS ONE. https://doi.org/10.1371/journal.pone.0244363
 #> |____/   For help: type vignette("backbone"); email zpneal@msu.edu; github domagal9/backbone
 data(davis)
 null_model_probabilities <- bipartite.null(davis, rows = TRUE, cols = FALSE)
