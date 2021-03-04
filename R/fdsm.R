@@ -47,13 +47,9 @@ fdsm <- function(B,
   class <- convert[[1]]
   B <- convert[[2]]
 
-  if ((max(B)>1)|(min(B)<0)){stop("Graph must be unweighted.")}
+  if (any(!B%in%c(0,1))){stop("Graph must be unweighted.")}
 
   #### Bipartite Projection ####
-  ### Use sparse matrix operations ###
-  if (!methods::is(B, "sparseMatrix")) {
-      B <- Matrix::Matrix(B, sparse = T)
-  }
   P <- Matrix::tcrossprod(B)
 
   ### Create Positive and Negative Matrices to hold backbone ###
@@ -78,8 +74,7 @@ fdsm <- function(B,
     Bstar <- curveball(B)
 
     ### Construct Pstar from Bstar ###
-    Bstar <- Matrix::Matrix(Bstar,sparse=T)
-    Pstar<-Matrix::tcrossprod(Bstar)
+    Pstar <- Matrix::tcrossprod(Bstar)
 
     ### Start estimation timer; print message ###
     if (i == 1) {
