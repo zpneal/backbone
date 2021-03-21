@@ -2,9 +2,11 @@
 
 export(backbone.extract)
 export(bicm)
-export(bipartite.null)
 export(curveball)
 export(fdsm)
+export(fixedcol)
+export(fixedfill)
+export(fixedrow)
 export(hyperg)
 export(sdsm)
 export(universal)
