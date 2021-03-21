@@ -43,14 +43,14 @@ fdsm <- function(B,
   run.time.start <- Sys.time()
 
   #### Class Conversion ####
-  convert <- class.convert(B, "matrix")
-  class <- convert[[1]]
-  B <- convert[[2]]
+  convert <- tomatrix(B)
+  class <- convert$summary[[1]]
+  B <- convert$G
 
   if (any(!B%in%c(0,1))){stop("Graph must be unweighted.")}
 
   #### Bipartite Projection ####
-  P <- Matrix::tcrossprod(B)
+  P <- tcrossprod(B)
 
   ### Create Positive and Negative Matrices to hold backbone ###
   Positive <- matrix(0, nrow(P), ncol(P))
@@ -74,12 +74,11 @@ fdsm <- function(B,
     Bstar <- curveball(B)
 
     ### Construct Pstar from Bstar ###
-    Pstar <- Matrix::tcrossprod(Bstar)
+    Pstar <- tcrossprod(Bstar)
 
     ### Start estimation timer; print message ###
     if (i == 1) {
       start.time <- Sys.time()
-      message("Approximating the distribution using Curveball FDSM")
     }
 
     ### Check whether Pstar edge is larger/smaller than P edge ###
@@ -118,8 +117,8 @@ fdsm <- function(B,
   total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
   #### Compile Summary ####
-  r <- Matrix::rowSums(B)
-  c <- Matrix::colSums(B)
+  r <- rowSums(B)
+  c <- colSums(B)
 
   a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
   b <- c(class[1], "Fixed Degree Sequence Model", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))

@@ -34,10 +34,10 @@ universal <- function(M,
   ### Run Time ###
   run.time.start <- Sys.time()
 
-  ### Class Conversion ###
-  convert <- class.convert(M)
-  class <- convert[[1]]
-  M <- convert[[2]]
+  #### Class Conversion ####
+  convert <- tomatrix(M)
+  class <- convert$summary[[1]]
+  M <- convert$G
 
   #### If not specified, guess whether bipartite or unipartite ####
   if (nrow(M)==ncol(M) & length(bipartite)==0) {
@@ -99,23 +99,19 @@ universal <- function(M,
   #### Compile Summary ####
   run.time.end <- Sys.time()
   total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
-  if (methods::is(M, "sparseMatrix")) {
-    r <- Matrix::rowSums(M)
-    c <- Matrix::colSums(M)
-  } else {
-    r <- rowSums(M)
-    c <- colSums(M)
-  }
+  r <- rowSums(M)
+  c <- colSums(M)
+
   a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
   b <- c(class[1], "Universal Threshold", dim(M)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(M)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
   #### Convert to Indicated Class Object ####
-  backbone_converted <- class.convert(backbone, class[1], extract = TRUE)
+  backbone_converted <- frommatrix(backbone, class[1])
 
   #### Return Backbone and Summary ####
-  bb <- list(backbone = backbone_converted[[2]], summary = model.summary)
+  bb <- list(backbone = backbone_converted, summary = model.summary)
   class(bb) <- "backbone"
 
   #### Display suggested manuscript text ####
