@@ -17,4 +17,8 @@ a list(summary, G)
 \description{
 Converts an input graph object to an adjacency matrix and identifies its characteristics
 }
+\examples{
+M <- matrix(rbinom(5*5,1,.5),5,5)
+test <- backbone:::tomatrix(M)
+}
 \keyword{internal}

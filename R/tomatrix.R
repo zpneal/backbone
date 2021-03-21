@@ -9,11 +9,13 @@
 #' @keywords internal
 #'
 #' @examples
+#' M <- matrix(rbinom(5*5,1,.5),5,5)
+#' test <- backbone:::tomatrix(M)
 tomatrix <- function(graph){
   class <- class(graph)[1]
   isbipartite <- FALSE
 
-  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "Matrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
 
   #### Convert matrix-like object ####
   if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {

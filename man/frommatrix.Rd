@@ -17,4 +17,8 @@ backbone graph: Binary or signed backbone graph of class given in parameter `con
 \description{
 Converts a backbone adjacency matrix to an object of specified class
 }
+\examples{
+M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
+test <- backbone:::frommatrix(M, "Matrix")
+}
 \keyword{internal}
