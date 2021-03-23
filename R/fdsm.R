@@ -38,7 +38,6 @@ fdsm <- function(B,
 
   #### Argument Checks ####
   if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
-  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
   ### Run Time ###
   run.time.start <- Sys.time()
 
@@ -46,8 +45,8 @@ fdsm <- function(B,
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
   B <- convert$G
-
-  if (any(!B%in%c(0,1))){stop("Graph must be unweighted.")}
+  if (convert$summary[[2]]==FALSE){stop("Graph must be bipartite.")}
+  if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
