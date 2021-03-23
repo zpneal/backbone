@@ -133,33 +133,15 @@ Here, the `davis` matrix has first been projected. Then, the standard deviation 
 
 The methods described above can be applied to any weighted graph $G$. In this section we describe methods that are designed for weighted graphs that are the result of bipartite projections. They differ from other methods because they take into account the information contained in the original bipartite graph $B$. Specifically, these methods are conditioned on the bipartite graph’s two degree sequences: the row vertex degrees (i.e. row marginals) and column vertex degrees (i.e. column marginals). We compare the values of $G_{ij} = (BB^T)_{ij}$ to the probability distributions that describe $G^*_{ij} = (B^*B^{*T})_{ij}$ for all bipartite graphs $B^*$ that satisfy the row and column vertex degree restrictions we choose. 
 
-The backbone package lets the user choose which of the row and column vertex degrees they would like to restrict using `bipartite.null()`. This function has four parameters, 
+The backbone package lets the user choose which of the row and column vertex degrees they would like to restrict. If you want to fix the row degrees and let the column degrees vary, use `fixedrow()`. If you want to fix the column degrees and let the row degrees vary, use `fixedcol()`. To fix the expected values of the row and column degrees, use `sdsm()`. To exactly fix the row and column degrees, use `fdsm()`. If you want to only fix the number of edges in the graph and let the row and column degrees vary, use `fixedfill()`. 
 
-* B, a bipartite graph
-* rows, a boolean set to TRUE if the row sums should be constrained by the null model, FALSE if not.
-* cols, a boolean set to TRUE if the column sums should be constrained by the null model, FALSE if not.
-* trials, a numeric used for exact constraints on row and column degrees
-
-The `bipartite.null()` function provides an easy way for the user to know which degree sequences were restricted in the distribution that their data is compared to. Specifically, `bipartite.null()` offers three different options. When `rows = TRUE, cols = FALSE`, the row degrees are fixed but the column degrees are allowed to vary. This probability distribution is the hypergeometric distribution (`hyperg()`). When `rows = TRUE, cols = TRUE, trials = NULL`, the row and column degrees of the distribution match that of $B$ on average. This is given by the Poisson binomial distribution which and the stochastic degree sequence model is used (`sdsm()`). When `rows = TRUE, cols = TRUE, trials != NULL`, the row and column degrees of the distribution match those of $B$ exactly. This distribution is unknown and thus is sampled the same number of times as `trials` using the fixed degree sequence model (`fdsm()`). The process is done in the following way: 
-
-1. Construct a random bipartite graph $B^*$ that preserves (to varying extents, depending on the method) one or both degree sequences [@strona2018bi]. 
-2. Project $B^*$ (i.e. $B^{*} B^{*T}$) to obtain a random weighted bipartite projection $G^*$
-3. Repeat steps 1 and 2 $N$ times to build a distribution of $G^*_{ij}$
-4. Compute the proportion of times $G^*{ij}$ is equal to or above the corresponding entry $G_{ij}$ and the proportion of times $G_{ij}^*$ is equal to or below the corresponding entry $G_{ij}$. 
-
-After choosing which of the degree sequences to constrain, the `bipartite.null()` function returns a backbone object of the following:
-
-* positive: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or above the corresponding entry $G_{ij}$.
-* negative: a matrix with $(i,j)$ entry equal to the probability that $G^*_{ij}$ is equal to or below the corresponding entry $G_{ij}$.
-* summary: a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
-
-The backbone can then be extracted for a given $\alpha$ level using the `backbone.extract()` function. In this section, we first describe `backbone.extract()`, then illustrate its use for each of the options in `bipartite.null()`. 
+The backbone can then be extracted for a given $\alpha$ level using the `backbone.extract()` function. In this section, we first describe `backbone.extract()`, then illustrate its use for each of functions mentioned above.
 
 ## Extracting the Backbone: backbone.extract( )
 
-The `bipartite.null()` function (as well as `hyperg(), fdsm(),` and `sdsm()`) returns two matrices: a `positive` matrix containing the probability that (or in the case of `fdsm()`, the proportion of times that) $G^*_{ij}$ was greater than or equal to $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was less than or equal to $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
+The functions `fdsm()`, `sdsm()`, `fixedrow()` and `fixedcol()` return a `backbone` class object containing two matrices: a `positive` matrix containing the probability that (or in the case of `fdsm()`, the proportion of times that) $G^*_{ij}$ was greater than or equal to $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was less than or equal to $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
 
-The `backbone.extract()` function has six parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, `class`, and `narrative`. The `matrix` parameter takes in the entire backbone object which is the output of `bipartite.null()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
+The `backbone.extract()` function has six parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, `class`, and `narrative`. The `matrix` parameter takes in the entire backbone object which is the output of `fdsm()`, `sdsm()`, `fixedrow()` or `fixedcol()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
 
 One can adjust the precision of the significance test, `alpha`, to refine their backbone results. The value of `alpha` should be between `0` and `1`. The default is `alpha=0.05`. The statistical test is two-tailed with an area of `alpha/2` in each tail. 
 
@@ -173,26 +155,42 @@ We demonstrate this function's use in the following sections.
 
 ## Fixed Rows and Varying Columns: The Hypergeometric Backbone
 
-To compare the observed bipartite graph to a distribution where the row marginals are fixed and column marginals are allowed to vary, one can use `bipartite.null(B, rows = TRUE, cols = FALSE)`. Under the hood, this function applies the hypergeometric distribution, `hyperg()`, to the bipartite graph `B`. 
+To compare the observed bipartite graph to a distribution where the row marginals are fixed and column marginals are allowed to vary, one can use `fixedrow()`. This function applies the hypergeometric distribution to the bipartite graph `B`. 
 
 The hypergeometric distribution compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where the row vertex degrees are fixed, but the column vertex degrees are allowed to vary. This method of backbone extraction was developed in [@Tumminello] and later in [@neal2013identifying], which showed that the distribution of $G^*_{ij}$ when only vertex degrees are fixed is given by the hypergeometric distribution. For documentation on the hypergeometric distribution, see `stats::phyper`. 
 
-The `hyperg()` function has one parameter,
+The `fixedrow()` function has one parameter,
 
 * B, graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 
-Following the `bipartite.null()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
+Following the `fixedrow()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
 
 ```{r hypergeometric model}
-hyperg <- bipartite.null(davis, rows = TRUE, cols = FALSE) # = hyperg(davis)
+hyperg <- fixedrow(davis)
 hyperg_bb <- backbone.extract(hyperg, signed = TRUE) 
 ```
 
+## Fixed Columns and Varying Rows: The Poisson binomial Backbone
+
+To compare the observed bipartite graph to a distribution where the column marginals are fixed and the row marginals are allowed to vary, one can use `fixedcol()`. This function applies the Poisson binomial distribution to the bipartite graph `B`. 
+
+The Poisson binomial distribution compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where the column vertex degrees are fixed, but the row vertex degrees are allowed to vary. 
+
+The `fixedcol()` function has one parameter,
+
+* B, graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+
+Following the `fixedcol()` function, the user must use the `backbone.extract()` function to find the backbone at a given significance value `alpha`. 
+
+```{r poisson binomial model}
+pb <- fixedcol(davis)
+pb_bb <- backbone.extract(pb, signed = TRUE) 
+```
 
 
 ## Approximately Fixed Rows and Columns: The Stochastic Degree Sequence Model
 
-To compare the observed bipartite graph to a distribution where the row marginals and column marginals are approximately equal to those of bipartite graph `B`, one can use `bipartite.null(B, rows = TRUE, cols = TRUE)`. Under the hood, this function applies the stochastic degree sequence model, `sdsm()` and Poisson binomial distribution to the bipartite graph `B`. 
+To compare the observed bipartite graph to a distribution where the row marginals and column marginals are approximately equal to those of bipartite graph `B`, one can use `sdsm()`. This function applies the stochastic degree sequence model and Poisson binomial distribution to the bipartite graph `B`. 
 
 The stochastic degree sequence model compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are *approximately* fixed. This method of backbone extraction was developed in [@neal2014backbone]. The distribution of $G^*_{ij}$ is given by the Poisson binomial distribution [@Hong_2013]. In order to apply the Poisson binomial distribution we need to have $P(B_{ij}=1)$ for all values of $B$. These probabilities are given by the Bipartite Configuration Model (BiCM) [@Saracco2015, @Saracco2017]. The matrix $G^*$ is then constructed via the Poisson-Binomial distribution, where the $(i,j)$ entry of $G$ is the probability of an edge weight begin above or below the observed value in the projection of $B$. 
 
@@ -205,7 +203,7 @@ These values are approximated using a Refined Normal Approximation (RNA method).
 
 
 ```{r sdsm, echo=T, results='hide'}
-sdsm <- bipartite.null(davis, rows = TRUE, cols = TRUE) # = sdsm(davis)
+sdsm <- sdsm(davis)
 ```
 
 The backbone package allows for two different types of family-wise error rate correction: Holm-Bonferroni and Bonferroni. To use Holm-Bonferroni correction, add parameter `fwer = "holm"` to `backbone.extract()`, and to use Bonferroni correction, add `fwer = "bonferroni"`. Note in this case, the Holm-Bonferroni is too restrictive and leaves us with no edges in our backbone graph.  
@@ -217,7 +215,7 @@ sdsm_bb
 
 ## Exactly Fixed Rows and Columns: The Fixed Degree Sequence Model
 
-To compare the observed bipartite graph to a distribution where the row marginals and column marginals are exactly equal to those of `B`, one can use `bipartite.null(B, rows = TRUE, cols = TRUE, trials = 1000)` where the number of trials can be any positive integer. Under the hood, this function applies the fixed degree sequence model, `fdsm()`, to the bipartite graph `B`. 
+To compare the observed bipartite graph to a distribution where the row marginals and column marginals are exactly equal to those of `B`, one can use `fdsm(B, trials = 1000)` where the number of trials can be any positive integer. This function applies the fixed degree sequence model to the bipartite graph `B`. 
 
 The fixed degree sequence model compares an edge's observed weight, $G_{ij}$, to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are fixed. This method of backbone extraction was developed in [@zweig2011systematic], however the challenge lies in randomly sampling from the space of $B^*$ with fixed degree sequences. The `fdsm()` function uses the curveball algorithm [@strona2014fast], which is proven to do so [@Carstens_2015].
 
@@ -228,12 +226,12 @@ The `fdsm( )` function has four parameters,
 * dyad, vector length 2: two row entries i,j. Saves each value of $G^*_{ij}$, which is useful for visualizing an example of the empirical null edge weight distribution generated by the model. These correspond to the row and column indices of a cell in the projected matrix , and can be written as their string row names or as numeric values. Default is NULL. 
 * progress, Boolean: If `utils::txtProgressBar` should be used to measure progress. Default is FALSE. 
 
-In addition to the normal outputs of `bipartite.null()`, when `fdsm()` is used, one can also return a list of `dyad_values`. These are a list of edge weights for a given pair $i,j$ of $G^*$, during each of the trials. To get these values, we add in the parameter $dyad$ and specify the two vertices to keep track of. 
+In addition to the normal outputs of a bipartite backbone function, when `fdsm()` is used, one can also return a list of `dyad_values`. These are a list of edge weights for a given pair $i,j$ of $G^*$, during each of the trials. To get these values, we add in the parameter $dyad$ and specify the two vertices to keep track of. 
 
 We can find the backbone using the fixed degree sequence model as follows:
 
 ```{r fdsm, echo=T, results='hide'}
-fdsm <- bipartite.null(davis, rows = TRUE, cols = TRUE, trials = 100, dyad=c(1,5)) # = fdsm(davis, trials = 100, dyad = c(1,5))
+fdsm <- fdsm(davis, trials = 100, dyad = c(1,5))
 ```
 ```{r fdsm backbone}
 fdsm$dyad_values
