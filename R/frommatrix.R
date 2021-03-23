@@ -31,4 +31,4 @@ frommatrix <- function(graph, convert = "matrix"){
   }
 
   return(G)
-  }
+}
