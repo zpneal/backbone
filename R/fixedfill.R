@@ -61,8 +61,8 @@ fixedfill <- function(B){
   probs <- sapply(0:max, FUN = prob)
 
   #### Create Positive and Negative Probability Matrices ####
-  Negative <- apply(P, c(1,2), FUN = function(k)sum(probs[1:k]))
-  Positive <- apply(P, c(1,2), FUN = function(k) 1- sum(probs[1:k-1]))
+  Negative <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))
+  Positive <- apply(P, c(1,2), FUN = function(k) 1- sum(probs[1:k]))
   diag(Negative) <- diagn
   diag(Positive) <- diagp
 
