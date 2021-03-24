@@ -25,7 +25,8 @@ Imports:
     stats,
     utils,
     igraph,
-    network
+    network,
+    PoissonBinomial
 Suggests:
     knitr,
     rmarkdown,
