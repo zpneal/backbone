@@ -7,6 +7,8 @@
 #'
 #' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
+#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by \link[PoissonBinomial]{ppbinom}.
+#'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #'
 #' @details Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
 #'     distribution of weights expected in a projection obtained from a random bipartite graph where
@@ -18,7 +20,8 @@
 #' @export
 #' @examples
 #' fixedcol(davis)
-fixedcol <- function(B){
+fixedcol <- function(B,
+                     method = "RefinedNormal"){
 
   ### Run Time ###
   run.time.start <- Sys.time()
@@ -40,15 +43,15 @@ fixedcol <- function(B){
   #### Poisson Binomial Distribution ####
   ### Compute parameters for the diagonal ###
   pd <- cs/m
-  diagonaln <- rna(kk = diag(P), pp = pd)
-  diagonalp <- 1-rna(kk = diag(P)-1, pp = pd)
+  diagonaln <- PoissonBinomial::ppbinom(x = diag(P), probs = pd, method = method)
+  diagonalp <- PoissonBinomial::ppbinom(x = diag(P)-1, probs = pd, method = method, lower.tail = FALSE)
 
   ### Compute parameters for the off diagonal###
   pt <- ((cs*(cs-1))/(m*(m-1)))
 
-  ### Use RNA to get probabilities ###
-  Negative <- as.array(rna(kk = P, pp = pt))
-  Positive <- as.array(1-rna(kk = (P-1), pp = pt))
+  ### Poisson binomial distribution probabilities ###
+  Negative <- as.array(PoissonBinomial::ppbinom(x = P, probs = pt, method = method))
+  Positive <- as.array(PoissonBinomial::ppbinom(x = (P-1), probs = pt, method = method, lower.tail = FALSE))
   diag(Negative) <- diagonaln
   diag(Positive) <- diagonalp
 

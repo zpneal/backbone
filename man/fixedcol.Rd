@@ -4,11 +4,14 @@
 \alias{fixedcol}
 \title{Compute fixed column sums / Poisson binomial backbone probabilities}
 \usage{
-fixedcol(B)
+fixedcol(B, method = "RefinedNormal")
 }
 \arguments{
 \item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
+
+\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by \link[PoissonBinomial]{ppbinom}.
+"RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}
 }
 \value{
 backbone, a list(positive, negative, summary). Here
