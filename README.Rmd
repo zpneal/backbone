@@ -26,7 +26,7 @@ Thank you for your interest in the backbone package! Here you will find a short 
 "Domagalski R, Neal ZP, Sagan B (2021) Backbone: an R package for extracting the backbone of bipartite projections. PLoS ONE 16(1): e0244363."
 [https://doi.org/10.1371/journal.pone.0244363](https://doi.org/10.1371/journal.pone.0244363)
 
-For additional resources on how to use the backbone package, please see [https://www.zacharyneal.com/backbone](https://www.zacharyneal.com/backbone)
+For additional resources on how to use the backbone package, please see [https://www.rbackbone.net](https://www.rbackbone.net)
 
 
 ## The Backbone of a Graph 
@@ -36,7 +36,7 @@ The `backbone` package provides methods for extracting from a weighted graph
     from which a weighted graph is first constructed via projection.
     Backbone extraction methods include the stochastic degree sequence model [(Neal, Z. P. (2014))](https://doi.org/10.1016/j.socnet.2014.06.001),
     hypergeometric model [(Neal, Z. (2013))](https://doi.org/10.1007/s13278-013-0107-y), 
-    the fixed degree sequence model [(Zweig, K. A., and Kaufmann, M. (2011))](https://doi.org/10.1007/s13278-011-0021-0),
+    the fixed degree sequence model [(Zweig, K. A., and Kaufmann, M. (2011))](https://doi.org/10.1007/s13278-011-0021-0), a fixed column model, a fixed fill model,
     as well as a universal threshold method. 
 
 In a graph  `G`, edges are either present (i.e. `G_{ij}=1`) or absent (i.e. `G_{ij}=0`). However in a weighted or valued graph, edges can take a range of values that may capture such properties as the strength or capacity of the edge. Although weighted graphs contain a large amount of information, there are some cases (e.g. visualization, application of statistical models not developed for weighted graphs) where it is useful to reduce this information by focusing on an unweighted subgraph that contains only the most important edges. We call this subgraph the backbone of `G`, which we denote as `G’`. 
@@ -46,6 +46,21 @@ if `G_{ij}>T_{ij}`,
 `G_{ij}’=-1` if `G_{ij} < T’_{ij}`, 
 and `G_{ij}’=0` if `G_{ij} > T’_{ij}` 
 and `G_{ij} < T_{ij}`. The key to all backbone extraction methods lies in the selection of `T`. The `backbone` package provides several different methods for selecting `T` and thus extracting `G’` from `G`. 
+
+The backbone package specifically provides five different ways of selecting `T` if the graph `G` is a bipartite projection. That is, `G = BB^T` where `B` is a bipartite graph. To decide whether an edge of a bipartite projection `G` is statistically significant, we compare the edge's observed weight to the distribution of weights expected in a projection obtained from a random bipartite graph under a null model. Given a null model that can generate a distribution of an edge's weights, we can then compute the probability that the observed weight is in the upper or lower tail of that distribution. The `backbone` package provides several different null models to use, all of which define different constraints on the row degrees and column degrees of a random bipartite graph in their corresponding distribution. The options are: 
+
+* `sdsm()`: computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the stochastic degree sequence model.
+    Here the expected row and column degrees of a random bipartite graph in the distribution match that of the original bipartite graph.
+* `fixedrow()`: computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the hypergeometric model.
+Here the row degrees of a random bipartite graph in the distribution exactly match that of the original bipartite graph. The column degrees are allowed to vary.
+* `fixedcol()`: computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the Poisson binomial model.
+Here the column degrees of a random bipartite graph in the distribution exactly match that of the original bipartite graph. The row degrees are allowed to vary.
+* `fdsm()`: computes the proportion of edge weights above or below the observed edge weights in a bipartite projection using the fixed degree sequence model.
+Here the row and column degrees of a random bipartite graph in the distribution exactly match that of the original bipartite graph.
+* `fixedfill()`:computes the probability of edge weights being above or below the observed edge weights in a bipartite projection where the number of edges in a random bipartite graph
+of the distribution exactly match the number of edges of the original bipartite graph.
+
+Once one of these models is computed, use \code{\link{backbone.extract}} to return the backbone graph for a chosen alpha value.
 
 ## Installation
 
@@ -64,12 +79,13 @@ install_github("domagal9/backbone", build_vignettes = TRUE)
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem using the included Davis' Southern Women dataset. Using the `bipartite.null()` function, one can decide if the null model should be constrained based on the row and/or column sums. 
+This is a basic example which shows you how to solve a common problem using the included Davis' Southern Women dataset. We can now decide which null model to compare the observed projection to. 
 
+Let's compare our bipartite graph to the distribution of bipartite graphs where the expected row and column sums match our data. This is the `sdsm()` function.
 ```{r echo=T, results='hide'}
 library(backbone)
 data(davis)
-null_model_probabilities <- bipartite.null(davis, rows = TRUE, cols = FALSE)
+null_model_probabilities <- sdsm(davis)
 backbone <- backbone.extract(null_model_probabilities, signed = TRUE, alpha = 0.05)
 ```
 
