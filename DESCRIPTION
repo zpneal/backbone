@@ -13,6 +13,7 @@ Description: Provides methods for extracting from a weighted graph
     Backbone extraction methods include the stochastic degree sequence model (Neal, Z. P. (2014). <doi:10.1016/j.socnet.2014.06.001>),
     hypergeometric model (Neal, Z. (2013). <doi:10.1007/s13278-013-0107-y>), 
     the fixed degree sequence model (Zweig, K. A., and Kaufmann, M. (2011). <doi:10.1007/s13278-011-0021-0>),
+    fixed column model, fixed fill model,
     as well as a universal threshold method. 
 License: GPL-3
 Encoding: UTF-8
@@ -32,5 +33,5 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-URL: https://github.com/domagal9/backbone, https://www.zacharyneal.com/backbone
+URL: https://www.rbackbone.net, https://github.com/domagal9/backbone
 BugReports: https://github.com/domagal9/backbone/issues
