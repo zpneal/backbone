@@ -50,10 +50,16 @@ fixedcol <- function(B,
   pt <- ((cs*(cs-1))/(m*(m-1)))
 
   ### Poisson binomial distribution probabilities ###
-  Negative <- as.array(PoissonBinomial::ppbinom(x = P, probs = pt, method = method))
-  Positive <- as.array(PoissonBinomial::ppbinom(x = (P-1), probs = pt, method = method, lower.tail = FALSE))
+  Negative <- matrix(PoissonBinomial::ppbinom(x = P, probs = pt, method = method),nrow = m, ncol = m,byrow = TRUE)
+  Positive <- matrix(PoissonBinomial::ppbinom(x = (P-1), probs = pt, method = method, lower.tail = FALSE),nrow = m, ncol = m,byrow = TRUE)
   diag(Negative) <- diagonaln
   diag(Positive) <- diagonalp
+
+  ### Add back in rownames ###
+  rownames(Positive) <- rownames(B)
+  colnames(Positive) <- rownames(B)
+  rownames(Negative) <- rownames(B)
+  colnames(Negative) <- rownames(B)
 
   ### Run Time ###
   run.time.end <- Sys.time()
