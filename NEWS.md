@@ -2,6 +2,16 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 1.4.0
+
+* add fixedcol() function - null model where column degrees are fixed and row sums are allowed to vary
+* add fixedfill() function - null model where the number of 1's in the matrix (number of edges in the graph) are fixed
+* replace class.convert() with tomatrix() and frommatrix()
+* use updated Poisson binomial calculations (more accurate approximation)
+* hyperg() now called fixedrow()
+* remove bipartite.null function
+* update documentation, readme, vignette
+* include logo
 
 ## backbone 1.3.1
 
