@@ -29,8 +29,9 @@ fixedfill <- function(B){
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
   B <- convert$G
-  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
+
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)

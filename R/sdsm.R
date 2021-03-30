@@ -8,7 +8,7 @@
 #'
 #' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by \link[PoissonBinomial]{ppbinom}.
+#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 #'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #' @param ... optional arguments
@@ -52,8 +52,9 @@ sdsm <- function(B,
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
   B <- convert$G
-  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
+
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)

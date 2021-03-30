@@ -12,7 +12,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 
-\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by \link[PoissonBinomial]{ppbinom}.
+\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}
 
 \item{...}{optional arguments}
