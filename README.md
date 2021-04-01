@@ -22,7 +22,7 @@ extracting the backbone of bipartite projections. PLoS ONE 16(1):
 e0244363.” <https://doi.org/10.1371/journal.pone.0244363>
 
 For additional resources on how to use the backbone package, please see
-<https://www.rbackbone.net>
+[www.rbackbone.net](https://www.zacharyneal.com/backbone)
 
 ## The Backbone of a Graph
 

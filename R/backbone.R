@@ -41,7 +41,7 @@
 #' }
 #'
 #' @details For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
-#'     For updates, papers, presentations, and other backbone news, please see \href{https://www.rbackbone.net}{https://www.rbackbone.net}
+#'     For updates, papers, presentations, and other backbone news, please see \href{https://www.zacharyneal.com/backbone}{www.rbackbone.net}
 #' @references {Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. \doi{10.1371/journal.pone.0244363}}
 #'
 #' @docType package

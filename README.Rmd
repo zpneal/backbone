@@ -26,7 +26,7 @@ Thank you for your interest in the backbone package! Here you will find a short 
 "Domagalski R, Neal ZP, Sagan B (2021) Backbone: an R package for extracting the backbone of bipartite projections. PLoS ONE 16(1): e0244363."
 [https://doi.org/10.1371/journal.pone.0244363](https://doi.org/10.1371/journal.pone.0244363)
 
-For additional resources on how to use the backbone package, please see [https://www.rbackbone.net](https://www.rbackbone.net)
+For additional resources on how to use the backbone package, please see [www.rbackbone.net](https://www.zacharyneal.com/backbone)
 
 
 ## The Backbone of a Graph 
