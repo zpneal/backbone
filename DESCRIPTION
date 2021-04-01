@@ -33,5 +33,5 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-URL: https://www.rbackbone.net, https://github.com/domagal9/backbone
+URL: https://www.zacharyneal.com/backbone, https://github.com/domagal9/backbone
 BugReports: https://github.com/domagal9/backbone/issues
