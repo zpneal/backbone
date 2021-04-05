@@ -1,190 +1,160 @@
-#' Convert graph object to adjacency matrix
+#' Converts an input graph object to an adjacency matrix and identifies its characteristics
 #'
-#' @param graph matrix, sparse matrix, \link{igraph}, edgelist, or \link[network]{network} object
+#' @param graph A graph object of class "matrix", "sparseMatrix", \link{igraph}, matrix or dataframe edgelist, or \link[network]{network}
+#'
+#' @return a list(summary, G)
+#'    `summary` is a dataframe containing characteristics of the supplied object
+#'    `G` is an adjacency matrix
+#'
+#' @keywords internal
+#'
+#' @examples
+#' M <- matrix(rbinom(5*5,1,.5),5,5)
+#' test <- backbone:::tomatrix(M)
+tomatrix <- function(graph){
+  class <- class(graph)[1]
+  isbipartite <- FALSE
+
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
+
+  #### Convert matrix-like object ####
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
+    if (dim(graph)[2] > 3) {
+      G <- as.matrix(graph)  #Coerce to matrix
+      class(G) <- "numeric"  #Coerce to numeric
+      if (any(is.na(G))) {stop("The object contains non-numeric entries")}
+
+      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix are treated as bipartite
+      if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
+        if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
+            !isSymmetric(G)) {                                                    #it is not symmetric
+          isbipartite <- TRUE
+        }
+      }
+    }
+  }
+
+  #### Convert edge list ####
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | methods::is(graph, "data.frame"))) {
+    if (dim(graph)[2] == 2 | dim(graph)[2] == 3) {
+      class <- "edgelist"  #Update starting class as edgelist
+      if ((methods::is(graph, "data.frame")) == FALSE) {G <- as.data.frame(as.matrix(graph))} else {G <- graph} #Coerce to dataframe if necessary
+      colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
+      isbipartite <- length(intersect(G[,1],G[,2])) == 0  #Treat as bipartite if there is no overlap in node lists A and B
+
+      if (isbipartite == TRUE) { #Bipartite
+        G <- igraph::graph_from_data_frame(G, directed = F)
+        igraph::V(G)$type <- igraph::V(G)$name %in% graph[,2] #second column of edges is TRUE type
+        if (dim(graph)[2] == 2) {G <- igraph::as_incidence_matrix(G, sparse = FALSE)} #Unweighted
+        if (dim(graph)[2] == 3) {G <- igraph::as_incidence_matrix(G, attr = "C", sparse = FALSE)} #Weighted
+      }
+
+      if (isbipartite == FALSE) { #Unipartite
+        G <- igraph::graph_from_data_frame(G, directed = T)
+        if (dim(graph)[2] == 2) {G <- igraph::as_adjacency_matrix(G, type = "both", sparse = FALSE)} #Unweighted
+        if (dim(graph)[2] == 3) {G <- igraph::as_adjacency_matrix(G, type = "both", attr = "C", sparse = FALSE)} #Weighted
+      }
+    }
+  }
+
+  #### Convert igraph ####
+  if (methods::is(graph, "igraph")) {
+
+    if (igraph::is.bipartite(graph) == TRUE){ #Bipartite
+      isbipartite <- TRUE
+      if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_incidence_matrix(graph, sparse = FALSE) #Unweighted
+      } else {G <- igraph::as_incidence_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted
+    }
+
+    if (igraph::is.bipartite(graph) == FALSE){ #Unipartite
+      if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_adjacency_matrix(graph, sparse = FALSE) #Unweighted
+      } else {G <- igraph::as_adjacency_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted
+    }
+  }
+
+  #### Convert statnet ####
+  if (methods::is(graph, "network")) {
+
+    if (network::is.bipartite(graph) == TRUE) { #Bipartite
+      isbipartite <- TRUE
+      if ("weight" %in% network::list.edge.attributes(graph)) {
+        G <- network::as.matrix.network(graph, type = "incidence", attrname = "weight")} else { #Weighted
+          G <- network::as.matrix.network(graph, type = "incidence")} #Unweighted
+    }
+
+    if (network::is.bipartite(graph) == FALSE) { #Unipartite
+      if ("weight" %in% network::list.edge.attributes(graph)) {
+        G <- network::as.matrix.network(graph, type = "adjacency", attrname = "weight")} else { #Weighted
+          G <- network::as.matrix.network(graph, type = "adjacency")} #Unweighted
+    }
+  }
+
+  #### If the graph is bipartite, remove rows/columns with zero sums ####
+  if (isbipartite){
+    R <- Matrix::rowSums(G)
+    C <- Matrix::colSums(G)
+    r <- which(R == 0)
+    c <- which(C == 0)
+    if (length(r)>0){G <- G[-r,]}
+    if (length(c)>0){G <- G[,-c]}
+  }
+
+  #### Summary dataframe ####
+  if (isbipartite) {issymmetric <- FALSE} else {issymmetric <- isSymmetric(G)}
+  isweighted <- any(!(G%in%c(0,1)))
+  summary <- data.frame(
+    class = class,
+    bipartite = isbipartite,
+    symmetric = issymmetric,
+    weighted = isweighted)
+
+  #### Report input type and modifications ####
+  if (issymmetric) {dir <- "undirected"} else {dir <- "directed"}
+  if (isweighted) {weigh <- "a weighted"} else {weigh <- "an unweighted"}
+  if (isbipartite) {
+    message(paste0("This ", class, " object looks like ", weigh, " bipartite network of ", nrow(G), " agents and ", ncol(G), " artifacts."))
+    if (length(r)>0) {message("These zero-sum rows have been removed from the data: ", paste0(r, " "))}
+    if (length(c)>0) {message("These zero-sum columns have been removed from the data: ", paste0(c, " "))}
+  }
+  if (!isbipartite) {message(paste0("This ", class, " object looks like ", weigh, " ", dir, " network containing ", nrow(G), " nodes."))}
+
+  return(list(summary = summary, G = G))
+}
+
+#' Converts a backbone adjacency matrix to an object of specified class
+#'
+#' @param graph a matrix
 #' @param convert class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
-#' @param extract Boolean, TRUE if using function within backbone.extract, FALSE if not.
-#' @details An object is considered an edgelist if it is (1) a matrix or sparse matrix, and (2) has only two columns.
-#'     Each column is understood as a bipartite set, with edges only going between members of column 1 and members of column 2.
-#' @return list(class, adjacency), a list containing the class of parameter graph, and the adjacency matrix of the graph
+#'
+#' @return backbone graph: Binary or signed backbone graph of class given in parameter `convert`.
 #'
 #' @keywords internal
 #'
 #' @examples
-#' \dontrun{davis.sp <- as(davis, "sparseMatrix")}
-#' \dontrun{davis.graph <- igraph::graph.incidence(davis)}
-#' \dontrun{davis.nw <- network::network(davis, ignore.eval = FALSE,
-#'     names.eval = "weight", loops = TRUE)}
-#' \dontrun{backbone:::class.convert(davis, "matrix")}
-#' \dontrun{backbone:::class.convert(davis.sp, "matrix")}
-#' \dontrun{backbone:::class.convert(davis.graph, "matrix")}
-#' \dontrun{backbone:::class.convert(davis.nw, "matrix")}
-#' \dontrun{bb.sdsm <- sdsm(davis)}
-#' \dontrun{bb <- backbone.extract(bb.sdsm, signed = TRUE, alpha = .2)}
-#' \dontrun{backbone:::class.convert(bb, "matrix")}
-#' \dontrun{backbone:::class.convert(bb, "sparseMatrix")}
-#' \dontrun{backbone:::class.convert(bb, "igraph")}
-#' \dontrun{backbone:::class.convert(bb, "network")}
-class.convert <- function(graph, convert = "matrix", extract = FALSE){
-  class <- class(graph)
+#' M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
+#' test <- backbone:::frommatrix(M, "Matrix")
+frommatrix <- function(graph, convert = "matrix"){
 
-  #### Converting to "matrix" ####
-  if (convert == "matrix"){
-    if ((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix"))) {
-      if (dim(graph)[2] == 2){ # for edgelists, assumes bipartite!
-        g <- igraph::graph.data.frame(graph, directed = F)
-        igraph::V(g)$type <- igraph::V(g)$name %in% graph[,2] #second column of edges is TRUE type
-        G <- igraph::get.incidence(g)
-        class <- "edgelist"} else {
-          if (is.numeric(graph[1]) != TRUE){
-            class(graph)<-"numeric"
-          }
-          G <- graph}
-    }
-    if (methods::is(graph, "igraph")) {
-      if (igraph::is.bipartite(graph)){
-        G <- igraph::get.incidence(graph)
-      } else {
-        if (length(igraph::edge.attributes(graph)) > 0){
-          G <- igraph::get.adjacency(graph, attr = "weight")
-          } else{G <- igraph::get.adjacency(graph)}
-      }
-    }
-    if (methods::is(graph, "network")) {
-      if ("weight" %in% network::list.edge.attributes(graph)){
-        G <- as.matrix(graph, attr = "weight")
-      } else {G <- as.matrix(graph)}
-    }
-  ### Remove rows/cols with zero sums ###
-    if (extract == FALSE){
-      R <- Matrix::rowSums(G)
-      C <- Matrix::colSums(G)
-      r <- which(R == 0)
-      c <- which(C == 0)
-      if (length(r)>0){
-        G <- G[-r,]
-        warning("Rows with a zero sum have been removed from the data. The rows removed were: ",
-        paste0(r, " "))
-      }
-      if (length(c)>0){
-        G <- G[,-c]
-        warning("Columns with a zero sum have been removed from the data. The columns removed were: ", paste0(c, " "))
-      }
-    }
-  }#end convert to matrix
+  if (convert == "matrix"){G <- graph}
 
-  #### Converting to "sparseMatrix ####
-  if (convert == "sparseMatrix"){
-    G <- methods::as(graph, "sparseMatrix")
-  }
+  if (convert == "Matrix"){G <- Matrix::Matrix(graph)}
 
-  #### Converting to "igraph" ####
-  if (convert == "igraph"){
-    if (-1 %in% graph){
-      G <- igraph::graph.adjacency(graph,mode = "undirected", weighted = TRUE)
-    } else {G <- igraph::graph.adjacency(graph, mode = "undirected")}
-    if (igraph::is.weighted(G) == T){
-      igraph::E(G)$sign <- igraph::E(G)$weight
-    }
-  }
+  if (convert == "sparseMatrix"){G <- methods::as(graph, "sparseMatrix")}
 
-  #### Converting to "network" ####
-  if (convert == "network"){
-    G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = FALSE)
-  }
+  if (convert == "network"){G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = TRUE)}
 
-  #### Converting to "edgelist" ####
   if (convert == "edgelist"){
-    g <- igraph::graph.adjacency(graph, weighted = TRUE)
-    G <- igraph::get.data.frame(g)
+    G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)
+    G <- igraph::as_data_frame(G, what = "edges")
   }
-  return(list(class, G))
+
+  if (convert == "igraph"){
+    G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)
+    igraph::E(G)$sign <- igraph::E(G)$weight  #To facilitate use with library(signnet)
+  }
+
+  return(G)
 }
 
-
-#' Poisson Binomial distribution computed with Refined Normal Approximation
-#'
-#' @param kk values where the cdf is to be computed
-#' @param pp vector of success probabilities for indicators
-#' @param wts the weights for each probability
-#'
-#' @return cdf, cumulative distribution function
-#'
-#' @references Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. Computational Statistics & Data Analysis, Vol. 59, pp. 41-51.
-#' @details These values are approximated using the Refined Normal Approximation (RNA method).
-#'     These functions are originally described by \link[poibin]{ppoibin} and used here under GPL-2 License.
-#' @keywords internal
-#' @examples
-#' \dontrun{probs <- polytope(davis)}
-#' \dontrun{P <- davis %*% t(davis)}
-#' \dontrun{prob.mat <- matrix(probs, nrow = nrow(davis), ncol = ncol(davis))}
-#' \dontrun{prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[1,], `*`)}
-#' \dontrun{mapply(backbone:::rna, kk= as.data.frame(t(P[1,])), pp = as.data.frame(t(prob.imat)))}
-rna <-function(kk,pp,wts=NULL){
-  #### Check Arguments ####
-  if(any(pp<0)|any(pp>1))
-  {
-    stop("invalid values in pp.")
-  }
-  if(is.null(wts))
-  {
-    wts=rep(1,length(pp))
-  }
-
-  #### Define Variables ####
-  pp=rep(pp,wts)
-  muk=sum(pp)
-  sigmak=sqrt(sum(pp*(1-pp)))
-  gammak=sum(pp*(1-pp)*(1-2*pp))
-  ind=gammak/(6*sigmak^3)
-  kk1=(kk+.5-muk)/sigmak
-
-  #### Compute Statistic and Return ####
-  vkk.r=stats::pnorm(kk1)+gammak/(6*sigmak^3)*(1-kk1^2)*stats::dnorm(kk1)
-  vkk.r[vkk.r<0]=0
-  vkk.r[vkk.r>1]=1
-  res=vkk.r
-  return(res)
-}
-
-
-#' bipartite.null: generates a backbone object from a bipartite matrix using a null model defined by constraining row and/or column sums.
-#' @param B graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-#' @param rows boolean: TRUE if the row sums should be constrained by the null model, FALSE if not.
-#' @param cols boolean: TRUE if the column sums should be constrained by the null model, FALSE if not.
-#' @param trials integer: number of monte carlo trials used to estimate the \link{fdsm} null model (rows = TRUE, cols = TRUE)
-#' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
-#' @param ... optional arguments
-#' @details When only rows are constrained, the hypergeometric null model (\link{hyperg}) is used.
-#'     When rows and columns are constrained, the stochastic degree sequence model (\link{sdsm}) is used.
-#'     When rows and columns are constrained and trials are specified, the fixed degree sequence model (\link{fdsm}) is used.
-#' @return backbone, a list(positive, negative, summary). Here
-#'     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
-#'     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-#'     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
-#' @export
-#'
-#' @examples bipartite.null(davis, rows = TRUE, cols = FALSE) #runs hyperg on davis data
-bipartite.null <- function(B,
-                      rows = TRUE,
-                      cols = TRUE,
-                      trials = NULL,
-                      progress = TRUE,
-                      ...){
- if ((rows==TRUE)&(cols==TRUE)){
-   if (is.null(trials)){
-     return(sdsm(B,progress = progress,...))
-   } else {
-     return(fdsm(B,trials = trials, progress = progress))
-   } #end else
- } #end if r/c T
- else if ((rows == TRUE)&(cols == FALSE)){
-   return(hyperg(B))
- }
- else if ((rows == FALSE) & (cols == TRUE)){
-   stop("This null model is not currently implemented.")
- } else if ((rows == FALSE) & (cols == FALSE)){
-   stop("This null model does not exist.")
- }
-} #end bipartite.null
 
 

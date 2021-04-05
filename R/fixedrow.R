@@ -1,6 +1,6 @@
-#' Compute hypergeometric backbone probabilities
+#' Compute fixed row sums / hypergeometric backbone probabilities
 #'
-#' `hyperg` computes the probability of observing
+#' `fixedrow` computes the probability of observing
 #'     a higher or lower edge weight using the hypergeometric distribution.
 #'     Once computed, use \code{\link{backbone.extract}} to return
 #'     the backbone matrix for a given alpha value.
@@ -20,33 +20,24 @@
 #' @export
 #'
 #' @examples
-#' hyperg_probs <- hyperg(davis)
+#' fixedrow_probs <- fixedrow(davis)
 
-hyperg <- function(B){
-
-  #### Argument Checks ####
-  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
+fixedrow <- function(B){
 
   ### Run Time ###
   run.time.start <- Sys.time()
 
   #### Class Conversion ####
-  convert <- class.convert(B)
-  class <- convert[[1]]
-  B <- convert[[2]]
+  convert <- tomatrix(B)
+  class <- convert$summary[[1]]
+  B <- convert$G
+  if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
 
-  if ((max(B)>1)|(min(B)<0)){stop("Graph must be unweighted.")}
-
-  message("Finding the distribution using hypergeometric distribution")
 
   #### Bipartite Projection ####
-  if (methods::is(B, "sparseMatrix")) {
-    P <- Matrix::tcrossprod(B)
-    rs <- Matrix::rowSums(B)
-  } else {
-    P <- tcrossprod(B)
-    rs <- rowSums(B)
-  }
+  P <- tcrossprod(B)
+  rs <- rowSums(B)
 
   #### Hypergeometric Distribution ####
 
@@ -84,13 +75,8 @@ hyperg <- function(B){
   total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
   #### Compile Summary ####
-  if (methods::is(B, "sparseMatrix")) {
-    r <- Matrix::rowSums(B)
-    c <- Matrix::colSums(B)
-  } else {
-    r <- rowSums(B)
-    c <- colSums(B)
-  }
+  r <- rowSums(B)
+  c <- colSums(B)
   a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
   b <- c(class[1], "Hypergeometric Model", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
   model.summary <- data.frame(a,b, row.names = 1)
@@ -101,4 +87,31 @@ hyperg <- function(B){
   class(bb) <- "backbone"
   return(bb)
 }
+
+
+#' A wrapper for the \link{fixedrow} function
+#'
+#' `hyperg` computes the probability of observing
+#'     a higher or lower edge weight using the hypergeometric distribution.
+#'     Once computed, use \code{\link{backbone.extract}} to return
+#'     the backbone matrix for a given alpha value.
+#'
+#' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
+#'
+#' @details Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+#'     distribution of weights expected in a projection obtained from a random bipartite graph where
+#'     the row vertex degrees are fixed but the column vertex degrees are allowed to vary.
+#' @return \link{fixedrow}
+#' @references {Tumminello, Michele and Miccichè, Salvatore and Lillo, Fabrizio and Piilo, Jyrki and Mantegna, Rosario N. 2011. "Statistically Validated Networks in Bipartite Complex Systems." PLOS ONE, 6(3), \doi{10.1371/journal.pone.0017994}}
+#' @references {Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. \doi{10.1007/s13278-013-0107-y}}
+#' @export
+#'
+#' @examples
+#' hyperg_probs <- hyperg(davis)
+
+hyperg <- function(B){
+  return(fixedrow(B))
+}
+
 

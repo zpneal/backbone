@@ -8,6 +8,8 @@
 #'
 #' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
+#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
+#'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #' @param ... optional arguments
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
@@ -29,38 +31,33 @@
 #'sdsm_probs <- sdsm(davis)
 sdsm <- function(B,
                  progress = FALSE,
+                 method = "RefinedNormal",
                  ...){
 
   #### Argument Checks ####
   args <- match.call()
   exist <- ("model" %in% names(args))
   if (exist == TRUE){
-      message("This model is deprecated. SDSM now uses the 'bicm' model.
+    message("This model is deprecated. SDSM now uses the 'bicm' model.
              To run an older model, you must install a previous version of backbone.
              This can be done by using:
             ''require(devtools)'' and
             ''install_version(''backbone'', version = '1.2.2')")
   }
 
-  if (!(methods::is(B, "matrix")) & !(methods::is(B, "sparseMatrix")) & !(methods::is(B, "igraph")) & !(methods::is(B, "network"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
-
   ### Run Time ###
   run.time.start <- Sys.time()
-  message(paste0("Finding the distribution using SDSM with BiCM probabilities."))
 
   #### Class Conversion ####
-  convert <- class.convert(B, "matrix")
-  class <- convert[[1]]
-  B <- convert[[2]]
+  convert <- tomatrix(B)
+  class <- convert$summary[[1]]
+  B <- convert$G
+  if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
 
-  if ((max(B)>1)|(min(B)<0)){stop("Graph must be unweighted.")}
 
   #### Bipartite Projection ####
-  ### If sparse matrix input, use sparse matrix operations ###
-  if (methods::is(B, "sparseMatrix")) {
-    B <- Matrix::Matrix(B, sparse = T)
-  }
-  P <- Matrix::tcrossprod(B)
+  P <- tcrossprod(B)
 
   ### Create Positive and Negative Matrices to hold backbone ###
   Positive <- matrix(0, nrow(P), ncol(P))
@@ -72,7 +69,7 @@ sdsm <- function(B,
   #### Assemble and Probabilities ####
   rows <- dim(prob.mat)[1]
 
-  #### Compute Null Edge Weight Distributions Using Poisson Binomial RNA ####
+  #### Compute Null Edge Weight Distributions Using Poisson Binomial Distribution ####
 
   for (i in 1:rows){
     ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
@@ -80,9 +77,9 @@ sdsm <- function(B,
     # prob.imat <- prob.mat*matrix(prob.mat[i,],nrow = nrow(prob.mat),ncol=ncol(prob.mat),byrow = TRUE)
 
     ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
-    ### Using RNA approximation ###
-    negative <- as.array(mapply(rna, kk= as.data.frame(t(P[i,])), pp = as.data.frame(t(prob.imat))))
-    positive <- as.array((1- mapply(rna, kk=(as.data.frame(t(P[i,])-1)), pp = as.data.frame(t(prob.imat)))))
+
+    negative <- as.array(mapply(PoissonBinomial::ppbinom, x= as.data.frame(t(P[i,])), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal"))
+    positive <- as.array(mapply(PoissonBinomial::ppbinom, x=(as.data.frame(t(P[i,])-1)), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal", lower.tail = FALSE))
 
     ### Set values in Positive & Negative matrices ###
     Positive[i,] <- positive
@@ -98,8 +95,8 @@ sdsm <- function(B,
   total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
 
   #### Compile Summary ####
-  r <- Matrix::rowSums(B)
-  c <- Matrix::colSums(B)
+  r <- rowSums(B)
+  c <- colSums(B)
 
   a <- c("Input Class", "Model", "Method", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
   b <- c(class[1], "Stochastic Degree Sequence Model", "BiCM", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))

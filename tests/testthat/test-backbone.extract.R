@@ -72,10 +72,10 @@ test_that("backbone.extract class outputs", {
   bb.edgelist <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none", class = "edgelist")
 
   expect_equal(bb, bb.matrix)
-  expect_equal(class.convert(bb, "sparseMatrix")[[2]], bb.spmatrix)
-  expect_true(igraph::identical_graphs(class.convert(bb, "igraph")[[2]], bb.igraph))
-  expect_equal(class.convert(bb, "network")[[2]], bb.network)
-  expect_equal(class.convert(bb, "edgelist")[[2]], bb.edgelist)
+  expect_equal(frommatrix(bb, "sparseMatrix"), bb.spmatrix)
+  expect_true(igraph::identical_graphs(frommatrix(bb, "igraph"), bb.igraph))
+  expect_equal(frommatrix(bb, "network"), bb.network)
+  expect_equal(frommatrix(bb, "edgelist"), bb.edgelist)
 })
 
 
