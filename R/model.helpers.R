@@ -141,16 +141,21 @@ frommatrix <- function(graph, convert = "matrix"){
 
   if (convert == "sparseMatrix"){G <- methods::as(graph, "sparseMatrix")}
 
-  if (convert == "network"){G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = TRUE)}
+  if (convert == "network"){
+    if (isSymmetric(graph)) {G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = FALSE)}
+    if (!isSymmetric(graph)) {G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = TRUE)}
+  }
 
   if (convert == "edgelist"){
-    G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)
+    if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
+    if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
     G <- igraph::as_data_frame(G, what = "edges")
   }
 
   if (convert == "igraph"){
-    G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)
-    igraph::E(G)$sign <- igraph::E(G)$weight  #To facilitate use with library(signnet)
+    if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
+    if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
+    if (gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
   }
 
   return(G)
