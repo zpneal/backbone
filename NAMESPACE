@@ -3,6 +3,7 @@
 export(backbone.extract)
 export(bicm)
 export(curveball)
+export(disparityfilter)
 export(fdsm)
 export(fixedcol)
 export(fixedfill)
