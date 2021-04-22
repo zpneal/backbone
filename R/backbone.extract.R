@@ -24,7 +24,7 @@
 #' @examples
 #' probs <- sdsm(davis)
 #' bb <- backbone.extract(probs, alpha = .2, signed = TRUE, fwer = "none")
-backbone.extract <- function(backbone, signed = TRUE, alpha = 0.05, fwer = "none", class = "original", narrative = FALSE){
+backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
