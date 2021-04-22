@@ -31,7 +31,7 @@ disparityfilter <- function(G){
     P <- G/strength
     pvalues <- (1-P)^(degree-1)
     positive <- as.matrix(pvalues)
-    #negative <- 1-positive
+    negative <- 1-positive
   }
 
   if (symmetric == FALSE){
@@ -40,7 +40,7 @@ disparityfilter <- function(G){
     inp <- t(G)/(colSums(G))
     invalues <- t((1-inp)^(colSums(binary)-1))
     positive <- pmin(invalues,outvalues)
-    #negative <- 1-positive
+    negative <- 1-positive
   }
 
   ### If edge weight was zero
