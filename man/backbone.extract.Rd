@@ -6,7 +6,7 @@
 \usage{
 backbone.extract(
   backbone,
-  signed = TRUE,
+  signed = FALSE,
   alpha = 0.05,
   fwer = "none",
   class = "original",
