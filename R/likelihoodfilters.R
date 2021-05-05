@@ -74,5 +74,15 @@ mlf <- function(G){
   return(bb)
 }
 
-
+#' Global Likelihood Filter
+#'
+#' @param G
+#'
+#' @return
+#' @export
+#'
+#' @examples
+glf <- function(G){
+  message("to be completed")
+}
 
