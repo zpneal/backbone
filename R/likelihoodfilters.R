@@ -17,26 +17,37 @@ mlf <- function(G){
   rs <- rowSums(G)
   cs <- colSums(G)
 
-  if (convert$summary[[3]] == TRUE){undirected <- TRUE}
+  if (convert$summary[[3]] == TRUE){undirected <- TRUE} #checks for symmetry
   else{undirected <- FALSE}
   if (convert$summary[[4]]==FALSE){stop("Graph must be weighted.")}
   if (convert$summary[[2]]==TRUE){warning("This object is being treated as a unipartite network.")}
 
+
   #### Compute Probabilities ####
+  ### it is assumed nothing on diagonal ###
   if (undirected){
-    ## T = total edges = sum of G ##
-    ## this parameter divided by 2 in paper ##
-    t <- sum(G)
+    ## T = total edges = sum of G/2 ##
+    t <- sum(G)/2
     ## m = G[i,j] edge weight ##
     ## p = k_i*k_j/(2*t^2), k_i deg of i, k_j deg of j
-    p = outer(rs,cs)/(2*t**2)
+    p = outer(rs,rs)/(2*t**2)
 
     Negative = stats::pbinom(G, t, p, lower.tail = TRUE)
     Positive = stats::pbinom(G-1,t,p, lower.tail = FALSE)
   }
   else if (!undirected){
-    t <- sum(G) ## seems misdefined in paper as well
+    ## directed case
+    ## T = total edges = sum(G)
+    t <- sum(G)
+    # m = G[i,j]
+    # p = k_i^out*k_j^in/T^2
+    # here I'm assuming our directed adj mat is read as G[i,j] = directed i to j
+    # k_i^out = rs[i]
+    # k_j^in = cs[j]
+    p = outer(rs,cs)/(t**2)
 
+    Negative = stats::pbinom(G, t, p, lower.tail = TRUE)
+    Positive = stats::pbinom(G-1,t,p, lower.tail = FALSE)
   }
 
   ### Add back in rownames ###

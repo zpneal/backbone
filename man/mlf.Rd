@@ -2,7 +2,7 @@
 % Please edit documentation in R/likelihoodfilters.R
 \name{mlf}
 \alias{mlf}
-\title{Maximum Likelihood Filter}
+\title{Marginal Likelihood Filter}
 \usage{
 mlf(G)
 }
@@ -13,5 +13,5 @@ mlf(G)
 
 }
 \description{
-Maximum Likelihood Filter
+Marginal Likelihood Filter
 }
