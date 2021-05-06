@@ -14,7 +14,7 @@
 #' @return backbone, a list(positive, negative, summary). Here
 #'     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
 #'     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-#'     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+#'     `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 #' @export
 #'
 #' @examples
@@ -100,8 +100,10 @@ fixedfill <- function(B){
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
-  a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
-  b <- c(class[1], "Fixed Fill Model", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
+  b <- c("Fixed Fill Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2], as.numeric(total.time))
+
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 

@@ -21,7 +21,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 \value{
 backbone, a list(backbone, summary). The `backbone` object is a graph object of the same class as M.
     The `summary` contains a data frame summary of the inputted matrix and the model used including:
-    model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+    model name, number of rows, number of columns, and running time.
 }
 \description{
 `universal` returns a backbone graph in which edge weights are set to

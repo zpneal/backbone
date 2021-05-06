@@ -24,7 +24,7 @@ backbone, a list(positive, negative, dyad_values, summary). Here
     `positive` is a matrix of proportion of times each entry of the projected matrix B is above the corresponding entry in the generated projection,
     `negative` is a matrix of proportion of times each entry of the projected matrix B is below the corresponding entry in the generated projection,
     `dyad_values` is a list of edge weight for i,j in each generated projection, and
-    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+    `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 }
 \description{
 `fdsm` computes the proportion of generated edges above

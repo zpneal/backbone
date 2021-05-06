@@ -14,7 +14,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 backbone, a list(positive, negative, summary). Here
     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+    `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 }
 \description{
 `fixedrow` computes the probability of observing
