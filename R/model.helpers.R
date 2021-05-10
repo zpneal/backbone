@@ -155,7 +155,7 @@ frommatrix <- function(graph, convert = "matrix"){
   if (convert == "igraph"){
     if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
     if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
-    if (gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
+    if (igraph::gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
   }
 
   return(G)
