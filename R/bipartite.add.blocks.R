@@ -4,8 +4,15 @@
 #' located within-block with `density` probability, while preserving the degree distributions.
 #'
 #' @param B A bipartite network object of class "matrix", "sparseMatrix", \link{igraph}, matrix or dataframe edgelist, or \link[network]{network}
-#' @param blocks numeric: number of blocks to add (between 2 and 26)
+#' @param blocks integer: number of blocks to add (between 2 and 26)
 #' @param density numeric: desired within-block density
+#' @param max.tries numeric: number of ineligible re-wiring attempts before giving up
+#'
+#' @details Each row node and each column node are randomly assigned to one of `blocks` number of groups. Then
+#' degree-preserving checkerboard swaps are performed that increase the within-block density, until `density`
+#' is achieved. Eligible swaps are identified randomly, so the re-wiring can be slow when B is large. The process
+#' can get stuck when no eligible swaps remain but the target `density` has not been achieved; if this happens, increase
+#' `max.tries` to keep looking for eligible swaps or reduce the target `density`.
 #'
 #' @return
 #' @export
@@ -13,7 +20,7 @@
 #' @examples
 #' B <- bipartite.from.probability(R = 10, C = 10, P = .5)
 #' B <- bipartite.add.blocks(B, blocks = 2, density = .7)
-bipartite.add.blocks <- function(B,blocks=2,density=.5) {
+bipartite.add.blocks <- function(B,blocks=2,density=.5,max.tries=100000) {
 
   #Convert supplied object to matrix
   B <- suppressMessages(tomatrix(B))
@@ -32,6 +39,7 @@ bipartite.add.blocks <- function(B,blocks=2,density=.5) {
   within.block <- sum((outer(substr(rownames(B),1,1), substr(colnames(B),1,1), `==`)*1)*B) / sum(B)  #Compute starting block density
   pb <- txtProgressBar(min = .49, max = density, style = 3)  #Initiate progress bar
 
+  failed.swaps <- 0
   while (within.block < density) {
     # Pick agents
     agent1 <- sample(rownames(B),1)  #Pick a random agent
@@ -46,7 +54,11 @@ bipartite.add.blocks <- function(B,blocks=2,density=.5) {
       B[c(agent1,agent2),c(artifact1,artifact2)] <- abs(B[c(agent1,agent2),c(artifact1,artifact2)] - 1)
       within.block <- sum((outer(substr(rownames(B),1,1), substr(colnames(B),1,1), `==`)*1)*B) / sum(B)
       setTxtProgressBar(pb, within.block)
-    }
+      failed.swaps <- 0
+    } else {failed.swaps <- failed.swaps + 1}  #If a swap would not increase within-block density, increase counter
+
+  # If within-block density can't be improved further, stop
+  if (failed.swaps == max.tries) {stop("No more swaps found; try again with higher `max.tries` or lower target `density`.")}
   }
 
   # Arrange by groups and close progress bar
