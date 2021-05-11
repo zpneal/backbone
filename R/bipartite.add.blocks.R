@@ -14,7 +14,6 @@
 #' can get stuck when no eligible swaps remain but the target `density` has not been achieved; if this happens, increase
 #' `max.tries` to keep looking for eligible swaps or reduce the target `density`.
 #'
-#' @return
 #' @export
 #'
 #' @examples
@@ -37,7 +36,7 @@ bipartite.add.blocks <- function(B,blocks=2,density=.5,max.tries=100000) {
   rownames(B) <- paste0(sample(block.names,nrow(B),replace=TRUE),c(1:nrow(B)))  #Assign each agent to a group
   colnames(B) <- paste0(sample(block.names,ncol(B),replace=TRUE),c(1:ncol(B)))  #Assign each artifact to a group
   within.block <- sum((outer(substr(rownames(B),1,1), substr(colnames(B),1,1), `==`)*1)*B) / sum(B)  #Compute starting block density
-  pb <- txtProgressBar(min = .49, max = density, style = 3)  #Initiate progress bar
+  pb <- utils::txtProgressBar(min = .49, max = density, style = 3)  #Initiate progress bar
 
   failed.swaps <- 0
   while (within.block < density) {
@@ -53,7 +52,7 @@ bipartite.add.blocks <- function(B,blocks=2,density=.5,max.tries=100000) {
     if (all(matrix(c(0,1,1,0),nrow=2,ncol=2) == B[c(agent1,agent2),c(artifact1,artifact2)])) {
       B[c(agent1,agent2),c(artifact1,artifact2)] <- abs(B[c(agent1,agent2),c(artifact1,artifact2)] - 1)
       within.block <- sum((outer(substr(rownames(B),1,1), substr(colnames(B),1,1), `==`)*1)*B) / sum(B)
-      setTxtProgressBar(pb, within.block)
+      utils::setTxtProgressBar(pb, within.block)
       failed.swaps <- 0
     } else {failed.swaps <- failed.swaps + 1}  #If a swap would not increase within-block density, increase counter
 
