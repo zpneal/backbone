@@ -23,16 +23,12 @@
 
 fixedfill <- function(B){
 
-  ### Run Time ###
-  run.time.start <- Sys.time()
-
   #### Class Conversion ####
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
   B <- convert$G
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
-
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
@@ -49,7 +45,6 @@ fixedfill <- function(B){
   diagp <- stats::phyper(diagonal-1, n, (m-1)*n, f-diagonal, lower.tail=FALSE)
 
   ### Off Diagonal Values ###
-
   ## This computes log of k! ##
   logsum <- function(k){
     if (k==0){
@@ -94,16 +89,12 @@ fixedfill <- function(B){
   diag(Negative) <- diagn
   diag(Positive) <- diagp
 
-  ### Run Time ###
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
-
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
 
-  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
-  b <- c("Fixed Fill Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2], as.numeric(total.time))
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Fixed Fill Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"

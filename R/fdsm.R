@@ -41,8 +41,6 @@ fdsm <- function(B,
   #### Argument Checks ####
   if (trials < 0) {stop("trials must be a positive integer")}
   if ((trials > 1) & (trials%%1!=0)) {stop("trials must be decimal < 1, or a positive integer")}
-  ### Run Time ###
-  run.time.start <- Sys.time()
 
   #### Class Conversion ####
   convert <- tomatrix(B)
@@ -50,7 +48,6 @@ fdsm <- function(B,
   B <- convert$G
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
-
 
   #### Set Trials if Decimal ####
   if ((trials > 0)&(trials<1)){
@@ -120,16 +117,12 @@ fdsm <- function(B,
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  ### Run Time ###
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
-
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
 
-  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
-  b <- c("Fixed Degree Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2], as.numeric(total.time))
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Fixed Degree Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
@@ -145,7 +138,6 @@ fdsm <- function(B,
   }
 
 } #end fdsm function
-
 
 #' curveball algorithm
 #'

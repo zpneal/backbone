@@ -45,16 +45,12 @@ sdsm <- function(B,
             ''install_version(''backbone'', version = '1.2.2')")
   }
 
-  ### Run Time ###
-  run.time.start <- Sys.time()
-
   #### Class Conversion ####
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
   B <- convert$G
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
-
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
@@ -70,14 +66,12 @@ sdsm <- function(B,
   rows <- dim(prob.mat)[1]
 
   #### Compute Null Edge Weight Distributions Using Poisson Binomial Distribution ####
-
   for (i in 1:rows){
     ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
     # prob.imat <- prob.mat*matrix(prob.mat[i,],nrow = nrow(prob.mat),ncol=ncol(prob.mat),byrow = TRUE)
 
     ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
-
     negative <- as.array(mapply(PoissonBinomial::ppbinom, x= as.data.frame(t(P[i,])), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal"))
     positive <- as.array(mapply(PoissonBinomial::ppbinom, x=(as.data.frame(t(P[i,])-1)), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal", lower.tail = FALSE))
 
@@ -90,16 +84,12 @@ sdsm <- function(B,
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  ### Run Time ###
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
-
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
 
-  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
-  b <- c("Stochastic Degree Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2], as.numeric(total.time))
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Stochastic Degree Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"

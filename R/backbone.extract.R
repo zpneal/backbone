@@ -42,7 +42,7 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
   negative <- as.matrix(backbone[[2]])
   summary <- backbone$summary
   model <- summary["Model",1]
-  method <- summary["Method",1]
+  if (class == "original") {class <- summary["Input Class",1]}
   agents <- summary["Number of Rows",1]
   artifacts <- summary["Number of Columns",1]
   original.alpha <- alpha
@@ -52,16 +52,10 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
   if (fwer == "bonferroni") {correction <- ", Bonferroni corrected"}
   if (fwer == "holm") {correction <- ", Holm-Bonferroni corrected"}
 
-
-
   if ((model == "Fixed Degree Sequence Model") & (fwer != "none")){
     warning("Use caution when applying Holm-Bonferroni or Bonferroni correction to backbones
              found via the Fixed Degree Sequence Method as the precision of the proportions
              depends on the number of trials.")
-  }
-
-  if (class == "original"){
-    class <- as.character(summary[1,1])
   }
 
   ### Auxiliary Values ###
@@ -140,6 +134,6 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
     if (model == "Fixed Degree Sequence Model") {message("Zweig, K. A. and Kaufmann, M. (2011). A systematic approach to the one-mode projection of bipartite graphs. Social Network Analysis and Mining, 1, 187-218. https://doi.org/10.1007/s13278-011-0021-0")}
   }
 
-  backbone <- frommatrix(backbone, class[1])
+  backbone <- frommatrix(backbone, class)
   return(backbone)
 }

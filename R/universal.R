@@ -31,9 +31,6 @@ universal <- function(M,
   if (!(methods::is(upper, "function")) & (!(methods::is(upper, "numeric"))) & (!(methods::is(upper, "NULL")))) {stop("upper must be either function, numeric, or NULL")}
   if (!(methods::is(lower, "function")) & (!(methods::is(lower, "numeric"))) & (!(methods::is(lower, "NULL")))) {stop("lower must be either function, numeric, or NULL")}
 
-  ### Run Time ###
-  run.time.start <- Sys.time()
-
   #### Class Conversion ####
   convert <- tomatrix(M)
   class <- convert$summary[[1]]
@@ -97,13 +94,11 @@ universal <- function(M,
   diag(backbone) <- 0
 
   #### Compile Summary ####
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
   r <- rowSums(M)
   c <- colSums(M)
 
-  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
-  b <- c("Universal Threshold", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(M)[1], dim(M)[2], as.numeric(total.time))
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Universal Threshold", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(M)[1], dim(M)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"

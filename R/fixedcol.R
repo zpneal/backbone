@@ -23,9 +23,6 @@
 fixedcol <- function(B,
                      method = "RefinedNormal"){
 
-  ### Run Time ###
-  run.time.start <- Sys.time()
-
   #### Class Conversion ####
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
@@ -33,12 +30,9 @@ fixedcol <- function(B,
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
 
-
   #### Bipartite Projection ####
-  ### If sparse matrix input, use sparse matrix operations ###
   P <- tcrossprod(B)
   cs <- colSums(B)
-
   m = dim(B)[1]
 
   #### Poisson Binomial Distribution ####
@@ -62,16 +56,12 @@ fixedcol <- function(B,
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  ### Run Time ###
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
-
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
 
-  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
-  b <- c("Poisson Binomial Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2], as.numeric(total.time))
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Poisson Binomial Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"

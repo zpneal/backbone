@@ -24,9 +24,6 @@
 
 fixedrow <- function(B){
 
-  ### Run Time ###
-  run.time.start <- Sys.time()
-
   #### Class Conversion ####
   convert <- tomatrix(B)
   class <- convert$summary[[1]]
@@ -34,13 +31,11 @@ fixedrow <- function(B){
   if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
 
-
   #### Bipartite Projection ####
   P <- tcrossprod(B)
   rs <- rowSums(B)
 
   #### Hypergeometric Distribution ####
-
   ### Set up df for values ###
   df <- data.frame(as.vector(P))
   names(df)[names(df)=="as.vector.P."] <- "projvalue"
@@ -70,16 +65,12 @@ fixedrow <- function(B){
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  ### Run Time ###
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
-
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
 
-  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns", "Running Time (secs)")
-  b <- c("Hypergeometric Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2], as.numeric(total.time))
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Hypergeometric Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
@@ -89,7 +80,6 @@ fixedrow <- function(B){
   class(bb) <- "backbone"
   return(bb)
 }
-
 
 #' A wrapper for the \link{fixedrow} function
 #'
