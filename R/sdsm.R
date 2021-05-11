@@ -69,7 +69,6 @@ sdsm <- function(B,
   for (i in 1:rows){
     ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
-    # prob.imat <- prob.mat*matrix(prob.mat[i,],nrow = nrow(prob.mat),ncol=ncol(prob.mat),byrow = TRUE)
 
     ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
     negative <- as.array(mapply(PoissonBinomial::ppbinom, x= as.data.frame(t(P[i,])), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal"))
@@ -79,11 +78,17 @@ sdsm <- function(B,
     Positive[i,] <- positive
     Negative[i,] <- negative
   } #end for i in rows
+  
+  ### Add back in rownames
   rownames(Positive) <- rownames(B)
   colnames(Positive) <- rownames(B)
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
+  ### Insert NAs for p-values along diagonal
+  diag(Positive) <- NA
+  diag(Negative) <- NA
+  
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)

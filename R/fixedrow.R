@@ -64,6 +64,10 @@ fixedrow <- function(B){
   colnames(Positive) <- rownames(B)
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
+  
+  ### Insert NAs for p-values along diagonal
+  diag(Positive) <- NA
+  diag(Negative) <- NA
 
   #### Compile Summary ####
   r <- rowSums(B)

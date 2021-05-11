@@ -40,9 +40,9 @@ fixedfill <- function(B){
   f <- sum(B)
 
   ### Diagonal Values ###
-  diagonal <- diag(P)
-  diagn <- stats::phyper(diagonal, n, (m-1)*n, f-diagonal, lower.tail = TRUE)
-  diagp <- stats::phyper(diagonal-1, n, (m-1)*n, f-diagonal, lower.tail=FALSE)
+  #diagonal <- diag(P)
+  #diagn <- stats::phyper(diagonal, n, (m-1)*n, f-diagonal, lower.tail = TRUE)
+  #diagp <- stats::phyper(diagonal-1, n, (m-1)*n, f-diagonal, lower.tail=FALSE)
 
   ### Off Diagonal Values ###
   ## This computes log of k! ##
@@ -86,8 +86,10 @@ fixedfill <- function(B){
   #### Create Positive and Negative Probability Matrices ####
   Negative <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))
   Positive <- apply(P, c(1,2), FUN = function(k) 1- sum(probs[1:k]))
-  diag(Negative) <- diagn
-  diag(Positive) <- diagp
+  
+  ### Insert NAs for p-values along diagonal
+  diag(Positive) <- NA
+  diag(Negative) <- NA
 
   #### Compile Summary ####
   r <- rowSums(B)
