@@ -54,22 +54,21 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
 
   if ((model == "Fixed Degree Sequence Model") & (fwer != "none")){
     warning("Use caution when applying Holm-Bonferroni or Bonferroni correction to backbones
-             found via the Fixed Degree Sequence Method as the precision of the proportions
+             found via the Fixed Degree Sequence Method as the precision of the p-values
              depends on the number of trials.")
   }
 
   ### Auxiliary Values ###
-  alpha <- alpha/2  #Alpha for each tail
-  #m <- sum(lower.tri(positive)==TRUE)  #Number of independent tests
-  n <- dim(positive)[1]
-  m <- (n*(n-1))/2
+  alpha <- alpha/2  #Alpha for each tail (all tests are two-tailed)
+  n <- dim(positive)[1] #Number of nodes in backbone
+  if (model=="Fixed Fill Model" | model=="Fixed Row Model" | model=="Fixed Column Model" |                 #For bipartite backbones,
+      model=="Stochastic Degree Sequence Model" | model=="Fixed Degree Sequence Model") {m <- (n*(n-1))/2} #number of independent tests
 
   #### Find p-value in the More Extreme Tail ####
   backbone <- pmin(positive,negative)  #matrix of smaller p-value from positive and negative
   diag(backbone) <- NA  #remove diagonal
 
   #### FWER Computations ####
-
   ### FWER: No correction ###
   if(fwer=="none"){backbone <- (backbone < alpha)*1}  #significant edges
 
@@ -82,9 +81,7 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
   ### FWER: Holm-Bonferroni correction ###
   if(fwer=="holm"){
     backbone[upper.tri(backbone)] <- NA  #remove upper triangle
-    rank <- matrix(rank(backbone,na.last="keep",ties.method="random"),  #rank of pvalue
-                   nrow=nrow(positive),
-                   ncol=ncol(positive))
+    rank <- matrix(rank(backbone,na.last="keep",ties.method="random"),nrow=nrow(positive),ncol=ncol(positive)) #rank of pvalue
     holm.alphas <- alpha/(m-rank+1)  #Holm-Bonferroni step-down p-values
     backbone <- (backbone < holm.alphas)*rank  #ranks of *potentially* significant edges
 
@@ -103,15 +100,6 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
   if(signed==FALSE) {backbone[backbone==-1] <- 0}  #if binary backbone requested, change -1s to 0s
   if (model=="Fixed Fill Model" | model=="Fixed Row Model" | model=="Fixed Column Model" |                     #For bipartite backbones,
       model=="Stochastic Degree Sequence Model" | model=="Fixed Degree Sequence Model") {diag(backbone) <- 0}  #fill diagonal with 0s
-
-  #### Return Backbone Graph of Correct Class ####
-  if ((class == "dgCMatrix") | (class == "dgRMatrix") | (class == "ngRMatrix")){
-    class <- "sparseMatrix"
-  }
-
-  if (class == "dgeMatrix"){
-    class <- "matrix"
-  }
 
   #### Display suggested manuscript text ####
   if (narrative == TRUE) {
