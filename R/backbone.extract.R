@@ -101,7 +101,8 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
   sign[sign==0] <- 1
   backbone <- backbone*sign  #apply appropriate sign to significant edges
   if(signed==FALSE) {backbone[backbone==-1] <- 0}  #if binary backbone requested, change -1s to 0s
-  diag(backbone) <- 0  #fill diagonal with 0s
+  if (model=="Fixed Fill Model" | model=="Fixed Row Model" | model=="Fixed Column Model" |                     #For bipartite backbones,
+      model=="Stochastic Degree Sequence Model" | model=="Fixed Degree Sequence Model") {diag(backbone) <- 0}  #fill diagonal with 0s
 
   #### Return Backbone Graph of Correct Class ####
   if ((class == "dgCMatrix") | (class == "dgRMatrix") | (class == "ngRMatrix")){
@@ -119,10 +120,10 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
 
     text <- paste0("From a bipartite graph containing ", agents, " agents and ", artifacts, " artifacts, we obtained the weighted bipartite projection, then extracted its ", type, " backbone using the backbone package (Domagalski, Neal, & Sagan, 2021).")
     text <- paste0(text, " Edges were retained in the backbone if their weights were statistically significant (alpha = ", original.alpha, correction,") by comparison to a null ", model)
-    if (model == "Hypergeometric Model") {text <- paste0(text, " (Neal, 2013).")}
+    if (model == "Fixed Row Model") {text <- paste0(text, " (Neal, 2013).")}
     if (model == "Stochastic Degree Sequence Model") {text <- paste0(text, " (Neal, 2014).")}
     if (model == "Fixed Degree Sequence Model") {text <- paste0(text, " (Zweig & Kaufmann, 2011).")}
-    if (model == "Poisson Binomial Sequence Model") {text <- paste0(text, " (Neal, Domagalski, Sagan, upcoming 2021).")}
+    if (model == "Fixed Column Model") {text <- paste0(text, " (Neal, Domagalski, Sagan, upcoming 2021).")}
     if (model == "Fixed Fill Model") {text <- paste0(text, " (Neal, Domagalski, Sagan, upcoming 2021).")}
 
     message(text)
@@ -130,7 +131,7 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
     message("Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. https://doi.org/10.1371/journal.pone.0244363")
     message("")
     if (model == "Stochastic Degree Sequence Model") {message("Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance and other co-behaviors. Social Networks, 39, 84-97. https://doi.org/10.1016/j.socnet.2014.06.001")}
-    if (model == "Hypergeometric Model") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}
+    if (model == "Fixed Row Model") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}
     if (model == "Fixed Degree Sequence Model") {message("Zweig, K. A. and Kaufmann, M. (2011). A systematic approach to the one-mode projection of bipartite graphs. Social Network Analysis and Mining, 1, 187-218. https://doi.org/10.1007/s13278-011-0021-0")}
   }
 

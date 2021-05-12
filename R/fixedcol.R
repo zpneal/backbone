@@ -55,7 +55,7 @@ fixedcol <- function(B,
   colnames(Positive) <- rownames(B)
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
-  
+
   ### Insert NAs for p-values along diagonal
   diag(Positive) <- NA
   diag(Negative) <- NA
@@ -65,7 +65,7 @@ fixedcol <- function(B,
   c <- colSums(B)
 
   a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
-  b <- c("Poisson Binomial Sequence Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
+  b <- c("Fixed Column Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
