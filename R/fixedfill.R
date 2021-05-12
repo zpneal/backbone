@@ -39,11 +39,6 @@ fixedfill <- function(B){
   n <- dim(B)[2]
   f <- sum(B)
 
-  ### Diagonal Values ###
-  #diagonal <- diag(P)
-  #diagn <- stats::phyper(diagonal, n, (m-1)*n, f-diagonal, lower.tail = TRUE)
-  #diagp <- stats::phyper(diagonal-1, n, (m-1)*n, f-diagonal, lower.tail=FALSE)
-
   ### Off Diagonal Values ###
   ## This computes log of k! ##
   logsum <- function(k){
@@ -80,14 +75,18 @@ fixedfill <- function(B){
     }
     return(sum((exp(logvalues))))
   }
-  max <- max(P)
+
+  max <- floor(f/2)  #Largest possible k
   probs <- sapply(0:max, FUN = prob_log)
 
   #### Create Positive and Negative Probability Matrices ####
+  Positive <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(max+1)]))
   Negative <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))
-  Positive <- apply(P, c(1,2), FUN = function(k) 1- sum(probs[1:k]))
-  
+
   ### Insert NAs for p-values along diagonal
+  #diagonal <- diag(P)
+  #diagn <- stats::phyper(diagonal, n, (m-1)*n, f-diagonal, lower.tail = TRUE)
+  #diagp <- stats::phyper(diagonal-1, n, (m-1)*n, f-diagonal, lower.tail=FALSE)
   diag(Positive) <- NA
   diag(Negative) <- NA
 
