@@ -25,10 +25,10 @@ fixedcol <- function(B,
 
   #### Class Conversion ####
   convert <- tomatrix(B)
-  class <- convert$summary[[1]]
+  class <- convert$summary$class
   B <- convert$G
-  if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
-  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
+  if (convert$summary$weighted==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary$bipartite==FALSE){warning("This object is being treated as a bipartite network.")}
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
@@ -65,7 +65,7 @@ fixedcol <- function(B,
   c <- colSums(B)
 
   a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
-  b <- c("Fixed Column Model", class[1], convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
+  b <- c("Fixed Column Model", convert$summary$class, convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
 
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
