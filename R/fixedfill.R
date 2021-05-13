@@ -76,12 +76,13 @@ fixedfill <- function(B){
     return(sum((exp(logvalues))))
   }
 
-  max <- floor(f/2)  #Largest possible k
-  probs <- sapply(0:max, FUN = prob_log)
+  maxk <- max(P)  #Largest observed k
+  probs <- sapply(0:maxk, FUN = prob_log)  #Probability of observing each k, for 0 <= k <= maxk
+  probs <- c(probs, 1 - sum(probs))  #Add one more entry for probability of observing any k > maxk (upper tail of PMF)
 
   #### Create Positive and Negative Probability Matrices ####
-  Positive <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(max+1)]))
-  Negative <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))
+  Positive <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(maxk+2)]))  #Sum of probabilities Pij <= k <= maxk and beyond
+  Negative <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))  #Sum of probabilities 0 <= k <= Pij
 
   ### Insert NAs for p-values along diagonal
   #diagonal <- diag(P)
