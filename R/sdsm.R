@@ -10,7 +10,6 @@
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 #'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
-#' @param progress Boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #' @param ... optional arguments
 #' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
 #'    to the distribution of weights expected in a projection obtained from a random bipartite network where
@@ -30,7 +29,6 @@
 #' @examples
 #'sdsm_probs <- sdsm(davis)
 sdsm <- function(B,
-                 progress = FALSE,
                  method = "RefinedNormal",
                  ...){
 
@@ -60,7 +58,7 @@ sdsm <- function(B,
   Negative <- matrix(0, nrow(P), ncol(P))
 
   #### Compute Probabilities for SDSM ####
-  prob.mat <- bicm(graph=B,progress=progress,...)
+  prob.mat <- bicm(graph=B,...)
 
   #### Assemble and Probabilities ####
   rows <- dim(prob.mat)[1]
