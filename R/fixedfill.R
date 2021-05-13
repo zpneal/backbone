@@ -28,7 +28,10 @@ fixedfill <- function(B){
   class <- convert$summary$class
   B <- convert$G
   if (convert$summary$weighted==TRUE){stop("Graph must be unweighted.")}
-  if (convert$summary$bipartite==FALSE){warning("This object is being treated as a bipartite network.")}
+  if (convert$summary$bipartite==FALSE){
+    warning("This object is being treated as a bipartite network.")
+    convert$summary$bipartite <- TRUE
+  }
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
