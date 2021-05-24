@@ -18,13 +18,13 @@ tomatrix <- function(graph){
   if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist, igraph, or network object.")}
 
   #### Convert matrix-like object ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | (methods::is(graph, "data.frame")))) {
     if (dim(graph)[2] > 3) {
       G <- as.matrix(graph)  #Coerce to matrix
       class(G) <- "numeric"  #Coerce to numeric
       if (any(is.na(G))) {stop("The object contains non-numeric entries")}
 
-      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix are treated as bipartite
+      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
       if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
         if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
             !isSymmetric(G)) {                                                    #it is not symmetric
