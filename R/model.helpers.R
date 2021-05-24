@@ -113,8 +113,8 @@ tomatrix <- function(graph){
   if (isweighted) {weigh <- "a weighted"} else {weigh <- "an unweighted"}
   if (isbipartite) {
     message(paste0("This ", class, " object looks like ", weigh, " bipartite network of ", nrow(G), " agents and ", ncol(G), " artifacts."))
-    if (length(r)>0) {message("These zero-sum rows have been removed from the data: ", paste0(r, " "))}
-    if (length(c)>0) {message("These zero-sum columns have been removed from the data: ", paste0(c, " "))}
+    if (length(r)>0) {message("These empty (i.e. all 0s) rows have been removed from the data: ", paste0(r, " "))}
+    if (length(c)>0) {message("These empty (i.e. all 0s) columns have been removed from the data: ", paste0(c, " "))}
   }
   if (!isbipartite) {message(paste0("This ", class, " object looks like ", weigh, " ", dir, " network containing ", nrow(G), " nodes."))}
 
