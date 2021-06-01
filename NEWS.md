@@ -8,7 +8,7 @@ output: html_document
 * set diagonal in `positive` and `negative` backbone object matrices to NA
 * corrected p-value computation in fixedfill()
 * remove running time from backbone object summary dataframe
-* update documentation, readme
+* update documentation, readme, vignette
 
 ## backbone 1.4.0
 
