@@ -25,7 +25,8 @@ backbone, a list(positive, negative, summary). Here
 \details{
 Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
     distribution of weights expected in a projection obtained from a random bipartite graph where
-    the number of edges present is equal to the number of edges in B.
+    the number of edges present is equal to the number of edges in B. When B is large, this function may be impractically
+    slow and may return a backbone object that contains NaN values.
 }
 \examples{
 fixed_probs <- fixedfill(davis)

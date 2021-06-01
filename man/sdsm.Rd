@@ -4,13 +4,11 @@
 \alias{sdsm}
 \title{The stochastic degree sequence model (sdsm) for backbone probabilities}
 \usage{
-sdsm(B, progress = FALSE, method = "RefinedNormal", ...)
+sdsm(B, method = "RefinedNormal", ...)
 }
 \arguments{
 \item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
-
-\item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 
 \item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}

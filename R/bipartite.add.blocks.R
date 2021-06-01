@@ -1,7 +1,7 @@
 #' Adds a block structure to a bipartite network
 #'
 #' `bipartite.add.blocks` rewires a bipartite graph B to have a block structure such that edges are
-#' located within-block with `density` probability, while preserving the degree distributions.
+#' located within-block with `density` probability, while preserving both degree distributions.
 #'
 #' @param B A bipartite network object of class "matrix", "sparseMatrix", \link{igraph}, matrix or dataframe edgelist, or \link[network]{network}
 #' @param blocks integer: number of blocks to add (between 2 and 26)
