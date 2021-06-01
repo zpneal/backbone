@@ -30,13 +30,19 @@ The `backbone` package provides methods for extracting from a weighted
 graph a binary or signed backbone that retains only the significant
 edges. The user may input a weighted graph, or a bipartite graph from
 which a weighted graph is first constructed via projection. Backbone
-extraction methods include the stochastic degree sequence model [(Neal,
-Z. P. (2014))](https://doi.org/10.1016/j.socnet.2014.06.001),
-hypergeometric model [(Neal, Z.
-(2013))](https://doi.org/10.1007/s13278-013-0107-y), the fixed degree
-sequence model [(Zweig, K. A., and Kaufmann, M.
-(2011))](https://doi.org/10.1007/s13278-011-0021-0), a fixed column
-model, a fixed fill model, as well as a universal threshold method.
+extraction methods include:
+
+  - stochastic degree sequence model (SDSM; Neal, Z. P. (2014).
+    <doi:10.1016/j.socnet.2014.06.001>),
+  - the fixed degree sequence model (FDSM; Zweig, K. A., and Kaufmann,
+    M. (2011). <doi:10.1007/s13278-011-0021-0>),
+  - the fixed row model (FRM; Neal, Z. P. (2013).
+    <doi:10.1007/s13278-013-0107-y>),
+  - the fixed column model (FCM; Neal, Domagalski, and Sagan (2021).
+    \<arXiv:2105.13396\>),
+  - the fixed fill model (FFM; Neal, Domagalski, and Sagan (2021).
+    \<arXiv:2105.13396\>),
+  - and a universal threshold method.
 
 In a graph `G`, edges are either present (i.e. `G_{ij}=1`) or absent
 (i.e. `G_{ij}=0`). However in a weighted or valued graph, edges can take
