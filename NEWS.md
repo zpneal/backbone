@@ -2,6 +2,14 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 1.5.0
+
+* add four functions to generate random bipartite graphs: bipartite.from.probability(), bipartite.from.sequence(), bipartite.from.distribution(), and bipartite.add.blocks()
+* set diagonal in `positive` and `negative` backbone object matrices to NA
+* corrected p-value computation in fixedfill()
+* remove running time from backbone object summary dataframe
+* update documentation, readme
+
 ## backbone 1.4.0
 
 * add fixedcol() function - null model where column degrees are fixed and row sums are allowed to vary
