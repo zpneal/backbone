@@ -45,8 +45,8 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
   agents <- summary["Number of Rows",1]
   artifacts <- summary["Number of Columns",1]
   original.alpha <- alpha
-  type <- "signed"
-  if (signed == FALSE) {type <- "binary"}
+  type <- "binary"
+  if (signed == TRUE) {type <- "signed"}
   correction <- ""
   if (fwer == "bonferroni") {correction <- ", Bonferroni corrected"}
   if (fwer == "holm") {correction <- ", Holm-Bonferroni corrected"}
@@ -102,16 +102,16 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
 
   #### Display suggested manuscript text ####
   if (narrative == TRUE) {
-    message("Suggested manuscript text and citations:")
+    message("=== Suggested manuscript text and citations ===")
     message(" ")
 
     text <- paste0("From a bipartite graph containing ", agents, " agents and ", artifacts, " artifacts, we obtained the weighted bipartite projection, then extracted its ", type, " backbone using the backbone package (Domagalski, Neal, & Sagan, 2021).")
     text <- paste0(text, " Edges were retained in the backbone if their weights were statistically significant (alpha = ", original.alpha, correction,") by comparison to a null ", model)
-    if (model == "Fixed Row Model") {text <- paste0(text, " (Neal, 2013).")}
-    if (model == "Stochastic Degree Sequence Model") {text <- paste0(text, " (Neal, 2014).")}
-    if (model == "Fixed Degree Sequence Model") {text <- paste0(text, " (Zweig & Kaufmann, 2011).")}
-    if (model == "Fixed Column Model") {text <- paste0(text, " (Neal, Domagalski, Sagan, upcoming 2021).")}
-    if (model == "Fixed Fill Model") {text <- paste0(text, " (Neal, Domagalski, Sagan, upcoming 2021).")}
+    if (model == "Fixed Row Model") {text <- paste0(text, " (FRM; Neal, 2013).")}
+    if (model == "Fixed Column Model") {text <- paste0(text, " (FCM; Neal, Domagalski, and Sagan, 2021).")}
+    if (model == "Fixed Fill Model") {text <- paste0(text, " (FFM; Neal, Domagalski, and Sagan, 2021).")}
+    if (model == "Stochastic Degree Sequence Model") {text <- paste0(text, " (SDSM; Neal, 2014).")}
+    if (model == "Fixed Degree Sequence Model") {text <- paste0(text, " (FDSM; Zweig & Kaufmann, 2011).")}
 
     message(text)
     message("")
@@ -120,6 +120,8 @@ backbone.extract <- function(backbone, signed = FALSE, alpha = 0.05, fwer = "non
     if (model == "Stochastic Degree Sequence Model") {message("Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance and other co-behaviors. Social Networks, 39, 84-97. https://doi.org/10.1016/j.socnet.2014.06.001")}
     if (model == "Fixed Row Model") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}
     if (model == "Fixed Degree Sequence Model") {message("Zweig, K. A. and Kaufmann, M. (2011). A systematic approach to the one-mode projection of bipartite graphs. Social Network Analysis and Mining, 1, 187-218. https://doi.org/10.1007/s13278-011-0021-0")}
+    if (model == "Fixed Column Model") {message("Neal, Z. P., Domagalski, R., and Sagan, B. 2021. Comparing models for extracting the backbone of bipartite projections. arXiv:2105.13396 [cs.SI]).")}
+    if (model == "Fixed Fill Model") {message("Neal, Z. P., Domagalski, R., and Sagan, B. 2021. Comparing models for extracting the backbone of bipartite projections. arXiv:2105.13396 [cs.SI]).")}
   }
 
   backbone <- frommatrix(backbone, class)
