@@ -23,7 +23,7 @@ backbone, a list(positive, negative, summary). Here
     the backbone matrix for a given alpha value.
 }
 \details{
-Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+The fixedrow function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
     distribution of weights expected in a projection obtained from a random bipartite graph where
     the row vertex degrees are fixed but the column vertex degrees are allowed to vary.
 }

@@ -26,10 +26,13 @@ backbone, a list(positive, negative, summary). Here
     the backbone matrix for a given alpha value.
 }
 \details{
-Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+This fixedcol function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
     distribution of weights expected in a projection obtained from a random bipartite graph where
     the column vertex degrees are fixed but the row vertex degrees are allowed to vary.
 }
 \examples{
 fixedcol(davis)
+}
+\references{
+{Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI})
 }

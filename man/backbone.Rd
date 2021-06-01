@@ -14,8 +14,8 @@ Provides methods for extracting from a weighted graph
     \item the stochastic degree sequence model (SDSM; {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97.}\doi{10.1016/j.socnet.2014.06.001}),
     \item the fixed degree sequence model (FDSM; {Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218.}\doi{10.1007/s13278-011-0021-0}),
     \item the fixed row model (FRM; {Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24.}\doi{10.1007/s13278-013-0107-y}),
-    \item the fixed column model (FCM; {Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections." arXiv:2105.13396 cs.SI}),
-    \item the fixed fill model (FFM; {Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections." arXiv:2105.13396 cs.SI}),
+    \item the fixed column model (FCM; {Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI}),
+    \item the fixed fill model (FFM; {Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI}),
     \item and a universal threshold method.
     }
 }

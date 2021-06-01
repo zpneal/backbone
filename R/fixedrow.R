@@ -8,7 +8,7 @@
 #' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #'
-#' @details Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+#' @details The fixedrow function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
 #'     distribution of weights expected in a projection obtained from a random bipartite graph where
 #'     the row vertex degrees are fixed but the column vertex degrees are allowed to vary.
 #' @return backbone, a list(positive, negative, summary). Here

@@ -8,13 +8,12 @@
 #'
 #' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
+#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 #'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param ... optional arguments
-#' @details Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
+#' @details The sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
 #'    to the distribution of weights expected in a projection obtained from a random bipartite network where
-#'    both the row vertex degrees and column vertex degrees are approximately fixed.
-#' @details sdsm uses the Bipartite Configuration Model \link{bicm} (Saracco et. al (2015, 2017)) to compute probabilities for the Poisson binomial distribution.
+#'    both the row vertex degrees and column vertex degrees are approximately fixed. It uses the Bipartite Configuration Model \link{bicm} (Saracco et. al (2015, 2017)) to compute probabilities for the Poisson binomial distribution.
 #'
 #' @details The "backbone" S3 class object returned is composed of two matrices, and a summary dataframe.
 #' @return backbone, a list(positive, negative, summary). Here

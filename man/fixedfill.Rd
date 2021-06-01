@@ -23,11 +23,14 @@ backbone, a list(positive, negative, summary). Here
     the backbone matrix for a given alpha value.
 }
 \details{
-Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+The fixedfill function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
     distribution of weights expected in a projection obtained from a random bipartite graph where
     the number of edges present is equal to the number of edges in B. When B is large, this function may be impractically
     slow and may return a backbone object that contains NaN values.
 }
 \examples{
 fixed_probs <- fixedfill(davis)
+}
+\references{
+{Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI})
 }
