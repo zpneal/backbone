@@ -30,20 +30,18 @@ library(backbone)
 # Weighted Graphs and Backbones
 
 ## Welcome 
+Thank you for your interest in the backbone package! This vignette illustrates how to use the functions in this package to extract the backbone of a bipartite projection. For more details on these functions and methods, please see our latest manuscripts on backbone here:
 
-Thank you for your interest in the backbone package! Here you will find a short vignette on how to use the functions in this package to extract the backbone of a bipartite projection. For more details on these functions and methods, please see our latest manuscript on backbone here:
+* "Domagalski R., Neal Z.P., and Sagan B. (2021). Backbone: an R package for extracting the backbone of bipartite projections. PLoS ONE 16(1): e0244363." [https://doi.org/10.1371/journal.pone.0244363](https://doi.org/10.1371/journal.pone.0244363)
 
-"Domagalski R, Neal ZP, Sagan B (2021) Backbone: an R package for extracting the backbone of bipartite projections. PLoS ONE 16(1): e0244363."
-[https://doi.org/10.1371/journal.pone.0244363](https://doi.org/10.1371/journal.pone.0244363)
+* "Neal, Z. P., Domagalski, R, Sagan B. (2021). Comparing models for extracting the backbone of bipartite projections. [https://arxiv.org/abs/2105.13396](arXiv:2105.13396 [cs.SI])
 
 For additional resources on how to use the backbone package, please see [https://www.zacharyneal.com/backbone](https://www.zacharyneal.com/backbone)
 
-## Introduction
-
-
+## Introduction [@neal2014backbone]
 In a graph  $G$, edges are either present (i.e. $G_{ij}=1$) or absent (i.e. $G_{ij}=0$). However in a weighted or valued graph, edges can take a range of values that may capture such properties as the strength or capacity of the edge. Although weighted graphs contain a large amount of information, there are some cases (e.g. visualization, application of statistical models not developed for weighted graphs) where it is useful to reduce this information by focusing on an unweighted subgraph that contains only the most important edges. We call this subgraph the backbone of $G$, which we denote as $G’$. 
-Extracting $G’$ from $G$ requires deciding which edges to preserve. This usually involves selecting a threshold $T_{ij}$ such that edges are preserved if they are above the threshold (i.e. $G_{ij}’=1$ if $G_{ij} > T_{ij}$), and omitted if they are below the threshold (i.e. $G_{ij}’=0$ if $G_{ij} < T_{ij}$). It is also possible to extract a signed backbone by selecting upper $T^+_{ij}$ and lower $T^-_{ij}$ thresholds such that $G_{ij}’=1$ if $G_{ij} > T^+_{ij}$, $G_{ij}’=-1$ if $G_{ij} < T^-_{ij}$, and $G_{ij}’=0$ if $G_{ij} > T^-_{ij}$ and $G_{ij} < T^+_{ij}$. The key to all backbone extraction methods lies in the selection of $T$. The backbone package provides several different methods for selecting $T$ and thus extracting $G’$ from $G$. 
 
+Extracting $G’$ from $G$ requires deciding which edges to preserve. This usually involves selecting a threshold $T_{ij}$ such that edges are preserved if they are above the threshold (i.e. $G_{ij}’=1$ if $G_{ij} > T_{ij}$), and omitted if they are below the threshold (i.e. $G_{ij}’=0$ if $G_{ij} < T_{ij}$). It is also possible to extract a signed backbone by selecting upper $T^+_{ij}$ and lower $T^-_{ij}$ thresholds such that $G_{ij}’=1$ if $G_{ij} > T^+_{ij}$, $G_{ij}’=-1$ if $G_{ij} < T^-_{ij}$, and $G_{ij}’=0$ if $G_{ij} > T^-_{ij}$ and $G_{ij} < T^+_{ij}$. The key to all backbone extraction methods lies in the selection of $T$. The backbone package provides several different methods for selecting $T$ and thus extracting $G’$ from $G$. 
 
 ## Example data
 We outline the use of the backbone package with Davis, Gardner, and Gardner's Southern Women Dataset [@davis1941deep], which can be accessed via [@ucinet]. This data takes the form of a bipartite graph $B$ containing 18 women (rows) and 14 social events (columns) taking place over a nine month period. In $B$, $B_{ij} = 1$ if women $i$ attended event $j$, and otherwise is 0. Let's take a look at the Davis dataset included in this package to see that it is bipartite. 
@@ -66,23 +64,21 @@ davis%*%t(davis) #The projected davis dataset
 
 In this vignette, we demonstrate using the backbone package to extract the backbone of $G$, which involves deciding whether to preserve an edge between Evelyn and Charlotte in $G’$, and similarly for all other edges in $G$.
 
-
-
 # General Backbone Methods
-In this section, we will describe backbone methods that can be applied to any weighted graph, whether the weights are present in a natively unipartite graph, or are the product of a bipartite projection (as is the case in our example data). All of the methods described can accept inputs of matrices, sparse matrices, igraph objects, edgelists, and network objects. For the sake of these examples, we use matrices.
+In this section, we will describe backbone methods that can be applied to any weighted graph, whether the weights are present in a natively unipartite graph, or are the result of a bipartite projection (as is the case in our example data). All of the methods described can accept inputs of matrices, sparse matrices, igraph objects, edgelists, and network objects. For the sake of these examples, we use matrices.
 
 ## Universal Backbone: universal( )
 The simplest approach to backbone extraction applies a single threshold $T$ to all edges, and is achieved using the `universal()` function. The `universal()` function allows the user to extract a binary backbone by selecting a single threshold $T$, or extract a signed backbone by selecting upper and lower thresholds $T^+$ and $T^-$.  
 
-The `universal( )` function has four parameters, 
+The `universal( )` function has four parameters:
 
 * M, graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 * upper, Real or FUN: upper threshold value or function to be applied to the edge weights. Default is 0. 
 * lower, Real or FUN: lower threshold value or function to be applied to the edge weights. Default is NULL. 
 * bipartite Boolean: TRUE if bipartite matrix, FALSE if weighted matrix. Default is FALSE.
 
+The function `universal()` returns a `backbone` object containing the backbone graph, with either signed (or binary) edge weights, and a data frame called `summary`, containing the model name (universal threshold), number of rows in M, skew of row sums of M, number of columns of M, skew of column sums of M, and running time. The `universal()` function can be used in a variety of different ways, demonstrated in the following examples.
 
-The function `universal()` returns a `backbone` object containing the backbone graph, with either signed (or binary) edge weights, and a data frame called `summary`, containing the model name (universal threshold), number of rows in M, skew of row sums of M, number of columns of M, skew of column sums of M, and running time. The `universal()` function can be used in a variety of different ways, demonstrated in the following examples. 
 Using the `davis` dataset, if we input the projected matrix `G <- davis%*%t(davis)`, we can use the universal threshold on the weighted matrix `G`. If we set an upper threshold of 0, then if two women have attended any event together (co-attendance > 0), there will be an edge between the two. We can plot this graph with the `igraph` package. 
 
 ```{r universal threshold of G}
@@ -129,16 +125,20 @@ universal_bb <- universal(davis,
 Here, the `davis` matrix has first been projected. Then, the standard deviation of the $G_{ij}$ entries is calculated and added to (or subtracted from) to the mean of the $G_{ij}$ values. This value is then used to threshold the projected matrix for the positive (or negative) entries.
 
 # Bipartite Projection Backbone Methods 
-## [@neal2014backbone]
-
+## Ensemble null models [@neal2021comparing]
 The methods described above can be applied to any weighted graph $G$. In this section we describe methods that are designed for weighted graphs that are the result of bipartite projections. They differ from other methods because they take into account the information contained in the original bipartite graph $B$. Specifically, these methods are conditioned on the bipartite graph’s two degree sequences: the row vertex degrees (i.e. row marginals) and column vertex degrees (i.e. column marginals). We compare the values of $G_{ij} = (BB^T)_{ij}$ to the probability distributions that describe $G^*_{ij} = (B^*B^{*T})_{ij}$ for all bipartite graphs $B^*$ that satisfy the row and column vertex degree restrictions we choose. 
 
-The backbone package lets the user choose which of the row and column vertex degrees they would like to restrict by specifying a null model. If you want to fix the row degrees and let the column degrees vary, use `fixedrow()`. If you want to fix the column degrees and let the row degrees vary, use `fixedcol()`. To fix the expected values of the row and column degrees, use `sdsm()`. To exactly fix the row and column degrees, use `fdsm()`. If you want to only fix the number of edges in the graph and let the row and column degrees vary, use `fixedfill()`. 
+The backbone package lets the user choose which of the row and column vertex degrees they would like to restrict by specifying a null model:
+
+* `fixedrow()` - row degrees in $B^*$ exactly match those in $B$
+* `fixedcol()` - column degrees in $B^*$ exactly match those in $B$
+* `fdsm()` - row and column degrees in $B^*$ exactly match those in $B$
+* `sdsm()` - expected row and column degrees in $B^*$ match those in $B$ (recommended)
+* `fixedfill()` - $B^*$ contains the same number of 1s as $B$
 
 The backbone can then be extracted for a given $\alpha$ level using the `backbone.extract()` function. In this section, we first describe `backbone.extract()`, then illustrate its use for each of functions mentioned above.
 
 ## Extracting the Backbone: backbone.extract( )
-
 The null model functions `fdsm()`, `sdsm()`, `fixedrow()`, `fixedcol()`, and `fixedfill()` return a `backbone` class object containing two matrices: a `positive` matrix containing the probability that (or in the case of `fdsm()`, the proportion of times that) $G^*_{ij}$ was greater than or equal to $G_{ij}$, and a `negative` matrix containing the number of times $G^*_{ij}$ was less than or equal to $G_{ij}$.  The `backbone.extract()` function allows the user to take these positive and negative matrices and return a binary or signed backbone. 
 
 The `backbone.extract()` function has six parameters: `matrix`, `signed`, a significance test value `alpha`, `fwer`, `class`, and `narrative`. The `matrix` parameter takes in the entire backbone object which is the output of null model functions `fdsm()`, `sdsm()`, `fixedrow()`, `fixedcol()`, or `fixedfill()`. If the `signed` parameter is set to `TRUE` (the default) a signed backbone is returned, if `FALSE` a binary backbone is returned.
@@ -153,11 +153,10 @@ When `narrative` is set to `TRUE`, `backbone.extract()` will provide text descri
 
 We demonstrate this function's use in the following sections. 
 
-## Fixed Rows and Varying Columns: The Hypergeometric Backbone
+## Fixed Row Model (FRM)
+To compare the observed bipartite projection to projections arising from an ensemble of bipartite graphs where the row degrees of $B^*$ exactly match the row degrees of $B$, but the column degrees are unconstrained, one can use `fixedrow()`. This function applies the hypergeometric distribution to the bipartite graph `B`, and in earlier versions was called the Hypergeometric Model using `hyperg()`. 
 
-To compare the observed bipartite graph to a distribution where the row marginals are fixed and column marginals are allowed to vary, one can use `fixedrow()`. This function applies the hypergeometric distribution to the bipartite graph `B`. 
-
-The hypergeometric distribution compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where the row vertex degrees are fixed, but the column vertex degrees are allowed to vary. This method of backbone extraction was developed in [@Tumminello] and later in [@neal2013identifying], which showed that the distribution of $G^*_{ij}$ when only vertex degrees are fixed is given by the hypergeometric distribution. For documentation on the hypergeometric distribution, see `stats::phyper`. 
+The FRM compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where the row vertex degrees are fixed, but the column vertex degrees are allowed to vary. This method of backbone extraction was developed in [@Tumminello] and later in [@neal2013identifying], which showed that the distribution of $G^*_{ij}$ when only vertex degrees are fixed is given by the hypergeometric distribution. For documentation on the hypergeometric distribution, see `stats::phyper`. 
 
 The `fixedrow()` function has one parameter,
 
@@ -170,11 +169,10 @@ hyperg <- fixedrow(davis)
 hyperg_bb <- backbone.extract(hyperg, signed = TRUE) 
 ```
 
-## Fixed Columns and Varying Rows: The Poisson binomial Backbone
+## Fixed Column Model (FCM)
+To compare the observed bipartite projection to projections arising from an ensemble of bipartite graphs where the column degrees of $B^*$ exactly match the column degrees of $B$, but the row degrees are unconstrained, one can use `fixedcol()`. This function applies the Poisson binomial distribution to the bipartite graph `B`.
 
-To compare the observed bipartite graph to a distribution where the column marginals are fixed and the row marginals are allowed to vary, one can use `fixedcol()`. This function applies the Poisson binomial distribution to the bipartite graph `B`. 
-
-The Poisson binomial distribution compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where the column vertex degrees are fixed, but the row vertex degrees are allowed to vary. 
+The FCM compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where the column vertex degrees are fixed, but the row vertex degrees are allowed to vary. 
 
 The `fixedcol()` function has two parameters,
 
@@ -190,37 +188,10 @@ pb <- fixedcol(davis)
 pb_bb <- backbone.extract(pb, signed = TRUE) 
 ```
 
+## Fixed Degree Sequence Model (FDSM)
+To compare the observed bipartite projection to projections arising from an ensemble of bipartite graphs where both the row degrees and column degrees of $B^*$ exactly match the row degrees and column degrees of $B$, one can use `fdsm(B, trials = 1000)` where the number of trials can be any positive integer. This function applies the fixed degree sequence model to the bipartite graph `B`. 
 
-## Approximately Fixed Rows and Columns: The Stochastic Degree Sequence Model
-
-To compare the observed bipartite graph to a distribution where the row marginals and column marginals are approximately equal to those of bipartite graph `B`, one can use `sdsm()`. This function applies the stochastic degree sequence model and Poisson binomial distribution to the bipartite graph `B`. 
-
-The stochastic degree sequence model compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are *approximately* fixed. This method of backbone extraction was developed in [@neal2014backbone]. The distribution of $G^*_{ij}$ is given by the Poisson binomial distribution [@Hong_2013]. In order to apply the Poisson binomial distribution we need to have $P(B_{ij}=1)$ for all values of $B$. These probabilities are given by the Bipartite Configuration Model (BiCM) [@Saracco2015, @Saracco2017]. The matrix $G^*$ is then constructed via the Poisson-Binomial distribution, where the $(i,j)$ entry of $G$ is the probability of an edge weight begin above or below the observed value in the projection of $B$. 
-
-The `sdsm( )` function has two parameters,
-
-* B, graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-* method string: Specifies the method of the Poisson Binomial distribution computation used by \link[PoissonBinomial]{ppbinom}. 
-
-The probability of edge weights being above or below the observed values are computed using the Poisson Binomial distribution. These values are approximated using a Refined Normal Approximation \link[PoissonBinomial]{ppbinom}. The user can change the parameter `method` to use different methods for computing these values: "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
-
-
-```{r sdsm, echo=T, results='hide'}
-sdsm <- sdsm(davis)
-```
-
-The backbone package allows for two different types of family-wise error rate correction: Holm-Bonferroni and Bonferroni. To use Holm-Bonferroni correction, add parameter `fwer = "holm"` to `backbone.extract()`, and to use Bonferroni correction, add `fwer = "bonferroni"`. Note in this case, the Holm-Bonferroni is too restrictive and leaves us with no edges in our backbone graph.  
-
-```{r sdsm backbone}
-sdsm_bb <- backbone.extract(sdsm, signed = FALSE, alpha = 0.1, fwer = "bonferroni") 
-sdsm_bb
-```
-
-## Exactly Fixed Rows and Columns: The Fixed Degree Sequence Model
-
-To compare the observed bipartite graph to a distribution where the row marginals and column marginals are exactly equal to those of `B`, one can use `fdsm(B, trials = 1000)` where the number of trials can be any positive integer. This function applies the fixed degree sequence model to the bipartite graph `B`. 
-
-The fixed degree sequence model compares an edge's observed weight, $G_{ij}$, to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are fixed. This method of backbone extraction was developed in [@zweig2011systematic], however the challenge lies in randomly sampling from the space of $B^*$ with fixed degree sequences. The `fdsm()` function uses the curveball algorithm [@strona2014fast], which is proven to do so [@Carstens_2015].
+The FDSM compares an edge's observed weight, $G_{ij}$, to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are fixed. This method of backbone extraction was developed in [@zweig2011systematic], however the challenge lies in randomly sampling from the space of $B^*$ with fixed degree sequences. The `fdsm()` function uses the curveball algorithm [@strona2014fast], which is proven to do so [@Carstens_2015].
 
 The `fdsm( )` function has four parameters, 
 
@@ -244,11 +215,34 @@ fdsm_bb
 
 The `fdsm_props$dyad_values` output is a list of the $G_{1,5}^*$ values for each of the 100 trials, which in these data corresponds to the number of parties Evelyn and Charlotte would be expected to simultaneously attend if: (a) the number of parties attended by Evelyn was fixed, (b) the number of parties attended by Charlotte was fixed, and (c) the number of attendees at each party was fixed.  Because we have provided both a `positive` and `negative` matrix, `backbone.extract()` returns a signed backbone matrix by conducting a two-tailed significance test in which `alpha` is $0.05$ on each end of the distribution. 
 
-## Fixed Number of Edges: The Fixed Fill Model
+## Stochastic Degree Sequence Model (SDSM)
+To compare the observed bipartite projection to projections arising from an ensemble of bipartite graphs where both the expected row degrees and expected column degrees of $B^*$ match the row degrees and column degrees of $B$, one can use `sdsm()`. This function applies the stochastic degree sequence model and Poisson binomial distribution to the bipartite graph `B`. This is the model recommended for most bipartite projections [@neal2021comparing].
 
-To compare the observed bipartite graph to a distribution where the number of ones in the matrix are fixed, that is the number of edges in each bipartite graph is equal to the number of edges in `B`, one can use `fixedfill()`. 
+The SDSM compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network where both the row vertex degrees and column vertex degrees are *approximately* fixed. This method of backbone extraction was developed in [@neal2014backbone]. The distribution of $G^*_{ij}$ is given by the Poisson binomial distribution [@Hong_2013]. In order to apply the Poisson binomial distribution we need to have $P(B_{ij}=1)$ for all values of $B$. These probabilities are given by the Bipartite Configuration Model (BiCM) [@Saracco2015; @Saracco2017]. The matrix $G^*$ is then constructed via the Poisson-Binomial distribution, where the $(i,j)$ entry of $G$ is the probability of an edge weight begin above or below the observed value in the projection of $B$. 
 
-The `fixedfill()` distribution compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network with the same number of edges as `B`.
+The `sdsm( )` function has two parameters,
+
+* B, graph: Bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+* method string: Specifies the method of the Poisson Binomial distribution computation used by \link[PoissonBinomial]{ppbinom}. 
+
+The probability of edge weights being above or below the observed values are computed using the Poisson Binomial distribution. These values are approximated using a Refined Normal Approximation \link[PoissonBinomial]{ppbinom}. The user can change the parameter `method` to use different methods for computing these values: "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
+
+
+```{r sdsm, echo=T, results='hide'}
+sdsm <- sdsm(davis)
+```
+
+The backbone package allows for two different types of family-wise error rate correction: Holm-Bonferroni and Bonferroni. To use Holm-Bonferroni correction, add parameter `fwer = "holm"` to `backbone.extract()`, and to use Bonferroni correction, add `fwer = "bonferroni"`. Note in this case, the Holm-Bonferroni is too restrictive and leaves us with no edges in our backbone graph.  
+
+```{r sdsm backbone}
+sdsm_bb <- backbone.extract(sdsm, signed = FALSE, alpha = 0.1, fwer = "bonferroni") 
+sdsm_bb
+```
+
+## Fixed Fill Model (FFM)
+To compare the observed bipartite graph to a distribution where the number of ones in $B^*$ match the number of ones in $B$, one can use `fixedfill()`. 
+
+The FFM compares an edge's observed weight, $G_{ij}$ to the distribution of weights expected in a projection obtained from a random bipartite network with the same number of edges as `B`.
 
 The `fixedfill()` function has one parameter,
 
@@ -262,5 +256,3 @@ ff_bb <- backbone.extract(ff, signed = TRUE)
 ```
 
 # References
-
-
