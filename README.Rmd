@@ -34,10 +34,14 @@ The `backbone` package provides methods for extracting from a weighted graph
     a binary or signed backbone that retains only the significant edges. 
     The user may input a weighted graph, or a bipartite graph 
     from which a weighted graph is first constructed via projection.
-    Backbone extraction methods include the stochastic degree sequence model [(Neal, Z. P. (2014))](https://doi.org/10.1016/j.socnet.2014.06.001),
-    hypergeometric model [(Neal, Z. (2013))](https://doi.org/10.1007/s13278-013-0107-y), 
-    the fixed degree sequence model [(Zweig, K. A., and Kaufmann, M. (2011))](https://doi.org/10.1007/s13278-011-0021-0), a fixed column model, a fixed fill model,
-    as well as a universal threshold method. 
+    Backbone extraction methods include:
+
+* stochastic degree sequence model (SDSM; Neal, Z. P. (2014). <doi:10.1016/j.socnet.2014.06.001>), 
+* the fixed degree sequence model (FDSM; Zweig, K. A., and Kaufmann, M. (2011). <doi:10.1007/s13278-011-0021-0>),
+* the fixed row model (FRM; Neal, Z. P. (2013). <doi:10.1007/s13278-013-0107-y>), 
+* the fixed column model (FCM; Neal, Domagalski, and Sagan (2021). <arXiv:2105.13396>),
+* the fixed fill model (FFM; Neal, Domagalski, and Sagan (2021). <arXiv:2105.13396>),
+* and a universal threshold method. 
 
 In a graph  `G`, edges are either present (i.e. `G_{ij}=1`) or absent (i.e. `G_{ij}=0`). However in a weighted or valued graph, edges can take a range of values that may capture such properties as the strength or capacity of the edge. Although weighted graphs contain a large amount of information, there are some cases (e.g. visualization, application of statistical models not developed for weighted graphs) where it is useful to reduce this information by focusing on an unweighted subgraph that contains only the most important edges. We call this subgraph the backbone of `G`, which we denote as `G’`. 
 Extracting `G’` from `G` requires deciding which edges to preserve. This usually involves selecting a threshold `T_{ij}` such that edges are preserved if they are above the threshold (i.e. `G_{ij}’=1` if `G_{ij} > T_{ij}`), and omitted if they are below the threshold (i.e. `G_{ij}’=0` if `G_{ij} < T_{ij}`). It is also possible to extract a signed backbone by selecting upper `T_{ij}` and lower `T’_{ij}` 
