@@ -147,7 +147,7 @@ fdsm <- function(B,
 #' @return rm, a matrix with same row sums and column sums as M, but randomized 0/1 entries.
 #' @export
 #'
-#' @references Algorithm and R implementation: Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. \doi{10.1038/ncomms5114.}
+#' @references Algorithm and R implementation: Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. \doi{10.1038/ncomms5114}
 #' @examples
 #' curveball(davis)
 curveball<-function(M){
