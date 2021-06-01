@@ -1,20 +1,21 @@
 Package: backbone
 Type: Package
 Title: Extracts the Backbone from Weighted Graphs
-Version: 1.4.0
+Version: 1.5.0
 Authors@R: c(
-    person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = c("aut", "cre")), 
-    person("Zachary", "Neal", email = "zpneal@msu.edu", role = "aut"),
+    person("Zachary", "Neal", email = "zpneal@msu.edu", role = c("aut", "cre")),
+    person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = "aut"), 
     person("Bruce", "Sagan", email = "bsagan@msu.edu", role = "aut")) 
 Description: Provides methods for extracting from a weighted graph 
     a binary or signed backbone that retains only the significant edges. 
     The user may input a weighted graph, or a bipartite graph 
     from which a weighted graph is first constructed via projection.
-    Backbone extraction methods include the stochastic degree sequence model (Neal, Z. P. (2014). <doi:10.1016/j.socnet.2014.06.001>),
-    hypergeometric model (Neal, Z. (2013). <doi:10.1007/s13278-013-0107-y>), 
-    the fixed degree sequence model (Zweig, K. A., and Kaufmann, M. (2011). <doi:10.1007/s13278-011-0021-0>),
-    fixed column model, fixed fill model,
-    as well as a universal threshold method. 
+    Backbone extraction methods include the stochastic degree sequence model (SDSM; Neal, Z. P. (2014). <doi:10.1016/j.socnet.2014.06.001>), 
+    the fixed degree sequence model (FDSM; Zweig, K. A., and Kaufmann, M. (2011). <doi:10.1007/s13278-011-0021-0>),
+    the fixed row model (FRM; Neal, Z. P. (2013). <doi:10.1007/s13278-013-0107-y>), 
+    the fixed column model (FCM; Neal, Domagalski, and Sagan (2021). <arXiv:2105.13396>),
+    the fixed fill model (FFM; Neal, Domagalski, and Sagan (2021). <arXiv:2105.13396>),
+    and a universal threshold method. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
