@@ -2,7 +2,7 @@
 % Please edit documentation in R/disparityfilter.R
 \name{disparityfilter}
 \alias{disparityfilter}
-\title{Disparity Filter Backbone Probabilities}
+\title{The disparity filter for backbone probabilities}
 \usage{
 disparityfilter(G)
 }
@@ -16,7 +16,11 @@ backbone, a list(positive, negative, summary). Here
     `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 }
 \description{
-Disparity Filter Backbone Probabilities
+`disparityfilter` computes the probability of edge weights being
+    above or below the observed edge weights in a weighted graph
+    using the disparity filter method.
+    Once computed, use \code{\link{backbone.extract}} to return
+    the backbone matrix for a given alpha value.
 }
 \examples{
 disparityfilter(davis\%*\%t(davis))

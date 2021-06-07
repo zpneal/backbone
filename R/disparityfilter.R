@@ -1,4 +1,10 @@
-#' Disparity Filter Backbone Probabilities
+#' The disparity filter for backbone probabilities
+#'
+#' `disparityfilter` computes the probability of edge weights being
+#'     above or below the observed edge weights in a weighted graph
+#'     using the disparity filter method.
+#'     Once computed, use \code{\link{backbone.extract}} to return
+#'     the backbone matrix for a given alpha value.
 #'
 #' @param G graph: Graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
