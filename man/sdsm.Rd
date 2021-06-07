@@ -4,15 +4,13 @@
 \alias{sdsm}
 \title{The stochastic degree sequence model (sdsm) for backbone probabilities}
 \usage{
-sdsm(B, progress = FALSE, method = "RefinedNormal", ...)
+sdsm(B, method = "RefinedNormal", ...)
 }
 \arguments{
 \item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
-\item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
-
-\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
+\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}
 
 \item{...}{optional arguments}
@@ -21,7 +19,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 backbone, a list(positive, negative, summary). Here
     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+    `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 }
 \description{
 `sdsm` computes the probability of edge weights being
@@ -31,11 +29,9 @@ backbone, a list(positive, negative, summary). Here
     the backbone matrix for a given alpha value.
 }
 \details{
-Specifically, the sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
+The sdsm function compares an edge's observed weight in the projection \code{B*t(B)}
    to the distribution of weights expected in a projection obtained from a random bipartite network where
-   both the row vertex degrees and column vertex degrees are approximately fixed.
-
-sdsm uses the Bipartite Configuration Model \link{bicm} (Saracco et. al (2015, 2017)) to compute probabilities for the Poisson binomial distribution.
+   both the row vertex degrees and column vertex degrees are approximately fixed. It uses the Bipartite Configuration Model \link{bicm} (Saracco et. al (2015, 2017)) to compute probabilities for the Poisson binomial distribution.
 
 The "backbone" S3 class object returned is composed of two matrices, and a summary dataframe.
 }

@@ -8,13 +8,13 @@
 #' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #'
-#' @details Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+#' @details The fixedrow function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
 #'     distribution of weights expected in a projection obtained from a random bipartite graph where
 #'     the row vertex degrees are fixed but the column vertex degrees are allowed to vary.
 #' @return backbone, a list(positive, negative, summary). Here
 #'     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
 #'     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-#'     `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+#'     `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 #' @references {Tumminello, Michele and Miccichè, Salvatore and Lillo, Fabrizio and Piilo, Jyrki and Mantegna, Rosario N. 2011. "Statistically Validated Networks in Bipartite Complex Systems." PLOS ONE, 6(3), \doi{10.1371/journal.pone.0017994}}
 #' @references {Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. \doi{10.1007/s13278-013-0107-y}}
 #' @export
@@ -24,23 +24,21 @@
 
 fixedrow <- function(B){
 
-  ### Run Time ###
-  run.time.start <- Sys.time()
-
   #### Class Conversion ####
   convert <- tomatrix(B)
-  class <- convert$summary[[1]]
+  class <- convert$summary$class
   B <- convert$G
-  if (convert$summary[[4]]==TRUE){stop("Graph must be unweighted.")}
-  if (convert$summary[[2]]==FALSE){warning("This object is being treated as a bipartite network.")}
-
+  if (convert$summary$weighted==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary$bipartite==FALSE){
+    warning("This object is being treated as a bipartite network.")
+    convert$summary$bipartite <- TRUE
+  }
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
   rs <- rowSums(B)
 
   #### Hypergeometric Distribution ####
-
   ### Set up df for values ###
   df <- data.frame(as.vector(P))
   names(df)[names(df)=="as.vector.P."] <- "projvalue"
@@ -70,15 +68,17 @@ fixedrow <- function(B){
   rownames(Negative) <- rownames(B)
   colnames(Negative) <- rownames(B)
 
-  ### Run Time ###
-  run.time.end <- Sys.time()
-  total.time = (round(difftime(run.time.end, run.time.start, units = "secs"), 2))
+  ### Insert NAs for p-values along diagonal
+  diag(Positive) <- NA
+  diag(Negative) <- NA
 
   #### Compile Summary ####
   r <- rowSums(B)
   c <- colSums(B)
-  a <- c("Input Class", "Model", "Number of Rows", "Mean of Row Sums", "SD of Row Sums", "Skew of Row Sums", "Number of Columns", "Mean of Column Sums", "SD of Column Sums", "Skew of Column Sums", "Running Time (secs)")
-  b <- c(class[1], "Hypergeometric Model", dim(B)[1], round(mean(r),5), round(stats::sd(r),5), round((sum((r-mean(r))**3))/((length(r))*((stats::sd(r))**3)), 5), dim(B)[2], round(mean(c),5), round(stats::sd(c),5), round((sum((c-mean(c))**3))/((length(c))*((stats::sd(c))**3)), 5), as.numeric(total.time))
+
+  a <- c("Model", "Input Class", "Bipartite", "Symmetric", "Weighted", "Number of Rows", "Number of Columns")
+  b <- c("Fixed Row Model", convert$summary$class, convert$summary$bipartite, convert$summary$symmetric, convert$summary$weighted, dim(B)[1], dim(B)[2])
+
   model.summary <- data.frame(a,b, row.names = 1)
   colnames(model.summary)<-"Model Summary"
 
@@ -87,7 +87,6 @@ fixedrow <- function(B){
   class(bb) <- "backbone"
   return(bb)
 }
-
 
 #' A wrapper for the \link{fixedrow} function
 #'

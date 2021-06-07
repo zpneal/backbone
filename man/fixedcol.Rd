@@ -10,14 +10,14 @@ fixedcol(B, method = "RefinedNormal")
 \item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
-\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the ``ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
+\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}
 }
 \value{
 backbone, a list(positive, negative, summary). Here
     `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
     `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
+    `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
 }
 \description{
 `fixedcol` computes the probability of observing
@@ -26,10 +26,13 @@ backbone, a list(positive, negative, summary). Here
     the backbone matrix for a given alpha value.
 }
 \details{
-Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
+This fixedcol function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
     distribution of weights expected in a projection obtained from a random bipartite graph where
     the column vertex degrees are fixed but the row vertex degrees are allowed to vary.
 }
 \examples{
 fixedcol(davis)
+}
+\references{
+{Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI})
 }

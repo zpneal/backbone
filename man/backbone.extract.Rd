@@ -21,13 +21,12 @@ backbone.extract(
 \item{alpha}{Real: significance level of hypothesis test(s)}
 
 \item{fwer}{string: type of familywise error rate correction to be applied; c("none","bonferroni","holm"). If "holm", Holm Bonferroni Family-wise Error Rate test is used,
-if "bonferroni", Bonferroni Family-wise Error Rate test should be used.
-By default, the given 'alpha' value is used for all tests with no correction for family-wise error rates.}
+if "bonferroni", Bonferroni Family-wise Error Rate test should be used. By default, the given 'alpha' value is used for all tests with no correction for family-wise error rates.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{tomatrix}.
-If "original", the backbone graph returned is of the same class as the data inputted in the original backbone null model.}
+If "original", the backbone graph returned is of the same class as the data used to generate the backbone object.}
 
-\item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned}
+\item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned.}
 }
 \value{
 backbone graph: Binary or signed backbone graph of class given in parameter `class`.

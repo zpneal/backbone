@@ -15,16 +15,16 @@ tomatrix <- function(graph){
   class <- class(graph)[1]
   isbipartite <- FALSE
 
-  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, igraph, or network object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist, igraph, or network object.")}
 
   #### Convert matrix-like object ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | (methods::is(graph, "data.frame")))) {
     if (dim(graph)[2] > 3) {
       G <- as.matrix(graph)  #Coerce to matrix
       class(G) <- "numeric"  #Coerce to numeric
       if (any(is.na(G))) {stop("The object contains non-numeric entries")}
 
-      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix are treated as bipartite
+      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
       if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
         if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
             !isSymmetric(G)) {                                                    #it is not symmetric
@@ -113,8 +113,8 @@ tomatrix <- function(graph){
   if (isweighted) {weigh <- "a weighted"} else {weigh <- "an unweighted"}
   if (isbipartite) {
     message(paste0("This ", class, " object looks like ", weigh, " bipartite network of ", nrow(G), " agents and ", ncol(G), " artifacts."))
-    if (length(r)>0) {message("These zero-sum rows have been removed from the data: ", paste0(r, " "))}
-    if (length(c)>0) {message("These zero-sum columns have been removed from the data: ", paste0(c, " "))}
+    if (length(r)>0) {message("These empty (i.e. all 0s) rows have been removed from the data: ", paste0(r, " "))}
+    if (length(c)>0) {message("These empty (i.e. all 0s) columns have been removed from the data: ", paste0(c, " "))}
   }
   if (!isbipartite) {message(paste0("This ", class, " object looks like ", weigh, " ", dir, " network containing ", nrow(G), " nodes."))}
 
@@ -155,7 +155,7 @@ frommatrix <- function(graph, convert = "matrix"){
   if (convert == "igraph"){
     if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
     if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
-    if (gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
+    if (igraph::gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
   }
 
   return(G)

@@ -2,7 +2,12 @@
 
 export(backbone.extract)
 export(bicm)
+export(bipartite.add.blocks)
+export(bipartite.from.distribution)
+export(bipartite.from.probability)
+export(bipartite.from.sequence)
 export(curveball)
+export(disparityfilter)
 export(fdsm)
 export(fixedcol)
 export(fixedfill)
