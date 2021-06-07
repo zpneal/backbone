@@ -2,16 +2,27 @@
 % Please edit documentation in R/likelihoodfilters.R
 \name{mlf}
 \alias{mlf}
-\title{Marginal Likelihood Filter}
+\title{The marginal likelihood filter (mlf) for backbone probabilities}
 \usage{
 mlf(G)
 }
 \arguments{
-\item{G}{}
+\item{G}{graph: An graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 }
 \value{
-
+backbone, a list(positive, negative, summary). Here
+    `positive` is a matrix of probabilities of edge weights being equal to or above the observed value,
+    `negative` is a matrix of probabilities of edge weights being equal to or below the observed value, and
+    `summary` is a data frame summary of the inputted matrix and the model used including: model name, number of rows, skew of row sums, number of columns, skew of column sums, and running time.
 }
 \description{
-Marginal Likelihood Filter
+`mlf` computes the probability of edge weights being
+    above or below the observed edge weights using
+    the binomial distribution. Once computed,
+    use \code{\link{backbone.extract}} to return
+    the backbone matrix for a given alpha value.
+}
+\references{
+Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93(1), 012304. \doi{10.1103/PhysRevE.93.012304}
 }
