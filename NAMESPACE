@@ -2,6 +2,10 @@
 
 export(backbone.extract)
 export(bicm)
+export(bipartite.add.blocks)
+export(bipartite.from.distribution)
+export(bipartite.from.probability)
+export(bipartite.from.sequence)
 export(curveball)
 export(fdsm)
 export(fixedcol)

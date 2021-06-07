@@ -34,7 +34,7 @@ Thank you for your interest in the backbone package! This vignette illustrates h
 
 * "Domagalski R., Neal Z.P., and Sagan B. (2021). Backbone: an R package for extracting the backbone of bipartite projections. PLoS ONE 16(1): e0244363." [https://doi.org/10.1371/journal.pone.0244363](https://doi.org/10.1371/journal.pone.0244363)
 
-* "Neal, Z. P., Domagalski, R, Sagan B. (2021). Comparing models for extracting the backbone of bipartite projections. [https://arxiv.org/abs/2105.13396](arXiv:2105.13396 [cs.SI])
+* "Neal, Z. P., Domagalski, R, Sagan B. (2021). Comparing models for extracting the backbone of bipartite projections. [https://arxiv.org/abs/2105.13396](https://arxiv.org/abs/2105.13396)
 
 For additional resources on how to use the backbone package, please see [https://www.zacharyneal.com/backbone](https://www.zacharyneal.com/backbone)
 

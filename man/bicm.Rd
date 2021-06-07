@@ -4,7 +4,7 @@
 \alias{bicm}
 \title{bicm: Bipartite Configuration Model.}
 \usage{
-bicm(graph, tol = 1e-08, max_steps = 200, progress = FALSE, ...)
+bicm(graph, tol = 1e-08, max_steps = 200, ...)
 }
 \arguments{
 \item{graph}{matrix, a bipartite adjacency matrix of a graph}
@@ -12,8 +12,6 @@ bicm(graph, tol = 1e-08, max_steps = 200, progress = FALSE, ...)
 \item{tol}{numeric, tolerance of algorithm}
 
 \item{max_steps}{numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm}
-
-\item{progress}{Boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 
 \item{...}{optional arguments}
 }

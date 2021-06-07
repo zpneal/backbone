@@ -15,11 +15,15 @@
 Thank you for your interest in the backbone package\! Here you will find
 a short example of how to use this package to extract the backbone of a
 bipartite projection. For more details on these functions and methods,
-please see our latest manuscript on backbone here:
+please see our latest manuscripts on backbone here:
 
-“Domagalski R, Neal ZP, Sagan B (2021) Backbone: an R package for
-extracting the backbone of bipartite projections. PLoS ONE 16(1):
-e0244363.” <https://doi.org/10.1371/journal.pone.0244363>
+  - Domagalski R., Neal, Z.P., and Sagan, B. (2021). Backbone: an R
+    package for extracting the backbone of bipartite projections. PLoS
+    ONE 16(1): e0244363. <https://doi.org/10.1371/journal.pone.0244363>
+
+  - Neal, Z.P., Domagalski, R., and Sagan, B. (2021). Comparing models
+    for extracting the backbone of bipartite projections.
+    arXiv:2105.13396 \[cs.SI\]. <https://arxiv.org/abs/2105.13396>
 
 For additional resources on how to use the backbone package, please see
 [www.rbackbone.net](https://www.zacharyneal.com/backbone)
@@ -30,13 +34,17 @@ The `backbone` package provides methods for extracting from a weighted
 graph a binary or signed backbone that retains only the significant
 edges. The user may input a weighted graph, or a bipartite graph from
 which a weighted graph is first constructed via projection. Backbone
-extraction methods include the stochastic degree sequence model [(Neal,
-Z. P. (2014))](https://doi.org/10.1016/j.socnet.2014.06.001),
-hypergeometric model [(Neal, Z.
-(2013))](https://doi.org/10.1007/s13278-013-0107-y), the fixed degree
-sequence model [(Zweig, K. A., and Kaufmann, M.
-(2011))](https://doi.org/10.1007/s13278-011-0021-0), a fixed column
-model, a fixed fill model, as well as a universal threshold method.
+extraction methods include:
+
+  - stochastic degree sequence model (SDSM;
+    <https://doi.org/10.1016/j.socnet.2014.06.001>),
+  - the fixed degree sequence model (FDSM;
+    <https://doi.org/10.1007/s13278-011-0021-0>),
+  - the fixed row model (FRM;
+    <https://doi.org/10.1007/s13278-013-0107-y>),
+  - the fixed column model (FCM; <https://arxiv.org/abs/2105.13396>),
+  - the fixed fill model (FFM; <https://arxiv.org/abs/2105.13396>),
+  - and a universal threshold method.
 
 In a graph `G`, edges are either present (i.e. `G_{ij}=1`) or absent
 (i.e. `G_{ij}=0`). However in a weighted or valued graph, edges can take
@@ -129,7 +137,7 @@ the `sdsm()` function.
 ``` r
 library(backbone)
 #>  ____
-#> |  _ \   backbone v1.4.0
+#> |  _ \   backbone v1.5.0
 #> |#|_) |  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021). Backbone: An
 #> |# _ <         R package for extracting the backbone of bipartite projections.
 #> |#|_) |        PLoS ONE. https://doi.org/10.1371/journal.pone.0244363
