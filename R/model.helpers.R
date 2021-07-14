@@ -106,7 +106,9 @@ tomatrix <- function(graph){
     class = class,
     bipartite = isbipartite,
     symmetric = issymmetric,
-    weighted = isweighted)
+    weighted = isweighted,
+    stringsAsFactors = FALSE
+    )
 
   #### Report input type and modifications ####
   if (issymmetric) {dir <- "undirected"} else {dir <- "directed"}
