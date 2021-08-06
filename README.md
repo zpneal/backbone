@@ -28,6 +28,23 @@ please see our latest manuscripts on backbone here:
 For additional resources on how to use the backbone package, please see
 [www.rbackbone.net](https://www.zacharyneal.com/backbone)
 
+## What’s on this GitHub Repo?
+
+The /master branch contains the current CRAN release of the backbone
+package. You can install it in R from GitHub, but it’s usually easier to
+install from CRAN using `install.packages(backbone)`.
+
+The /develop branch contains a beta version of the next release of the
+backbone package. All the functions are documented and have undergone
+various levels of preliminary debugging, so they should mostly work, but
+there are no guarantees. Feel free to use the develop version (with
+caution), and let us know if you run into any problems. You can install
+it in R using `devtools::install_github("domagal9/backbone", ref =
+"develop")`.
+
+Any other branches contain in-progress untested code and should probably
+not be used.
+
 ## The Backbone of a Graph
 
 The `backbone` package provides methods for extracting from a weighted
@@ -137,7 +154,7 @@ the `sdsm()` function.
 ``` r
 library(backbone)
 #>  ____
-#> |  _ \   backbone v1.5.0
+#> |  _ \   backbone v2.0.0
 #> |#|_) |  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021). Backbone: An
 #> |# _ <         R package for extracting the backbone of bipartite projections.
 #> |#|_) |        PLoS ONE. https://doi.org/10.1371/journal.pone.0244363
