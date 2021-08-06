@@ -32,7 +32,7 @@ For additional resources on how to use the backbone package, please see
 
 The /master branch contains the current CRAN release of the backbone
 package. You can install it in R from GitHub, but it’s usually easier to
-install from CRAN using `install.packages(backbone)`.
+install from CRAN using `install.packages("backbone")`.
 
 The /develop branch contains a beta version of the next release of the
 backbone package. All the functions are documented and have undergone
