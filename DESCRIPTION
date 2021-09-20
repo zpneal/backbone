@@ -1,7 +1,7 @@
 Package: backbone
 Type: Package
 Title: Extracts the Backbone from Weighted Graphs
-Version: 1.5.0
+Version: 1.5.1
 Authors@R: c(
     person("Zachary", "Neal", email = "zpneal@msu.edu", role = c("aut", "cre")),
     person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = "aut"), 

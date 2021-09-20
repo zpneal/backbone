@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 1.5.1
+
+* removed `testthat` tests due to unknown MKL error; will be restored in a future version
+
 ## backbone 1.5.0
 
 * add four functions to generate random bipartite graphs: bipartite.from.probability(), bipartite.from.sequence(), bipartite.from.distribution(), and bipartite.add.blocks()
