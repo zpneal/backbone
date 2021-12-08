@@ -12,7 +12,6 @@
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
-#' @param progress boolean: If \link[utils]{txtProgressBar} should be used to measure progress
 #' @param ... optional arguments
 #'
 #' @details
@@ -61,7 +60,7 @@
 #' bb <- fdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, trials = 1000, method = "fastball", progress = FALSE,
+fdsm <- function(B, trials = 1000, method = "fastball",
                  alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE,
                  ...){
 
@@ -92,14 +91,11 @@ fdsm <- function(B, trials = 1000, method = "fastball", progress = FALSE,
     B <- t(B)
   }
   if (method == "fastball") {Bindex <- apply(B==1, 1, which)}  #If using fastball, create an indexed list of 1s
+  message("Constructing empirical edgewise p-values -")
+  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
 
   #### Build Null Models ####
   for (i in 1:trials){
-
-    ### Start estimation timer; print message ###
-    if (i == 1) {
-      start.time <- Sys.time()
-    }
 
     ### Generate an FDSM Bstar ###
     if (method == "fastball") {Bstar <- fastball(Bindex, nrow(B), ncol(B))}
@@ -113,18 +109,10 @@ fdsm <- function(B, trials = 1000, method = "fastball", progress = FALSE,
     Pupper <- Pupper + (Pstar >= P)+0
     Plower <- Plower + (Pstar <= P)+0
 
-    ### Report estimated running time, update progress bar ###
-    if (i==10){
-      end.time <- Sys.time()
-      est = (round(difftime(end.time, start.time, units = "auto"), 2) * (trials/10))
-      message("Estimated time to complete is ", est, " " , units(est), " for ", trials, " trials")
-      if (progress == "TRUE"){
-        pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)
-      }
-    }
-    if ((progress == "TRUE") & (i>=10)) {utils::setTxtProgressBar(pb, i)}
+    ### Increment progress bar ###
+    utils::setTxtProgressBar(pb, i)
   } #end for loop
-  if (progress == "TRUE"){close(pb)}
+  if (progress == "TRUE"){close(pb)} #End progress bar
 
   #### Create Backbone Object ####
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
