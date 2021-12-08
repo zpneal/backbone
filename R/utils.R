@@ -5,7 +5,7 @@
   packageStartupMessage("|#|_) |       R package for extracting the backbone of bipartite projections. ")
   packageStartupMessage("|# _ <        PLoS ONE, 16(1), e0244363. https://doi.org/10.1371/journal.pone.0244363")
   packageStartupMessage("|#|_) | Help: type vignette(\"backbone\"); email zpneal@msu.edu; github zpneal/backbone")
-  packageStartupMessage("|____/  Beta: type devtools::install_github(\"zpneal/backbone\", ref = \"develop\")")
+  packageStartupMessage("|____/  Beta: type devtools::install_github(\"zpneal/backbone\", ref = \"devel\")")
 }
 
 #' Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
