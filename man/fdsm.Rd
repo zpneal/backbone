@@ -8,7 +8,6 @@ fdsm(
   B,
   trials = 1000,
   method = "fastball",
-  progress = FALSE,
   alpha = NULL,
   signed = FALSE,
   fwer = "none",
@@ -24,8 +23,6 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 \item{trials}{numeric: The number of bipartite graphs generated to approximate the edge weight distribution.}
 
 \item{method}{string: The method used to generate random bipartite graphs, one of c("fastball", "curveball")}
-
-\item{progress}{boolean: If \link[utils]{txtProgressBar} should be used to measure progress}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
