@@ -1,0 +1,40 @@
+Package: backbone
+Type: Package
+Title: Extracts the Backbone from Graphs
+Version: 2.0.0
+Authors@R: c(
+    person("Zachary", "Neal", email = "zpneal@msu.edu", role = c("aut", "cre")),
+    person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = "aut"), 
+    person("Bruce", "Sagan", email = "bsagan@msu.edu", role = "aut"),
+    person("Godard", "Karl", email = "godardk@umich.edu", role = "ctb")) 
+Description: An implementation of methods for extracting an unweighted unipartite
+   graph (i.e. a backbone) from (a) an unweighted unipartite graph, (b) a weighted 
+   unipartite graph, (c) the projection of an unweighted bipartite graph, or (d) the
+   projection of a weighted bipartite graph. It also provides utility functions to
+   generate random binary matrices with (a) given density, (b) given row and column
+   marginals, and (c) given row and column marginal distributions.
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.1.2
+Roxygen: list(markdown = TRUE)
+Depends: R (>= 2.10)
+Imports: 
+    igraph,
+    Matrix,
+    methods,
+    network,
+    PoissonBinomial,
+    stats,
+    Rcpp,
+    utils,
+Suggests:
+    knitr,
+    MASS,
+    rmarkdown,
+    testthat (>= 3.0.0)
+LinkingTo: 
+    Rcpp
+VignetteBuilder: knitr
+URL: https://www.zacharyneal.com/backbone, https://github.com/zpneal/backbone
+BugReports: https://github.com/zpneal/backbone/issues
+Config/testthat/edition: 3
