@@ -8,11 +8,13 @@ Authors@R: c(
     person("Bruce", "Sagan", email = "bsagan@msu.edu", role = "aut"),
     person("Godard", "Karl", email = "godardk@umich.edu", role = "ctb")) 
 Description: An implementation of methods for extracting an unweighted unipartite
-   graph (i.e. a backbone) from (a) an unweighted unipartite graph, (b) a weighted 
-   unipartite graph, (c) the projection of an unweighted bipartite graph, or (d) the
-   projection of a weighted bipartite graph. It also provides utility functions to
-   generate random binary matrices with (a) given density, (b) given row and column
-   marginals, and (c) given row and column marginal distributions.
+   graph (i.e. a backbone) from an unweighted unipartite graph (Hamann et al., 2016 
+   <doi:10.1007/s13278-016-0332-2>), a weighted  unipartite graph (Serrano et al., 
+   2009 <doi:10.1073/pnas.0808904106>), the projection of an unweighted bipartite
+   graph (Neal et al., <doi:10.1038/s41598-021-03238-3>, or the projection of a weighted
+   bipartite graph (Neal, 2017 <doi:10.1177/0308518X16631339>). It also provides utility
+   functions to generate random binary matrices with (a) given density, (b) given row
+   and column marginals, and (c) given row and column marginal distributions.
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.2
