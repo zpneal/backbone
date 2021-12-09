@@ -332,7 +332,7 @@ B  #Contains blocks
 ```
 
 ## Matrix randomization {#randomization}
-Extracting a backbone from a bipartite projection using the fixed degree sequence model and `fdsm()` function requires randomly sampling matrices from the space of all binary matrices with given row and column sums. The fastball algorithm is a faster version of the curveball algorithm [@strona2014fast], that has been implemented in C++ for efficiency. Given a matrix, `fastball()` returns a new matrix randomly sampled from the space of all binary matrices with the same row and column sums:
+Extracting a backbone from a bipartite projection using the fixed degree sequence model and `fdsm()` function requires randomly sampling matrices from the space of all binary matrices with given row and column sums, which is performed using the 'fastball' algorithm [@godard2021fastball]. Given a matrix, `fastball()` returns a new matrix randomly sampled from the space of all binary matrices with the same row and column sums:
 ```{r}
 mat <- rbind(c(1,0,0), c(0,0,1), c(0,1,1))
 mat
