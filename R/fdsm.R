@@ -111,8 +111,9 @@ fdsm <- function(B, trials = 1000, method = "fastball",
 
     ### Increment progress bar ###
     utils::setTxtProgressBar(pb, i)
+
   } #end for loop
-  if (progress == "TRUE"){close(pb)} #End progress bar
+  close(pb) #End progress bar
 
   #### Create Backbone Object ####
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
