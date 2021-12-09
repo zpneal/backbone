@@ -208,7 +208,7 @@ curveball<-function(M){
 #'    column sums, and is used by [fdsm()] to extract the backbone from a bipartite projection using the fixed
 #'    degree sequence model.
 #'
-#' @references {Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals. *Nature Communications, 5*, 4114. \doi{10.1038/ncomms5114}}
+#' @references {Godard, Karl and Neal, Zachary P. 2021. fastball: A fast algorithm to sample binary matrices with fixed marginals. \href{https://arxiv.org/abs/2112.04017}{*arXiv:2112.04017*}}
 #'
 #' @export
 #' @examples
