@@ -25,7 +25,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 
 # Table of Contents {#toc}
 
-[<img src='../man/figures/logo.png' align="right" height="250" />](https://www.rbackbone.net)
+[<img src='../man/figures/logo.png' align="right" height="250" />](https://www.zacharyneal.com/backbone)
 
 1. [Introduction](#introduction)
     a. [Welcome](#welcome)
@@ -58,9 +58,9 @@ Thank you for your interest in the backbone package! This vignette illustrates h
 
 * "Neal, Z. P., Domagalski, R, Sagan B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. [https://arxiv.org/abs/2105.13396](https://arxiv.org/abs/2105.13396)
 
-For additional resources on the backbone package, please see [https://www.rbackbone.net/](https://www.rbackbone.net).
+For additional resources on the backbone package, please see [https://www.rbackbone.net/](https://www.zacharyneal.com/backbone).
 
-If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)) or via Twitter ([\@zpneal](https://twitter.com/zpneal)). Please report bugs in the backbone package at [https://github.com/domagal9/backbone/issues](https://github.com/domagal9/backbone/issues).
+If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)) or via Twitter ([\@zpneal](https://twitter.com/zpneal)). Please report bugs in the backbone package at [https://github.com/zpneal/backbone/issues](https://github.com/zpneal/backbone/issues).
 
 ## Loading the package {#loading}
 The backbone package can be loaded in the usual way:
