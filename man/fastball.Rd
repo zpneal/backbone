@@ -41,5 +41,5 @@ Mlist <- apply(M==1, 1, which)  #Converting M to a list
 fastball(Mlist, R = 10, C = 20)  #Even faster generation of a random matrix
 }
 \references{
-{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals. \emph{Nature Communications, 5}, 4114. \doi{10.1038/ncomms5114}}
+{Godard, Karl and Neal, Zachary P. 2021. fastball: A fast algorithm to sample binary matrices with fixed marginals. \href{https://arxiv.org/abs/2112.04017}{\emph{arXiv:2112.04017}}}
 }
