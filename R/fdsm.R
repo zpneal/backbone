@@ -138,30 +138,42 @@ fdsm <- function(B, trials = 1000, method = "fastball",
 #'
 #' `curveball` randomizes a binary matrix, preserving the row and column sums
 #'
-#' @param M matrix: a binary matrix
+#' @param M matrix: a binary matrix or adjacency list
+#' @param R integer: number of rows in `M`
+#' @param C integer: number of columns in `M`
+#' @param trades integer: number of trades; the default is 5R trades (approx. mixing time)
 #'
 #' @return
 #' matrix: A random binary matrix with same row sums and column sums as M.
+#' 
+#' @details
+#' `curveball` is a slightly modified version of Strona et al.'s (2014) R implementation of the curveball
+#'    algorithm for generating random binary matrices with fixed row and column sums. For maximum efficiency,
+#'    the input should be oriented wide (more columns than rows) rather than long (more rows than columns). 
+#'    It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a 
+#'    binary matrix `M`, it can be converted into an adjacency list using `apply(M==1, 1, which, simplify = FALSE)`.
+#'    When `M` is supplied as an indexed list, `R` and `C` must be specified.
 #'
 #' @export
-#'
 #' @references {Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals. *Nature Communications, 5*, 4114. \doi{10.1038/ncomms5114}}
+#'
 #' @examples
-#' B <- matrix(rbinom(200,1,0.5),10,20)  #A random bipartite graph
-#' curveball(B)
-curveball<-function(M){
-  #### Define Variables ####
-  RC=dim(M)
-  R=RC[1]
-  C=RC[2]
-  hp=list()
-
-  #### Mark Locations of One's ####
-  for (row in 1:dim(M)[1]) {hp[[row]]=(which(M[row,]==1))}
+#' M <- matrix(rbinom(200,1,0.5),10,20)  #A random bipartite graph
+#' curveball(M)  #Generation of a random matrix
+#' Mlist <- apply(M==1, 1, which, simplify = FALSE)  #Converting M to an adjacency list
+#' curveball(Mlist, R = 10, C = 20)  #Faster generation of a random matrix
+curveball<-function(M, R = nrow(M), C = ncol(M), trades = 5*R){
+  
+  #### Convert to adjacency list (if necessary); Define variables ####
+  force(R)  #Evaluate R and C now, setting defaults before matrix gets indexed
+  force(C)
+  if (methods::is(M, "matrix")) {M <- apply(M==1, 1, which, simplify = FALSE)}
+  hp=M
   l_hp=length(hp)
-
+  
   #### Curveball Swaps ####
-  for (rep in 1:(5*l_hp)){
+  #From here down, verbatim https://static-content.springer.com/esm/art%3A10.1038%2Fncomms5114/MediaObjects/41467_2014_BFncomms5114_MOESM898_ESM.txt
+  for (rep in 1:trades){
     AB=sample(1:l_hp,2)
     a=hp[[AB[1]]]
     b=hp[[AB[2]]]
@@ -177,7 +189,7 @@ curveball<-function(M){
       hp[[AB[1]]] = c(ab,tot[1:L])
       hp[[AB[2]]] = c(ab,tot[(L+1):l_tot])}
   }
-
+  
   #### Define and Return Random Matrix ####
   rm=matrix(0,R,C)
   for (row in 1:R){rm[row,hp[[row]]]=1}
@@ -197,13 +209,12 @@ curveball<-function(M){
 #' matrix: A random binary matrix with same row sums and column sums as M.
 #'
 #' @details
-#' `fastball` is an optimized C++ implementation of the curveball algorithm (Strona et al.. 2014) for generating random
-#'    binary matrices. There are two ways that `fastball` can be made even more efficient. First, be sure that
-#'    `M` is oriented wide (more columns than rows) rather than long (more rows than columns). Second, if
-#'    `fastball` is used in a loop to repeatedly sample from the space of all 0/1 matrices with the same
-#'    row and column sums as `M`, supply `M` as an indexed list of the locations of the 1s using `apply(M==1, 1, which)`.
-#'    This indexed list should be generated just once, outside the loop. When `B` is supplied as an indexed list,
-#'    `R` and `C` must be specified.
+#' `fastball` is an optimized C++ implementation of the curveball algorithm (Strona et al.. 2014)
+#'    for generating random binary matrices with fixed row and column sums. For maximum efficiency,
+#'    the input should be oriented wide (more columns than rows) rather than long (more rows than columns). 
+#'    It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a 
+#'    binary matrix `M`, it can be converted into an adjacency list using `apply(M==1, 1, which, simplify = FALSE)`.
+#'    When `M` is supplied as an indexed list, `R` and `C` must be specified.
 #'
 #' The fastball algorithm is the fastest known method for randomly sampling binary matrices with given row and
 #'    column sums, and is used by [fdsm()] to extract the backbone from a bipartite projection using the fixed
@@ -215,12 +226,12 @@ curveball<-function(M){
 #' @examples
 #' M <- matrix(rbinom(200,1,0.5),10,20)  #A random 10x20 binary matrix
 #' fastball(M)  #Fast generation of a random matrix
-#' Mlist <- apply(M==1, 1, which)  #Converting M to a list
+#' Mlist <- apply(M==1, 1, which, simplify = FALSE)  #Converting M to a list
 #' fastball(Mlist, R = 10, C = 20)  #Even faster generation of a random matrix
 fastball <- function(M, R = nrow(M), C = ncol(M), trades = 5*R) {
   force(R)  #Evaluate R and C now, setting defaults before matrix gets indexed
   force(C)
-  if (methods::is(M, "matrix")) {M <- apply(M==1, 1, which)}  #If a matrix is provided, convert to an indexed list
+  if (methods::is(M, "matrix")) {M <- apply(M==1, 1, which, simplify = FALSE)}  #If a matrix is provided, convert to an indexed list
   return(fastball_cpp(M, c(R,C), trades))  #Run fastball C++
 }
 
