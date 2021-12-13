@@ -22,13 +22,12 @@ matrix: A random binary matrix with same row sums and column sums as M.
 \code{fastball} randomizes a binary matrix, preserving the row and column sums
 }
 \details{
-\code{fastball} is an optimized C++ implementation of the curveball algorithm (Strona et al.. 2014) for generating random
-binary matrices. There are two ways that \code{fastball} can be made even more efficient. First, be sure that
-\code{M} is oriented wide (more columns than rows) rather than long (more rows than columns). Second, if
-\code{fastball} is used in a loop to repeatedly sample from the space of all 0/1 matrices with the same
-row and column sums as \code{M}, supply \code{M} as an indexed list of the locations of the 1s using \code{apply(M==1, 1, which)}.
-This indexed list should be generated just once, outside the loop. When \code{B} is supplied as an indexed list,
-\code{R} and \code{C} must be specified.
+\code{fastball} is an optimized C++ implementation of the curveball algorithm (Strona et al.. 2014)
+for generating random binary matrices with fixed row and column sums. For maximum efficiency,
+the input should be oriented wide (more columns than rows) rather than long (more rows than columns).
+It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a
+binary matrix \code{M}, it can be converted into an adjacency list using \code{apply(M==1, 1, which, simplify = FALSE)}.
+When \code{M} is supplied as an indexed list, \code{R} and \code{C} must be specified.
 
 The fastball algorithm is the fastest known method for randomly sampling binary matrices with given row and
 column sums, and is used by \code{\link[=fdsm]{fdsm()}} to extract the backbone from a bipartite projection using the fixed
@@ -37,7 +36,7 @@ degree sequence model.
 \examples{
 M <- matrix(rbinom(200,1,0.5),10,20)  #A random 10x20 binary matrix
 fastball(M)  #Fast generation of a random matrix
-Mlist <- apply(M==1, 1, which)  #Converting M to a list
+Mlist <- apply(M==1, 1, which, simplify = FALSE)  #Converting M to a list
 fastball(Mlist, R = 10, C = 20)  #Even faster generation of a random matrix
 }
 \references{
