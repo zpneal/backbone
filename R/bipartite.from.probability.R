@@ -14,7 +14,7 @@
 #' B <- bipartite.from.probability(R = 10, C = 10)
 #' B <- bipartite.from.probability(R = 10, C = 10, P = .5)
 #' B <- bipartite.from.probability(R = 10, C = 10, P = .5, class = "igraph")
-bipartite.from.probability <- function(R,C,P=0,class="matrix") {
+bipartite.from.probability <- function(R, C, P=0, class="matrix") {
 
   #Parameter check
   if (!is.numeric(R) | !is.numeric(C) | !is.numeric(P)) {stop("R, C, and P must be numeric")}

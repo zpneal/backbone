@@ -27,7 +27,7 @@ bipartite.from.distribution(
 \item{class}{string: the class of the returned backbone graph, one of c("matrix", "Matrix", "sparseMatrix", "igraph", "network")}
 }
 \description{
-`bipartite.from.distribution` returns a bipartite graph, as an object of the requested class,
+\code{bipartite.from.distribution} returns a bipartite graph, as an object of the requested class,
 with row and column degree distributions that approximately follow beta distributions with given parameters.
 }
 \examples{

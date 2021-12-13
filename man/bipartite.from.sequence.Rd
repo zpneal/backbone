@@ -14,11 +14,10 @@ bipartite.from.sequence(R, C, class = "matrix")
 \item{class}{string: the class of the returned backbone graph, one of c("matrix", "Matrix", "sparseMatrix", "igraph", "network")}
 }
 \description{
-`bipartite.from.sequence` returns a bipartite graph, as an object of the requested class,
- that has the given row and column degree sequences.
+\code{bipartite.from.sequence} returns a bipartite graph, as an object of the requested class,
+that has the given row and column degree sequences.
 }
 \examples{
 B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2))
 B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2), class = "igraph")
-B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2), class = "network")
 }

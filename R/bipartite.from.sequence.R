@@ -12,7 +12,6 @@
 #' @examples
 #' B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2))
 #' B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2), class = "igraph")
-#' B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2), class = "network")
 bipartite.from.sequence <- function(R,C,class="matrix"){
   #Replacement for sample() function so that if length(x)=1, it simply returns x
   newsample <- function(x) {if (length(x) <= 1) {return(x)} else {return(sample(x,1,replace = FALSE, prob = NULL))}}

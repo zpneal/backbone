@@ -2,22 +2,23 @@
 % Please edit documentation in R/fdsm.R
 \name{curveball}
 \alias{curveball}
-\title{curveball algorithm}
+\title{Randomize a binary matrix using the curveball algorithm}
 \usage{
 curveball(M)
 }
 \arguments{
-\item{M}{matrix}
+\item{M}{matrix: a binary matrix}
 }
 \value{
-rm, a matrix with same row sums and column sums as M, but randomized 0/1 entries.
+matrix: A random binary matrix with same row sums and column sums as M.
 }
 \description{
-curveball algorithm
+\code{curveball} randomizes a binary matrix, preserving the row and column sums
 }
 \examples{
-curveball(davis)
+B <- matrix(rbinom(200,1,0.5),10,20)  #A random bipartite graph
+curveball(B)
 }
 \references{
-Algorithm and R implementation: Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. “A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals.” Nature Communications 5 (June). Nature Publishing Group: 4114. \doi{10.1038/ncomms5114}
+{Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals. \emph{Nature Communications, 5}, 4114. \doi{10.1038/ncomms5114}}
 }

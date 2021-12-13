@@ -2,35 +2,75 @@
 % Please edit documentation in R/fixedfill.R
 \name{fixedfill}
 \alias{fixedfill}
-\title{Compute fixed fill backbone probabilities}
+\title{Extract backbone using the Fixed Fill Model}
 \usage{
-fixedfill(B)
+fixedfill(
+  B,
+  alpha = NULL,
+  signed = FALSE,
+  fwer = "none",
+  class = "original",
+  narrative = FALSE
+)
 }
 \arguments{
-\item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
+\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.}
+
+\item{alpha}{real: significance level of hypothesis test(s)}
+
+\item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
+
+\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+If "original", the backbone graph returned is of the same class as \code{B}.}
+
+\item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
 }
 \value{
-backbone, a list(positive, negative, summary). Here
-    `positive` is a matrix of probabilities of edge weights being equal to or above the observed value in the projection,
-    `negative` is a matrix of probabilities of edge weights being equal to or below the observed value in the projection, and
-    `summary` is a data frame summary of the inputted matrix and the model used including: class, model name, number of rows, number of columns, and running time.
+If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
+
+If \code{alpha} == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
+edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
+can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{fwer}, \code{class}, and \code{narrative} parameters
+are ignored.
 }
 \description{
-`fixedfill` computes the probability of observing
-    a higher or lower edge weight.
-    Once computed, use \code{\link{backbone.extract}} to return
-    the backbone matrix for a given alpha value.
+\code{fixedfill} extracts the backbone of a bipartite projection using the Fixed Fill Model.
 }
 \details{
-The fixedfill function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
-    distribution of weights expected in a projection obtained from a random bipartite graph where
-    the number of edges present is equal to the number of edges in B. When B is large, this function may be impractically
-    slow and may return a backbone object that contains NaN values.
+The \code{fixedfill} function compares an edge's observed weight in the projection \eqn{B*t(B)} to the distribution
+of weights expected in a projection obtained from a random bipartite graph where the number of edges present
+(i.e., the number of cells \emph{filled} with a 1) is equal to the number of edges in B. When B is large, this function
+may be impractically slow and may return a backbone object that contains \code{NaN} values.
+
+When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
+yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected under the null
+model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
+It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
+negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
+\emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
 }
 \examples{
-fixed_probs <- fixedfill(davis)
+#A binary bipartite network of 30 agents & 75 artifacts; agents form three communities
+B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
+                 matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.2),10)),
+           cbind(matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.8),10),
+                 matrix(rbinom(250,1,.2),10)),
+           cbind(matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.8),10)))
+
+P <- B\%*\%t(B) #An ordinary weighted projection...
+plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
+                                         weighted = TRUE, diag = FALSE)) #...is a dense hairball
+
+bb <- fixedfill(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedfill backbone...
+plot(bb) #...is sparse with clear communities
 }
 \references{
-{Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI})
+{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 }

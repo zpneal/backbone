@@ -1,38 +1,42 @@
 Package: backbone
 Type: Package
-Title: Extracts the Backbone from Weighted Graphs
-Version: 1.5.1
+Title: Extracts the Backbone from Graphs
+Version: 2.0.0
 Authors@R: c(
     person("Zachary", "Neal", email = "zpneal@msu.edu", role = c("aut", "cre")),
     person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = "aut"), 
-    person("Bruce", "Sagan", email = "bsagan@msu.edu", role = "aut")) 
-Description: Provides methods for extracting from a weighted graph 
-    a binary or signed backbone that retains only the significant edges. 
-    The user may input a weighted graph, or a bipartite graph 
-    from which a weighted graph is first constructed via projection.
-    Backbone extraction methods include the stochastic degree sequence model (SDSM; Neal, Z. P. (2014). <doi:10.1016/j.socnet.2014.06.001>), 
-    the fixed degree sequence model (FDSM; Zweig, K. A., and Kaufmann, M. (2011). <doi:10.1007/s13278-011-0021-0>),
-    the fixed row model (FRM; Neal, Z. P. (2013). <doi:10.1007/s13278-013-0107-y>), 
-    the fixed column model (FCM; Neal, Domagalski, and Sagan (2021). <arXiv:2105.13396>),
-    the fixed fill model (FFM; Neal, Domagalski, and Sagan (2021). <arXiv:2105.13396>),
-    and a universal threshold method. 
+    person("Bruce", "Sagan", email = "bsagan@msu.edu", role = "aut"),
+    person("Godard", "Karl", email = "godardk@umich.edu", role = "ctb")) 
+Description: An implementation of methods for extracting an unweighted unipartite
+   graph (i.e. a backbone) from an unweighted unipartite graph (Hamann et al., 2016 
+   <doi:10.1007/s13278-016-0332-2>), a weighted  unipartite graph (Serrano et al., 
+   2009 <doi:10.1073/pnas.0808904106>), the projection of an unweighted bipartite
+   graph (Neal et al., <doi:10.1038/s41598-021-03238-3>, or the projection of a weighted
+   bipartite graph (Neal, 2017 <doi:10.1177/0308518X16631339>). It also provides utility
+   functions to generate random binary matrices with (a) given density, (b) given row
+   and column marginals, and (c) given row and column marginal distributions.
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
+Roxygen: list(markdown = TRUE)
 Depends: R (>= 2.10)
 Imports: 
+    igraph,
     Matrix,
     methods,
-    stats,
-    utils,
-    igraph,
     network,
-    PoissonBinomial
+    PoissonBinomial,
+    stats,
+    Rcpp,
+    utils,
 Suggests:
     knitr,
+    MASS,
     rmarkdown,
-    testthat
+    testthat (>= 3.0.0)
+LinkingTo: 
+    Rcpp
 VignetteBuilder: knitr
-URL: https://www.zacharyneal.com/backbone, https://github.com/domagal9/backbone
-BugReports: https://github.com/domagal9/backbone/issues
+URL: https://www.zacharyneal.com/backbone, https://github.com/zpneal/backbone
+BugReports: https://github.com/zpneal/backbone/issues
+Config/testthat/edition: 3

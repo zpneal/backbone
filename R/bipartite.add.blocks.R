@@ -10,14 +10,14 @@
 #'
 #' @details Each row node and each column node are randomly assigned to one of `blocks` number of groups. Then
 #' degree-preserving checkerboard swaps are performed that increase the within-block density, until `density`
-#' is achieved. Eligible swaps are identified randomly, so the re-wiring can be slow when B is large. The process
+#' is achieved. Eligible swaps are identified randomly, so the re-wiring can be slow when `B` is large. The process
 #' can get stuck when no eligible swaps remain but the target `density` has not been achieved; if this happens, increase
 #' `max.tries` to keep looking for eligible swaps or reduce the target `density`.
 #'
 #' @export
 #'
 #' @examples
-#' B <- bipartite.from.probability(R = 10, C = 10, P = .5)
+#' B <- bipartite.from.probability(R = 100, C = 100, P = .5)
 #' B <- bipartite.add.blocks(B, blocks = 2, density = .7)
 bipartite.add.blocks <- function(B,blocks=2,density=.5,max.tries=100000) {
 

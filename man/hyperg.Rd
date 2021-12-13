@@ -2,33 +2,32 @@
 % Please edit documentation in R/fixedrow.R
 \name{hyperg}
 \alias{hyperg}
-\title{A wrapper for the \link{fixedrow} function}
+\title{Wrapper for fixedrow()}
 \usage{
-hyperg(B)
+hyperg(
+  B,
+  alpha = NULL,
+  signed = FALSE,
+  fwer = "none",
+  class = "original",
+  narrative = FALSE
+)
 }
 \arguments{
-\item{B}{graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
-}
-\value{
-\link{fixedrow}
+
+\item{alpha}{Real: significance level of hypothesis test(s)}
+
+\item{signed}{Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned}
+
+\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+If "original", the backbone graph returned is of the same class as \code{B}.}
+
+\item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned.}
 }
 \description{
-`hyperg` computes the probability of observing
-    a higher or lower edge weight using the hypergeometric distribution.
-    Once computed, use \code{\link{backbone.extract}} to return
-    the backbone matrix for a given alpha value.
-}
-\details{
-Specifically, this function compares an edge's observed weight in the projection \eqn{B*t(B)} to the
-    distribution of weights expected in a projection obtained from a random bipartite graph where
-    the row vertex degrees are fixed but the column vertex degrees are allowed to vary.
-}
-\examples{
-hyperg_probs <- hyperg(davis)
-}
-\references{
-{Tumminello, Michele and Miccichè, Salvatore and Lillo, Fabrizio and Piilo, Jyrki and Mantegna, Rosario N. 2011. "Statistically Validated Networks in Bipartite Complex Systems." PLOS ONE, 6(3), \doi{10.1371/journal.pone.0017994}}
-
-{Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24. \doi{10.1007/s13278-013-0107-y}}
+Wrapper for fixedrow()
 }

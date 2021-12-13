@@ -3,53 +3,33 @@
 \docType{package}
 \name{backbone}
 \alias{backbone}
-\title{backbone: Extracts the Backbone from Weighted Graphs}
+\title{backbone: Extracts the Backbone from Graphs}
 \description{
-Provides methods for extracting from a weighted graph
-    a binary or signed backbone that retains only the significant edges.
-    The user may input a weighted graph, or a bipartite graph
-    from which a weighted graph is first constructed via projection.
-    Backbone extraction methods include:
-    \itemize{
-    \item the stochastic degree sequence model (SDSM; {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. Social Networks, 39, Elsevier: 84-97.}\doi{10.1016/j.socnet.2014.06.001}),
-    \item the fixed degree sequence model (FDSM; {Zweig, Katharina Anna, and Michael Kaufmann. 2011. “A Systematic Approach to the One-Mode Projection of Bipartite Graphs.” Social Network Analysis and Mining 1 (3): 187–218.}\doi{10.1007/s13278-011-0021-0}),
-    \item the fixed row model (FRM; {Neal, Zachary. 2013. “Identifying Statistically Significant Edges in One-Mode Projections.” Social Network Analysis and Mining 3 (4). Springer: 915–24.}\doi{10.1007/s13278-013-0107-y}),
-    \item the fixed column model (FCM; {Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI}),
-    \item the fixed fill model (FFM; {Neal, Domagalski, and Sagan. 2021. "Comparing Models for Extracting the Backbone of Bipartite Projections."} \href{https://arxiv.org/abs/2105.13396}{arXiv:2105.13396 cs.SI}),
-    \item and a universal threshold method.
-    }
-}
-\details{
-To decide whether an edge of a bipartite projection \eqn{B*t(B)} is statistically significant, we compare the edge's observed weight to the distribution of weights expected in a projection obtained from a random bipartite graph under a null model.
-    Given a null model that can generate a distribution of an edge's weights, we can then compute the probability that the observed weight is in the upper or lower tail of that distribution.
-    The `backbone` package provides several different null models to use, all of which define different constraints on the row degrees and column degrees of a random bipartite graph in their corresponding distribution.
+Provides methods for extracting from an unweighted and sparse subgraph (i.e., a backbone)
+that contains only the most "important" edges in a weighted bipartite projection, a non-projection
+weighted network, or an unweighted network.
+
+Available backbone extraction functions include:
 \itemize{
-\item '\code{\link{sdsm}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the stochastic degree sequence model.
-    Here the expected row and column degrees of a random bipartite graph in the distribution match that of the original bipartite graph.
-\item '\code{\link{fixedrow}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the hypergeometric model.
-    Here the row degrees of a random bipartite graph in the distribution exactly match that of the original bipartite graph. The column degrees are allowed to vary.
-\item '\code{\link{fixedcol}}': computes the probability of edge weights being above or below the observed edge weights in a bipartite projection using the Poisson binomial model.
-    Here the column degrees of a random bipartite graph in the distribution exactly match that of the original bipartite graph. The row degrees are allowed to vary.
-\item '\code{\link{fdsm}}': computes the proportion of edge weights above or below the observed edge weights in a bipartite projection using the fixed degree sequence model.
-    Here the row and column degrees of a random bipartite graph in the distribution exactly match that of the original bipartite graph.
-\item '\code{\link{fixedfill}}':computes the probability of edge weights being above or below the observed edge weights in a bipartite projection where the number of edges in a random bipartite graph
-    of the distribution exactly match the number of edges of the original bipartite graph.
+\item For weighted bipartite projections of weighted bipartite networks: \code{\link[=osdsm]{osdsm()}}.
+\item For weighted bipartite projections of binary bipartite networks: \code{\link[=fixedfill]{fixedfill()}}, \code{\link[=fixedrow]{fixedrow()}}, \code{\link[=fixedcol]{fixedcol()}}, \code{\link[=sdsm]{sdsm()}}, and \code{\link[=fdsm]{fdsm()}}.
+\item For non-projection weighted networks: \code{\link[=global]{global()}}, \code{\link[=disparity]{disparity()}}.
+\item For unweighted networks: \code{\link[=sparsify]{sparsify()}}, \code{\link[=sparsify.with.skeleton]{sparsify.with.skeleton()}}, \code{\link[=sparsify.with.gspar]{sparsify.with.gspar()}}, \code{\link[=sparsify.with.lspar]{sparsify.with.lspar()}}, \code{\link[=sparsify.with.simmelian]{sparsify.with.simmelian()}}, \code{\link[=sparsify.with.jaccard]{sparsify.with.jaccard()}}, \code{\link[=sparsify.with.meetmin]{sparsify.with.meetmin()}}, \code{\link[=sparsify.with.geometric]{sparsify.with.geometric()}}, \code{\link[=sparsify.with.hypergeometric]{sparsify.with.hypergeometric()}}, \code{\link[=sparsify.with.localdegree]{sparsify.with.localdegree()}}, \code{\link[=sparsify.with.quadrilateral]{sparsify.with.quadrilateral()}}.
+\item For all networks: \code{\link[=backbone.suggest]{backbone.suggest()}} will examine the data and suggest an appropriate backbone function
 }
-Once one of these models is computed, use \code{\link{backbone.extract}} to return the backbone graph for a chosen alpha value.
 
-In addition to these methods, one can also use \code{\link{universal}} to return a backbone graph in which edge weights
-    are set to 1 if above the given upper parameter threshold,
-    and set to -1 if below the given lower parameter threshold, and are 0 otherwise.
-
-Additional functions that aid in the use of the above models are exported:
+The package also includes some utility functions:
 \itemize{
-\item '\code{\link{bicm}}': finds a matrix that maximizes the entropy function, used in \code{\link{sdsm}}.
-\item '\code{\link{curveball}}': generates a random 0/1 matrix with the same row and column sums as the input, used in \code{\link{fdsm}}.
+\item \code{\link[=fastball]{fastball()}} - Fast marginal-preserving randomization of binary matrices
+\item \code{\link[=bicm]{bicm()}} - Compute probabilities under the bipartite configuration model
+\item \code{\link[=bipartite.from.probability]{bipartite.from.probability()}}, \code{\link[=bipartite.from.sequence]{bipartite.from.sequence()}}, and \code{\link[=bipartite.from.distribution]{bipartite.from.distribution()}} - Generate random bipartite networks with given edge probability, degree sequences, or degree distributions.
 }
 
-For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone", package = "backbone")}}.
-    For updates, papers, presentations, and other backbone news, please see \href{https://www.zacharyneal.com/backbone}{www.rbackbone.net}
+For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone")}}.
+For updates, papers, presentations, and other backbone news, please see \href{https://www.zacharyneal.com/backbone}{www.rbackbone.net}
 }
 \references{
-{Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE. \doi{10.1371/journal.pone.0244363}}
+{Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. \emph{PLoS ONE, 16}, e0244363. \doi{10.1371/journal.pone.0244363}}
+
+{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 }

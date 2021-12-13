@@ -80,36 +80,48 @@ loglikelihood_bicm <- function(x0, args){
   return(f)
 }
 
-#' bicm: Bipartite Configuration Model.
+#' Bipartite Configuration Model
 #'
-#' @param graph matrix, a bipartite adjacency matrix of a graph
+#' `bicm` estimates cell probabilities under the bipartite configuration model
+#'
+#' @param M matrix: a binary matrix
 #' @param tol numeric, tolerance of algorithm
 #' @param max_steps numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm
 #' @param ... optional arguments
 #'
-#' @details The Bipartite Configuration Model (Saracco et. al. 2015, 2017) produces a matrix of edge specific probabilities which are used in \link{sdsm} to find the p-values of the edges in the bipartite projection. This R code is adapted from the python BiCM package by Matteo Bruno under the MIT license.
-#' @references python bicm: \href{https://github.com/mat701/BiCM}{Matteo Bruno, matteo.bruno<at>imtlucca.it, https://github.com/mat701/BiCM}
-#' @references bicm: {Saracco, F., Straka, M. J., Clemente, R. D., Gabrielli, A., Caldarelli, G., & Squartini, T. (2017). Inferring monopartite projections of bipartite networks: An entropy-based approach. New Journal of Physics, 19(5), 053022. \doi{10.1088/1367-2630/aa6b38}}
-#' @references bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. Scientific Reports, 5(1), 10595. \doi{10.1038/srep10595}}
+#' @details
+#' Given a binary matrix **M**, the Bipartite Configuration Model (BiCM; Saracco et. al. 2015) returns a valued matrix
+#'    **B** in which Bij is the *approximate* probability that Mij = 1 in the space of all binary matrices with
+#'    the same row and column marginals as **M**. The BiCM yields the closest approximations of the true probabilities
+#'    compared to other estimation methods (Neal et al., 2021), and is used by [sdsm()] to extract the backbone of
+#'    a bipartite projection using the stochastic degree sequence model.
 #'
-#' @return matrix containing probabilities
+#' @references
+#' {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. *Scientific Reports, 5*, 10595. \doi{10.1038/srep10595}}
+#'
+#' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. \doi{10.1038/s41598-021-03238-3}}
+#'
+#' @return
+#' matrix: a matrix of probabilities
 #' @export
 #'
-#' @examples bicm(davis)
-bicm <- function(graph,
+#' @examples
+#' M <- matrix(rbinom(25,1,0.5),5,5)  #A random bipartite graph
+#' bicm(M)
+bicm <- function(M,
                  tol = 1e-8,
                  max_steps = 200,
                  ...){
 
   #### initialize_graph ####
-  n_rows <- dim(graph)[1]
-  n_cols <- dim(graph)[2]
-  rows_deg <- Matrix::rowSums(graph)
-  cols_deg <- Matrix::colSums(graph)
+  n_rows <- dim(M)[1]
+  n_cols <- dim(M)[2]
+  rows_deg <- Matrix::rowSums(M)
+  cols_deg <- Matrix::colSums(M)
 
   #### initialize probability matrix ####
   probs <- matrix(0, nrow = n_rows, ncol = n_cols)
-  r_bipart <- graph
+  r_bipart <- M
   good_rows <- seq(1,n_rows)
   good_cols <- seq(1,n_cols)
   zero_rows <- which(rows_deg == 0)

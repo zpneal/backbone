@@ -16,17 +16,17 @@ bipartite.add.blocks(B, blocks = 2, density = 0.5, max.tries = 1e+05)
 \item{max.tries}{numeric: number of ineligible re-wiring attempts before giving up}
 }
 \description{
-`bipartite.add.blocks` rewires a bipartite graph B to have a block structure such that edges are
-located within-block with `density` probability, while preserving both degree distributions.
+\code{bipartite.add.blocks} rewires a bipartite graph B to have a block structure such that edges are
+located within-block with \code{density} probability, while preserving both degree distributions.
 }
 \details{
-Each row node and each column node are randomly assigned to one of `blocks` number of groups. Then
-degree-preserving checkerboard swaps are performed that increase the within-block density, until `density`
-is achieved. Eligible swaps are identified randomly, so the re-wiring can be slow when B is large. The process
-can get stuck when no eligible swaps remain but the target `density` has not been achieved; if this happens, increase
-`max.tries` to keep looking for eligible swaps or reduce the target `density`.
+Each row node and each column node are randomly assigned to one of \code{blocks} number of groups. Then
+degree-preserving checkerboard swaps are performed that increase the within-block density, until \code{density}
+is achieved. Eligible swaps are identified randomly, so the re-wiring can be slow when \code{B} is large. The process
+can get stuck when no eligible swaps remain but the target \code{density} has not been achieved; if this happens, increase
+\code{max.tries} to keep looking for eligible swaps or reduce the target \code{density}.
 }
 \examples{
-B <- bipartite.from.probability(R = 10, C = 10, P = .5)
+B <- bipartite.from.probability(R = 100, C = 100, P = .5)
 B <- bipartite.add.blocks(B, blocks = 2, density = .7)
 }

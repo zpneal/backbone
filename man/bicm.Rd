@@ -2,12 +2,12 @@
 % Please edit documentation in R/bicm.R
 \name{bicm}
 \alias{bicm}
-\title{bicm: Bipartite Configuration Model.}
+\title{Bipartite Configuration Model}
 \usage{
-bicm(graph, tol = 1e-08, max_steps = 200, ...)
+bicm(M, tol = 1e-08, max_steps = 200, ...)
 }
 \arguments{
-\item{graph}{matrix, a bipartite adjacency matrix of a graph}
+\item{M}{matrix: a binary matrix}
 
 \item{tol}{numeric, tolerance of algorithm}
 
@@ -16,21 +16,24 @@ bicm(graph, tol = 1e-08, max_steps = 200, ...)
 \item{...}{optional arguments}
 }
 \value{
-matrix containing probabilities
+matrix: a matrix of probabilities
 }
 \description{
-bicm: Bipartite Configuration Model.
+\code{bicm} estimates cell probabilities under the bipartite configuration model
 }
 \details{
-The Bipartite Configuration Model (Saracco et. al. 2015, 2017) produces a matrix of edge specific probabilities which are used in \link{sdsm} to find the p-values of the edges in the bipartite projection. This R code is adapted from the python BiCM package by Matteo Bruno under the MIT license.
+Given a binary matrix \strong{M}, the Bipartite Configuration Model (BiCM; Saracco et. al. 2015) returns a valued matrix
+\strong{B} in which Bij is the \emph{approximate} probability that Mij = 1 in the space of all binary matrices with
+the same row and column marginals as \strong{M}. The BiCM yields the closest approximations of the true probabilities
+compared to other estimation methods (Neal et al., 2021), and is used by \code{\link[=sdsm]{sdsm()}} to extract the backbone of
+a bipartite projection using the stochastic degree sequence model.
 }
 \examples{
-bicm(davis)
+M <- matrix(rbinom(25,1,0.5),5,5)  #A random bipartite graph
+bicm(M)
 }
 \references{
-python bicm: \href{https://github.com/mat701/BiCM}{Matteo Bruno, matteo.bruno<at>imtlucca.it, https://github.com/mat701/BiCM}
+{Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. \emph{Scientific Reports, 5}, 10595. \doi{10.1038/srep10595}}
 
-bicm: {Saracco, F., Straka, M. J., Clemente, R. D., Gabrielli, A., Caldarelli, G., & Squartini, T. (2017). Inferring monopartite projections of bipartite networks: An entropy-based approach. New Journal of Physics, 19(5), 053022. \doi{10.1088/1367-2630/aa6b38}}
-
-bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. Scientific Reports, 5(1), 10595. \doi{10.1038/srep10595}}
+{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 }

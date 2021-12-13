@@ -3,11 +3,11 @@ citHeader("To cite backbone in publications use:")
 citEntry(
   entry    = "Manual",
   title    = "{backbone}: Extracts the Backbone from Weighted Graphs",
-  author   = c(person("Rachel","Domagalski"), person("Zachary", "Neal"), person("Bruce", "Sagan")),
+  author   = c(person("Zachary", "Neal"), person("Rachel","Domagalski"), person("Bruce", "Sagan")),
   year     = 2021,
-  note     = "R package version 1.5.0",
+  note     = "R package version 2.0.0",
   url      = "https://CRAN.R-project.org/package=backbone",
-  textVersion = paste("Rachel Domagalski, Zachary Neal, and Bruce Sagan (2021). backbone: Extracts the Backbone from Weighted Graphs. R package version 1.5.0.
+  textVersion = paste("Zachary Neal, Rachel Domagalski, and Bruce Sagan (2021). backbone: Extracts the Backbone from Weighted Graphs. R package version 2.0.0.
   https://CRAN.R-project.org/package=backbone"
   )
 )

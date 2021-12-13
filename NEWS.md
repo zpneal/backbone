@@ -2,6 +2,19 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.0.0
+
+* remove `davis` example data; add examples using synthetic data
+* add support for unweighted graphs: `sparsify()`
+* add support for weighted bipartite graphs: `osdsm()`
+* add support for non-projection weighted graphs: `disparity()`
+* new vignette illustrating all functions
+* add implementation of `fastball()` algorithm for marginal-preserving matrix randomization
+* re-add `testthat` tests
+* allow backbone functions to directly output a backbone, eliminating the need for the `backbone.extract()` function
+* add support for any `p.adjust()` method of correcting for familywise error rates
+* Minor bug fixes
+
 ## backbone 1.5.1
 
 * removed `testthat` tests due to unknown MKL error; will be restored in a future version

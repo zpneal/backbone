@@ -16,8 +16,8 @@ bipartite.from.probability(R, C, P = 0, class = "matrix")
 \item{class}{string: the class of the returned backbone graph, one of c("matrix", "Matrix", "sparseMatrix", "igraph", "network").}
 }
 \description{
-`bipartite.from.probability` returns a bipartite graph, as an object of the requested class,
- in which each edge has a given probability and where no node is an isolate or maximally connected.
+\code{bipartite.from.probability} returns a bipartite graph, as an object of the requested class,
+in which each edge has a given probability and where no node is an isolate or maximally connected.
 }
 \examples{
 B <- bipartite.from.probability(R = 10, C = 10)
