@@ -69,9 +69,9 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     //generate iterators for first pass through rows
     std::vector<int>::iterator first1 = r1.begin();
     std::vector<int>::iterator last1 = r1.end();
-    std::vector<int>::iterator  first2 = r2.begin();
-    std::vector<int>::iterator  last2 = r2.end();
-    int intersectionLength = 0;
+    std::vector<int>::iterator first2 = r2.begin();
+    std::vector<int>::iterator last2 = r2.end();
+    size_t intersectionLength = 0;
 
 
     //find the length of the intersection
@@ -86,9 +86,9 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     }
 
     //calculate length of symmetric difference
-    int r1SymDiffSize = r1.size() - intersectionLength;
-    int r2SymDiffSize = r2.size() - intersectionLength;
-    int symDiffSize = r1SymDiffSize + r2SymDiffSize;
+    size_t r1SymDiffSize = r1.size() - intersectionLength;
+    size_t r2SymDiffSize = r2.size() - intersectionLength;
+    size_t symDiffSize = r1SymDiffSize + r2SymDiffSize;
 
     if (symDiffSize == 0) {
       continue;
@@ -102,8 +102,8 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
 
 
     //shuffle swapLocations using Fisher-Yates shuffle
-    for (int i = 0; i < swapLocations.size() - 1; i++) {
-      int j = i + R::runif(0,1) * (swapLocations.size() - i);
+    for (size_t i = 0; i < swapLocations.size() - 1; i++) {
+      size_t j = i + R::runif(0,1) * (swapLocations.size() - i);
       std::swap(swapLocations[i],swapLocations[j]);
     }
 
@@ -170,7 +170,7 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     std::vector<int> & newV2 = curveballRows[1];
 
 
-    //inser the data for the shuffled rows back into oneLocs
+    //insert the data for the shuffled rows back into oneLocs
     r1.insert(r1.end(), newV1.begin(), newV1.end());
     r2.insert(r2.end(), newV2.begin(), newV2.end());
   }
@@ -178,8 +178,8 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
   //write de-indexed data to return matrix
   Rcpp::NumericMatrix  randomizedMatrix (numRows, numCols);
 
-  for (int row = 0; row < numRows; row++) {
-    for (int index = 0; index < oneLocs[row].size(); index++) {
+  for (size_t row = 0; row < oneLocs.size(); row++) {
+    for (size_t index = 0; index < oneLocs[row].size(); index++) {
       //Rcpp::Rcout << row<< " " << oneLocs[row][index] << '\n';
       randomizedMatrix (row, oneLocs[row][index]-1) = 1;
     }
