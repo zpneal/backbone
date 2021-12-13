@@ -4,6 +4,11 @@ output: html_document
 ---
 ## backbone 2.0.0
 
+* minor bug fixes
+
+
+## backbone 2.0.0
+
 * remove `davis` example data; add examples using synthetic data
 * add support for unweighted graphs: `sparsify()`
 * add support for weighted bipartite graphs: `osdsm()`
