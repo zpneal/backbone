@@ -48,7 +48,7 @@ bipartite.from.sequence <- function(R,C,class="matrix"){
   } #end while loop
 
   if ((sum(row_s) == 0) & (sum(col_s) == 0)) {
-    B <- curveball(B)
+    B <- fastball(B)
     if (class == "Matrix"){B <- Matrix::Matrix(B)}
     if (class == "sparseMatrix"){B <- Matrix::Matrix(B, sparse = TRUE)}
     if (class == "network"){B <- network::network(B, bipartite = TRUE)}
