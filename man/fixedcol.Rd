@@ -75,5 +75,5 @@ bb <- fixedcol(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedcol 
 plot(bb) #...is sparse with clear communities
 }
 \references{
-{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
+{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
 }
