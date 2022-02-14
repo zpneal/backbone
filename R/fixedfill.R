@@ -2,7 +2,7 @@
 #'
 #' `fixedfill` extracts the backbone of a bipartite projection using the Fixed Fill Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)

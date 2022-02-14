@@ -2,7 +2,7 @@
 #'
 #' `sdsm` extracts the backbone of a bipartite projection using the Stochastic Degree Sequence Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
 #'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
@@ -35,10 +35,10 @@
 #'    can subsequently be extracted using [backbone.extract()]. The `signed`, `fwer`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
-#' @references 
+#' @references
 #' {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 #' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
-#' 
+#'
 #' @export
 #'
 #' @examples

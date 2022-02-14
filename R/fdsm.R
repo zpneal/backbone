@@ -2,7 +2,7 @@
 #'
 #' `fdsm` extracts the backbone of a bipartite projection using the Fixed Degree Sequence Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param trials numeric: The number of bipartite graphs generated to approximate the edge weight distribution.
 #' @param method string: The method used to generate random bipartite graphs, one of c("fastball", "curveball")
@@ -145,12 +145,12 @@ fdsm <- function(B, trials = 1000, method = "fastball",
 #'
 #' @return
 #' matrix: A random binary matrix with same row sums and column sums as M.
-#' 
+#'
 #' @details
 #' `curveball` is a slightly modified version of Strona et al.'s (2014) R implementation of the curveball
 #'    algorithm for generating random binary matrices with fixed row and column sums. For maximum efficiency,
-#'    the input should be oriented wide (more columns than rows) rather than long (more rows than columns). 
-#'    It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a 
+#'    the input should be oriented wide (more columns than rows) rather than long (more rows than columns).
+#'    It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a
 #'    binary matrix `M`, it can be converted into an adjacency list using `apply(M==1, 1, which, simplify = FALSE)`.
 #'    When `M` is supplied as an indexed list, `R` and `C` must be specified.
 #'
@@ -163,14 +163,14 @@ fdsm <- function(B, trials = 1000, method = "fastball",
 #' Mlist <- apply(M==1, 1, which, simplify = FALSE)  #Converting M to an adjacency list
 #' curveball(Mlist, R = 10, C = 20)  #Faster generation of a random matrix
 curveball<-function(M, R = nrow(M), C = ncol(M), trades = 5*R){
-  
+
   #### Convert to adjacency list (if necessary); Define variables ####
   force(R)  #Evaluate R and C now, setting defaults before matrix gets indexed
   force(C)
   if (methods::is(M, "matrix")) {M <- apply(M==1, 1, which, simplify = FALSE)}
   hp=M
   l_hp=length(hp)
-  
+
   #### Curveball Swaps ####
   #From here down, verbatim https://static-content.springer.com/esm/art%3A10.1038%2Fncomms5114/MediaObjects/41467_2014_BFncomms5114_MOESM898_ESM.txt
   for (rep in 1:trades){
@@ -189,7 +189,7 @@ curveball<-function(M, R = nrow(M), C = ncol(M), trades = 5*R){
       hp[[AB[1]]] = c(ab,tot[1:L])
       hp[[AB[2]]] = c(ab,tot[(L+1):l_tot])}
   }
-  
+
   #### Define and Return Random Matrix ####
   rm=matrix(0,R,C)
   for (row in 1:R){rm[row,hp[[row]]]=1}
@@ -211,8 +211,8 @@ curveball<-function(M, R = nrow(M), C = ncol(M), trades = 5*R){
 #' @details
 #' `fastball` is an optimized C++ implementation of the curveball algorithm (Strona et al.. 2014)
 #'    for generating random binary matrices with fixed row and column sums. For maximum efficiency,
-#'    the input should be oriented wide (more columns than rows) rather than long (more rows than columns). 
-#'    It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a 
+#'    the input should be oriented wide (more columns than rows) rather than long (more rows than columns).
+#'    It is also more efficient is the input is supplied not as a matrix but as an adjacency list. Given a
 #'    binary matrix `M`, it can be converted into an adjacency list using `apply(M==1, 1, which, simplify = FALSE)`.
 #'    When `M` is supplied as an indexed list, `R` and `C` must be specified.
 #'

@@ -2,7 +2,7 @@
 #'
 #' `osdsm` extracts the backbone of a bipartite projection using the Ordinal Stochastic Degree Sequence Model.
 #'
-#' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.
 #' @param trials integer: Number of random bipartite graphs generated
 #' @param alpha real: significance level of hypothesis test(s)

@@ -10,7 +10,7 @@
 
 #' Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
 #'
-#' @param graph A graph object of class "matrix", "sparseMatrix", \link{igraph}, matrix or dataframe edgelist, or \link[network]{network}
+#' @param graph A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}, \link[network]{network}.
 #'
 #' @return a list(summary, G)
 #'    `summary` is a dataframe containing characteristics of the supplied object
@@ -25,32 +25,30 @@ tomatrix <- function(graph){
   class <- class(graph)[1]
   isbipartite <- FALSE
 
-  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist, igraph, or network object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist dataframe, igraph, or network object.")}
 
-  #### Convert from matrix-like object ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | (methods::is(graph, "data.frame")))) {
-    if (dim(graph)[2] > 3) {  #If `graph` contains more than 3 columns, treat it as a matrix
-      G <- as.matrix(graph)  #Coerce to matrix
-      class(G) <- "numeric"  #Coerce to numeric
-      if (any(is.na(G))) {stop("The object contains non-numeric entries")}
+  #### Convert from matrix object ####
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
+    G <- as.matrix(graph)  #Coerce to matrix
+    class(G) <- "numeric"  #Coerce to numeric
+    if (any(is.na(G))) {stop("The object contains non-numeric entries")}
 
-      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
-      if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
-        if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
-            !isSymmetric(G)) {                                                    #it is not symmetric
-          isbipartite <- TRUE
+    if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
+    if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
+      if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
+          !isSymmetric(G)) {                                                    #it is not symmetric
+        isbipartite <- TRUE
         }
       }
     }
-  }
 
   #### Convert from edge list ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | methods::is(graph, "data.frame"))) {
-    if (dim(graph)[2] == 2 | dim(graph)[2] == 3) {  #If `graph` contains 2 or 3 columns, treat it as an edgelist
-      class <- "edgelist"  #Update starting class as edgelist
-      if ((methods::is(graph, "data.frame")) == FALSE) {G <- as.data.frame(as.matrix(graph))} else {G <- graph} #Coerce to dataframe if necessary
-      colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
-      isbipartite <- length(intersect(G[,1],G[,2])) == 0  #Treat as bipartite if there is no overlap in node lists A and B
+  if (methods::is(graph, "data.frame")) {
+    if (ncol(graph)==1 | ncol(graph)>3) {stop("An edgelist must contain 2 or 3 columns")}
+    class <- "edgelist"  #Update starting class as edgelist
+    G <- graph
+    colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
+    isbipartite <- length(intersect(G[,1],G[,2])) == 0  #Treat as bipartite if there is no overlap in node lists A and B
 
       if (isbipartite == TRUE) { #Bipartite
         G <- igraph::graph_from_data_frame(G, directed = F)
@@ -65,7 +63,6 @@ tomatrix <- function(graph){
         if (dim(graph)[2] == 3) {G <- igraph::as_adjacency_matrix(G, type = "both", attr = "C", sparse = FALSE)} #Weighted
       }
     }
-  }
 
   #### Convert from igraph ####
   if (methods::is(graph, "igraph")) {
