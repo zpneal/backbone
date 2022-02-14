@@ -6,7 +6,7 @@
 \usage{
 fdsm(
   B,
-  trials = 1000,
+  trials = NULL,
   method = "fastball",
   alpha = NULL,
   signed = FALSE,
@@ -20,7 +20,7 @@ fdsm(
 \item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
-\item{trials}{numeric: The number of bipartite graphs generated to approximate the edge weight distribution.}
+\item{trials}{numeric: The number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected to ensure p-values are computed with sufficient power given \code{alpha}.}
 
 \item{method}{string: The method used to generate random bipartite graphs, one of c("fastball", "curveball")}
 
