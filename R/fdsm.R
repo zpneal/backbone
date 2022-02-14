@@ -57,7 +57,7 @@
 #' plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
 #'                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 #'
-#' bb <- fdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An FDSM backbone...
+#' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
 fdsm <- function(B, trials = NULL, method = "fastball",
