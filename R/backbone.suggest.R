@@ -50,7 +50,8 @@ backbone.suggest <- function(G, s = NULL) {
 
   #### Unweighted unipartite ####
   if (summary$bipartite == FALSE & summary$weighted == FALSE) {
-    if (is.null(s)) {message("The L-Spar sparsification model is suggested. Type \"?sparsify.with.lspar\" for more information.")}
+    if (is.null(s)) {message("The L-Spar sparsification model is suggested for revealing subgroups. Type \"?sparsify.with.lspar\" for more information.")}
+    if (is.null(s)) {message("The Local Degree sparsification model is suggested for revealing hierarchy. Type \"?sparsify.with.localdegree\" for more information.")}
     if (!is.null(s)) {
       message(paste0("Extracting backbone using: sparsify.with.lspar(G, s = ", s, ", class = \"original\", narrative = TRUE)"))
       backbone <- sparsify.with.lspar(G, s = s, class = summary$class, narrative = TRUE)
