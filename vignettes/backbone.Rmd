@@ -43,11 +43,10 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     a. [Background](#unweight-background)
     b. [Extracting the backbone](#unweight-extract)
 5. [Utility functions](#utility)
-    a. [Estimate number of FDSM trials required](#trials)
-    b. [Backbone extraction from backbone objects](#extraction)
-    c. [Bipartite network genetation](#generation)
-    d. [Matrix randomization](#randomization)
-    e. [Bipartite Configuration Model (BiCM)](#bicm)
+    a. [Backbone extraction from backbone objects](#extraction)
+    b. [Bipartite network genetation](#generation)
+    c. [Matrix randomization](#randomization)
+    d. [Bipartite Configuration Model (BiCM)](#bicm)
 
 # Introduction {#introduction}
 
@@ -99,7 +98,7 @@ The functions in the backbone package support many different data formats that c
 
 * **matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite matrix can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object, a *sparse Matrix* object from the Matrix package, or a *dataframe* object.
 
-* **edgelist** - A network can be represented as an edgelist, which can be supplied to a backbone extraction function as a *matrix* object, a *sparse Matrix* object from the Matrix package, or a *dataframe* object. These objects should have two or three columns; the first two columns contain the IDs of the sending and receiving nodes, respectively, while the third column (optionally) contains the edge weights.
+* **edgelist** - A network can be represented as an edgelist, supplied as a *dataframe* object. The dataframe should have two or three columns; the first two columns contain the IDs of the sending and receiving nodes, respectively, while the third column (optionally) contains the edge weights.
 
 * **igraph** or **network** - A network can be supplied to a backbone extraction function as an *igraph* object from the igraph package, or as a *network* object from the statnet package.
 
@@ -260,20 +259,6 @@ plot(bb, vertex.size = igraph::degree(bb), vertex.label = NA)
 [back to Table of Contents](#toc)
 
 # Utility functions {#utility}
-## Estimate number of FDSM trials required [@neal2021comparing] {#trials}
-The fixed degree sequence model estimates edgewise p-values via Monte Carlo simulation. One challenge to using the FDSM is deciding how many Monte Carlo trials are necessary to obtain stable p-value estimated, but the `fdsm.trials()` function can provide some guidance. The estimates rely on formulas used for estimating sample size requirements when estimating a proportion [@fleiss2013statistical], and should be treated as a rough guide. 
-
-Given a bipartite network `B`, `fdsm.trial` will estimate the number of Monte Carlo trials necessary to obtain stable p-value estimates that can be used to extract the backbone from a projection of `B`. The function uses reasonable defaults for the alpha significance level and Type-I and Type-II error. In this example, we specify that we do not intend to perform a familywise error rate correction (`fwer = FALSE`),  and that the riskiest p-value we are concerned about is 75% of our alpha significance level (`riskyp = .75`). Under these assumptions, we should perform at least 2962 Monte Carlo trials when using FDSM (i.e. `fdsm(B, trials = 2962)`).
-```{r}
-B <- matrix(rbinom(100*1000,1,0.5),100,1000)
-fdsm.trials(B, riskyp = .75, fwer = FALSE)
-```
-
-Extracting a backbone requires evaluating the statistical significance of every edge in the network, which can lead to Type-I error inflation and false positives. Therefore, it is often desirable to perform a familywise error rate correction (this is available using the `fwer` parameter in most backbone extraction functions). However, doing so requires more precise p-values, which can require an impractically large number of Monte Carlo trials. For example, under the same assumptions as above, if we intend to perform a familywise error rate correction (`fwer = TRUE`), we would need to perform at least 15,318,477 Monte Carlo trials when using FDSM, which likely makes an FDSM backbone computationally infeasible.
-```{r}
-fdsm.trials(B, riskyp = .75, fwer = TRUE)
-```
-
 ## Backbone extraction from ensemble backbone objects {#extraction}
 If the `alpha` parameter is specified when using any of the bipartite projection (e.g., `sdsm()`) or weighted (e.g., `disparity()`) backbone functions, they return the backbone network. If the `alpha` parameter is not specified, these functions instead return an S3 backbone-class object that contains p-values for each edge. The `backbone.extract()` function can be applied to this object to extract backbones at different alpha significance levels.
 
