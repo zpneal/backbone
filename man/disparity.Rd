@@ -14,7 +14,7 @@ disparity(
 )
 }
 \arguments{
-\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 

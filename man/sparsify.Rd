@@ -16,7 +16,7 @@ sparsify(
 )
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
 
 \item{s}{numeric: Sparsification parameter}
 
