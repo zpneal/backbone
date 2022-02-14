@@ -273,7 +273,7 @@ B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
            cbind(matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.8),10)))
-bb.object <- fdsm(B)  #Backbone object containing edgewise p-values
+bb.object <- fdsm(B, trials = 1000)  #Backbone object containing edgewise p-values
 ```
 
 We can extract a backbone from this backbone object using a very liberal alpha significance level, which results in many edges being retained:
