@@ -4,7 +4,7 @@
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param trials numeric: The number of bipartite graphs generated to approximate the edge weight distribution.
+#' @param trials numeric: The number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected to ensure p-values are computed with sufficient power given `alpha`.
 #' @param method string: The method used to generate random bipartite graphs, one of c("fastball", "curveball")
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -60,13 +60,13 @@
 #' bb <- fdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, trials = 1000, method = "fastball",
+fdsm <- function(B, trials = NULL, method = "fastball",
                  alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE,
                  ...){
 
   #### Argument Checks ####
-  if (trials < 0) {stop("trials must be a positive integer")}
-  if ((trials > 1) & (trials%%1!=0)) {stop("trials must be decimal < 1, or a positive integer")}
+  if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
+  if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
 
   #### Class Conversion ####
   convert <- tomatrix(B)
@@ -81,6 +81,17 @@ fdsm <- function(B, trials = 1000, method = "fastball",
   #### Bipartite Projection ####
   P <- tcrossprod(B)
 
+  #### Compute number of trials needed ####
+  if (is.null(trials)) {
+    trials.alpha <- alpha
+    if (signed == TRUE) {trials.alpha <- trials.alpha / 2}  #Two-tailed test
+    if (fwer != "none") {  #Adjust trial.alpha using Bonferroni
+      if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
+      if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
+    }
+    trials <- ceiling((power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
+  }
+
   #### Prepare for randomization loop ####
   ### Create Positive and Negative Matrices to hold backbone ###
   rotate <- FALSE  #initialize
@@ -91,7 +102,7 @@ fdsm <- function(B, trials = 1000, method = "fastball",
     B <- t(B)
   }
   if (method == "fastball") {Bindex <- apply(B==1, 1, which)}  #If using fastball, create an indexed list of 1s
-  message("Constructing empirical edgewise p-values -")
+  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
   pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
 
   #### Build Null Models ####
@@ -233,69 +244,4 @@ fastball <- function(M, R = nrow(M), C = ncol(M), trades = 5*R) {
   force(C)
   if (methods::is(M, "matrix")) {M <- apply(M==1, 1, which, simplify = FALSE)}  #If a matrix is provided, convert to an indexed list
   return(fastball_cpp(M, c(R,C), trades))  #Run fastball C++
-}
-
-#' Estimate number of Monte Carlo trials needed for FDSM backbone
-#'
-#' `fdsm.trials` estimates the number of Monte Carlo trials needed to extract an FDSM backbone, correcting for
-#'    familywise error rate, and given tolerance for Type-I and Type-II errors
-#'
-#' @param B graph: An unweighted bipartite graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
-#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param type1 numeric: Type-I error used in sample size calculation
-#' @param type2 numeric: Type-II error used in sample size calculation
-#' @param alpha numeric: Desired Type-I error for tests of edge significance
-#' @param fwer boolean: If TRUE, `alpha` is interpreted as the desired familywise error rate.
-#'    If FALSE, `alpha` is interpreted as the desired testwise error rate.
-#' @param signed boolean: TRUE to estimate the number of trials needed to extract a signed backbone, FALSE to estimate
-#'    the number of trials needed to extract a binary backbone
-#' @param riskyp numeric: Expected riskiest edge p-value, as a proportion of `alpha` (see details)
-#'
-#' @details
-#' This function uses sample size estimation equations 2.22 and 2.24 given by Fleiss et al. (2013).
-#'
-#' If `fwer = TRUE`, it assumes that a conservative Bonferroni correction will be used to maintain
-#' the familywise error rate across the independent hypothesis tests required for every edge in
-#' the bipartite projection of `B`.
-#'
-#' The required number of trials depends in part on the difference between an edge's estimated p-value and the
-#' desired level of statistical significance. If an edge is deemed statistically significant when its p-value is
-#' less than 0.05, then there is little risk in making a decision about an edge with an estimated p-value of 0,
-#' and fewer trials are required. In contrast, if the edge's estimated p-value is 0.049, there is more risk of
-#' making an error and more trials are required. The `riskyp` parameter specifies how close to `alpha` the riskiest
-#' expected edge p-value, as a proportion of `alpha`. For example, if `alpha = 0.05` and `riskyp = 0.75`, then
-#' the expected riskiest p-value is 0.0375.
-#'
-#' @references
-#' {Fleiss, J. L., Levin, B., & Paik, M. C. (2013). Statistical methods for rates and proportions. John Wiley & Sons.}
-#'
-#' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
-#'
-#' @return integer: estimated minimum number of Monte Carlo trials
-#'
-#' @export
-#'
-#' @examples
-#' B <- matrix(rbinom(100*1000,1,0.5),100,1000)
-#' fdsm.trials(B, riskyp = .75)
-fdsm.trials <- function(B, type1 = 0.05, type2 = 0.05, alpha = 0.05, fwer = TRUE, signed = FALSE, riskyp = 0) {
-  B <- suppressMessages(tomatrix(B))
-  if (B$summary$bipartite == TRUE & B$summary$weighted == FALSE) {B <- B$G} else {stop("B must be a binary bipartite network")}
-
-  if (signed) {  #For a signed backbone...
-    tests <- (nrow(B) * (nrow(B) - 1)) / 2  #...every dyad requires an independent test
-    p0 <- alpha / 2  #...a two-tailed test is used
-    }
-  if (!signed) {  #For a binary backbone...
-    P <- tcrossprod(B)
-    diag(P) <- 0
-    tests <- sum((P!=0)*1)/2  #...only dyads with non-zero edge weight are tested
-    p0 <- alpha  #...a one-tailed test is used
-  }
-
-  if (fwer) {p0 <- p0 / tests} #Bonferroni corrected per-test significance threshold
-  p1 <- p0 * riskyp
-  n_prime <- ceiling((((stats::qnorm(type1) * sqrt(p0*(1-p0))) + (stats::qnorm(type2) * sqrt(p1*(1-p1))))/(p0 - p1))^2)  #Equation 2.22
-  n <- n_prime + (1/(abs(p1 - p0)))  #Equation 2.24
-  return(n)
 }
