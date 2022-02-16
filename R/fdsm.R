@@ -17,8 +17,7 @@
 #' The `fdsm` function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 #'    expected in a projection obtained from a random bipartite network where both the row vertex degrees and column
 #'    vertex degrees are *exactly* fixed at their values in `B`. It uses the [fastball()] algorithm to generate random
-#'    bipartite matrices with give row and column vertex degrees. The [fdsm.trials()] function can be used to estimate
-#'    the number of random bipartite matrices that must be generated to obtain stable edge *p*-values.
+#'    bipartite matrices with give row and column vertex degrees.
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 #'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
@@ -58,7 +57,7 @@
 #' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, trials = NULL, method = "fastball",
+fdsm <- function(B, trials = NULL,
                  alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE,
                  ...){
 
@@ -87,7 +86,7 @@ fdsm <- function(B, trials = NULL, method = "fastball",
       if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
       if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
     }
-    trials <- ceiling((power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
+    trials <- ceiling((stats::power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
   }
 
   #### Prepare for randomization loop ####
@@ -99,7 +98,7 @@ fdsm <- function(B, trials = NULL, method = "fastball",
     rotate <- TRUE
     B <- t(B)
   }
-  Blist <- apply(B==1, 1, which)  #Convert B to an adjacency list
+  L <- apply(B==1, 1, which)  #Convert B to an adjacency list
   message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
   pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
 
@@ -107,7 +106,9 @@ fdsm <- function(B, trials = NULL, method = "fastball",
   for (i in 1:trials){
 
     ### Generate an FDSM Bstar ###
-    Bstar <- fastball(Blist, nrow(B), ncol(B))
+    Lstar <- fastball(L)
+    Bstar <- matrix(0,nrow(B),ncol(B))
+    for (row in 1:nrow(Bstar)) {Bstar[row,Lstar[[row]]] <- 1L}
     if (rotate) {Bstar <- t(Bstar)}  #If B got rotated from long to wide for randomization, rotate Bstar back from wide to long
 
     ### Construct Pstar from Bstar ###
