@@ -2,9 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
-## backbone 2.0.0
+## backbone 2.0.1
 
 * minor bug fixes
+* faster implementation of `fastball()` algorithm
 
 
 ## backbone 2.0.0
