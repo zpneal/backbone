@@ -7,7 +7,6 @@
 fdsm(
   B,
   trials = NULL,
-  method = "fastball",
   alpha = NULL,
   signed = FALSE,
   fwer = "none",
@@ -50,8 +49,7 @@ are ignored.
 The \code{fdsm} function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 expected in a projection obtained from a random bipartite network where both the row vertex degrees and column
 vertex degrees are \emph{exactly} fixed at their values in \code{B}. It uses the \code{\link[=fastball]{fastball()}} algorithm to generate random
-bipartite matrices with give row and column vertex degrees. The \code{\link[=fdsm.trials]{fdsm.trials()}} function can be used to estimate
-the number of random bipartite matrices that must be generated to obtain stable edge \emph{p}-values.
+bipartite matrices with give row and column vertex degrees.
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
