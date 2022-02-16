@@ -22,8 +22,6 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{trials}{numeric: The number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected to ensure p-values are computed with sufficient power given \code{alpha}.}
 
-\item{method}{string: The method used to generate random bipartite graphs, one of c("fastball", "curveball")}
-
 \item{alpha}{real: significance level of hypothesis test(s)}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
@@ -84,5 +82,5 @@ plot(bb) #...is sparse with clear communities
 \references{
 fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 
-curveball: {Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals. \emph{Nature Communications, 5}, 4114. \doi{10.1038/ncomms5114}}
+fastball: {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{\emph{arXiv:2112.04017}}}#'
 }
