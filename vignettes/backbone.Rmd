@@ -44,9 +44,8 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     b. [Extracting the backbone](#unweight-extract)
 5. [Utility functions](#utility)
     a. [Backbone extraction from backbone objects](#extraction)
-    b. [Bipartite network genetation](#generation)
-    c. [Matrix randomization](#randomization)
-    d. [Bipartite Configuration Model (BiCM)](#bicm)
+    b. [Matrix randomization](#randomization)
+    c. [Bipartite Configuration Model (BiCM)](#bicm)
 
 # Introduction {#introduction}
 
@@ -286,34 +285,6 @@ Then we can extract another backbone, using a more conservative alpha significan
 ```{r}
 bb2 <- backbone.extract(bb.object, alpha = 0.05, class = "igraph")  #Backbone extracted at alpha = 0.05
 plot(bb2)
-```
-
-## Bipartite generation {#generation}
-The backbone package includes several functions designed to generate random bipartite networks. The simplest, `bipartite.from.probability()`, generates a bipartite network containing a given number of agents/rows (`R`) and a given number of artifacts/columns (`C`), where agents and connected to artifacts with a given probability (`P`), and no agent or artifact is either an isolate or maximally connected:
-```{r}
-B <- bipartite.from.probability(R = 5, C = 10, P = .5)
-B
-```
-
-The `bipartite.from.sequence()` function generates a random bipartite network with given row (`R`) and column (`C`) degree sequences:
-```{r}
-B <- bipartite.from.sequence(R = c(1,1,2), C = c(1,1,2))
-B
-```
-
-The `bipartite.from.distribution()` function generates a random bipartite network with a given number of rows (`R`), columns (`C`), and probability of an edge (`P`), where the row degrees (`rowdist`) and column degrees (`coldist`) approximately follow given beta distributions. For example, a beta distribution with an alpha paramater of 1 and beta parameter of 10 is right-tailed, so `rowdist = c(1,10)` and `coldist = c(1,10)` will yield a bipartite network with right-tailed agent and artifact degree distributions:
-```{r}
-par(mfrow=c(1,2), pty="s", mar=c(1,1,1,1))
-B <- bipartite.from.distribution(R = 100, C = 100, P = 0.1, rowdist = c(1,10), coldist = c(1,10))
-hist(rowSums(B), main = "Agent Deg.", xlab = "", yaxt='n')
-hist(colSums(B), main = "Artifact Deg.", xlab = "", yaxt='n')
-```
-
-Finally, the `bipartite.add.blocks()` function attempts to add a block structure to a random bipartite network, such that it contains `blocks` blocks and `density` proportion of edges are within-block, while preserving the degree distributions. For example, given a random bipartite network `B`, we can shuffle the edges such that 75% connect a type-A agent to a type-A artifact (i.e., the A block), or a type-B agent to a type-B artifact (i.e. the B-block):
-```{r}
-B <- bipartite.from.probability(R = 10, C = 10, P = .4)
-B <- bipartite.add.blocks(B, blocks = 2, density = .75)
-B  #Contains blocks
 ```
 
 ## Matrix randomization {#randomization}
