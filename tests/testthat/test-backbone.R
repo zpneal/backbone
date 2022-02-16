@@ -6,29 +6,18 @@ test_that("BiCM", {
   expect_equal(test, rbind(c(.216,.216,.568),c(.216,.216,.568),c(.568,.568,.863)))
 })
 
-test_that("Estimated number of FDSM trials", {
-  M <- matrix(rbinom(100*1000,1,0.5),100,1000)
-  test <- fdsm.trials(M, riskyp = .75)
-  expect_equal(test, 15318477)
-})
-
-test_that("Curveball", {
-  M <- matrix(rbinom(100*1000,1,0.5),100,1000)
-  test <- curveball(M)
-  expect_equal(rowSums(test), rowSums(M))
-  expect_equal(colSums(test), colSums(M))
-})
-
 test_that("Fastball", {
   M <- matrix(rbinom(100*1000,1,0.5),100,1000)
   test <- fastball(M)
   expect_equal(rowSums(test), rowSums(M))
   expect_equal(colSums(test), colSums(M))
 
-  Mlist <- apply(M==1, 1, which)
-  test <- fastball(Mlist, 100, 1000)
-  expect_equal(rowSums(test), rowSums(M))
-  expect_equal(colSums(test), colSums(M))
+  L <- apply(M==1, 1, which, simplify = FALSE)
+  Lrand <- fastball(L)
+  Mrand <- matrix(0,nrow(M),ncol(M))
+  for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}
+  expect_equal(rowSums(Mrand), rowSums(M))
+  expect_equal(colSums(Mrand), colSums(M))
 })
 
 test_that("SDSM output", {
@@ -43,7 +32,7 @@ test_that("SDSM output", {
 test_that("FDSM output", {
   set.seed(1)
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-  test <- fdsm(M)
+  test <- fdsm(M, trials = 1000)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)))
   expect_equal(round(test$Plower,3), rbind(c(1,.510,1),c(.51,1,.755),c(1,.755,1)))
