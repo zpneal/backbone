@@ -19,7 +19,7 @@ fdsm(
 \item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
-\item{trials}{numeric: The number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected to ensure p-values are computed with sufficient power given \code{alpha}.}
+\item{trials}{numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on \code{alpha} (see details)}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -57,6 +57,15 @@ model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or w
 It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
 negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
 \emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
+
+The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
+\code{trials} performed affects the precision of these p-values, and the confidence that a given p-value is less than the
+desired \code{alpha} level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
+in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
+comparing a proportion (the p-value) to a known proportion (alpha). When \code{trials = NULL}, the \code{power.prop.test} function
+is used to estimate the required number of trials to make such a comparison with a \code{alpha} type-I error rate, (1-\code{alpha}) power,
+and when the riskiest p-value being evaluated is at least 5\% smaller than \code{alpha}. When any \code{fwer} correction is applied,
+for simplicity this estimation is based on a conservative Bonferroni correction.
 }
 \examples{
 #A binary bipartite network of 30 agents & 75 artifacts; agents form three communities
