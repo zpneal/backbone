@@ -277,31 +277,21 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "no
 #'
 #' `fastball` randomizes a binary matrix, preserving the row and column sums
 #'
-#' @param M matrix or list: a representation of a binary matrix (see details)
+#' @param M matrix: a binary matrix (see details)
 #' @param trades integer: number of trades; the default is 5R trades (approx. mixing time)
 #'
 #' @return
-#' matrix or list: A random binary matrix with same row sums and column sums as M.
+#' matrix: A random binary matrix with same row sums and column sums as M.
 #'
 #' @details
-#' Given a matrix `M`, `fastball` randomly samples a new matrix from the space of all matrices with the same row
-#'    and column sums as `M`. `M` can be supplied as a matrix or adjacency list, and the result is returned in the
-#'    same form. The matrix approach is easy, however the list approach can be more efficient when multiple samples
-#'    are drawn in a loop because `M` only needs to be converted to an adjacency list once outside the loop.
+#' Given a matrix `M`, `fastball` randomly samples a new matrix from the space of all matrices with the same row and column sums as `M`.
 #'
 #' @references {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{*arXiv:2112.04017*}}
 #'
 #' @export
 #' @examples
-#' #The easy way
 #' M <- matrix(rbinom(200,1,0.5),10,20)  #A random 10x20 binary matrix
 #' Mrand <- fastball(M)  #Random matrix with same row and column sums
-#'
-#' #The efficient way
-#' L <- apply(M==1, 1, which, simplify = FALSE)  #Convert M to adjacency list L
-#' Lrand <- fastball(L)  #Sample random adjacency list
-#' Mrand <- matrix(0,nrow(M),ncol(M))  #Set up empty matrix
-#' for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}  #Convert random adjacency list to matrix
 fastball <- function(M, trades = 5 * nrow(M)) {
   if (methods::is(M, "matrix")) {
     L <- apply(M==1, 1, which, simplify = FALSE)
