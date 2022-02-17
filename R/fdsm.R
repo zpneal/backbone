@@ -4,7 +4,7 @@
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param trials numeric: The number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected to ensure p-values are computed with sufficient power given `alpha`.
+#' @param trials numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
@@ -25,6 +25,15 @@
 #'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
 #'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
 #'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
+#'
+#' The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
+#'    `trials` performed affects the precision of these p-values, and the confidence that a given p-value is less than the
+#'    desired `alpha` level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
+#'    in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
+#'    comparing a proportion (the p-value) to a known proportion (alpha). When `trials = NULL`, the `power.prop.test` function
+#'    is used to estimate the required number of trials to make such a comparison with a `alpha` type-I error rate, (1-`alpha`) power,
+#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `fwer` correction is applied,
+#'    for simplicity this estimation is based on a conservative Bonferroni correction.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -99,10 +108,10 @@ fdsm <- function(B, trials = NULL,
     B <- t(B)
   }
   L <- apply(B==1, 1, which)  #Convert B to an adjacency list
-  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
-  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
 
   #### Build Null Models ####
+  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
+  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
   for (i in 1:trials){
 
     ### Generate an FDSM Bstar ###

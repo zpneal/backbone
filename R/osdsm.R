@@ -4,7 +4,7 @@
 #'
 #' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.
-#' @param trials integer: Number of random bipartite graphs generated
+#' @param trials integer: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
@@ -24,6 +24,15 @@
 #'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
 #'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
 #'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
+#'
+#' The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
+#'    `trials` performed affects the precision of these p-values, and the confidence that a given p-value is less than the
+#'    desired `alpha` level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
+#'    in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
+#'    comparing a proportion (the p-value) to a known proportion (alpha). When `trials = NULL`, the `power.prop.test` function
+#'    is used to estimate the required number of trials to make such a comparison with a `alpha` type-I error rate, (1-`alpha`) power,
+#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `fwer` correction is applied,
+#'    for simplicity this estimation is based on a conservative Bonferroni correction.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -51,7 +60,7 @@
 #' bb <- osdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An oSDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-osdsm <- function(B, trials = 1000,
+osdsm <- function(B, trials = NULL,
                   alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
 
   #### Class Conversion and Argument Checks ####
@@ -64,10 +73,22 @@ osdsm <- function(B, trials = 1000,
     convert$summary$bipartite <- TRUE
   }
   if (any(B!=as.integer(B)) | any(B < 0)) {stop("Edge weights must be positive integers.")}
-  if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
+  if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
+  if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
+
+  #### Compute number of trials needed ####
+  if (is.null(trials)) {
+    trials.alpha <- alpha
+    if (signed == TRUE) {trials.alpha <- trials.alpha / 2}  #Two-tailed test
+    if (fwer != "none") {  #Adjust trial.alpha using Bonferroni
+      if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
+      if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
+    }
+    trials <- ceiling((stats::power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
+  }
 
   ### Create Positive and Negative Matrices to hold backbone ###
   Pupper <- matrix(0, nrow(P), ncol(P))
@@ -98,6 +119,8 @@ osdsm <- function(B, trials = 1000,
   }
 
   #### Build null models ####
+  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
+  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
   for (i in 1:trials){
 
     #Start estimation timer; print message
@@ -107,7 +130,7 @@ osdsm <- function(B, trials = 1000,
     }
 
     #Use probabilities to create an SDSM Bstar
-    Bstar <- stats::runif(nrow(probs))                         #Random number
+    Bstar <- stats::runif(nrow(probs))                  #Random number
     Bstar <- rowSums((Bstar > probs)*1)                 #Compare to probabilities
     Bstar <- matrix(Bstar, nrow=nrow(B), ncol=ncol(B))  #Convert to matrix
 
@@ -116,14 +139,11 @@ osdsm <- function(B, trials = 1000,
     Pupper <- Pupper + (Pstar > P)+0
     Plower <- Plower + (Pstar < P)+0
 
-    #Report estimated running time
-    if (i == 10) {
-      end.time <- Sys.time()
-      est <- (round(difftime(end.time, start.time), 2) * (trials/10))
-      message("Estimated time to complete is ", est," ", units(est))
-    } #end timer estimate
+    ### Increment progress bar ###
+    utils::setTxtProgressBar(pb, i)
 
   } #end for loop
+  close(pb) #End progress bar
 
   #### Create Backbone Object ####
   Pupper <- (Pupper/trials)
