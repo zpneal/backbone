@@ -33,12 +33,12 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     c. [Package overview](#overview)
     d. [The narrative parameter](#narrative)
     e. [Supported data formats](#formats)
-2. [Weighted bipartite projection networks](#projection)
-    a. [Background](#proj-background)
-    b. [Extracting the backbone](#proj-extract)
-3. [Non-projection weighted networks](#weighted)
+2. [Weighted networks](#weighted)
     a. [Background](#weight-background)
     b. [Extracting the backbone](#weight-extract)
+3. [Weighted bipartite projection networks](#projection)
+    a. [Background](#proj-background)
+    b. [Extracting the backbone](#proj-extract)
 4. [Unweighted networks](#unweighted)
     a. [Background](#unweight-background)
     b. [Extracting the backbone](#unweight-extract)
@@ -103,6 +103,53 @@ The functions in the backbone package support many different data formats that c
 
 [back to Table of Contents](#toc)
 
+# Weighted networks {#weighted}
+## Background {#weight-background}
+A weighted unipartite network contains one type of node, and pairs of nodes are connected by edges that have weights. These weights usually indicate the intensity of the relationship between them (e.g., strength, intensity, etc.). A weighted unipartite network can be represented by a matrix **W**, where W~ij~ indicates the weight of the edge between node *i* and node *j*. Weighted networks can be undirected (i.e., W~ij~ = W~ji~) or directed (i.e., W~ij~ != W~ji~).
+
+The goal of backbone extraction from a weighted network is to identify edges in **W** whose weights are statistically significantly strong (or weak, for signed backbones), and thus should be preserved in the backbone. One simple possibility is to apply a global threshold *T*, such that all edges with weights stronger than *T* are preserved, however this approach tends to systematically overlook nodes with low degree. Alternative approaches, such as the disparity filter [@serrano2009extracting], involve comparing edge weights to their expected values under a null model that considers each node's local neighborhood.
+
+## Extracting the backbone {#weight-extract}
+To illustrate extracting the backbone from a weighted network, we begin by creating a simulated weighted network, stored in a matrix `W`. This network has strongly heterogeneous edge weights; some are quite weak (10) while others are quite strong (100), which gives the network a multi-scalar character. This network might represent the number of passengers flying between each of 10 airports, where there are two hub airports (one large, one small) that each serve their local areas.
+```{r}
+W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
+              10,0,1,1,1,0,0,0,0,0,
+              10,1,0,1,1,0,0,0,0,0,
+              10,1,1,0,1,0,0,0,0,0,
+              10,1,1,1,0,0,0,0,0,0,
+              75,0,0,0,0,0,100,100,100,100,
+              0,0,0,0,0,100,0,10,10,10,
+              0,0,0,0,0,100,10,0,10,10,
+              0,0,0,0,0,100,10,10,0,10,
+              0,0,0,0,0,100,10,10,10,0),10)
+```
+
+We could simply examine this network as a weighted network, however this yields a cluttered visualization, and many network analytic techniques (e.g., ERGM, SOAM) are not possible with weighted networks:
+```{r}
+weighted <- igraph::graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE, diag = FALSE)
+plot(weighted, edge.width = sqrt(igraph::E(weighted)$weight), vertex.label = NA)
+```
+
+We could extract a backbone by applying a global threshold using the `global()` function. One possibility is to extract a backbone that preserves all edges with weights greater than 0. However, this yields a network that is very dense because all edges are preserved:
+```{r}
+bb <- global(W, upper = 0, class = "igraph")
+plot(bb, vertex.label = NA)
+```
+
+Instead, we could choose the threshold value based on the edge weights. For example, we could extract a backbone by using the average edge weight as the global threshold, thus obtaining a backbone that preserves stronger-than-average edges. However, this yields a network that is focused only on high-degree nodes (i.e., the large hub airport), while ignoring the low-degree nodes (i.e., the smaller hub airport):
+```{r}
+bb <- global(W, upper = function(x)mean(x), class = "igraph")
+plot(bb, vertex.label = NA)
+```
+
+A better option is to extract the backbone using a statistical null model, such as the disparity filter (currently, the only available model). Now we can clearly see the hub-and-spoke structure of the transportation system:
+```{r}
+bb <- disparity(W, alpha = 0.05, narrative = TRUE, class = "igraph")
+plot(bb, vertex.label = NA)
+```
+
+[back to Table of Contents](#toc)
+
 # Weighted bipartite projection networks {#projection}
 ## Background [@neal2014backbone] {#proj-background}
 A bipartite network contains two types of nodes, which we call *agents* and *artifacts*, and edges that exist only between nodes of different types (i.e., an edge may connect an agent to an artifact, but never an agent to another agent). A bipartite network can be represented by a matrix **B**, where B~ik~ = 1 if agent *i* is connected to artifact *k*, and otherwise is 0 (e.g., author *i* wrote paper *k*). The row sums of **B** indicate agent degrees (e.g., the number of papers written by author *i*), while the column sums of **B** indicate artifact degrees (e.g., the number of authors on paper *k*).
@@ -160,53 +207,6 @@ bb <- sdsm(B, alpha = 0.075, narrative = TRUE, class = "igraph")
 
 Notice that this function is performed on the original bipartite network `B`, not on the bipartite projection `P`. We use `alpha = 0.075` to indicate that edges should be preserved at the 0.075 level of statistical significance; we use an unusually large value in this example only because it is a small toy network. We use `narrative = TRUE` to request that suggested manuscript text and citations be displayed. Finally, we use `class = "igraph"` to request that the resulting backbone be returned as an `igraph` class object, to facilitate further analysis. When we plot the backbone, the three communities are now clearly visible:
 ```{r}
-plot(bb, vertex.label = NA)
-```
-
-[back to Table of Contents](#toc)
-
-# Non-projection weighted networks {#weighted}
-## Background {#weight-background}
-A weighted unipartite network contains one type of node, and pairs of nodes are connected by edges that have weights. These weights usually indicate the intensity of the relationship between them (e.g., strength, intensity, etc.). A weighted unipartite network can be represented by a matrix **W**, where W~ij~ indicates the weight of the edge between node *i* and node *j*. Weighted networks can be undirected (i.e., W~ij~ = W~ji~) or directed (i.e., W~ij~ != W~ji~).
-
-The goal of backbone extraction from a weighted network is to identify edges in **W** whose weights are statistically significantly strong (or weak, for signed backbones), and thus should be preserved in the backbone. One simple possibility is to apply a global threshold *T*, such that all edges with weights stronger than *T* are preserved, however this approach tends to systematically overlook nodes with low degree. Alternative approaches, such as the disparity filter [@serrano2009extracting], involve comparing edge weights to their expected values under a null model that considers each node's local neighborhood.
-
-## Extracting the backbone {#weight-extract}
-To illustrate extracting the backbone from a weighted network, we begin by creating a simulated weighted network, stored in a matrix `W`. This network has strongly heterogeneous edge weights; some are quite weak (10) while others are quite strong (100), which gives the network a multi-scalar character. This network might represent the number of passengers flying between each of 10 airports, where there are two hub airports (one large, one small) that each serve their local areas.
-```{r}
-W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
-              10,0,1,1,1,0,0,0,0,0,
-              10,1,0,1,1,0,0,0,0,0,
-              10,1,1,0,1,0,0,0,0,0,
-              10,1,1,1,0,0,0,0,0,0,
-              75,0,0,0,0,0,100,100,100,100,
-              0,0,0,0,0,100,0,10,10,10,
-              0,0,0,0,0,100,10,0,10,10,
-              0,0,0,0,0,100,10,10,0,10,
-              0,0,0,0,0,100,10,10,10,0),10)
-```
-
-We could simply examine this network as a weighted network, however this yields a cluttered visualization, and many network analytic techniques (e.g., ERGM, SOAM) are not possible with weighted networks:
-```{r}
-weighted <- igraph::graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE, diag = FALSE)
-plot(weighted, edge.width = sqrt(igraph::E(weighted)$weight), vertex.label = NA)
-```
-
-We could extract a backbone by applying a global threshold using the `global()` function. One possibility is to extract a backbone that preserves all edges with weights greater than 0. However, this yields a network that is very dense because all edges are preserved:
-```{r}
-bb <- global(W, upper = 0, class = "igraph")
-plot(bb, vertex.label = NA)
-```
-
-Instead, we could choose the threshold value based on the edge weights. For example, we could extract a backbone by using the average edge weight as the global threshold, thus obtaining a backbone that preserves stronger-than-average edges. However, this yields a network that is focused only on high-degree nodes (i.e., the large hub airport), while ignoring the low-degree nodes (i.e., the smaller hub airport):
-```{r}
-bb <- global(W, upper = function(x)mean(x), class = "igraph")
-plot(bb, vertex.label = NA)
-```
-
-A better option is to extract the backbone using a statistical null model, such as the disparity filter (currently, the only available model). Now we can clearly see the hub-and-spoke structure of the transportation system:
-```{r}
-bb <- disparity(W, alpha = 0.05, narrative = TRUE, class = "igraph")
 plot(bb, vertex.label = NA)
 ```
 
