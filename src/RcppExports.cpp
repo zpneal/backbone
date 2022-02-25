@@ -11,21 +11,20 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // fastball_cpp
-Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, int numSwaps);
-RcppExport SEXP _backbone_fastball_cpp(SEXP inputListSEXP, SEXP dimSEXP, SEXP numSwapsSEXP) {
+Rcpp::List fastball_cpp(Rcpp::List inputList, int numSwaps);
+RcppExport SEXP _backbone_fastball_cpp(SEXP inputListSEXP, SEXP numSwapsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type inputList(inputListSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type dim(dimSEXP);
     Rcpp::traits::input_parameter< int >::type numSwaps(numSwapsSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastball_cpp(inputList, dim, numSwaps));
+    rcpp_result_gen = Rcpp::wrap(fastball_cpp(inputList, numSwaps));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_backbone_fastball_cpp", (DL_FUNC) &_backbone_fastball_cpp, 3},
+    {"_backbone_fastball_cpp", (DL_FUNC) &_backbone_fastball_cpp, 2},
     {NULL, NULL, 0}
 };
 
