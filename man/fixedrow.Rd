@@ -6,7 +6,7 @@
 \usage{
 fixedrow(
   B,
-  alpha = NULL,
+  alpha = 0.05,
   signed = FALSE,
   fwer = "none",
   class = "original",

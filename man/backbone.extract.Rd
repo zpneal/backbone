@@ -53,6 +53,6 @@ B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
                  matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.8),10)))
 
-backbone.object <- fixedrow(B)
+backbone.object <- fixedrow(B, alpha = NULL)
 bb <- backbone.extract(backbone.object, alpha = 0.05)
 }

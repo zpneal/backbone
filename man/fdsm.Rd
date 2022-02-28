@@ -6,8 +6,8 @@
 \usage{
 fdsm(
   B,
+  alpha = 0.05,
   trials = NULL,
-  alpha = NULL,
   signed = FALSE,
   fwer = "none",
   class = "original",
@@ -19,9 +19,9 @@ fdsm(
 \item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
-\item{trials}{numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on \code{alpha} (see details)}
-
 \item{alpha}{real: significance level of hypothesis test(s)}
+
+\item{trials}{numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on \code{alpha} (see details)}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 

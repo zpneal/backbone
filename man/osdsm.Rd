@@ -6,8 +6,8 @@
 \usage{
 osdsm(
   B,
+  alpha = 0.05,
   trials = NULL,
-  alpha = NULL,
   signed = FALSE,
   fwer = "none",
   class = "original",
@@ -18,9 +18,9 @@ osdsm(
 \item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.}
 
-\item{trials}{integer: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on \code{alpha} (see details)}
-
 \item{alpha}{real: significance level of hypothesis test(s)}
+
+\item{trials}{integer: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on \code{alpha} (see details)}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
