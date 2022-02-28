@@ -60,20 +60,10 @@
 #' bb <- sdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An SDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-sdsm <- function(B, method = "RefinedNormal",
-                 alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE,
-                 ...){
+sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, fwer = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
-  args <- match.call()
-  exist <- ("model" %in% names(args))
-  if (exist == TRUE){
-    message("This model is deprecated. SDSM now uses the 'bicm' model.
-             To run an older model, you must install a previous version of backbone.
-             This can be done by using:
-            ''require(devtools)'' and
-            ''install_version(''backbone'', version = '1.2.2')")
-  }
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Class Conversion ####
   convert <- tomatrix(B)

@@ -60,8 +60,7 @@
 #' bb <- osdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An oSDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-osdsm <- function(B, trials = NULL,
-                  alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
 
   #### Class Conversion and Argument Checks ####
   convert <- tomatrix(B)
@@ -75,6 +74,7 @@ osdsm <- function(B, trials = NULL,
   if (any(B!=as.integer(B)) | any(B < 0)) {stop("Edge weights must be positive integers.")}
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
   if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)

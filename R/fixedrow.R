@@ -53,7 +53,10 @@
 #' bb <- fixedrow(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedrow backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fixedrow <- function(B, alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+fixedrow <- function(B, alpha = 0.05, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+
+  #### Argument Checks ####
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Class Conversion ####
   convert <- tomatrix(B)
@@ -117,7 +120,7 @@ fixedrow <- function(B, alpha = NULL, signed = FALSE, fwer = "none", class = "or
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned.
 #' @export
-hyperg <- function(B, alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+hyperg <- function(B, alpha = 0.05, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
   warning("The hyperg() function is now called fixedrow(); please use fixedrow() instead.")
   fixedrow(B, alpha = alpha, signed = signed, fwer = fwer, class = class, narrative = narrative)
 }

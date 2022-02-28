@@ -54,7 +54,10 @@
 #' bb <- fixedfill(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedfill backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fixedfill <- function(B, alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+fixedfill <- function(B, alpha = 0.05, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+
+  #### Argument Checks ####
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Class Conversion ####
   convert <- tomatrix(B)

@@ -66,13 +66,12 @@
 #' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, trials = NULL,
-                 alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE,
-                 ...){
+fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
   if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Class Conversion ####
   convert <- tomatrix(B)

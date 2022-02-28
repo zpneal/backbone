@@ -57,7 +57,10 @@
 #'
 #' bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
 #' plot(bb) #...preserves edges at multiple scales
-disparity <- function(W, alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+disparity <- function(W, alpha = 0.05, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+
+  #### Argument Checks ####
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Class Conversion ####
   convert <- tomatrix(W)
