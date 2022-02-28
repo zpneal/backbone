@@ -22,7 +22,7 @@ test_that("Fastball", {
 
 test_that("SDSM output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-  test <- sdsm(M)
+  test <- sdsm(M, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(.432,1,.549),c(1,.304,1),c(.549,1,.329)))
   expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)))
@@ -32,7 +32,7 @@ test_that("SDSM output", {
 test_that("FDSM output", {
   set.seed(1)
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-  test <- fdsm(M, trials = 1000)
+  test <- fdsm(M, trials = 1000, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)))
   expect_equal(round(test$Plower,3), rbind(c(1,.510,1),c(.51,1,.755),c(1,.755,1)))
@@ -41,7 +41,7 @@ test_that("FDSM output", {
 
 test_that("FixedFill output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-  test <- fixedfill(M)
+  test <- fixedfill(M, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(.004,1,.173),c(1,.732,1),c(.173,1,.173)))
   expect_equal(round(test$Plower,3), rbind(c(1,.268,.996),c(.268,.827,.268),c(.996,.268,.996)))
@@ -50,7 +50,7 @@ test_that("FixedFill output", {
 
 test_that("FixedRow output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-  test <- fixedrow(M)
+  test <- fixedrow(M, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)))
   expect_equal(round(test$Plower,3), rbind(c(1,.25,1),c(.25,1,.5),c(1,.5,1)))
@@ -59,7 +59,7 @@ test_that("FixedRow output", {
 
 test_that("FixedColumn output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-  test <- fixedcol(M)
+  test <- fixedcol(M, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(0,1,.111),c(1,.556,1),c(.111,1,.111)))
   expect_equal(round(test$Plower,3), rbind(c(1,.444,1),c(.444,.889,.444),c(1,.444,1)))
@@ -68,7 +68,7 @@ test_that("FixedColumn output", {
 
 test_that("Disparity Filter output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1),c(1,1,0,1))
-  test <- disparity(M)
+  test <- disparity(M, alpha = NULL)
   expect_equal(test$G, M)  #Weighted projection
   expect_equal(round(test$Pupper,3), rbind(c(.444,1,.444,.444),c(1,.5,1,1),c(.444,1,1,.444),c(.444,.444,1,.444)))
   expect_equal(round(test$Plower,3), rbind(c(.556,1,.556,.556),c(1,.5,1,1),c(.556,1,1,.556),c(.556,.556,1,.556)))
