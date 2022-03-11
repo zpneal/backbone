@@ -8,7 +8,7 @@
 #' @param bipartite boolean: TRUE if input graph was bipartite
 #' @param symmetric boolean: TRUE if input graph was symmetric
 #' @param signed boolean: TRUE if a signed backbone was requested
-#' @param fwer string: type of familywise error rate correction
+#' @param mtc string: type of multiple test correction
 #' @param alpha numeric: alpha significance threshold (used in statistical models)
 #' @param s numeric: sparsification parameter (used in sparsification models)
 #' @param ut numeric: upper threshold (used in global threshold)
@@ -19,7 +19,7 @@
 #'
 #' @return NULL; only displays text in the console
 #' @keywords internal
-write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, fwer, alpha, s, ut, lt,  trials, model, retained) {
+write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, retained) {
 
   #### Prepare narrative components ####
   version <- utils::packageVersion("backbone")
@@ -32,12 +32,12 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (!weighted & !symmetric & !bipartite) {type <- "an unweighted and directed unipartite"}
   if (signed) {signed <- "signed"} else {signed <- "binary"}
   correction <- ""
-  if (fwer == "bonferroni") {correction <- ", Bonferroni adjusted"}
-  if (fwer == "holm") {correction <- ", Holm adjusted"}
-  if (fwer == "hommel") {correction <- ", Hommel adjusted"}
-  if (fwer == "hochberg") {correction <- ", Hochberg adjusted"}
-  if (fwer == "BH") {correction <- ", Benjamini & Hochberg adjusted"}
-  if (fwer == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
+  if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
+  if (mtc == "holm") {correction <- ", Holm adjusted"}
+  if (mtc == "hommel") {correction <- ", Hommel adjusted"}
+  if (mtc == "hochberg") {correction <- ", Hochberg adjusted"}
+  if (mtc == "BH") {correction <- ", Benjamini & Hochberg adjusted"}
+  if (mtc == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
 
   if (model == "fixedfill") {desc <- "the fixed fill model (FFM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "fixedrow") {desc <- "the fixed row model (FRM; Neal, 2013)"}

@@ -28,8 +28,8 @@ backbone.suggest <- function(G, s = NULL) {
   if (summary$bipartite == TRUE & summary$weighted == FALSE) {
     if (is.null(s)) {message("The stochastic degree sequence model is suggested. Type \"?sdsm\" for more information.")}
     if (!is.null(s)) {
-      message(paste0("Extracting backbone using: sdsm(B, alpha = ", s, ", signed = FALSE, fwer = \"none\", class = \"original\", narrative = TRUE)"))
-      backbone <- sdsm(G, alpha = s, fwer = "none", class = summary$class, narrative = TRUE)
+      message(paste0("Extracting backbone using: sdsm(B, alpha = ", s, ", signed = FALSE, mtc = \"none\", class = \"original\", narrative = TRUE)"))
+      backbone <- sdsm(G, alpha = s, mtc = "none", class = summary$class, narrative = TRUE)
       return(backbone)
     }
   }
@@ -42,8 +42,8 @@ backbone.suggest <- function(G, s = NULL) {
     if (all(G==as.integer(G)) & all(G >= 0) & is.null(s)) {message("The ordinal stochastic degree sequence model is suggested. Type \"?osdsm\" for more information.")}
 
     if (all(G==as.integer(G)) & all(G >= 0) & !is.null(s)) {
-      message(paste0("Extracting backbone using: osdsm(B, alpha = ", s, ", trials = 1000, signed = FALSE, fwer = \"none\", class = \"original\", narrative = TRUE)"))
-      backbone <- osdsm(G, alpha = s, trials = 1000, signed = FALSE, fwer = "none", class = summary$class, narrative = TRUE)
+      message(paste0("Extracting backbone using: osdsm(B, alpha = ", s, ", trials = 1000, signed = FALSE, mtc = \"none\", class = \"original\", narrative = TRUE)"))
+      backbone <- osdsm(G, alpha = s, trials = 1000, signed = FALSE, mtc = "none", class = summary$class, narrative = TRUE)
       return(backbone)
     }
   }
@@ -72,8 +72,8 @@ backbone.suggest <- function(G, s = NULL) {
 
     if (is.null(s)) {message("The disparity filter is suggested. Type \"?disparity\" for more information.")}
     if (!is.null(s)) {
-      message(paste0("Extracting backbone using: disparity(G, alpha = ", s, ", signed = FALSE, fwer = \"none\", class = \"original\", narrative = TRUE)"))
-      backbone <- disparity(G, alpha = s, fwer = "none", class = summary$class, narrative = TRUE)
+      message(paste0("Extracting backbone using: disparity(G, alpha = ", s, ", signed = FALSE, mtc = \"none\", class = \"original\", narrative = TRUE)"))
+      backbone <- disparity(G, alpha = s, mtc = "none", class = summary$class, narrative = TRUE)
       return(backbone)
     }
   }

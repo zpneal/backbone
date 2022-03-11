@@ -233,7 +233,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   if (model=="") {model <- "sparify"}
   retained <- round((sum((G!=0)*1)) / (sum((original!=0)*1) - nrow(original)),3)*100
   if (narrative) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = FALSE, bipartite = FALSE, symmetric = TRUE,
-                                  signed = FALSE, fwer = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model, retained = retained)}
+                                  signed = FALSE, mtc = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model, retained = retained)}
 
   #### Return backbone in desired class ####
   rownames(G) <- rownames(original)  #Restore labels if they were lost

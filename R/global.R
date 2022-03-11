@@ -67,7 +67,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   if (narrative == TRUE) {
     retained <- round((sum((backbone!=0)*1)) / sum((M!=0)*1),3)*100
     write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
-                    signed = signed, fwer = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global", retained = retained)
+                    signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global", retained = retained)
   }
 
   backbone <- frommatrix(backbone, class)

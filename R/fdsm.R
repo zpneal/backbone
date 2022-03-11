@@ -7,7 +7,7 @@
 #' @param trials numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
@@ -32,7 +32,7 @@
 #'    in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
 #'    comparing a proportion (the p-value) to a known proportion (alpha). When `trials = NULL`, the `power.prop.test` function
 #'    is used to estimate the required number of trials to make such a comparison with a `alpha` type-I error rate, (1-`alpha`) power,
-#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `fwer` correction is applied,
+#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `mtc` correction is applied,
 #'    for simplicity this estimation is based on a conservative Bonferroni correction.
 #'
 #' @return
@@ -40,7 +40,7 @@
 #'
 #' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
 #'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `fwer`, `class`, and `narrative` parameters
+#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
 #' @references fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. \doi{10.1038/s41598-021-03238-3}}
@@ -66,7 +66,7 @@
 #' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE, ...){
+fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
@@ -90,7 +90,7 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, fwer = "none", 
   if (is.null(trials)) {
     trials.alpha <- alpha
     if (signed == TRUE) {trials.alpha <- trials.alpha / 2}  #Two-tailed test
-    if (fwer != "none") {  #Adjust trial.alpha using Bonferroni
+    if (mtc != "none") {  #Adjust trial.alpha using Bonferroni
       if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
       if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
     }
@@ -142,10 +142,10 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, fwer = "none", 
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, fwer = fwer, class = "matrix")
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
     retained <- round((sum((backbone!=0)*1)) / (sum((P!=0)*1) - nrow(P)),3)*100
     if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = FALSE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, fwer = fwer, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = trials, model = "fdsm", retained = retained)}
+                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = trials, model = "fdsm", retained = retained)}
     backbone <- frommatrix(backbone, convert = class)
     return(backbone)
   }

@@ -176,7 +176,7 @@ frommatrix <- function(graph, convert = "matrix"){
 #' @param bb.object backbone: backbone S3 class object.
 #' @param signed Boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param alpha Real: significance level of hypothesis test(s)
-#' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by [p.adjust()].
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{tomatrix}.
 #' @return backbone graph: Binary or signed backbone graph of class given in parameter `class`.
 #'
@@ -206,7 +206,7 @@ frommatrix <- function(graph, convert = "matrix"){
 #'
 #' backbone.object <- fixedrow(B, alpha = NULL)
 #' bb <- backbone.extract(backbone.object, alpha = 0.05)
-backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "none", class = "matrix"){
+backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "none", class = "matrix"){
 
   #### Argument Checks ####
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
@@ -232,11 +232,11 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "no
     Ptail <- (Pupper < Plower)  #Find tail of smaller p-value (TRUE if smaller p-value is in upper tail)
     diag(Ptail) <- NA
 
-    if (fwer != "none") {  #Adjust p-values for familywise error, if requested
+    if (mtc != "none") {  #Adjust p-values for familywise error, if requested
       if (isSymmetric(Psmaller)) {Psmaller[upper.tri(Psmaller)] <- NA}  #If undirected, ignore upper triangle
       p <- as.vector(Psmaller)  #Vector of p-values
       m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = fwer, m)  #Adjust p-values
+      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
       Psmaller <- matrix(p, nrow = nrow(Psmaller), ncol = ncol(Psmaller))  #Put adjusted p-values in original p-value matrix
       if (all(is.na(Psmaller[upper.tri(Psmaller)]))) {Psmaller[upper.tri(Psmaller)] <- t(Psmaller)[upper.tri(Psmaller)]}  #If upper triangle is missing, put it back
     }
@@ -253,11 +253,11 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "no
     Pupper[which(G==0)] <- NA  #Eliminate p-values for zero-weight edges; not relevant
     diag(Pupper) <- NA  #Eliminate p-values for loops; not relevant
 
-    if (fwer != "none") {  #Adjust p-values for familywise error, if requested
+    if (mtc != "none") {  #Adjust p-values for familywise error, if requested
       if (isSymmetric(Pupper)) {Pupper[upper.tri(Pupper)] <- NA}  #If undirected, ignore upper triangle
       p <- as.vector(Pupper)  #Vector of p-values
       m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = fwer, m)  #Adjust p-values
+      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
       Pupper <- matrix(p, nrow = nrow(Pupper), ncol = ncol(Pupper))  #Put adjusted p-values in original p-value matrix
       if (all(is.na(Pupper[upper.tri(Pupper)]))) {Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]}  #If upper triangle is missing, put it back
     }

@@ -5,7 +5,7 @@
 #' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `W`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
@@ -30,7 +30,7 @@
 #'
 #' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
 #'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `fwer`, `class`, and `narrative` parameters
+#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
 #' @references {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -57,7 +57,7 @@
 #'
 #' bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
 #' plot(bb) #...preserves edges at multiple scales
-disparity <- function(W, alpha = 0.05, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -115,10 +115,10 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, fwer = "none", class = "o
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, fwer = fwer, class = "matrix")
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
     retained <- round((sum((backbone!=0)*1)) / (sum((G!=0)*1) - nrow(G)),3)*100
     if (narrative == TRUE) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = symmetric,
-                                            signed = signed, fwer = fwer, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity", retained = retained)}
+                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity", retained = retained)}
     backbone <- frommatrix(backbone, convert = class)
     return(backbone)
   }
