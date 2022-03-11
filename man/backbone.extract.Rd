@@ -8,7 +8,7 @@ backbone.extract(
   bb.object,
   signed = FALSE,
   alpha = 0.05,
-  fwer = "none",
+  mtc = "none",
   class = "matrix"
 )
 }
@@ -19,7 +19,7 @@ backbone.extract(
 
 \item{alpha}{Real: significance level of hypothesis test(s)}
 
-\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{tomatrix}.}
 }

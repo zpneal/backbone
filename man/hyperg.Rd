@@ -8,7 +8,7 @@ hyperg(
   B,
   alpha = 0.05,
   signed = FALSE,
-  fwer = "none",
+  mtc = "none",
   class = "original",
   narrative = FALSE
 )
@@ -21,7 +21,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{signed}{Boolean: TRUE if signed backbone is to be returned, FALSE if binary backbone is to be returned}
 
-\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}

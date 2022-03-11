@@ -9,7 +9,7 @@ fdsm(
   alpha = 0.05,
   trials = NULL,
   signed = FALSE,
-  fwer = "none",
+  mtc = "none",
   class = "original",
   narrative = FALSE,
   ...
@@ -25,7 +25,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
-\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
@@ -39,7 +39,7 @@ If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
 
 If \code{alpha} == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
 edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{fwer}, \code{class}, and \code{narrative} parameters
+can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{mtc}, \code{class}, and \code{narrative} parameters
 are ignored.
 }
 \description{
@@ -64,7 +64,7 @@ desired \code{alpha} level. Because these p-values are proportions (i.e., the pr
 in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
 comparing a proportion (the p-value) to a known proportion (alpha). When \code{trials = NULL}, the \code{power.prop.test} function
 is used to estimate the required number of trials to make such a comparison with a \code{alpha} type-I error rate, (1-\code{alpha}) power,
-and when the riskiest p-value being evaluated is at least 5\% smaller than \code{alpha}. When any \code{fwer} correction is applied,
+and when the riskiest p-value being evaluated is at least 5\% smaller than \code{alpha}. When any \code{mtc} correction is applied,
 for simplicity this estimation is based on a conservative Bonferroni correction.
 }
 \examples{
