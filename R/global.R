@@ -52,8 +52,8 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   signed <- !is.null(lower)
 
   #### Set Threshold Values ####
-  if (class(upper) == "function"){ut <- upper(M)} else {ut <- upper}
-  if (class(lower) == "function"){lt <- lower(M)} else {lt <- lower}
+  if (methods::is(upper, "function")){ut <- upper(M)} else {ut <- upper}
+  if (methods::is(lower, "function")){lt <- lower(M)} else {lt <- lower}
 
   #### Apply Global Thresholds ####
   if (!is.null(upper)) {positive <- M > ut} else {positive <- 0}
