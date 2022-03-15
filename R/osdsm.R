@@ -2,12 +2,12 @@
 #'
 #' `osdsm` extracts the backbone of a bipartite projection using the Ordinal Stochastic Degree Sequence Model.
 #'
-#' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.
-#' @param trials integer: Number of random bipartite graphs generated
+#' @param trials integer: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
@@ -25,12 +25,21 @@
 #'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
 #'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
 #'
+#' The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
+#'    `trials` performed affects the precision of these p-values, and the confidence that a given p-value is less than the
+#'    desired `alpha` level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
+#'    in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
+#'    comparing a proportion (the p-value) to a known proportion (alpha). When `trials = NULL`, the `power.prop.test` function
+#'    is used to estimate the required number of trials to make such a comparison with a `alpha` type-I error rate, (1-`alpha`) power,
+#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `mtc` correction is applied,
+#'    for simplicity this estimation is based on a conservative Bonferroni correction.
+#'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
 #' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
 #'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `fwer`, `class`, and `narrative` parameters
+#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
 #' @references {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. *Environment and Planning A, 49*, 2859-2877. \doi{10.1177/0308518X16631339}}
@@ -48,11 +57,10 @@
 #' plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
 #'                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 #'
-#' bb <- osdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An oSDSM backbone...
+#' bb <- osdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph", trials = 1000) #An oSDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-osdsm <- function(B, trials = 1000,
-                  alpha = NULL, signed = FALSE, fwer = "none", class = "original", narrative = FALSE){
+osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Class Conversion and Argument Checks ####
   convert <- tomatrix(B)
@@ -64,10 +72,23 @@ osdsm <- function(B, trials = 1000,
     convert$summary$bipartite <- TRUE
   }
   if (any(B!=as.integer(B)) | any(B < 0)) {stop("Edge weights must be positive integers.")}
-  if ((trials < 1) | (trials%%1!=0)) {stop("trials must be a positive integer")}
+  if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
+  if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
+
+  #### Compute number of trials needed ####
+  if (is.null(trials)) {
+    trials.alpha <- alpha
+    if (signed == TRUE) {trials.alpha <- trials.alpha / 2}  #Two-tailed test
+    if (mtc != "none") {  #Adjust trial.alpha using Bonferroni
+      if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
+      if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
+    }
+    trials <- ceiling((stats::power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
+  }
 
   ### Create Positive and Negative Matrices to hold backbone ###
   Pupper <- matrix(0, nrow(P), ncol(P))
@@ -98,6 +119,8 @@ osdsm <- function(B, trials = 1000,
   }
 
   #### Build null models ####
+  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
+  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
   for (i in 1:trials){
 
     #Start estimation timer; print message
@@ -107,7 +130,7 @@ osdsm <- function(B, trials = 1000,
     }
 
     #Use probabilities to create an SDSM Bstar
-    Bstar <- stats::runif(nrow(probs))                         #Random number
+    Bstar <- stats::runif(nrow(probs))                  #Random number
     Bstar <- rowSums((Bstar > probs)*1)                 #Compare to probabilities
     Bstar <- matrix(Bstar, nrow=nrow(B), ncol=ncol(B))  #Convert to matrix
 
@@ -116,14 +139,11 @@ osdsm <- function(B, trials = 1000,
     Pupper <- Pupper + (Pstar > P)+0
     Plower <- Plower + (Pstar < P)+0
 
-    #Report estimated running time
-    if (i == 10) {
-      end.time <- Sys.time()
-      est <- (round(difftime(end.time, start.time), 2) * (trials/10))
-      message("Estimated time to complete is ", est," ", units(est))
-    } #end timer estimate
+    ### Increment progress bar ###
+    utils::setTxtProgressBar(pb, i)
 
   } #end for loop
+  close(pb) #End progress bar
 
   #### Create Backbone Object ####
   Pupper <- (Pupper/trials)
@@ -134,10 +154,10 @@ osdsm <- function(B, trials = 1000,
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, fwer = fwer, class = "matrix")
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
     retained <- round((sum((backbone!=0)*1)) / (sum((P!=0)*1) - nrow(P)),3)*100
     if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = TRUE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, fwer = fwer, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = trials, model = "osdsm", retained = retained)}
+                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = trials, model = "osdsm", retained = retained)}
     backbone <- frommatrix(backbone, convert = class)
     return(backbone)
   }
