@@ -294,7 +294,8 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
 #' Mrand <- fastball(M)  #Random matrix with same row and column sums
 fastball <- function(M, trades = 5 * nrow(M)) {
   if (methods::is(M, "matrix")) {
-    L <- apply(M==1, 1, which, simplify = FALSE)
+    #L <- apply(M==1, 1, which, simplify = FALSE)  #Slightly faster, but requires R > 4.1.0
+    L <- lapply(asplit(M == 1, 1), which)  #Ensures result is returned as a list
     Lrand <- fastball_cpp(L, trades)
     Mrand <- matrix(0,nrow(M),ncol(M))
     for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}

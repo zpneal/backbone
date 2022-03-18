@@ -106,7 +106,8 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
     rotate <- TRUE
     B <- t(B)
   }
-  L <- apply(B==1, 1, which)  #Convert B to an adjacency list
+  #L <- apply(B==1, 1, which)  #Convert B to an adjacency list, slightly faster but doesn't work on R < 4.1.0
+  L <- lapply(asplit(B == 1, 1), which)  #Works on all R releases
 
   #### Build Null Models ####
   message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
