@@ -11,13 +11,6 @@ test_that("Fastball", {
   test <- fastball(M)
   expect_equal(rowSums(test), rowSums(M))
   expect_equal(colSums(test), colSums(M))
-
-  L <- apply(M==1, 1, which, simplify = FALSE)
-  Lrand <- fastball(L)
-  Mrand <- matrix(0,nrow(M),ncol(M))
-  for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}
-  expect_equal(rowSums(Mrand), rowSums(M))
-  expect_equal(colSums(Mrand), colSums(M))
 })
 
 test_that("SDSM output", {
