@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.0.3
+
+* fixed bug in `fastball()` so it will work with R < 4.1.0
+
 ## backbone 2.0.2
 
 * fixed bug in `fastball()` so it will work with R < 4.1.0
