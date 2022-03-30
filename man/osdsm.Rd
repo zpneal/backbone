@@ -75,7 +75,8 @@ P <- B\%*\%t(B) #An ordinary weighted projection...
 plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 
-bb <- osdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph", trials = 1000) #An oSDSM backbone...
+bb <- osdsm(B, alpha = 0.05, narrative = TRUE,  #An oSDSM backbone...
+            class = "igraph", trials = 1000)
 plot(bb) #...is sparse with clear communities
 }
 \references{

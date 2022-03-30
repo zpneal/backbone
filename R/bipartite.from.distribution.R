@@ -57,9 +57,8 @@ bipartite.from.distribution <- function(R, C, P, rowdist = c(1,1), coldist = c(1
     if (all.equal(R,rowSums(B)) == TRUE | all.equal(C,colSums(B)) == TRUE) {break}  #Repeat until conditions are achieved
   }
 
-  #Verify, randomize, and return
+  #Verify and return
   if (all.equal(R,rowSums(B)) == TRUE | all.equal(C,colSums(B)) == TRUE) {
-    B <- curveball(B)
     if (class == "Matrix"){B <- Matrix::Matrix(B)}
     if (class == "sparseMatrix"){B <- Matrix::Matrix(B, sparse = TRUE)}
     if (class == "network"){B <- network::network(B, bipartite = TRUE)}

@@ -6,22 +6,22 @@
 \usage{
 fixedrow(
   B,
-  alpha = NULL,
+  alpha = 0.05,
   signed = FALSE,
-  fwer = "none",
+  mtc = "none",
   class = "original",
   narrative = FALSE
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
-\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
@@ -33,7 +33,7 @@ If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
 
 If \code{alpha} == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
 edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{fwer}, \code{class}, and \code{narrative} parameters
+can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{mtc}, \code{class}, and \code{narrative} parameters
 are ignored.
 }
 \description{
@@ -71,5 +71,5 @@ bb <- fixedrow(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedrow 
 plot(bb) #...is sparse with clear communities
 }
 \references{
-{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
+{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
 }

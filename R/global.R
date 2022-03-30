@@ -2,7 +2,7 @@
 #'
 #' `global` extracts the backbone of a weighted network using a global threshold
 #'
-#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param upper real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros boolean: TRUE if zero-weight edges in `W` should be excluded from (i.e. also be zero in) the backbone
@@ -52,8 +52,8 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   signed <- !is.null(lower)
 
   #### Set Threshold Values ####
-  if (class(upper) == "function"){ut <- upper(M)} else {ut <- upper}
-  if (class(lower) == "function"){lt <- lower(M)} else {lt <- lower}
+  if (methods::is(upper, "function")){ut <- upper(M)} else {ut <- upper}
+  if (methods::is(lower, "function")){lt <- lower(M)} else {lt <- lower}
 
   #### Apply Global Thresholds ####
   if (!is.null(upper)) {positive <- M > ut} else {positive <- 0}
@@ -67,7 +67,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   if (narrative == TRUE) {
     retained <- round((sum((backbone!=0)*1)) / sum((M!=0)*1),3)*100
     write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
-                    signed = signed, fwer = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global", retained = retained)
+                    signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global", retained = retained)
   }
 
   backbone <- frommatrix(backbone, class)

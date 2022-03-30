@@ -2,6 +2,21 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.0.3
+
+* fixed bug in `fastball()` so it will work with R < 4.1.0
+
+## backbone 2.0.2
+
+* fixed bug in `fastball()` so it will work with R < 4.1.0
+
+## backbone 2.0.1
+
+* minor bug fixes
+* faster implementation of `fastball()` algorithm
+* set `alpha = 0.05` as default in all statistical models
+* renamed `fwer` (familywise error rate) parameter as `mtc` (multiple test correction)
+
 ## backbone 2.0.0
 
 * remove `davis` example data; add examples using synthetic data

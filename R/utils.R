@@ -10,7 +10,7 @@
 
 #' Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
 #'
-#' @param graph A graph object of class "matrix", "sparseMatrix", \link{igraph}, matrix or dataframe edgelist, or \link[network]{network}
+#' @param graph A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}, \link[network]{network}.
 #'
 #' @return a list(summary, G)
 #'    `summary` is a dataframe containing characteristics of the supplied object
@@ -25,32 +25,30 @@ tomatrix <- function(graph){
   class <- class(graph)[1]
   isbipartite <- FALSE
 
-  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist, igraph, or network object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist dataframe, igraph, or network object.")}
 
-  #### Convert from matrix-like object ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | (methods::is(graph, "data.frame")))) {
-    if (dim(graph)[2] > 3) {  #If `graph` contains more than 3 columns, treat it as a matrix
-      G <- as.matrix(graph)  #Coerce to matrix
-      class(G) <- "numeric"  #Coerce to numeric
-      if (any(is.na(G))) {stop("The object contains non-numeric entries")}
+  #### Convert from matrix object ####
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
+    G <- as.matrix(graph)  #Coerce to matrix
+    class(G) <- "numeric"  #Coerce to numeric
+    if (any(is.na(G))) {stop("The object contains non-numeric entries")}
 
-      if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
-      if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
-        if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
-            !isSymmetric(G)) {                                                    #it is not symmetric
-          isbipartite <- TRUE
+    if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
+    if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
+      if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
+          !isSymmetric(G)) {                                                    #it is not symmetric
+        isbipartite <- TRUE
         }
       }
     }
-  }
 
   #### Convert from edge list ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")) | methods::is(graph, "data.frame"))) {
-    if (dim(graph)[2] == 2 | dim(graph)[2] == 3) {  #If `graph` contains 2 or 3 columns, treat it as an edgelist
-      class <- "edgelist"  #Update starting class as edgelist
-      if ((methods::is(graph, "data.frame")) == FALSE) {G <- as.data.frame(as.matrix(graph))} else {G <- graph} #Coerce to dataframe if necessary
-      colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
-      isbipartite <- length(intersect(G[,1],G[,2])) == 0  #Treat as bipartite if there is no overlap in node lists A and B
+  if (methods::is(graph, "data.frame")) {
+    if (ncol(graph)==1 | ncol(graph)>3) {stop("An edgelist must contain 2 or 3 columns")}
+    class <- "edgelist"  #Update starting class as edgelist
+    G <- graph
+    colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
+    isbipartite <- length(intersect(G[,1],G[,2])) == 0  #Treat as bipartite if there is no overlap in node lists A and B
 
       if (isbipartite == TRUE) { #Bipartite
         G <- igraph::graph_from_data_frame(G, directed = F)
@@ -65,7 +63,6 @@ tomatrix <- function(graph){
         if (dim(graph)[2] == 3) {G <- igraph::as_adjacency_matrix(G, type = "both", attr = "C", sparse = FALSE)} #Weighted
       }
     }
-  }
 
   #### Convert from igraph ####
   if (methods::is(graph, "igraph")) {
@@ -179,7 +176,7 @@ frommatrix <- function(graph, convert = "matrix"){
 #' @param bb.object backbone: backbone S3 class object.
 #' @param signed Boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param alpha Real: significance level of hypothesis test(s)
-#' @param fwer string: type of familywise error rate correction to be applied; can be any method allowed by [p.adjust()].
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{tomatrix}.
 #' @return backbone graph: Binary or signed backbone graph of class given in parameter `class`.
 #'
@@ -207,9 +204,9 @@ frommatrix <- function(graph, convert = "matrix"){
 #'                  matrix(rbinom(250,1,.2),10),
 #'                  matrix(rbinom(250,1,.8),10)))
 #'
-#' backbone.object <- fixedrow(B)
+#' backbone.object <- fixedrow(B, alpha = NULL)
 #' bb <- backbone.extract(backbone.object, alpha = 0.05)
-backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "none", class = "matrix"){
+backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "none", class = "matrix"){
 
   #### Argument Checks ####
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
@@ -235,11 +232,11 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "no
     Ptail <- (Pupper < Plower)  #Find tail of smaller p-value (TRUE if smaller p-value is in upper tail)
     diag(Ptail) <- NA
 
-    if (fwer != "none") {  #Adjust p-values for familywise error, if requested
+    if (mtc != "none") {  #Adjust p-values for familywise error, if requested
       if (isSymmetric(Psmaller)) {Psmaller[upper.tri(Psmaller)] <- NA}  #If undirected, ignore upper triangle
       p <- as.vector(Psmaller)  #Vector of p-values
       m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = fwer, m)  #Adjust p-values
+      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
       Psmaller <- matrix(p, nrow = nrow(Psmaller), ncol = ncol(Psmaller))  #Put adjusted p-values in original p-value matrix
       if (all(is.na(Psmaller[upper.tri(Psmaller)]))) {Psmaller[upper.tri(Psmaller)] <- t(Psmaller)[upper.tri(Psmaller)]}  #If upper triangle is missing, put it back
     }
@@ -256,11 +253,11 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "no
     Pupper[which(G==0)] <- NA  #Eliminate p-values for zero-weight edges; not relevant
     diag(Pupper) <- NA  #Eliminate p-values for loops; not relevant
 
-    if (fwer != "none") {  #Adjust p-values for familywise error, if requested
+    if (mtc != "none") {  #Adjust p-values for familywise error, if requested
       if (isSymmetric(Pupper)) {Pupper[upper.tri(Pupper)] <- NA}  #If undirected, ignore upper triangle
       p <- as.vector(Pupper)  #Vector of p-values
       m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = fwer, m)  #Adjust p-values
+      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
       Pupper <- matrix(p, nrow = nrow(Pupper), ncol = ncol(Pupper))  #Put adjusted p-values in original p-value matrix
       if (all(is.na(Pupper[upper.tri(Pupper)]))) {Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]}  #If upper triangle is missing, put it back
     }
@@ -274,4 +271,34 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, fwer = "no
   #### Return result ####
   backbone <- frommatrix(backbone, class)
   return(backbone)
+}
+
+#' Randomize a binary matrix using the fastball algorithm
+#'
+#' `fastball` randomizes a binary matrix, preserving the row and column sums
+#'
+#' @param M matrix: a binary matrix (see details)
+#' @param trades integer: number of trades; the default is 5R trades (approx. mixing time)
+#'
+#' @return
+#' matrix: A random binary matrix with same row sums and column sums as M.
+#'
+#' @details
+#' Given a matrix `M`, `fastball` randomly samples a new matrix from the space of all matrices with the same row and column sums as `M`.
+#'
+#' @references {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{*arXiv:2112.04017*}}
+#'
+#' @export
+#' @examples
+#' M <- matrix(rbinom(200,1,0.5),10,20)  #A random 10x20 binary matrix
+#' Mrand <- fastball(M)  #Random matrix with same row and column sums
+fastball <- function(M, trades = 5 * nrow(M)) {
+  if (methods::is(M, "matrix")) {
+    #L <- apply(M==1, 1, which, simplify = FALSE)  #Slightly faster, but requires R > 4.1.0
+    L <- lapply(asplit(M == 1, 1), which)  #Ensures result is returned as a list
+    Lrand <- fastball_cpp(L, trades)
+    Mrand <- matrix(0,nrow(M),ncol(M))
+    for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}
+    return(Mrand)
+  } else {return(fastball_cpp(M, 5 * length(M)))}
 }

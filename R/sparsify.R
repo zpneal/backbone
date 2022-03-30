@@ -5,7 +5,7 @@
 #' network using a sparsification model described by a combination of an edge scoring metric, a
 #' edge score normalization, and an edge score filter.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsification parameter
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
@@ -233,7 +233,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   if (model=="") {model <- "sparify"}
   retained <- round((sum((G!=0)*1)) / (sum((original!=0)*1) - nrow(original)),3)*100
   if (narrative) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = FALSE, bipartite = FALSE, symmetric = TRUE,
-                                  signed = FALSE, fwer = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model, retained = retained)}
+                                  signed = FALSE, mtc = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model, retained = retained)}
 
   #### Return backbone in desired class ####
   rownames(G) <- rownames(original)  #Restore labels if they were lost
@@ -261,7 +261,7 @@ sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( funct
 #' `sparsify.with.skeleton` is a wrapper for [sparsify()] that extracts the skeleton backbone described by Karger (1999),
 #' which preserves a specified proportion of random edges. It is equivalent to `sparsify(escore = "random", normalize = "none", filter = "proportion", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -286,7 +286,7 @@ sparsify.with.skeleton <- function(U, s, class = "original", narrative = FALSE) 
 #' `sparsify.with.gspar` is a wrapper for [sparsify()] that extracts the G-spar backbone described by Satuluri et al. (2011).
 #' It is equivalent to `sparsify(escore = "jaccard", normalize = "none", filter = "proportion", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -311,7 +311,7 @@ sparsify.with.gspar <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.lspar` is a wrapper for [sparsify()] that extracts the L-spar backbone described by Satuluri et al. (2011).
 #' It is equivalent to `sparsify(escore = "jaccard", normalize = "rank", filter = "degree", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -336,7 +336,7 @@ sparsify.with.lspar <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.simmelian` is a wrapper for [sparsify()] that extracts the simmelian backbone described by Nick et al. (2013).
 #' It is equivalent to `sparsify(escore = "triangles", normalize = "embeddedness", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -361,7 +361,7 @@ sparsify.with.simmelian <- function(U, s, class = "original", narrative = FALSE)
 #' `sparsify.with.jaccard` is a wrapper for [sparsify()] that extracts the jaccard backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "jaccard", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -386,7 +386,7 @@ sparsify.with.jaccard <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.meetmin` is a wrapper for [sparsify()] that extracts the meetmin backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "meetmin", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -411,7 +411,7 @@ sparsify.with.meetmin <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.geometric` is a wrapper for [sparsify()] that extracts the geometric backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "geometric", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -436,7 +436,7 @@ sparsify.with.geometric <- function(U, s, class = "original", narrative = FALSE)
 #' `sparsify.with.hypergeometric` is a wrapper for [sparsify()] that extracts the hypergeometric backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "hypergeometric", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; smaller values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -461,7 +461,7 @@ sparsify.with.hypergeometric <- function(U, s, class = "original", narrative = F
 #' `sparsify.with.localdegree` is a wrapper for [sparsify()] that extracts the local degree backbone described by Hamann et al. (2016).
 #' It is equivalent to `sparsify(escore = "degree", normalize = "rank", filter = "degree", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -486,7 +486,7 @@ sparsify.with.localdegree <- function(U, s, class = "original", narrative = FALS
 #' `sparsify.with.quadrilateral` is a wrapper for [sparsify()] that extracts the quadrilateral Simmelian backbone described by Nocaj et al. (2015).
 #' It is equivalent to `sparsify(escore = "quadrilateral embeddedness", normalize = "embeddedness", filter = "threshold", umst = TRUE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; larger values yield sparser graphs
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.

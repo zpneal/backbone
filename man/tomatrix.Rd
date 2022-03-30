@@ -7,7 +7,7 @@
 tomatrix(graph)
 }
 \arguments{
-\item{graph}{A graph object of class "matrix", "sparseMatrix", \link{igraph}, matrix or dataframe edgelist, or \link[network]{network}}
+\item{graph}{A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}, \link[network]{network}.}
 }
 \value{
 a list(summary, G)

@@ -1,56 +1,21 @@
 #include <Rcpp.h>
-#include <vector>
-#include <algorithm>
-#include <random>
 using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, int numSwaps) {
+Rcpp::List fastball_cpp(Rcpp::List inputList, int numSwaps) {
 
-  //define dimension variables
-  int numRows = dim[0];
-  int numCols = dim[1];
+  //get number of rows
+  int numRows = inputList.length(); 
 
   //convert input list into a 2D std::vector
-  std::vector<std::vector<int> > oneLocs (numRows);
+  std::vector<std::vector<int>> oneLocs (numRows);
   for(int i = 0; i < numRows; i++) {
     oneLocs[i] = Rcpp::as<std::vector<int> > (inputList[i]);
   }
 
-
   //conduct row swaps a total of (numSwaps) times
   for (int i = 1; i <= numSwaps; i++) {
-    /* Algorithm Description
-     *
-     * Pick two rows (r1 and r2)
-     * Find the length of the intersection of r1 and r2
-     * Calculate the size of the symmetric difference
-     * Calculate the number of elements from r1 in the symm diff (s1)
-     * Calculate the number of elements from r2 in the symm diff (s2)
-     * Create a vector (swapLocations) of s1 0's and s2 1's. Shuffle this vector.
-     *
-     * Create two empty vectors (n1 and n2) to store the swapped rows
-     * Start by looking at the first elements of the initial rows (r1 and r2)
-     * If the element in r1 is equal to r2:
-     *    1) add the element to n1 and n2
-     *    2) progress to the next element in each array
-     *
-     * If the element in r1 is less than r2:
-     *    1) use swapLocations to determine whether to place the element into n1 or n2
-     *    2) progress to the next element in r1 and swapLocations
-     *
-     * If the element in r1 is greater than r2:
-     *    1) use swapLocations to determine whether to place the element into n1 or n2
-     *    2) progress to the next element in r2 and swapLocations
-     *
-     * When the end of a vector is reached, progress through the remainder of
-     * the other vector, using swapLocations to determine where to add the element
-     *
-     * The output of this algorithm is two sorted vectors (n1 and n2) that are
-     * randomized combinations of r1 and r2
-     */
-
 
     //get two random row numbers
     int r1Index = R::runif(0,1) * numRows;
@@ -69,10 +34,9 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     //generate iterators for first pass through rows
     std::vector<int>::iterator first1 = r1.begin();
     std::vector<int>::iterator last1 = r1.end();
-    std::vector<int>::iterator  first2 = r2.begin();
-    std::vector<int>::iterator  last2 = r2.end();
-    int intersectionLength = 0;
-
+    std::vector<int>::iterator first2 = r2.begin();
+    std::vector<int>::iterator last2 = r2.end();
+    size_t intersectionLength = 0;
 
     //find the length of the intersection
     while (first1!=last1 && first2!=last2)
@@ -86,9 +50,9 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     }
 
     //calculate length of symmetric difference
-    int r1SymDiffSize = r1.size() - intersectionLength;
-    int r2SymDiffSize = r2.size() - intersectionLength;
-    int symDiffSize = r1SymDiffSize + r2SymDiffSize;
+    size_t r1SymDiffSize = r1.size() - intersectionLength;
+    size_t r2SymDiffSize = r2.size() - intersectionLength;
+    size_t symDiffSize = r1SymDiffSize + r2SymDiffSize;
 
     if (symDiffSize == 0) {
       continue;
@@ -100,10 +64,9 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     std::fill(swapLocations.begin(), swapLocations.begin() + r1SymDiffSize, 0);
     std::fill(swapLocations.begin() + r1SymDiffSize, swapLocations.end(), 1);
 
-
     //shuffle swapLocations using Fisher-Yates shuffle
-    for (int i = 0; i < swapLocations.size() - 1; i++) {
-      int j = i + R::runif(0,1) * (swapLocations.size() - i);
+    for (size_t i = 0; i < swapLocations.size() - 1; i++) {
+      size_t j = i + R::runif(0,1) * (swapLocations.size() - i);
       std::swap(swapLocations[i],swapLocations[j]);
     }
 
@@ -169,24 +132,17 @@ Rcpp::NumericMatrix fastball_cpp(Rcpp::List inputList, Rcpp::NumericVector dim, 
     std::vector<int> & newV1 = curveballRows[0];
     std::vector<int> & newV2 = curveballRows[1];
 
-
-    //inser the data for the shuffled rows back into oneLocs
+    //insert the data for the shuffled rows back into oneLocs
     r1.insert(r1.end(), newV1.begin(), newV1.end());
     r2.insert(r2.end(), newV2.begin(), newV2.end());
   }
 
-  //write de-indexed data to return matrix
-  Rcpp::NumericMatrix  randomizedMatrix (numRows, numCols);
+  //Return randomized adjacency list
+  Rcpp::List randomizedList (numRows);
 
-  for (int row = 0; row < numRows; row++) {
-    for (int index = 0; index < oneLocs[row].size(); index++) {
-      //Rcpp::Rcout << row<< " " << oneLocs[row][index] << '\n';
-      randomizedMatrix (row, oneLocs[row][index]-1) = 1;
-    }
+  for (int i = 0; i < numRows; i++) {
+    Rcpp::IntegerVector temp = Rcpp::wrap(oneLocs[i]);
+    randomizedList[i] = temp;
   }
-
-  //return de-indexed matrix
-  return randomizedMatrix;
+  return randomizedList;
 }
-
-

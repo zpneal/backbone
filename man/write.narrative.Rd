@@ -11,7 +11,7 @@ write.narrative(
   bipartite,
   symmetric,
   signed,
-  fwer,
+  mtc,
   alpha,
   s,
   ut,
@@ -34,7 +34,7 @@ write.narrative(
 
 \item{signed}{boolean: TRUE if a signed backbone was requested}
 
-\item{fwer}{string: type of familywise error rate correction}
+\item{mtc}{string: type of multiple test correction}
 
 \item{alpha}{numeric: alpha significance threshold (used in statistical models)}
 

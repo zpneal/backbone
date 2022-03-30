@@ -6,29 +6,26 @@
 \usage{
 fdsm(
   B,
-  trials = 1000,
-  method = "fastball",
-  alpha = NULL,
+  alpha = 0.05,
+  trials = NULL,
   signed = FALSE,
-  fwer = "none",
+  mtc = "none",
   class = "original",
   narrative = FALSE,
   ...
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix, sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a two-column matrix, sparse \code{\link{Matrix}}, or dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
-
-\item{trials}{numeric: The number of bipartite graphs generated to approximate the edge weight distribution.}
-
-\item{method}{string: The method used to generate random bipartite graphs, one of c("fastball", "curveball")}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
+\item{trials}{numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on \code{alpha} (see details)}
+
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
-\item{fwer}{string: type of familywise error rate correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
@@ -42,7 +39,7 @@ If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
 
 If \code{alpha} == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
 edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{fwer}, \code{class}, and \code{narrative} parameters
+can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{mtc}, \code{class}, and \code{narrative} parameters
 are ignored.
 }
 \description{
@@ -52,8 +49,7 @@ are ignored.
 The \code{fdsm} function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 expected in a projection obtained from a random bipartite network where both the row vertex degrees and column
 vertex degrees are \emph{exactly} fixed at their values in \code{B}. It uses the \code{\link[=fastball]{fastball()}} algorithm to generate random
-bipartite matrices with give row and column vertex degrees. The \code{\link[=fdsm.trials]{fdsm.trials()}} function can be used to estimate
-the number of random bipartite matrices that must be generated to obtain stable edge \emph{p}-values.
+bipartite matrices with give row and column vertex degrees.
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
@@ -61,6 +57,15 @@ model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or w
 It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
 negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
 \emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
+
+The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
+\code{trials} performed affects the precision of these p-values, and the confidence that a given p-value is less than the
+desired \code{alpha} level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
+in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
+comparing a proportion (the p-value) to a known proportion (alpha). When \code{trials = NULL}, the \code{power.prop.test} function
+is used to estimate the required number of trials to make such a comparison with a \code{alpha} type-I error rate, (1-\code{alpha}) power,
+and when the riskiest p-value being evaluated is at least 5\% smaller than \code{alpha}. When any \code{mtc} correction is applied,
+for simplicity this estimation is based on a conservative Bonferroni correction.
 }
 \examples{
 #A binary bipartite network of 30 agents & 75 artifacts; agents form three communities
@@ -78,11 +83,11 @@ P <- B\%*\%t(B) #An ordinary weighted projection...
 plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 
-bb <- fdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An FDSM backbone...
+bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 plot(bb) #...is sparse with clear communities
 }
 \references{
 fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 
-curveball: {Strona, Giovanni, Domenico Nappo, Francesco Boccacci, Simone Fattorini, and Jesus San-Miguel-Ayanz. 2014. A Fast and Unbiased Procedure to Randomize Ecological Binary Matrices with Fixed Row and Column Totals. \emph{Nature Communications, 5}, 4114. \doi{10.1038/ncomms5114}}
+fastball: {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{\emph{arXiv:2112.04017}}}#'
 }

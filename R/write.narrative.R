@@ -8,7 +8,7 @@
 #' @param bipartite boolean: TRUE if input graph was bipartite
 #' @param symmetric boolean: TRUE if input graph was symmetric
 #' @param signed boolean: TRUE if a signed backbone was requested
-#' @param fwer string: type of familywise error rate correction
+#' @param mtc string: type of multiple test correction
 #' @param alpha numeric: alpha significance threshold (used in statistical models)
 #' @param s numeric: sparsification parameter (used in sparsification models)
 #' @param ut numeric: upper threshold (used in global threshold)
@@ -19,7 +19,7 @@
 #'
 #' @return NULL; only displays text in the console
 #' @keywords internal
-write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, fwer, alpha, s, ut, lt,  trials, model, retained) {
+write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, retained) {
 
   #### Prepare narrative components ####
   version <- utils::packageVersion("backbone")
@@ -32,12 +32,12 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (!weighted & !symmetric & !bipartite) {type <- "an unweighted and directed unipartite"}
   if (signed) {signed <- "signed"} else {signed <- "binary"}
   correction <- ""
-  if (fwer == "bonferroni") {correction <- ", Bonferroni adjusted"}
-  if (fwer == "holm") {correction <- ", Holm adjusted"}
-  if (fwer == "hommel") {correction <- ", Hommel adjusted"}
-  if (fwer == "hochberg") {correction <- ", Hochberg adjusted"}
-  if (fwer == "BH") {correction <- ", Benjamini & Hochberg adjusted"}
-  if (fwer == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
+  if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
+  if (mtc == "holm") {correction <- ", Holm adjusted"}
+  if (mtc == "hommel") {correction <- ", Hommel adjusted"}
+  if (mtc == "hochberg") {correction <- ", Hochberg adjusted"}
+  if (mtc == "BH") {correction <- ", Benjamini & Hochberg adjusted"}
+  if (mtc == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
 
   if (model == "fixedfill") {desc <- "the fixed fill model (FFM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "fixedrow") {desc <- "the fixed row model (FRM; Neal, 2013)"}
@@ -89,9 +89,9 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   message("")
   message("Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE, 16, e0244363. https://doi.org/10.1371/journal.pone.0244363")
   message("")
-  if (model == "fixedfill") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports.")}
+  if (model == "fixedfill") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
   if (model == "fixedrow") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}
-  if (model == "fixedcol") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports.")}
+  if (model == "fixedcol") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
   if (model == "sdsm") {message("Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance and other co-behaviors. Social Networks, 39, 84-97. https://doi.org/10.1016/j.socnet.2014.06.001")}
   if (model == "fdsm") {message("Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance and other co-behaviors. Social Networks, 39, 84-97. https://doi.org/10.1016/j.socnet.2014.06.001")}
   if (model == "osdsm") {message("Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. Environment and Planning A, 49, 2859-2877. https://doi.org/10.1177/0308518X16631339")}
