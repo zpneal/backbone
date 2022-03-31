@@ -17,7 +17,7 @@ test_that("SDSM output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
   test <- sdsm(M, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
-  expect_equal(round(test$Pupper,3), rbind(c(.432,1,.549),c(1,.304,1),c(.549,1,.329)))
+  expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)))
   expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)))
   expect_equal(test$model, "sdsm")
 })
@@ -54,8 +54,8 @@ test_that("FixedColumn output", {
   M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
   test <- fixedcol(M, alpha = NULL)
   expect_equal(test$G, M%*%t(M))  #Weighted projection
-  expect_equal(round(test$Pupper,3), rbind(c(0,1,.111),c(1,.556,1),c(.111,1,.111)))
-  expect_equal(round(test$Plower,3), rbind(c(1,.444,1),c(.444,.889,.444),c(1,.444,1)))
+  expect_equal(round(test$Pupper,3), rbind(c(.008,.975,.114),c(.975,.568,.975),c(.114,.975,.114)))
+  expect_equal(round(test$Plower,3), rbind(c(1,.432,.992),c(.432,.886,.432),c(.992,.432,.992)))
   expect_equal(test$model, "fixedcol")
 })
 
