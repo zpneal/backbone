@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.0.4
+
+* eliminated dependency on `PoissonBinomial`; `sdsm()` and `fixedcol()` now use an efficient implementation of the Refined Normal Approximation in base R
+
 ## backbone 2.0.3
 
 * fixed bug in `fastball()` so it will work with R < 4.1.0

@@ -1,7 +1,7 @@
 Package: backbone
 Type: Package
 Title: Extracts the Backbone from Graphs
-Version: 2.0.3
+Version: 2.0.4
 Authors@R: c(
     person("Zachary", "Neal", email = "zpneal@msu.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3076-4995")),
     person("Rachel", "Domagalski", email = "domagal9@msu.edu", role = "aut"), 
@@ -24,7 +24,6 @@ Imports:
     methods,
     network,
     MASS,
-    PoissonBinomial,
     stats,
     Rcpp,
     utils,
