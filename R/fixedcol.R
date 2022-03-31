@@ -4,8 +4,6 @@
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
-#'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
@@ -55,7 +53,7 @@
 #' bb <- fixedcol(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedcol backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fixedcol <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+fixedcol <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -77,8 +75,8 @@ fixedcol <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, 
 
   #### Create Backbone Object ####
   pt <- ((cs*(cs-1))/(m*(m-1)))  #Parameters for computing Poissonbinomial
-  Pupper <- matrix(PoissonBinomial::ppbinom(x = (P-1), probs = pt, method = method, lower.tail = FALSE),nrow = m, ncol = m,byrow = TRUE)
-  Plower <- matrix(PoissonBinomial::ppbinom(x = P, probs = pt, method = method),nrow = m, ncol = m,byrow = TRUE)
+  Pupper <- matrix((pb(k = (P-1), p = pt, lower = FALSE)),nrow = m, ncol = m,byrow = TRUE)
+  Plower <- matrix(pb(k = P, p = pt),nrow = m, ncol = m,byrow = TRUE)
   bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedcol")
   class(bb) <- "backbone"
 

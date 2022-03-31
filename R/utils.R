@@ -302,3 +302,36 @@ fastball <- function(M, trades = 5 * nrow(M)) {
     return(Mrand)
   } else {return(fastball_cpp(M, 5 * length(M)))}
 }
+
+#' Poisson binomial distribution function
+#'
+#' `pb` computes the poisson binomial distribution function using the refined normal approximation.
+#'
+#' @param k numeric: values where the pdf should be evaluated
+#' @param p numeric: vector of success probabilities
+#' @param lower boolean: If FALSE return lower tail, if FALSE return upper tail
+#'
+#' @details
+#' The Refined Normal Approximation (RNA) offers a close approximation when `length(p)` is large (Hong, 2013). This function
+#'    is a slightly more efficient implementation of `ppoibin()` from the `poibin` package.
+#'
+#' @return numeric: probability of observing `k` or fewer (if lower = TRUE), or more than `k` (if lower = FALSE),
+#'    successes when each trial has probability `p` of success
+#'
+#' @references
+#' {Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. *Computational Statistics and Data Analysis, 59*, 41-51. \doi{10.1016/j.csda.2012.10.006}}
+#'
+#' @export
+#'
+#' @examples
+#' pb(50,runif(100))
+pb <-function(k,p,lower=TRUE) {
+  mu <- sum(p)
+  sigma <- sqrt(sum(p*(1-p)))
+  gamma <- sum(p*(1-p)*(1-2*p))
+  k <- (k+.5-mu)/sigma
+  prob <- stats::pnorm(k)+gamma/(6*sigma^3)*(1-k^2)*stats::dnorm(k)
+  prob[prob<0] <- 0
+  prob[prob>1] <- 1
+  if (lower) {return(prob)} else {return(1-prob)}
+}

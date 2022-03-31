@@ -4,8 +4,6 @@
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
-#'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
@@ -60,7 +58,7 @@
 #' bb <- sdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An SDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
+sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -94,8 +92,8 @@ sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc 
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
 
     ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
-    negative <- as.array(mapply(PoissonBinomial::ppbinom, x= as.data.frame(t(P[i,])), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal"))
-    positive <- as.array(mapply(PoissonBinomial::ppbinom, x=(as.data.frame(t(P[i,])-1)), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal", lower.tail = FALSE))
+    negative <- as.array(mapply(pb, k = as.data.frame(t(P[i,])), p = as.data.frame(t(prob.imat))))
+    positive <- as.array(mapply(pb, k = (as.data.frame(t(P[i,])-1)), p = as.data.frame(t(prob.imat)), lower = FALSE))
 
     ### Set values in Positive & Negative matrices ###
     Pupper[i,] <- positive
