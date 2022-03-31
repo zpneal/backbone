@@ -6,7 +6,6 @@
 \usage{
 fixedcol(
   B,
-  method = "RefinedNormal",
   alpha = 0.05,
   signed = FALSE,
   mtc = "none",
@@ -17,9 +16,6 @@ fixedcol(
 \arguments{
 \item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
-
-\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
-"RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
