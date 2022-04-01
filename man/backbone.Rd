@@ -22,7 +22,6 @@ The package also includes some utility functions:
 \itemize{
 \item \code{\link[=fastball]{fastball()}} - Fast marginal-preserving randomization of binary matrices
 \item \code{\link[=bicm]{bicm()}} - Compute probabilities under the bipartite configuration model
-\item \code{\link[=bipartite.from.probability]{bipartite.from.probability()}}, \code{\link[=bipartite.from.sequence]{bipartite.from.sequence()}}, and \code{\link[=bipartite.from.distribution]{bipartite.from.distribution()}} - Generate random bipartite networks with given edge probability, degree sequences, or degree distributions.
 }
 
 For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone")}}.
