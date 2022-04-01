@@ -17,7 +17,6 @@
 #'    \itemize{
 #'    \item [fastball()] - Fast marginal-preserving randomization of binary matrices
 #'    \item [bicm()] - Compute probabilities under the bipartite configuration model
-#'    \item [bipartite.from.probability()], [bipartite.from.sequence()], and [bipartite.from.distribution()] - Generate random bipartite networks with given edge probability, degree sequences, or degree distributions.
 #'    }
 #'
 #' For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone")}}.
