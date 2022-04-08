@@ -76,29 +76,23 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
   #### Bipartite Projection ####
   P <- tcrossprod(B)
 
-  ### Create Positive and Negative Matrices to hold backbone ###
-  Pupper <- matrix(0, nrow(P), ncol(P))
-  Plower <- matrix(0, nrow(P), ncol(P))
-
   #### Compute Probabilities for SDSM ####
   prob.mat <- bicm(B,...)
 
-  #### Assemble and Probabilities ####
-  rows <- dim(prob.mat)[1]
+  #### Compute p-values ####
+  Pupper <- matrix(0, nrow(P), ncol(P))
+  Plower <- matrix(0, nrow(P), ncol(P))
+  for (col in 1:ncol(P)) {  #Loop over lower triangle
+    for (row in col:nrow(P)) {
+      probs <- prob.mat[row,]*prob.mat[col,]
+      Plower[row,col] <- pb(P[row,col], probs)
+      Pupper[row,col] <- pb(P[row,col]-1, probs, lower = FALSE)
+    }
+  }
+  Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangles
+  Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]
 
-  #### Create Backbone Object ####
-  for (i in 1:rows){
-    ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
-    prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
-
-    ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
-    negative <- mapply(pb, k = as.data.frame(t(P[i,])), p = as.data.frame(t(prob.imat)))
-    positive <- mapply(pb, k = (as.data.frame(t(P[i,])-1)), p = as.data.frame(t(prob.imat)), lower = FALSE)
-    
-    ### Set values in Positive & Negative matrices ###
-    Pupper[i,] <- positive
-    Plower[i,] <- negative
-  } #end for i in rows
+  #### Assemble backbone object ####
   bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "sdsm")
   class(bb) <- "backbone"
 
