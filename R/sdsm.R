@@ -92,9 +92,9 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
     prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
 
     ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
-    negative <- as.array(mapply(pb, k = as.data.frame(t(P[i,])), p = as.data.frame(t(prob.imat))))
-    positive <- as.array(mapply(pb, k = (as.data.frame(t(P[i,])-1)), p = as.data.frame(t(prob.imat)), lower = FALSE))
-
+    negative <- mapply(pb, k = as.data.frame(t(P[i,])), p = as.data.frame(t(prob.imat)))
+    positive <- mapply(pb, k = (as.data.frame(t(P[i,])-1)), p = as.data.frame(t(prob.imat)), lower = FALSE)
+    
     ### Set values in Positive & Negative matrices ###
     Pupper[i,] <- positive
     Plower[i,] <- negative
