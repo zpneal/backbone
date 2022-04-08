@@ -85,6 +85,7 @@ loglikelihood_bicm <- function(x0, args){
 #' `bicm` estimates cell probabilities under the bipartite configuration model
 #'
 #' @param M matrix: a binary matrix
+#' @param fitness boolean: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only
 #' @param tol numeric, tolerance of algorithm
 #' @param max_steps numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm
 #' @param ... optional arguments
@@ -95,102 +96,49 @@ loglikelihood_bicm <- function(x0, args){
 #'    the same row and column marginals as **M**. The BiCM yields the closest approximations of the true probabilities
 #'    compared to other estimation methods (Neal et al., 2021), and is used by [sdsm()] to extract the backbone of
 #'    a bipartite projection using the stochastic degree sequence model.
+#'    
+#' Optionally (if `fitness = TRUE`), `bicm()` instead returns a list of row and column fitnesses, which is faster and
+#'    requires less memory. Given the *i*th row's fitness Ri and the *j*th column's fitness Rj, the entry Bij in the
+#'    matrix can be computed as Ri\*Rj/(1+(Ri\*Rj)).
+#'    
+#' **Note**: M cannot contain any rows or columns that contain all 0s or all 1s.
 #'
 #' @references
 #' {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. *Scientific Reports, 5*, 10595. \doi{10.1038/srep10595}}
 #'
-#' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. \doi{10.1038/s41598-021-03238-3}}
+#' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
-#' @return
-#' matrix: a matrix of probabilities
+#' @return a matrix of probabilities, or a list of fitnesses
 #' @export
 #'
 #' @examples
-#' M <- matrix(rbinom(25,1,0.5),5,5)  #A random bipartite graph
+#' M <- matrix(c(0,0,1,0,1,0,1,0,1),3,3)  #A binary matrix
 #' bicm(M)
-bicm <- function(M,
-                 tol = 1e-8,
-                 max_steps = 200,
-                 ...){
+bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
 
   #### initialize_graph ####
   n_rows <- dim(M)[1]
   n_cols <- dim(M)[2]
-  rows_deg <- Matrix::rowSums(M)
-  cols_deg <- Matrix::colSums(M)
-
-  #### initialize probability matrix ####
-  probs <- matrix(0, nrow = n_rows, ncol = n_cols)
-  r_bipart <- M
-  good_rows <- seq(1,n_rows)
-  good_cols <- seq(1,n_cols)
-  zero_rows <- which(rows_deg == 0)
-  zero_cols <- which(cols_deg == 0)
-  full_rows <- which(rows_deg == n_cols)
-  full_cols <- which(cols_deg == n_rows)
-  num_full_rows <- 0
-  num_full_cols <- 0
-
-  while ((length(zero_rows)
-          + length(zero_cols)
-          + length(full_rows)
-          + length(full_cols)) > 0){
-    if (length(zero_rows)>0){
-      r_bipart <- r_bipart[-zero_rows,]
-      good_rows <- good_rows[-zero_rows]
-    }
-    if (length(zero_cols)>0){
-      r_bipart <- r_bipart[, -zero_cols]
-      good_cols <- good_cols[-zero_cols]
-    }
-    full_rows = which(Matrix::rowSums(r_bipart) == dim(r_bipart)[2])
-    full_cols = which(Matrix::colSums(r_bipart) == dim(r_bipart)[1])
-    num_full_rows = num_full_rows + length(full_rows)
-    num_full_cols = num_full_cols + length(full_cols)
-    probs[good_rows[full_rows],good_cols] <- 1
-    probs[good_rows,good_cols[full_cols]] <- 1
-    if (length(full_rows)>0){
-      good_rows <- good_rows[-full_rows]
-      r_bipart <- r_bipart[-full_rows,]
-    }
-    if (length(full_cols)>0){
-      good_cols <- good_cols[-full_cols]
-      r_bipart <- r_bipart[,-full_cols]
-    }
-    zero_rows <- which(Matrix::rowSums(r_bipart) == 0)
-    zero_cols <- which(Matrix::colSums(r_bipart) == 0)
-  } #end while
-  nonfixed_rows = good_rows
-  fixed_rows = seq(1,n_rows)[-good_rows]
-  nonfixed_cols = good_cols
-  fixed_cols = seq(1,n_cols)[-good_cols]
-
-  #### degree reduction ####
-  if (length(nonfixed_rows)>0){
-    rows_deg <- rows_deg[nonfixed_rows]
-  }
-  if (length(nonfixed_cols)>0){
-    cols_deg <- cols_deg[nonfixed_cols]
-  }
+  rows_deg <- rowSums(M)
+  cols_deg <- colSums(M)
+  if (any(rows_deg==0) | any(rows_deg==n_cols) | any(cols_deg==0) | any(cols_deg==n_rows)) {stop("M cannot contain any rows/cols that contain all 0s or all 1s")}
 
   ### find the unique row and column degrees ###
   ### keep track of each cells row/col deg ###
-  row_t <- as.data.frame(table(rows_deg-num_full_cols))
-  r_rows_deg <- as.numeric(as.vector(row_t$Var1))
-  r_invert_rows_deg <- match((rows_deg-num_full_cols), r_rows_deg)
-  rows_multiplicity <- as.numeric(as.vector(row_t$Freq))
-  r_n_rows <- length(r_rows_deg)
-  col_t <- as.data.frame(table(cols_deg - num_full_rows))
-  r_cols_deg <- as.numeric(as.vector(col_t$Var1))
-  r_invert_cols_deg <- match((cols_deg-num_full_rows), r_cols_deg)
+  row_t <- as.data.frame(table(rows_deg))
+  r_rows_deg <- as.numeric(as.vector(row_t$rows_deg))     #Unique row degree values
+  r_invert_rows_deg <- match((rows_deg), r_rows_deg)      #Rows having each unique degree value
+  rows_multiplicity <- as.numeric(as.vector(row_t$Freq))  #Number of rows having each unique degree value
+  r_n_rows <- length(r_rows_deg)                          #Number of unique degree values
+  col_t <- as.data.frame(table(cols_deg))
+  r_cols_deg <- as.numeric(as.vector(col_t$cols_deg))
+  r_invert_cols_deg <- match((cols_deg), r_cols_deg)
   cols_multiplicity <- as.numeric(as.vector(col_t$Freq))
-  r_n_edges <- sum(rows_deg-num_full_cols)
+  r_n_edges <- sum(rows_deg)
 
   #### apply the initial guess function ####
-  ### an initial probability to start with ###
-  r_x = as.vector(r_rows_deg)/(sqrt(r_n_edges)+1)
+  r_x = r_rows_deg/(sqrt(r_n_edges)+1)
   r_y = r_cols_deg/(sqrt(r_n_edges)+1)
-  ### save all together as a vector ###
   x = c(r_x,r_y)
 
   #### initialize problem main ####
@@ -201,47 +149,39 @@ bicm <- function(M,
   norm <- norm(as.matrix(f_x), type = "F")
   diff <- 1
 
-
   while ((norm > tol) & (diff > tol) & (n_steps < max_steps)){
     x_old <- x
-
     B <- as.array(loglikelihood_hessian_diag_bicm(x,args))
     dx <- -f_x/B
-
     alpha <- 1
     i <- 0
-    while ((!(-loglikelihood_bicm(x,args)>-loglikelihood_bicm(x + alpha * dx,args)))&
-           (i<50)){
+    while ((!(-loglikelihood_bicm(x,args)>-loglikelihood_bicm(x + alpha * dx,args)))&(i<50)){
       alpha <- alpha*.5
       i <- i+1
-    }#end while sdc
-
+      }#end while sdc
     x <- x+alpha*dx
     f_x <- loglikelihood_prime_bicm(x,args)
     norm <- norm(as.matrix(f_x), type = "F")
     diff <- norm(as.matrix(x-x_old), type = "F")
-
     n_steps <- n_steps + 1
-  }#end while
+    }#end while
 
   #### set solved problem ####
   sx <- as.vector(rep(0,n_rows))
   sy <- as.vector(rep(0,n_cols))
-  sr_xy <- x
-  sr_x <- sr_xy[1:r_n_rows]
-  sr_y <- sr_xy[-(1:r_n_rows)]
-  sx[nonfixed_rows] <- sr_x[r_invert_rows_deg]
-  sy[nonfixed_cols] <- sr_y[r_invert_cols_deg]
+  row_fitness <- x[1,1:r_n_rows][r_invert_rows_deg]
+  col_fitness <- x[1,-(1:r_n_rows)][r_invert_cols_deg]
 
-  #### plug everything into probability matrix ####
-  f <- function(x,y){
-    z <- x*y
-    z/(1+z)
+  #### Return result ####
+  if (fitness) {
+    fitnesses <- list(rowfit = row_fitness, colfit = col_fitness)
+    return(fitnesses)
+  } else {
+    x <- row_fitness %*% t(col_fitness)
+    probs <- x/(x+1)
+    return(probs)
   }
-  r_probs <- outer(sx[nonfixed_rows],sy[nonfixed_cols],f)
-
-  probs[nonfixed_rows,nonfixed_cols] <- r_probs
-  return(probs)
+  
 }
 
 
