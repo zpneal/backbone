@@ -10,7 +10,7 @@
 
 #' Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
 #'
-#' @param graph A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}, \link[network]{network}.
+#' @param graph A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}.
 #'
 #' @return a list(summary, G)
 #'    `summary` is a dataframe containing characteristics of the supplied object
@@ -25,7 +25,7 @@ tomatrix <- function(graph){
   class <- class(graph)[1]
   isbipartite <- FALSE
 
-  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "network")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist dataframe, igraph, or network object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist dataframe, or igraph object.")}
 
   #### Convert from matrix object ####
   if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
@@ -79,23 +79,6 @@ tomatrix <- function(graph){
     }
   }
 
-  #### Convert from statnet ####
-  if (methods::is(graph, "network")) {
-
-    if (network::is.bipartite(graph) == TRUE) { #Bipartite
-      isbipartite <- TRUE
-      if ("weight" %in% network::list.edge.attributes(graph)) {
-        G <- network::as.matrix.network(graph, type = "incidence", attrname = "weight")} else { #Weighted
-          G <- network::as.matrix.network(graph, type = "incidence")} #Unweighted
-    }
-
-    if (network::is.bipartite(graph) == FALSE) { #Unipartite
-      if ("weight" %in% network::list.edge.attributes(graph)) {
-        G <- network::as.matrix.network(graph, type = "adjacency", attrname = "weight")} else { #Weighted
-          G <- network::as.matrix.network(graph, type = "adjacency")} #Unweighted
-    }
-  }
-
   #### If the graph is bipartite, remove rows/columns with zero sums ####
   if (isbipartite){
     R <- Matrix::rowSums(G)
@@ -131,7 +114,7 @@ tomatrix <- function(graph){
 #' Converts a backbone adjacency matrix to an object of specified class
 #'
 #' @param graph a matrix
-#' @param convert class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"
+#' @param convert class to convert to, one of "matrix", "sparseMatrix", "igraph", or "edgelist"
 #'
 #' @return backbone graph: Binary or signed backbone graph of class given in parameter `convert`.
 #'
@@ -147,11 +130,6 @@ frommatrix <- function(graph, convert = "matrix"){
   if (convert == "Matrix"){G <- Matrix::Matrix(graph)}
 
   if (convert == "sparseMatrix"){G <- methods::as(graph, "sparseMatrix")}
-
-  if (convert == "network"){
-    if (isSymmetric(graph)) {G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = FALSE)}
-    if (!isSymmetric(graph)) {G <- network::network(graph, ignore.eval = FALSE, names.eval = "weight", directed = TRUE)}
-  }
 
   if (convert == "edgelist"){
     if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}

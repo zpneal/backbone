@@ -2,11 +2,11 @@
 #'
 #' `global` extracts the backbone of a weighted network using a global threshold
 #'
-#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param upper real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros boolean: TRUE if zero-weight edges in `W` should be excluded from (i.e. also be zero in) the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `W`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -75,15 +75,15 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
 }
 
 #' Wrapper for global()
-#' @param M graph: Graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param upper Real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower Real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros Boolean: TRUE if zero-weight edges in `M` should be missing in the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned
 #' @export
-universal <- function(M, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
+universal <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
   warning("The universal() function is now called global(); please use global() instead.")
-  global(M, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE)
+  global(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE)
 }
