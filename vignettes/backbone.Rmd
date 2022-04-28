@@ -95,11 +95,13 @@ Most functions in the backbone package include a `narrative` parameter. When `na
 ## Supported data formats {#formats}
 The functions in the backbone package support many different data formats that can be used to represent a network or graph in R:
 
-* **matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite matrix can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object, a *sparse Matrix* object from the Matrix package, or a *dataframe* object.
+* **matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite matrix can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object or *Matrix* object created using the Matrix package.
 
 * **edgelist** - A network can be represented as an edgelist, supplied as a *dataframe* object. The dataframe should have two or three columns; the first two columns contain the IDs of the sending and receiving nodes, respectively, while the third column (optionally) contains the edge weights.
 
-* **igraph** or **network** - A network can be supplied to a backbone extraction function as an *igraph* object from the igraph package, or as a *network* object from the statnet package.
+* **igraph** - A network can be supplied to a backbone extraction function as an *igraph* object from the igraph package.
+
+Note: Earlier versions of backbone also supported *network* objects created using the statnet package. To reduce package dependencies, these objects are no longer supported. You can convert a *network* bipartite graph into an incidence matrix using `network::as.matrix.network(graph, type = "incidence")`, and can convert a *network* unipartite graph into an adjacency matrix using `network::as.matrix.network(graph, type = "adjacency")`. In either case, if the graph is weighted, the command should also include `attrname = "weight"`.
 
 [back to Table of Contents](#toc)
 
