@@ -80,11 +80,6 @@ test_that("frommatrix classes match", {
   test <- frommatrix(M,"sparseMatrix")
   expect_s4_class(test, "sparseMatrix")
 
-  # matrix (signed unipartite) --> network
-  M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
-  test <- frommatrix(M,"network") #OK
-  expect_s3_class(test, "network")
-
   # matrix (signed unipartite) --> igraph
   M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
   test <- frommatrix(M,"igraph") #OK
