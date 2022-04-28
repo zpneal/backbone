@@ -7,7 +7,7 @@
 backbone.suggest(G, s = NULL)
 }
 \arguments{
-\item{G}{graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, \code{\link{igraph}}, or \code{\link{network}}.}
+\item{G}{graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, or \code{\link{igraph}}.}
 
 \item{s}{numeric: If provided, a backbone is extracted using this value as the significance level or sparsification parameter.}
 }

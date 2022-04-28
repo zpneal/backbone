@@ -14,7 +14,7 @@ global(
 )
 }
 \arguments{
-\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{upper}{real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.}
 
@@ -22,7 +22,7 @@ global(
 
 \item{keepzeros}{boolean: TRUE if zero-weight edges in \code{W} should be excluded from (i.e. also be zero in) the backbone}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{W}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}

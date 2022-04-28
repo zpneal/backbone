@@ -9,7 +9,7 @@ frommatrix(graph, convert = "matrix")
 \arguments{
 \item{graph}{a matrix}
 
-\item{convert}{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
+\item{convert}{class to convert to, one of "matrix", "sparseMatrix", "igraph", or "edgelist"}
 }
 \value{
 backbone graph: Binary or signed backbone graph of class given in parameter \code{convert}.

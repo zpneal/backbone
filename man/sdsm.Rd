@@ -15,7 +15,7 @@ sdsm(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
@@ -24,7 +24,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}

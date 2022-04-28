@@ -7,11 +7,11 @@
 sparsify.with.localdegree(U, s, class = "original", narrative = FALSE)
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{s}{numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{U}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}

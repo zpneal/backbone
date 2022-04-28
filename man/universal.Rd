@@ -5,7 +5,7 @@
 \title{Wrapper for global()}
 \usage{
 universal(
-  M,
+  W,
   upper = 0,
   lower = NULL,
   keepzeros = TRUE,
@@ -14,7 +14,7 @@ universal(
 )
 }
 \arguments{
-\item{M}{graph: Graph object of class matrix, sparse matrix, igraph, edgelist, or network object.}
+\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{upper}{Real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.}
 
@@ -22,7 +22,7 @@ universal(
 
 \item{keepzeros}{Boolean: TRUE if zero-weight edges in \code{M} should be missing in the backbone}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned}
