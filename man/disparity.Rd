@@ -76,5 +76,7 @@ bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
 plot(bb) #...preserves edges at multiple scales
 }
 \references{
-{Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+
+disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
 }

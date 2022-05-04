@@ -30,5 +30,7 @@ sparse <- sparsify.with.lspar(U, s = 0.6, narrative = TRUE)
 plot(sparse) #Clearly visible communities
 }
 \references{
+{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+
 {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 }

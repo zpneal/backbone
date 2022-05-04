@@ -26,3 +26,6 @@ M <- matrix(runif(100),10,10)  #A random weighted, directed graph
 backbone <- backbone.suggest(M)
 backbone <- backbone.suggest(M, s = 0.05)
 }
+\references{
+{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+}

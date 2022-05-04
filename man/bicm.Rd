@@ -41,7 +41,7 @@ M <- matrix(c(0,0,1,0,1,0,1,0,1),3,3)  #A binary matrix
 bicm(M)
 }
 \references{
-{Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. \emph{Scientific Reports, 5}, 10595. \doi{10.1038/srep10595}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
 
-{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. \emph{Scientific Reports, 5}, 10595. \doi{10.1038/srep10595}}
 }

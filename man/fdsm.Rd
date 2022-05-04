@@ -87,6 +87,8 @@ bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #
 plot(bb) #...is sparse with clear communities
 }
 \references{
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+
 fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 
 fastball: {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{\emph{arXiv:2112.04017}}}#'
