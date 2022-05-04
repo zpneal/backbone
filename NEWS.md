@@ -2,7 +2,7 @@
 title: "NEWS"
 output: html_document
 ---
-## backbone 2.0.4
+## backbone 2.1.0
 
 * eliminated dependency on `PoissonBinomial`; `sdsm()` and `fixedcol()` now use an efficient implementation of the Refined Normal Approximation in base R
 * removed bipartite generative functions `bipartite.from.probability()`, `bipartite.from.sequence()`, `bipartite.from.distribution()`, and `bipartite.add.blocks()`. These are now part of the `incidentally` package
