@@ -66,9 +66,11 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
 
   #### Display suggested manuscript text ####
   if (narrative == TRUE) {
-    retained <- round((sum((backbone!=0)*1)) / sum((M!=0)*1),3)*100
-    write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
-                    signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global", retained = retained)
+    reduced_edges <- round((sum(M!=0) - sum(backbone!=0)) / sum(M!=0),3)*100  #Percent decrease in number of edges
+    reduced_nodes <- round((max(sum(rowSums(M)!=0),sum(colSums(M)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(M)!=0),sum(colSums(M)!=0)),3) * 100  #Percent decrease in number of connected nodes
+    if (narrative == TRUE) {write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
+                                            signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global",
+                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
   }
 
   backbone <- frommatrix(backbone, class)

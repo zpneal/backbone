@@ -15,11 +15,12 @@
 #' @param lt numeric: lower threshold (used in global threshold)
 #' @param trials: integer: number of trials used to estimate FDSM or oSDSM p-values
 #' @param model string: name of backbone null model
-#' @param retained numeric: percent of edges retained in the backbone
+#' @param reduced_edges numeric: percent reduction in number of edges
+#' @param reduced_nodes numeric: percent reduction in number of connected nodes
 #'
 #' @return NULL; only displays text in the console
 #' @keywords internal
-write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, retained) {
+write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, reduced_edges, reduced_nodes) {
 
   #### Prepare narrative components ####
   version <- utils::packageVersion("backbone")
@@ -65,23 +66,25 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   #### Second sentence (model) ####
   #Statistical models
   if (!is.null(alpha)) {
-    text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant")
-    text <- paste0(text, " (alpha = ", alpha, correction, ") using ", desc,", which retained ", retained, "% of edges.")
+    text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ".")
     }
 
   #Sparsify models
   if (!is.null(s)) {
-    text <- paste0(text, " Specifically, we used ", desc, " with a sparsification threshold of ", s, ", which retained ", retained, "% of edges.")
+    text <- paste0(text, " Specifically, we used ", desc, " with a sparsification threshold of ", s, ".")
   }
 
   #Global threshold
   if (model == "global" & is.null(lt)) {  #Binary
-    text <- paste0(text, " An edge was retained if its weight was greater than ", round(ut, 3), ", resulting in the retention of ", retained, "% of edges.")
+    text <- paste0(text, " An edge was retained if its weight was greater than ", round(ut, 3), ".")
   }
   if (model == "global" & !is.null(lt)) {  #Signed
-    text <- paste0(text, " An edge was retained as positive if its weight was greater than ", round(ut, 3), ", and as negative if its weight was less than ", round(lt, 3), ", resulting in the retention of ", retained, "% of edges.")
+    text <- paste0(text, " An edge was retained as positive if its weight was greater than ", round(ut, 3), ", and as negative if its weight was less than ", round(lt, 3), ".")
   }
 
+  #### Third sentence (reduction) ####
+  text <- paste0(text, " This reduced the number of edges by ", reduced_edges, "%, and reduced the number of connected nodes by ", reduced_nodes, "%.")
+  
   #### Display text ####
   message("")
   message("=== Suggested manuscript text and citations ===")

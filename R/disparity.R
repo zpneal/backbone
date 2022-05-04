@@ -117,9 +117,11 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
     backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    retained <- round((sum((backbone!=0)*1)) / (sum((G!=0)*1) - nrow(G)),3)*100
+    reduced_edges <- round((sum(G!=0) - sum(backbone!=0)) / sum(G!=0),3)*100  #Percent decrease in number of edges
+    reduced_nodes <- round((max(sum(rowSums(G)!=0),sum(colSums(G)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(G)!=0),sum(colSums(G)!=0)),3) * 100  #Percent decrease in number of connected nodes
     if (narrative == TRUE) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = symmetric,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity", retained = retained)}
+                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity",
+                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
     backbone <- frommatrix(backbone, convert = class)
     return(backbone)
   }
