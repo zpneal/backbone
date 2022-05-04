@@ -1,9 +1,9 @@
 .onAttach <- function(lib,pkg) {
   local_version <- utils::packageVersion("backbone")
   packageStartupMessage(" ____   backbone v",local_version)
-  packageStartupMessage("|  _ \\  Cite: Domagalski, R., Neal, Z. P., & Sagan, B. (2021). Backbone: An")
-  packageStartupMessage("|#|_) |       R package for extracting the backbone of bipartite projections. ")
-  packageStartupMessage("|# _ <        PLoS ONE, 16(1), e0244363. https://doi.org/10.1371/journal.pone.0244363")
+  packageStartupMessage("|  _ \\  Cite: Neal, Z. P., (2022). Backbone: An R package to extract network")
+  packageStartupMessage("|#|_) |       backbones. arXiv. https://doi.org/10.48550/arXiv.2203.11055")
+  packageStartupMessage("|# _ < ")
   packageStartupMessage("|#|_) | Help: type vignette(\"backbone\"); email zpneal@msu.edu; github zpneal/backbone")
   packageStartupMessage("|____/  Beta: type devtools::install_github(\"zpneal/backbone\", ref = \"devel\")")
 }
@@ -22,19 +22,19 @@
 #' M <- matrix(rbinom(5*5,1,.5),5,5)
 #' test <- backbone:::tomatrix(M)
 tomatrix <- function(graph){
-  class <- class(graph)[1]
+  class <- class(graph)[1]  #Identify class of supplied object
   isbipartite <- FALSE
 
-  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "sparseMatrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, edgelist dataframe, or igraph object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, Matrix, dataframe, or igraph object.")}
 
-  #### Convert from matrix object ####
-  if (((methods::is(graph, "matrix")) | (methods::is(graph, "sparseMatrix")) | (methods::is(graph, "Matrix")))) {
+  #### Convert from matrix or Matrix object ####
+  if (((methods::is(graph, "matrix")) | (methods::is(graph, "Matrix")))) {
     G <- as.matrix(graph)  #Coerce to matrix
     class(G) <- "numeric"  #Coerce to numeric
     if (any(is.na(G))) {stop("The object contains non-numeric entries")}
 
     if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
-    if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite IFF
+    if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite if
       if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
           !isSymmetric(G)) {                                                    #it is not symmetric
         isbipartite <- TRUE
@@ -44,7 +44,7 @@ tomatrix <- function(graph){
 
   #### Convert from edge list ####
   if (methods::is(graph, "data.frame")) {
-    if (ncol(graph)==1 | ncol(graph)>3) {stop("An edgelist must contain 2 or 3 columns")}
+    if (ncol(graph)<2 | ncol(graph)>3) {stop("An edgelist must contain 2 or 3 columns")}
     class <- "edgelist"  #Update starting class as edgelist
     G <- graph
     colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
@@ -67,6 +67,8 @@ tomatrix <- function(graph){
   #### Convert from igraph ####
   if (methods::is(graph, "igraph")) {
 
+    graph <- igraph::simplify(graph) #Remove any multi-edges and loops
+
     if (igraph::is.bipartite(graph) == TRUE){ #Bipartite
       isbipartite <- TRUE
       if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_incidence_matrix(graph, sparse = FALSE) #Unweighted
@@ -81,12 +83,9 @@ tomatrix <- function(graph){
 
   #### If the graph is bipartite, remove rows/columns with zero sums ####
   if (isbipartite){
-    R <- Matrix::rowSums(G)
-    C <- Matrix::colSums(G)
-    r <- which(R == 0)
-    c <- which(C == 0)
-    if (length(r)>0){G <- G[-r,]}
-    if (length(c)>0){G <- G[,-c]}
+    while (any(rowSums(G)==0) | any(rowSums(G)==ncol(G)) | any(colSums(G)==0) | any(colSums(G)==nrow(G))) {  #If any rows/columns are empty/full
+      G <- G[which(rowSums(G)!=0 & rowSums(G)!=ncol(G)),which(colSums(G)!=0 & colSums(G)!=nrow(G))]  #Remove them, check again
+    }
   }
 
   #### Summary dataframe ####
@@ -97,16 +96,6 @@ tomatrix <- function(graph){
     bipartite = isbipartite,
     symmetric = issymmetric,
     weighted = isweighted)
-
-  #### Report input type and modifications ####
-  if (issymmetric) {dir <- "undirected"} else {dir <- "directed"}
-  if (isweighted) {weigh <- "a weighted"} else {weigh <- "an unweighted"}
-  if (isbipartite) {
-    message(paste0("This ", class, " object is being treated as ", weigh, " bipartite network of ", nrow(G), " agents and ", ncol(G), " artifacts."))
-    if (length(r)>0) {message("These empty (i.e. all 0s) rows have been removed from the data: ", paste0(r, " "))}
-    if (length(c)>0) {message("These empty (i.e. all 0s) columns have been removed from the data: ", paste0(c, " "))}
-  }
-  if (!isbipartite) {message(paste0("This ", class, " object is being treated as ", weigh, " ", dir, " network containing ", nrow(G), " nodes."))}
 
   return(list(summary = summary, G = G))
 }
