@@ -33,7 +33,8 @@
 #'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
-#' @references {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
+#' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
 #' @export
 #'
 #' @examples

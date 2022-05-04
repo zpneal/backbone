@@ -59,7 +59,7 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (model == "quadrilateral") {desc <- "Nocaj et al.'s (2015) quadrilateral Simmelian model"}
 
   #### First sentence (descriptive) ####
-  text <- paste0("We used the backbone package for R (v", version, "; Domagalski, Neal, & Sagan, 2021) to extract the ", signed, " backbone")
+  text <- paste0("We used the backbone package for R (v", version, "; Neal, 2022) to extract the ", signed, " backbone")
   text <- paste0(text, " of ", type, " network containing ", contents, ".")
 
   #### Second sentence (model) ####
@@ -87,7 +87,7 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   message("=== Suggested manuscript text and citations ===")
   message(text)
   message("")
-  message("Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE, 16, e0244363. https://doi.org/10.1371/journal.pone.0244363")
+  message("Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. arXiv:2203.11055 [cs.SI]. https://doi.org/10.48550/arXiv.2203.11055")
   message("")
   if (model == "fixedfill") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
   if (model == "fixedrow") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}

@@ -22,8 +22,7 @@
 #' For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone")}}.
 #'     For updates, papers, presentations, and other backbone news, please see \href{https://www.zacharyneal.com/backbone}{www.rbackbone.net}
 #'
-#' @references {Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. *PLoS ONE, 16*, e0244363. \doi{10.1371/journal.pone.0244363}}
-#' @references {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
+#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
 #'
 #' @docType package
 #' @name backbone

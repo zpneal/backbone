@@ -96,17 +96,15 @@ loglikelihood_bicm <- function(x0, args){
 #'    the same row and column marginals as **M**. The BiCM yields the closest approximations of the true probabilities
 #'    compared to other estimation methods (Neal et al., 2021), and is used by [sdsm()] to extract the backbone of
 #'    a bipartite projection using the stochastic degree sequence model.
-#'    
+#'
 #' Optionally (if `fitness = TRUE`), `bicm()` instead returns a list of row and column fitnesses, which is faster and
 #'    requires less memory. Given the *i*th row's fitness Ri and the *j*th column's fitness Rj, the entry Bij in the
 #'    matrix can be computed as Ri\*Rj/(1+(Ri\*Rj)).
-#'    
+#'
 #' **Note**: M cannot contain any rows or columns that contain all 0s or all 1s.
 #'
-#' @references
-#' {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. *Scientific Reports, 5*, 10595. \doi{10.1038/srep10595}}
-#'
-#' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
+#' @references bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. *Scientific Reports, 5*, 10595. \doi{10.1038/srep10595}}
 #'
 #' @return a matrix of probabilities, or a list of fitnesses
 #' @export
@@ -181,7 +179,7 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
     probs <- x/(x+1)
     return(probs)
   }
-  
+
 }
 
 
