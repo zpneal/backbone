@@ -31,7 +31,7 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (weighted & !symmetric & !bipartite) {type <- "a weighted and directed unipartite"}
   if (!weighted & symmetric & !bipartite) {type <- "an unweighted and undirected unipartite"}
   if (!weighted & !symmetric & !bipartite) {type <- "an unweighted and directed unipartite"}
-  if (signed) {signed <- "signed"} else {signed <- "binary"}
+  if (signed) {signed <- "signed"} else {signed <- "unweighted"}
   correction <- ""
   if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
   if (mtc == "holm") {correction <- ", Holm adjusted"}
