@@ -9,6 +9,7 @@ output: html_document
 * speed improvements to `bicm()`
 * eliminated dependency on `network` and support for `network` objects, which can easily be converted to matrix objects
 * updated the information provided in the narrative text when `narrative = TRUE`
+* when the original graph is supplied as an `igraph` object with vertex attributes, the attributes are preserved in the backbone
 
 ## backbone 2.0.3
 
