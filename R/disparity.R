@@ -6,7 +6,7 @@
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `W`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -67,6 +67,7 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   convert <- tomatrix(W)
   G <- convert$G
   if (class == "original") {class <- convert$summary$class}
+  attribs <- convert$attribs
   symmetric <- convert$summary$symmetric
   if (convert$summary$bipartite==TRUE){
     message("The input graph is bipartite; extraction is performed on its unipartite projection.")
@@ -122,7 +123,7 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
     if (narrative == TRUE) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = symmetric,
                                             signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity",
                                             reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, convert = class)
+    backbone <- frommatrix(backbone, attribs, convert = class)
     return(backbone)
   }
 }

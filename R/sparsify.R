@@ -11,7 +11,7 @@
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
 #' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -59,10 +59,23 @@
 #' plot(sparse) #Clearly visible communities
 sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE, class = "original", narrative = FALSE) {
 
+  #### Helper Function: Edge score ranking ####
+  nhood.rank <- function(x) {  #Ranking function - Highest value = 1
+    old <- sort(unique(x))      #Second highest value = 2
+    new <- c((length(old)):1)   #Missing edges = 0
+    new[which(new==max(new))] <- 0
+    x[x %in% old] <- new[match(x, old, nomatch = 0)]
+    return(x)
+  }
+
+  #### Helper Function: Symmetrize using maximum ####
+  sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( function(i,j) (max(m[i,j], m[j,i])))))}
+
   #### Convert supplied object to matrix ####
   G <- tomatrix(U)
   if (G$summary$bipartite==TRUE | G$summary$symmetric==FALSE | G$summary$weighted==TRUE) {stop("G must be an undirected, unweighted, unipartite network")}
   if (class == "original") {class <- G$summary$class}
+  attribs <- G$attribs
   original <- G$G  #Original graph
   G <- G$G  #Copy to be manipulated
 
@@ -242,21 +255,9 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   #### Return backbone in desired class ####
   rownames(G) <- rownames(original)  #Restore labels if they were lost
   colnames(G) <- colnames(original)
-  backbone <- frommatrix(G, convert = class)  #Convert to desired class
+  backbone <- frommatrix(G, attribs, convert = class)  #Convert to desired class
   return(backbone)
 }
-
-#### Helper Function: Edge score ranking ####
-nhood.rank <- function(x) {  #Ranking function - Highest value = 1
-  old <- sort(unique(x))      #Second highest value = 2
-  new <- c((length(old)):1)   #Missing edges = 0
-  new[which(new==max(new))] <- 0
-  x[x %in% old] <- new[match(x, old, nomatch = 0)]
-  return(x)
-}
-
-#### Helper Function: Symmetrize using maximum ####
-sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( function(i,j) (max(m[i,j], m[j,i])))))}
 
 #### Wrappers ####
 #' Extract Karger's (1999) skeleton backbone
@@ -267,7 +268,7 @@ sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( funct
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -293,7 +294,7 @@ sparsify.with.skeleton <- function(U, s, class = "original", narrative = FALSE) 
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -319,7 +320,7 @@ sparsify.with.gspar <- function(U, s, class = "original", narrative = FALSE) {
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -345,7 +346,7 @@ sparsify.with.lspar <- function(U, s, class = "original", narrative = FALSE) {
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -371,7 +372,7 @@ sparsify.with.simmelian <- function(U, s, class = "original", narrative = FALSE)
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -397,7 +398,7 @@ sparsify.with.jaccard <- function(U, s, class = "original", narrative = FALSE) {
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -423,7 +424,7 @@ sparsify.with.meetmin <- function(U, s, class = "original", narrative = FALSE) {
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -449,7 +450,7 @@ sparsify.with.geometric <- function(U, s, class = "original", narrative = FALSE)
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -475,7 +476,7 @@ sparsify.with.hypergeometric <- function(U, s, class = "original", narrative = F
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -501,7 +502,7 @@ sparsify.with.localdegree <- function(U, s, class = "original", narrative = FALS
 #'
 #' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'

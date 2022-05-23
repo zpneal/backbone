@@ -12,9 +12,10 @@
 #'
 #' @param graph A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}.
 #'
-#' @return a list(summary, G)
+#' @return a list(summary, G, attribs)
 #'    `summary` is a dataframe containing characteristics of the supplied object
 #'    `G` is an adjacency/incidence matrix
+#'    `attribs` is a dataframe containing node characteristics if present in `graph`
 #'
 #' @keywords internal
 #'
@@ -70,18 +71,47 @@ tomatrix <- function(graph){
     graph <- igraph::simplify(graph) #Remove any multi-edges and loops
 
     if (igraph::is.bipartite(graph) == TRUE){ #Bipartite
-      isbipartite <- TRUE
-      if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_incidence_matrix(graph, sparse = FALSE) #Unweighted
-      } else {G <- igraph::as_incidence_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted
+      isbipartite <- TRUE  #Set type of graph
+
+      #Remove isolates and maximally connected nodes; similar as code below to remove empty/full rows/columns
+      isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
+      fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
+      fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
+      todrop <- c(isolates, fullrows, fullcols)
+      while (length(todrop)>0) {
+        graph <- igraph::delete.vertices(graph, todrop)
+        isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
+        fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
+        fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
+        todrop <- c(isolates, fullrows, fullcols)
+      }
+
+      #Capture attributes of FALSE (i.e. row) nodes
+      attribs <- as.data.frame(igraph::vertex_attr(graph, index = (igraph::V(graph)$type == FALSE)))  #Get attributes
+      attribs <- attribs[,!colnames(attribs)%in%c("type","name"),drop=F]  #Do not need to keep type or name
+      attribs <- Filter(function(x)!all(is.na(x)), attribs)  #Remove unused attributes
+      if (ncol(attribs)==0) {rm(attribs)}  #Delete dataframe if empty
+
+      #Convert to incidence matrix
+      if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_incidence_matrix(graph, sparse = FALSE) #Unweighted bipartite
+        } else {G <- igraph::as_incidence_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted bipartite
     }
 
     if (igraph::is.bipartite(graph) == FALSE){ #Unipartite
-      if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_adjacency_matrix(graph, sparse = FALSE) #Unweighted
-      } else {G <- igraph::as_adjacency_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted
+
+      #Capture attributes of nodes
+      attribs <- as.data.frame(igraph::vertex_attr(graph))  #Get attributes
+      attribs <- attribs[,!colnames(attribs)%in%c("type","name"),drop=F]  #Do not need to keep type or name
+      attribs <- Filter(function(x)!all(is.na(x)), attribs)  #Remove unused attributes
+      if (ncol(attribs)==0) {rm(attribs)}  #Delete dataframe if empty
+
+      #Convert to adjacency matrix
+      if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_adjacency_matrix(graph, sparse = FALSE) #Unweighted unipartite
+      } else {G <- igraph::as_adjacency_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted unipartite
     }
   }
 
-  #### If the graph is bipartite, remove rows/columns with zero sums ####
+  #### If the graph is bipartite, remove rows/columns with zero sums (already done above if igraph ####
   if (isbipartite){
     while (any(rowSums(G)==0) | any(rowSums(G)==ncol(G)) | any(colSums(G)==0) | any(colSums(G)==nrow(G))) {  #If any rows/columns are empty/full
       G <- G[which(rowSums(G)!=0 & rowSums(G)!=ncol(G)),which(colSums(G)!=0 & colSums(G)!=nrow(G))]  #Remove them, check again
@@ -97,13 +127,14 @@ tomatrix <- function(graph){
     symmetric = issymmetric,
     weighted = isweighted)
 
-  return(list(summary = summary, G = G))
+  if (exists("attribs")) {return(list(summary = summary, G = G, attribs = attribs))} else {return(list(summary = summary, G = G))}
 }
 
 #' Converts a backbone adjacency matrix to an object of specified class
 #'
 #' @param graph a matrix
-#' @param convert class to convert to, one of "matrix", "sparseMatrix", "igraph", or "edgelist"
+#' @param attribs dataframe: vertex attributes to be assigned in igraph object
+#' @param convert class to convert to, one of "matrix", "Matrix", "igraph", or "edgelist"
 #'
 #' @return backbone graph: Binary or signed backbone graph of class given in parameter `convert`.
 #'
@@ -112,13 +143,11 @@ tomatrix <- function(graph){
 #' @examples
 #' M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
 #' test <- backbone:::frommatrix(M, "Matrix")
-frommatrix <- function(graph, convert = "matrix"){
+frommatrix <- function(graph, attribs = NA, convert = "matrix"){
 
   if (convert == "matrix"){G <- graph}
 
   if (convert == "Matrix"){G <- Matrix::Matrix(graph)}
-
-  if (convert == "sparseMatrix"){G <- methods::as(graph, "sparseMatrix")}
 
   if (convert == "edgelist"){
     if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
@@ -130,6 +159,14 @@ frommatrix <- function(graph, convert = "matrix"){
     if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
     if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
     if (igraph::gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
+
+    if (!is.null(attribs)) {  #If attributes are supplied, add them to the igraph object
+      attribs.to.add <- colnames(attribs)
+      for (attrib in attribs.to.add) {
+        G <- igraph::set_vertex_attr(graph = G, name = attrib, value = attribs[,attrib])
+      }
+    }
+
   }
 
   return(G)

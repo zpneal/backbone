@@ -6,7 +6,7 @@
 #' @param upper real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros boolean: TRUE if zero-weight edges in `W` should be excluded from (i.e. also be zero in) the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `W`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -43,6 +43,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   #### Class Conversion ####
   convert <- tomatrix(W)
   if (class == "original") {class <- convert$summary$class}
+  attribs <- convert$attribs
   M <- convert$G
   if (convert$summary$bipartite) {
     artifacts <- ncol(M)      #Record the number of artifacts
@@ -73,7 +74,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
                                             reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
   }
 
-  backbone <- frommatrix(backbone, class)
+  backbone <- frommatrix(backbone, attribs, convert = class)
   return(backbone)
 }
 
@@ -82,7 +83,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
 #' @param upper Real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower Real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros Boolean: TRUE if zero-weight edges in `M` should be missing in the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned
 #' @export
