@@ -72,21 +72,16 @@ test_that("frommatrix classes match", {
   #NOTE: All matrices passed to frommatrix() will be binary or signed unipartite
   # matrix (signed unipartite) --> Matrix
   M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
-  test <- frommatrix(M,"Matrix")
+  test <- frommatrix(M,convert="Matrix")
   expect_s4_class(test, "Matrix")
-
-  # matrix (signed unipartite) --> Sparse Matrix
-  M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
-  test <- frommatrix(M,"sparseMatrix")
-  expect_s4_class(test, "sparseMatrix")
 
   # matrix (signed unipartite) --> igraph
   M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
-  test <- frommatrix(M,"igraph") #OK
+  test <- frommatrix(M,convert="igraph") #OK
   expect_s3_class(test, "igraph")
 
   # matrix (signed unipartite) --> edgelist
   M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
-  test <- frommatrix(M,"edgelist") #OK
+  test <- frommatrix(M,convert="edgelist") #OK
   expect_s3_class(test, "data.frame")
 })
