@@ -8,7 +8,7 @@
 <!-- badges: end -->
 
 ## Welcome
-Thank you for your interest in the backbone package\! The backbone package implements methods to extract the *backbone* of a network, which is a sparse and unweighted subgraph that contains only the most ‘important’ or ‘significant’ edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. Methods are available for:
+The backbone package implements methods to extract the *backbone* of a network, which is a sparse and unweighted subgraph that contains only the most ‘important’ or ‘significant’ edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. Methods are available for:
 
 * Weighted bipartite projections
 * Non-projection weighted networks
