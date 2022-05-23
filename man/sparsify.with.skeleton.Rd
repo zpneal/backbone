@@ -11,7 +11,7 @@ sparsify.with.skeleton(U, s, class = "original", narrative = FALSE)
 
 \item{s}{numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{U}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}

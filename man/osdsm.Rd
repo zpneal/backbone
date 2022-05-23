@@ -26,7 +26,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}

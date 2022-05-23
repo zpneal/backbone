@@ -22,7 +22,7 @@ global(
 
 \item{keepzeros}{boolean: TRUE if zero-weight edges in \code{W} should be excluded from (i.e. also be zero in) the backbone}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{W}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}

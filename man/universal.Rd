@@ -22,7 +22,7 @@ universal(
 
 \item{keepzeros}{Boolean: TRUE if zero-weight edges in \code{M} should be missing in the backbone}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{Boolean: TRUE if suggested text for a manuscript is to be returned}

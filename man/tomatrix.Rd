@@ -10,9 +10,10 @@ tomatrix(graph)
 \item{graph}{A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}.}
 }
 \value{
-a list(summary, G)
+a list(summary, G, attribs)
 \code{summary} is a dataframe containing characteristics of the supplied object
 \code{G} is an adjacency/incidence matrix
+\code{attribs} is a dataframe containing node characteristics if present in \code{graph}
 }
 \description{
 Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
