@@ -22,7 +22,6 @@ Imports:
     igraph,
     Matrix,
     methods,
-    MASS,
     stats,
     Rcpp,
     utils,

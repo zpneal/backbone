@@ -5,9 +5,10 @@ output: html_document
 ## backbone 2.1.0
 
 * eliminated dependency on `PoissonBinomial`; `sdsm()` and `fixedcol()` now use an efficient implementation of the Refined Normal Approximation in base R
+* eliminated dependency on `MASS`; `osdsm()` now uses `glm()` in base R to implement the conditional logistic regression method described by Neal (2017)
+* eliminated dependency on `network` and support for `network` objects, which can easily be converted to matrix objects
 * removed bipartite generative functions `bipartite.from.probability()`, `bipartite.from.sequence()`, `bipartite.from.distribution()`, and `bipartite.add.blocks()`. These are now part of the `incidentally` package
 * speed improvements to `bicm()`
-* eliminated dependency on `network` and support for `network` objects, which can easily be converted to matrix objects
 * updated the information provided in the narrative text when `narrative = TRUE`
 * when the original graph is supplied as an `igraph` object with vertex attributes, the attributes are preserved in the backbone
 
