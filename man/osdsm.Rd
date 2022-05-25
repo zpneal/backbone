@@ -46,7 +46,7 @@ are ignored.
 The \code{osdsm} function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 expected in a projection obtained from a random bipartite network where both the rows and the columns contain
 approximately the same number of each value. The edges in \code{B} must be integers, and are assumed to represent an
-ordinal-level measure such as a Likert scale.
+ordinal-level measure such as a Likert scale that starts at 0.
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
@@ -76,7 +76,7 @@ plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 
 bb <- osdsm(B, alpha = 0.05, narrative = TRUE,  #An oSDSM backbone...
-            class = "igraph", trials = 1000)
+            class = "igraph", trials = 100)
 plot(bb) #...is sparse with clear communities
 }
 \references{
