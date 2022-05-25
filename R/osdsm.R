@@ -16,7 +16,7 @@
 #' The `osdsm` function compares an edge's observed weight in the projection `B*t(B)` to the distribution of weights
 #'    expected in a projection obtained from a random bipartite network where both the rows and the columns contain
 #'    approximately the same number of each value. The edges in `B` must be integers, and are assumed to represent an
-#'    ordinal-level measure such as a Likert scale.
+#'    ordinal-level measure such as a Likert scale that starts at 0.
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 #'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
@@ -59,7 +59,7 @@
 #'                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 #'
 #' bb <- osdsm(B, alpha = 0.05, narrative = TRUE,  #An oSDSM backbone...
-#'             class = "igraph", trials = 1000)
+#'             class = "igraph", trials = 100)
 #' plot(bb) #...is sparse with clear communities
 
 osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
@@ -74,10 +74,11 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
     warning("This object is being treated as a bipartite network.")
     convert$summary$bipartite <- TRUE
   }
-  if (any(B!=as.integer(B)) | any(B < 0)) {stop("Edge weights must be positive integers.")}
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
   if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
+  weights <- sort(unique(as.vector(B)))  #Unique edge weights
+  if (!all.equal(weights,c(0:max(weights)))) {stop("Edge weights must be measured on an ordinal scale starting with 0")}
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
@@ -99,50 +100,44 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
 
   #### Compute probabilities for SDSM ####
   #Vectorize the bipartite data
-  A <- as.vector(B)                             #Cell values in column 1
-  A <- cbind(A, rep(1:nrow(B), times=ncol(B)))  #Row IDs in column 2
-  A <- cbind(A, rep(1:ncol(B), times=nrow(B)))  #Column IDs in column 3
+  A <- data.frame(value = as.vector(B))     #Edge weight
+  A$rowid <- rep(1:nrow(B), times=ncol(B))  #Row index
+  A$colid <- rep(1:ncol(B), each=nrow(B))   #Column index
 
-  #For each ordinal value, compute and attach row and column sums
-  for (i in min(A[,1]):max(A[,1])) {
-    if (dim(A)[2]>3) {A[,4] <- ((A[,1]==i)*1)}       #Does cell value equal i, put in column 4
-    if (dim(A)[2]==3) {A <- cbind(A, (A[,1]==i)*1)}  #Does cell value equal i, put in column 4
-    A <- cbind(A, stats::ave(A[,4],A[,2],FUN=sum))   #Number of times row contains i, put in column 5,7,9...
-    A <- cbind(A, stats::ave(A[,4],A[,3],FUN=sum))   #Number of times column contains i, put in column 6,8,10...
+  #Compute conditional probabilities using logistic regression (see Neal, 2017)
+  for (value in 1:max(weights)) {  #For each edge weight > 0
+    dat <- data.frame(y = (A$value>=value)*1, x1 = stats::ave(A$value>=value,A$rowid,FUN=sum), x2 = stats::ave(A$value>=value,A$colid, FUN=sum))
+    fitted <- stats::glm(y ~ x1 + x2, data = dat[which(A$value>=(value-1)),], family = "binomial")
+    A <- cbind(A, stats::predict(fitted, newdata = dat, type = "response"))
   }
 
-  #Compute probabilities using a Proportional Odds Logistic Regression
-  A <- as.data.frame(A[,c(1,5:ncol(A))])  #Data frame with cell values and row/column sums
-  A[,1] <- factor(A[,1], ordered = TRUE)  #Cell values as ordered factor
-  fitted <- suppressWarnings(MASS::polr(A ~ ., data = A)$fitted.values)  #Fitted probabilities (model will be rank-deficient, this is OK)
-  probs <- matrix(0, nrow=nrow(fitted), ncol=ncol(fitted))  #Matrix to hold cumulative probabilities
-  for (i in 1:ncol(fitted)) {  #Compute cumulative probabilities
-    if (i == 1) {probs[,i] <- fitted[,i]}
-    if (i > 1) {probs[,i] <- rowSums(fitted[,1:i])}
+  #Transform into unconditional probabilities (see Neal, 2017)
+  for (value in c(1:max(weights),0)) {  #For each edge weight value, doing weight = 0 last
+    if (value == 1) {ucondp <- A[,4]}
+    if (value > 1) {ucondp <- apply(A[,4:(value+3)], 1, prod)}
+    if (value != 0 & value != max(weights)) {ucondp <- ucondp * (1 - A[,(value+4)])}
+    if (value == 0) {ucondp <- 1 - rowSums(A[,(4+max(weights)):ncol(A)])}
+    A <- cbind(A, ucondp)
   }
+  A <- A[,c(1:3,(4+max(weights)):ncol(A))]
+  colnames(A) <- c("value", "rowid", "colid", paste0("p", c(1:max(weights),0)))
+  A$rand <- NA
 
   #### Build null models ####
   message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
   pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
   for (i in 1:trials){
 
-    #Start estimation timer; print message
-    if (i == 1) {
-      start.time <- Sys.time()
-      message("Finding the Backbone using Ordinal SDSM")
-    }
-
     #Use probabilities to create an SDSM Bstar
-    Bstar <- stats::runif(nrow(probs))                  #Random number
-    Bstar <- rowSums((Bstar > probs)*1)                 #Compare to probabilities
-    Bstar <- matrix(Bstar, nrow=nrow(B), ncol=ncol(B))  #Convert to matrix
+    A$rand <- apply(X = A[,4:(max(weights)+4)], MARGIN = 1, FUN = function(x) sample(c(1:max(weights),0), size = 1, replace= TRUE, prob = x))
+    Bstar <- matrix(A$rand, nrow=nrow(B), ncol=ncol(B))  #Convert to matrix
 
     #Construct Pstar from Bstar, check whether Pstar edge is larger/smaller than P edge
     Pstar <- tcrossprod(Bstar)
     Pupper <- Pupper + (Pstar > P)+0
     Plower <- Plower + (Pstar < P)+0
 
-    ### Increment progress bar ###
+    #Increment progress bar
     utils::setTxtProgressBar(pb, i)
 
   } #end for loop
