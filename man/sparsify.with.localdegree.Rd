@@ -30,7 +30,7 @@ sparse <- sparsify.with.localdegree(U, s = 0.3, narrative = TRUE)
 plot(sparse) #Clearly visible hubs
 }
 \references{
-{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-{Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. \emph{Social Network Analysis and Mining, 6}, 22. \doi{10.1007/s13278-016-0332-2}}
+model: {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. \emph{Social Network Analysis and Mining, 6}, 22. \doi{10.1007/s13278-016-0332-2}}
 }

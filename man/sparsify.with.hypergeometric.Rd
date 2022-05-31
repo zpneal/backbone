@@ -30,7 +30,7 @@ sparse <- sparsify.with.hypergeometric(U, s = 0.3, narrative = TRUE)
 plot(sparse) #Clearly visible communities
 }
 \references{
-{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-{Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. \emph{Proceedings of the National Academy of Sciences, 100}, 4372-4376. \doi{10.1073/pnas.0735871100}}
+model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. \emph{Proceedings of the National Academy of Sciences, 100}, 4372-4376. \doi{10.1073/pnas.0735871100}}
 }

@@ -30,7 +30,7 @@ sparse <- sparsify.with.skeleton(U, s = 0.25, narrative = TRUE)
 plot(sparse) #A sparser graph
 }
 \references{
-{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-{Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. \emph{Mathematics of Operations Research, 24}, 383-413. \doi{10.1287/moor.24.2.383}}
+model: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. \emph{Mathematics of Operations Research, 24}, 383-413. \doi{10.1287/moor.24.2.383}}
 }

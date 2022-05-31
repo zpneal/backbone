@@ -80,7 +80,7 @@ bb <- osdsm(B, alpha = 0.05, narrative = TRUE,  #An oSDSM backbone...
 plot(bb) #...is sparse with clear communities
 }
 \references{
-{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
 {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. \emph{Environment and Planning A, 49}, 2859-2877. \doi{10.1177/0308518X16631339}}
 }

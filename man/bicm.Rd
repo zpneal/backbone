@@ -41,7 +41,7 @@ M <- matrix(c(0,0,1,0,1,0,1,0,1),3,3)  #A binary matrix
 bicm(M)
 }
 \references{
-package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{arXiv:2203.11055 [cs.SI]}. \doi{10.48550/arXiv.2203.11055}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
 bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. \emph{Scientific Reports, 5}, 10595. \doi{10.1038/srep10595}}
 }

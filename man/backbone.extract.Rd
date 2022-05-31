@@ -21,7 +21,7 @@ backbone.extract(
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{tomatrix}.}
+\item{class}{string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "edgelist"), converted via \link{tomatrix}.}
 }
 \value{
 backbone graph: Binary or signed backbone graph of class given in parameter \code{class}.
