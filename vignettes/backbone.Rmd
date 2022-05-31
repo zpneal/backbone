@@ -70,7 +70,7 @@ Upon successful loading, a startup message will display that shows the version n
 ## Package overview {#overview}
 The primary use of the backbone package is backbone extraction, that is, identifying and preserving only the most important edges in a network. Different types of networks require different backbone extraction methods, however the basic workflow using the backbone package is the same for all methods:
 
-* You begin with some network data `dat`, which may take any of the following forms: an adjacency matrix (as a matrix, Matrix, or Sparse Matrix object), an edge list (as a 2- or 3-column matrix or data frame), a statnet object, or an igraph object.
+* You begin with some network data `dat`, which may take any of the following forms: an adjacency matrix (as a matrix, Matrix, or Sparse Matrix object), an edge list (as a 2- or 3-column matrix or data frame), or an igraph object.
 
 * You run an applicable backbone function on these data (e.g., `sdsm(dat)`), which yields an unweighted network of the same class as `dat`.
 
