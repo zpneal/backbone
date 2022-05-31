@@ -280,13 +280,13 @@ bb.object <- fdsm(B, alpha = NULL, trials = 1000)  #Backbone object containing e
 We can extract a backbone from this backbone object using a very liberal alpha significance level, which results in many edges being retained:
 ```{r}
 bb1 <- backbone.extract(bb.object, alpha = 0.5, class = "igraph")  #Backbone extracted at alpha = 0.5
-plot(bb1)
+plot(bb1, vertex.label = NA)
 ```
 
 Then we can extract another backbone, using a more conservative alpha significance level that retains fewer edges, from the same backbone object without needing to recompute the p-values:
 ```{r}
 bb2 <- backbone.extract(bb.object, alpha = 0.05, class = "igraph")  #Backbone extracted at alpha = 0.05
-plot(bb2)
+plot(bb2, vertex.label = NA)
 ```
 
 ## Matrix randomization {#randomization}
