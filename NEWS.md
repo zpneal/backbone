@@ -11,6 +11,7 @@ output: html_document
 * speed improvements to `bicm()`
 * updated the information provided in the narrative text when `narrative = TRUE`
 * when the original graph is supplied as an `igraph` object with vertex attributes, the attributes are preserved in the backbone
+* added links to new tutorial: Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137
 
 ## backbone 2.0.3
 
