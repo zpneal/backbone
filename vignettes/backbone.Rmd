@@ -50,12 +50,11 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 # Introduction {#introduction}
 
 ## Welcome {#welcome}
-Thank you for your interest in the backbone package! This vignette illustrates how to use this package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a network that contains only the most 'important' or 'significant' edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. While this vignette provides an overview and introduction, with some examples, for more details please see our latest manuscripts on backbone here:
+Thank you for your interest in the backbone package! This vignette illustrates how to use this package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a network that contains only the most 'important' or 'significant' edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. 
 
-* Neal Z.P. (2022). backbone: An R package to Extract Network Backbones. *arXiv:2203.11055 [cs.SI]*. [https://doi.org/10.48550/arXiv.2203.11055
-](https://doi.org/10.48550/arXiv.2203.11055)
+The `backbone` package can be cited as:
 
-* Neal, Z. P., Domagalski, R, Sagan B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. [https://arxiv.org/abs/2105.13396](https://arxiv.org/abs/2105.13396)
+**Neal, Z. P. (2022). backbone: An R package to Extract Network Backbones. *PLOS ONE, 17*. [https://doi.org/10.1371/journal.pone.0269137](https://doi.org/10.1371/journal.pone.0269137)**
 
 For additional resources on the backbone package, please see [https://www.rbackbone.net/](https://www.zacharyneal.com/backbone).
 
@@ -265,7 +264,7 @@ plot(bb, vertex.size = igraph::degree(bb), vertex.label = NA)
 If the `alpha` parameter is specified when using any of the bipartite projection (e.g., `sdsm()`) or weighted (e.g., `disparity()`) backbone functions, they return the backbone network. If `alpha = NULL`, these functions instead return an S3 backbone-class object that contains p-values for each edge. The `backbone.extract()` function can be applied to this object to extract backbones at different alpha significance levels.
 
 This can be particularly useful in the case of backbones extracted using models that are computationally intensive, such as the fixed degree sequence model (FDSM). values To illustrate, we use a simulated bipartite network whose backbone *should* contain evidence of agents clustered in three communities, and we use `fdsm()` with `alpha = NULL` to compute edgewise p-values and store them in a backbone object:
-```{r}
+```{r, echo = TRUE, results = 'hide', warning = FALSE}
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
                  matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.2),10)),
