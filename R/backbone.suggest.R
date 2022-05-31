@@ -12,7 +12,7 @@
 #'    text are displayed.
 #' @export
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #'
 #' @examples
 #' M <- matrix(runif(100),10,10)  #A random weighted, directed graph

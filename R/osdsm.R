@@ -43,7 +43,7 @@
 #'    are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
-#' @references {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. *Environment and Planning A, 49*, 2859-2877. \doi{10.1177/0308518X16631339}}
+#' @references osdsm: {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. *Environment and Planning A, 49*, 2859-2877. \doi{10.1177/0308518X16631339}}
 #'
 #' @export
 #'
