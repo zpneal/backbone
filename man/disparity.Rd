@@ -78,5 +78,5 @@ plot(bb) #...preserves edges at multiple scales
 \references{
 package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
+disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
 }

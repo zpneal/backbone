@@ -54,5 +54,5 @@ global(W, upper = function(x)mean(x),  #Above-average --> positive edges
 \references{
 package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. \emph{Social Networks, 39}, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
+model: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. \emph{Social Networks, 39}, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 }
