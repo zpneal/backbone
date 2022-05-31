@@ -49,7 +49,7 @@
 #' @return An unweighted, undirected, unipartite graph of class `class`.
 #' @export
 #'
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #'
 #' @examples
 #' U <- igraph::sbm.game(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
@@ -273,8 +273,8 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
 #' @export
 #'
 #' @examples
@@ -299,8 +299,8 @@ sparsify.with.skeleton <- function(U, s, class = "original", narrative = FALSE) 
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 #' @export
 #'
 #' @examples
@@ -325,8 +325,8 @@ sparsify.with.gspar <- function(U, s, class = "original", narrative = FALSE) {
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 #' @export
 #'
 #' @examples
@@ -351,8 +351,8 @@ sparsify.with.lspar <- function(U, s, class = "original", narrative = FALSE) {
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
 #' @export
 #'
 #' @examples
@@ -377,8 +377,8 @@ sparsify.with.simmelian <- function(U, s, class = "original", narrative = FALSE)
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -403,8 +403,8 @@ sparsify.with.jaccard <- function(U, s, class = "original", narrative = FALSE) {
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -429,8 +429,8 @@ sparsify.with.meetmin <- function(U, s, class = "original", narrative = FALSE) {
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -455,8 +455,8 @@ sparsify.with.geometric <- function(U, s, class = "original", narrative = FALSE)
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -481,8 +481,8 @@ sparsify.with.hypergeometric <- function(U, s, class = "original", narrative = F
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. *Social Network Analysis and Mining, 6*, 22. \doi{10.1007/s13278-016-0332-2}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. *Social Network Analysis and Mining, 6*, 22. \doi{10.1007/s13278-016-0332-2}}
 #' @export
 #'
 #' @examples
@@ -507,8 +507,8 @@ sparsify.with.localdegree <- function(U, s, class = "original", narrative = FALS
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
-#' @references {Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. *Journal of Graph Algorithms and Applications, 19*, 595-618. \doi{10.7155/jgaa.00370}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. *Journal of Graph Algorithms and Applications, 19*, 595-618. \doi{10.7155/jgaa.00370}}
 #' @export
 #'
 #' @examples

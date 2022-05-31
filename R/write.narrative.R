@@ -84,13 +84,13 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
 
   #### Third sentence (reduction) ####
   text <- paste0(text, " This reduced the number of edges by ", reduced_edges, "%, and reduced the number of connected nodes by ", reduced_nodes, "%.")
-  
+
   #### Display text ####
   message("")
   message("=== Suggested manuscript text and citations ===")
   message(text)
   message("")
-  message("Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. arXiv:2203.11055 [cs.SI]. https://doi.org/10.48550/arXiv.2203.11055")
+  message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
   message("")
   if (model == "fixedfill") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
   if (model == "fixedrow") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}

@@ -103,7 +103,7 @@ loglikelihood_bicm <- function(x0, args){
 #'
 #' **Note**: M cannot contain any rows or columns that contain all 0s or all 1s.
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *arXiv:2203.11055 \[cs.SI\]*. \doi{10.48550/arXiv.2203.11055}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. *Scientific Reports, 5*, 10595. \doi{10.1038/srep10595}}
 #'
 #' @return a matrix of probabilities, or a list of fitnesses

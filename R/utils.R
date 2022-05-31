@@ -1,8 +1,8 @@
 .onAttach <- function(lib,pkg) {
   local_version <- utils::packageVersion("backbone")
   packageStartupMessage(" ____   backbone v",local_version)
-  packageStartupMessage("|  _ \\  Cite: Neal, Z. P., (2022). Backbone: An R package to extract network")
-  packageStartupMessage("|#|_) |       backbones. arXiv. https://doi.org/10.48550/arXiv.2203.11055")
+  packageStartupMessage("|  _ \\  Cite: Neal, Z. P., (2022). Backbone: An R package to extract network backbones.")
+  packageStartupMessage("|#|_) |       PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
   packageStartupMessage("|# _ < ")
   packageStartupMessage("|#|_) | Help: type vignette(\"backbone\"); email zpneal@msu.edu; github zpneal/backbone")
   packageStartupMessage("|____/  Beta: type devtools::install_github(\"zpneal/backbone\", ref = \"devel\")")
@@ -181,7 +181,7 @@ frommatrix <- function(graph, attribs = NA, convert = "matrix"){
 #' @param signed Boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param alpha Real: significance level of hypothesis test(s)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
-#' @param class string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "network", "edgelist"), converted via \link{tomatrix}.
+#' @param class string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "edgelist"), converted via \link{tomatrix}.
 #' @return backbone graph: Binary or signed backbone graph of class given in parameter `class`.
 #'
 #' @details The "backbone" S3 class object is composed of three matrices (the weighted graph, edges' upper-tail p-values,
@@ -218,9 +218,8 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
       & (class != "Matrix")
       & (class != "sparseMatrix")
       & (class != "igraph")
-      & (class != "network")
       & (class != "edgelist"))
-  {stop("incorrect class type, must be one of c(matrix, Matrix, sparseMatrix, igraph, network, edgelist)")}
+  {stop("incorrect class type, must be one of c(matrix, Matrix, sparseMatrix, igraph, edgelist)")}
 
   #### Extract object components ####
   G <- bb.object$G
@@ -273,7 +272,7 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
   }
 
   #### Return result ####
-  backbone <- frommatrix(backbone, class)
+  backbone <- frommatrix(backbone, convert = class)
   return(backbone)
 }
 
