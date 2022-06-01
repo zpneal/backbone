@@ -10,7 +10,7 @@ Authors@R: c(
 Description: An implementation of methods for extracting an unweighted unipartite
    graph (i.e. a backbone) from an unweighted unipartite graph, a weighted unipartite
    graph, the projection of an unweighted bipartite graph , or the projection
-   of a weighted bipartite graph (e.g., Neal, 2022 <doi:10.1371/journal.pone.0269137>).
+   of a weighted bipartite graph (Neal, 2022 <doi:10.1371/journal.pone.0269137>).
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.2
