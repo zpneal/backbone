@@ -7,7 +7,7 @@
 backbone.suggest(G, s = NULL)
 }
 \arguments{
-\item{G}{graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, \code{\link{igraph}}, or \code{\link{network}}.}
+\item{G}{graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, or \code{\link{igraph}}.}
 
 \item{s}{numeric: If provided, a backbone is extracted using this value as the significance level or sparsification parameter.}
 }
@@ -25,4 +25,7 @@ text are displayed.
 M <- matrix(runif(100),10,10)  #A random weighted, directed graph
 backbone <- backbone.suggest(M)
 backbone <- backbone.suggest(M, s = 0.05)
+}
+\references{
+{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 }

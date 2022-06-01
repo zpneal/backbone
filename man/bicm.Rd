@@ -4,10 +4,12 @@
 \alias{bicm}
 \title{Bipartite Configuration Model}
 \usage{
-bicm(M, tol = 1e-08, max_steps = 200, ...)
+bicm(M, fitness = FALSE, tol = 1e-08, max_steps = 200, ...)
 }
 \arguments{
 \item{M}{matrix: a binary matrix}
+
+\item{fitness}{boolean: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only}
 
 \item{tol}{numeric, tolerance of algorithm}
 
@@ -16,7 +18,7 @@ bicm(M, tol = 1e-08, max_steps = 200, ...)
 \item{...}{optional arguments}
 }
 \value{
-matrix: a matrix of probabilities
+a matrix of probabilities, or a list of fitnesses
 }
 \description{
 \code{bicm} estimates cell probabilities under the bipartite configuration model
@@ -27,13 +29,19 @@ Given a binary matrix \strong{M}, the Bipartite Configuration Model (BiCM; Sarac
 the same row and column marginals as \strong{M}. The BiCM yields the closest approximations of the true probabilities
 compared to other estimation methods (Neal et al., 2021), and is used by \code{\link[=sdsm]{sdsm()}} to extract the backbone of
 a bipartite projection using the stochastic degree sequence model.
+
+Optionally (if \code{fitness = TRUE}), \code{bicm()} instead returns a list of row and column fitnesses, which is faster and
+requires less memory. Given the \emph{i}th row's fitness Ri and the \emph{j}th column's fitness Rj, the entry Bij in the
+matrix can be computed as Ri\*Rj/(1+(Ri\*Rj)).
+
+\strong{Note}: M cannot contain any rows or columns that contain all 0s or all 1s.
 }
 \examples{
-M <- matrix(rbinom(25,1,0.5),5,5)  #A random bipartite graph
+M <- matrix(c(0,0,1,0,1,0,1,0,1),3,3)  #A binary matrix
 bicm(M)
 }
 \references{
-{Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. \emph{Scientific Reports, 5}, 10595. \doi{10.1038/srep10595}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
+bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. \emph{Scientific Reports, 5}, 10595. \doi{10.1038/srep10595}}
 }

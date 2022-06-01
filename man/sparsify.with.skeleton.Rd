@@ -7,11 +7,11 @@
 sparsify.with.skeleton(U, s, class = "original", narrative = FALSE)
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{s}{numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{U}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -30,5 +30,7 @@ sparse <- sparsify.with.skeleton(U, s = 0.25, narrative = TRUE)
 plot(sparse) #A sparser graph
 }
 \references{
-{Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. \emph{Mathematics of Operations Research, 24}, 383-413. \doi{10.1287/moor.24.2.383}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+model: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. \emph{Mathematics of Operations Research, 24}, 383-413. \doi{10.1287/moor.24.2.383}}
 }

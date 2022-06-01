@@ -14,7 +14,7 @@ global(
 )
 }
 \arguments{
-\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{upper}{real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.}
 
@@ -22,7 +22,7 @@ global(
 
 \item{keepzeros}{boolean: TRUE if zero-weight edges in \code{W} should be excluded from (i.e. also be zero in) the backbone}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{W}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -52,5 +52,7 @@ global(W, upper = function(x)mean(x),  #Above-average --> positive edges
           lower = function(x)mean(x), narrative = TRUE)  #Below-average --> negative edges
 }
 \references{
-{Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. \emph{Social Networks, 39}, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+model: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. \emph{Social Networks, 39}, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 }

@@ -2,6 +2,17 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.1.0
+
+* eliminated dependency on `PoissonBinomial`; `sdsm()` and `fixedcol()` now use an efficient implementation of the Refined Normal Approximation in base R
+* eliminated dependency on `MASS`; `osdsm()` now uses `glm()` in base R to implement the conditional logistic regression method described by Neal (2017)
+* eliminated dependency on `network` and support for `network` objects, which can easily be converted to matrix objects
+* removed bipartite generative functions `bipartite.from.probability()`, `bipartite.from.sequence()`, `bipartite.from.distribution()`, and `bipartite.add.blocks()`. These are now part of the `incidentally` package
+* speed improvements to `bicm()`
+* updated the information provided in the narrative text when `narrative = TRUE`
+* when the original graph is supplied as an `igraph` object with vertex attributes, the attributes are preserved in the backbone
+* added links to new tutorial: Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137
+
 ## backbone 2.0.3
 
 * fixed bug in `fastball()` so it will work with R < 4.1.0

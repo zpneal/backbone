@@ -7,11 +7,11 @@
 sparsify.with.localdegree(U, s, class = "original", narrative = FALSE)
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{s}{numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{U}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -30,5 +30,7 @@ sparse <- sparsify.with.localdegree(U, s = 0.3, narrative = TRUE)
 plot(sparse) #Clearly visible hubs
 }
 \references{
-{Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. \emph{Social Network Analysis and Mining, 6}, 22. \doi{10.1007/s13278-016-0332-2}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+model: {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. \emph{Social Network Analysis and Mining, 6}, 22. \doi{10.1007/s13278-016-0332-2}}
 }

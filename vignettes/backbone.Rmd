@@ -50,11 +50,11 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 # Introduction {#introduction}
 
 ## Welcome {#welcome}
-Thank you for your interest in the backbone package! This vignette illustrates how to use this package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a network that contains only the most 'important' or 'significant' edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. While this vignette provides an overview and introduction, with some examples, for more details please see our latest manuscripts on backbone here:
+Thank you for your interest in the backbone package! This vignette illustrates how to use this package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a network that contains only the most 'important' or 'significant' edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. 
 
-* "Domagalski R., Neal Z.P., and Sagan B. (2021). Backbone: an R package for extracting the backbone of bipartite projections. *PLoS ONE 16(1)*: e0244363." [https://doi.org/10.1371/journal.pone.0244363](https://doi.org/10.1371/journal.pone.0244363)
+The `backbone` package can be cited as:
 
-* "Neal, Z. P., Domagalski, R, Sagan B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. [https://arxiv.org/abs/2105.13396](https://arxiv.org/abs/2105.13396)
+**Neal, Z. P. (2022). backbone: An R package to Extract Network Backbones. *PLOS ONE, 17*. [https://doi.org/10.1371/journal.pone.0269137](https://doi.org/10.1371/journal.pone.0269137)**
 
 For additional resources on the backbone package, please see [https://www.rbackbone.net/](https://www.zacharyneal.com/backbone).
 
@@ -70,7 +70,7 @@ Upon successful loading, a startup message will display that shows the version n
 ## Package overview {#overview}
 The primary use of the backbone package is backbone extraction, that is, identifying and preserving only the most important edges in a network. Different types of networks require different backbone extraction methods, however the basic workflow using the backbone package is the same for all methods:
 
-* You begin with some network data `dat`, which may take any of the following forms: an adjacency matrix (as a matrix, Matrix, or Sparse Matrix object), an edge list (as a 2- or 3-column matrix or data frame), a statnet object, or an igraph object.
+* You begin with some network data `dat`, which may take any of the following forms: an adjacency matrix (as a matrix, Matrix, or Sparse Matrix object), an edge list (as a 2- or 3-column matrix or data frame), or an igraph object.
 
 * You run an applicable backbone function on these data (e.g., `sdsm(dat)`), which yields an unweighted network of the same class as `dat`.
 
@@ -95,11 +95,13 @@ Most functions in the backbone package include a `narrative` parameter. When `na
 ## Supported data formats {#formats}
 The functions in the backbone package support many different data formats that can be used to represent a network or graph in R:
 
-* **matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite matrix can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object, a *sparse Matrix* object from the Matrix package, or a *dataframe* object.
+* **matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite matrix can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object or *Matrix* object created using the Matrix package.
 
 * **edgelist** - A network can be represented as an edgelist, supplied as a *dataframe* object. The dataframe should have two or three columns; the first two columns contain the IDs of the sending and receiving nodes, respectively, while the third column (optionally) contains the edge weights.
 
-* **igraph** or **network** - A network can be supplied to a backbone extraction function as an *igraph* object from the igraph package, or as a *network* object from the statnet package.
+* **igraph** - A network can be supplied to a backbone extraction function as an *igraph* object from the igraph package.
+
+Note: Earlier versions of backbone also supported *network* objects created using the statnet package. To reduce package dependencies, these objects are no longer supported. You can convert a *network* bipartite graph into an incidence matrix using `network::as.matrix.network(graph, type = "incidence")`, and can convert a *network* unipartite graph into an adjacency matrix using `network::as.matrix.network(graph, type = "adjacency")`. In either case, if the graph is weighted, the command should also include `attrname = "weight"`.
 
 [back to Table of Contents](#toc)
 
@@ -109,7 +111,7 @@ A weighted unipartite network contains one type of node, and pairs of nodes are 
 
 The goal of backbone extraction from a weighted network is to identify edges in **W** whose weights are statistically significantly strong (or weak, for signed backbones), and thus should be preserved in the backbone. One simple possibility is to apply a global threshold *T*, such that all edges with weights stronger than *T* are preserved, however this approach tends to systematically overlook nodes with low degree. Alternative approaches, such as the disparity filter [@serrano2009extracting], involve comparing edge weights to their expected values under a null model that considers each node's local neighborhood.
 
-## Extracting the backbone {#weight-extract}
+## Extracting the backbone [@neal2022backbone] {#weight-extract}
 To illustrate extracting the backbone from a weighted network, we begin by creating a simulated weighted network, stored in a matrix `W`. This network has strongly heterogeneous edge weights; some are quite weak (10) while others are quite strong (100), which gives the network a multi-scalar character. This network might represent the number of passengers flying between each of 10 airports, where there are two hub airports (one large, one small) that each serve their local areas.
 ```{r}
 W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
@@ -167,7 +169,7 @@ The goal of backbone extraction from bipartite projections is to identify edges 
 
 This approach relies on Monte Carlo simulation, and is used by `fdsm()`. However, for the other bipartite backbone null models, the distribution of P\*~ij~ is known and does not require simulation [@neal2021comparing], which makes them faster. Additionally, this process preserves only edges that are statistically significantly *stronger* than expected under the chosen null model, thus yielding a binary backbone. However, it is also possible to preserve edges that are statistically significantly *weaker*, and thus to obtain a signed backbone.
 
-## Extracting the backbone [@domagalski2021backbone] {#proj-extract}
+## Extracting the backbone [@neal2022backbone] {#proj-extract}
 Because all bipartite backbone functions work similarly, here we will use the stochastic degree sequence model and `sdsm()` function as an example, applying it to simulated data.
 
 We begin by creating a simulated bipartite network, stored in a matrix `B`. This network contains 30 agents (rows) and 75 artifacts (columns). The agents are connected to the artifacts in a way that we might expect if the agents form three cohesive communities. For example, this could represent authors from three distinct disciplines, and the papers they have written. In practice, `B` can take the form of a matrix object (as in this example), but could take other forms, such as a bipartite network stored in a `statnet` or `igraph` class object.
@@ -226,7 +228,7 @@ Although many sparsification models have been proposed, each one is defined by f
 * How are edges *filtered* based on the (normalized) edge score?
 * Are edges in the union of minimum spanning trees (*UMST*) preserved to ensure connectivity?
 
-## Extracting the backbone {#unweight-extract}
+## Extracting the backbone [@neal2022backbone] {#unweight-extract}
 The backbone of an unweighted network can be extracted using the `sparsify()` function, which includes parameters that answer each of the four questions that define a sparsification model (`escore`, `normalize`, `filter`, and `umst`), as well as a sparsification parameter `s` that controls the amount of sparsification.
 
 Specific combinations of these parameters correspond to named sparsification models that have been proposed in the literature. For example, the *L-spar* sparsification model [@satuluri2011local] can be obtained using `sparsify(escore = "jaccard", normalize = "rank", filter = "degree", umst = FALSE)`. For this reason, the backbone package includes several wrappers for the `sparsify()` function that return specific named sparsification models. For example, the `sparsify.with.lspar()` function is a wrapper that uses the above `sparsify()` options.
@@ -262,7 +264,7 @@ plot(bb, vertex.size = igraph::degree(bb), vertex.label = NA)
 If the `alpha` parameter is specified when using any of the bipartite projection (e.g., `sdsm()`) or weighted (e.g., `disparity()`) backbone functions, they return the backbone network. If `alpha = NULL`, these functions instead return an S3 backbone-class object that contains p-values for each edge. The `backbone.extract()` function can be applied to this object to extract backbones at different alpha significance levels.
 
 This can be particularly useful in the case of backbones extracted using models that are computationally intensive, such as the fixed degree sequence model (FDSM). values To illustrate, we use a simulated bipartite network whose backbone *should* contain evidence of agents clustered in three communities, and we use `fdsm()` with `alpha = NULL` to compute edgewise p-values and store them in a backbone object:
-```{r}
+```{r, echo = TRUE, results = 'hide', warning = FALSE}
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
                  matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.2),10)),
@@ -278,13 +280,13 @@ bb.object <- fdsm(B, alpha = NULL, trials = 1000)  #Backbone object containing e
 We can extract a backbone from this backbone object using a very liberal alpha significance level, which results in many edges being retained:
 ```{r}
 bb1 <- backbone.extract(bb.object, alpha = 0.5, class = "igraph")  #Backbone extracted at alpha = 0.5
-plot(bb1)
+plot(bb1, vertex.label = NA)
 ```
 
 Then we can extract another backbone, using a more conservative alpha significance level that retains fewer edges, from the same backbone object without needing to recompute the p-values:
 ```{r}
 bb2 <- backbone.extract(bb.object, alpha = 0.05, class = "igraph")  #Backbone extracted at alpha = 0.05
-plot(bb2)
+plot(bb2, vertex.label = NA)
 ```
 
 ## Matrix randomization {#randomization}

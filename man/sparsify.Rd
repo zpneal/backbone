@@ -16,7 +16,7 @@ sparsify(
 )
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{s}{numeric: Sparsification parameter}
 
@@ -28,7 +28,7 @@ sparsify(
 
 \item{umst}{boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{U}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -84,4 +84,7 @@ plot(U) #A hairball
 sparse <- sparsify(U, s = 0.6, escore = "jaccard", normalize = "rank",
 filter = "degree", narrative = TRUE)
 plot(sparse) #Clearly visible communities
+}
+\references{
+{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 }

@@ -2,7 +2,7 @@
 #'
 #' `backbone.suggest` suggests and optionally runs an appropriate backbone model for a graph object.
 #'
-#' @param G graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, \code{\link{igraph}}, or \code{\link{network}}.
+#' @param G graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, or \code{\link{igraph}}.
 #' @param s numeric: If provided, a backbone is extracted using this value as the significance level or sparsification parameter.
 #'
 #' @return If `s` == NULL: NULL, but a message is displayed with a suggested model.
@@ -11,6 +11,8 @@
 #'    (if a sparsification model is suggested). The code used to perform the extraction, and suggested manuscript
 #'    text are displayed.
 #' @export
+#'
+#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #'
 #' @examples
 #' M <- matrix(runif(100),10,10)  #A random weighted, directed graph

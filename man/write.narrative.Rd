@@ -18,7 +18,8 @@ write.narrative(
   lt,
   trials,
   model,
-  retained
+  reduced_edges,
+  reduced_nodes
 )
 }
 \arguments{
@@ -46,7 +47,9 @@ write.narrative(
 
 \item{model}{string: name of backbone null model}
 
-\item{retained}{numeric: percent of edges retained in the backbone}
+\item{reduced_edges}{numeric: percent reduction in number of edges}
+
+\item{reduced_nodes}{numeric: percent reduction in number of connected nodes}
 
 \item{trials:}{integer: number of trials used to estimate FDSM or oSDSM p-values}
 }

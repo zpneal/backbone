@@ -2,11 +2,11 @@
 #'
 #' `global` extracts the backbone of a weighted network using a global threshold
 #'
-#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param upper real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros boolean: TRUE if zero-weight edges in `W` should be excluded from (i.e. also be zero in) the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `W`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -21,7 +21,8 @@
 #'
 #' @return Binary or signed backbone graph of class given in parameter `class`.
 #'
-#' @references {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 #' @export
 #'
 #' @examples
@@ -42,6 +43,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   #### Class Conversion ####
   convert <- tomatrix(W)
   if (class == "original") {class <- convert$summary$class}
+  attribs <- convert$attribs
   M <- convert$G
   if (convert$summary$bipartite) {
     artifacts <- ncol(M)      #Record the number of artifacts
@@ -65,25 +67,27 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
 
   #### Display suggested manuscript text ####
   if (narrative == TRUE) {
-    retained <- round((sum((backbone!=0)*1)) / sum((M!=0)*1),3)*100
-    write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
-                    signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global", retained = retained)
+    reduced_edges <- round((sum(M!=0) - sum(backbone!=0)) / sum(M!=0),3)*100  #Percent decrease in number of edges
+    reduced_nodes <- round((max(sum(rowSums(M)!=0),sum(colSums(M)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(M)!=0),sum(colSums(M)!=0)),3) * 100  #Percent decrease in number of connected nodes
+    if (narrative == TRUE) {write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
+                                            signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global",
+                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
   }
 
-  backbone <- frommatrix(backbone, class)
+  backbone <- frommatrix(backbone, attribs, convert = class)
   return(backbone)
 }
 
 #' Wrapper for global()
-#' @param M graph: Graph object of class matrix, sparse matrix, igraph, edgelist, or network object.
+#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param upper Real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower Real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros Boolean: TRUE if zero-weight edges in `M` should be missing in the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned
 #' @export
-universal <- function(M, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
+universal <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
   warning("The universal() function is now called global(); please use global() instead.")
-  global(M, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE)
+  global(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE)
 }

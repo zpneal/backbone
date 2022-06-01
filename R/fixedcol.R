@@ -2,14 +2,12 @@
 #'
 #' `fixedcol` extracts the backbone of a bipartite projection using the Fixed Column Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
-#'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 
@@ -33,7 +31,8 @@
 #'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
-#' @references {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references fixedcol: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #' @export
 #'
 #' @examples
@@ -55,7 +54,7 @@
 #' bb <- fixedcol(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedcol backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fixedcol <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+fixedcol <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -63,6 +62,7 @@ fixedcol <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, 
   #### Class Conversion ####
   convert <- tomatrix(B)
   if (class == "original") {class <- convert$summary$class}
+  attribs <- convert$attribs
   B <- convert$G
   if (convert$summary$weighted==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary$bipartite==FALSE){
@@ -77,8 +77,8 @@ fixedcol <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, 
 
   #### Create Backbone Object ####
   pt <- ((cs*(cs-1))/(m*(m-1)))  #Parameters for computing Poissonbinomial
-  Pupper <- matrix(PoissonBinomial::ppbinom(x = (P-1), probs = pt, method = method, lower.tail = FALSE),nrow = m, ncol = m,byrow = TRUE)
-  Plower <- matrix(PoissonBinomial::ppbinom(x = P, probs = pt, method = method),nrow = m, ncol = m,byrow = TRUE)
+  Pupper <- matrix((pb(k = (P-1), p = pt, lower = FALSE)),nrow = m, ncol = m,byrow = TRUE)
+  Plower <- matrix(pb(k = P, p = pt),nrow = m, ncol = m,byrow = TRUE)
   bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedcol")
   class(bb) <- "backbone"
 
@@ -86,10 +86,12 @@ fixedcol <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, 
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
     backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    retained <- round((sum((backbone!=0)*1)) / (sum((P!=0)*1) - nrow(P)),3)*100
+    reduced_edges <- round(((sum(P!=0)-nrow(P)) - sum(backbone!=0)) / (sum(P!=0)-nrow(P)),3)*100  #Percent decrease in number of edges
+    reduced_nodes <- round((max(sum(rowSums(P)!=0),sum(colSums(P)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(P)!=0),sum(colSums(P)!=0)),3) * 100  #Percent decrease in number of connected nodes
     if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = FALSE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "fixedcol", retained = retained)}
-    backbone <- frommatrix(backbone, convert = class)
+                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "fixedcol",
+                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
+    backbone <- frommatrix(backbone, attribs, convert = class)
     return(backbone)
   }
 }

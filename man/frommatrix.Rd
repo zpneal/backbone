@@ -4,12 +4,14 @@
 \alias{frommatrix}
 \title{Converts a backbone adjacency matrix to an object of specified class}
 \usage{
-frommatrix(graph, convert = "matrix")
+frommatrix(graph, attribs = NA, convert = "matrix")
 }
 \arguments{
 \item{graph}{a matrix}
 
-\item{convert}{class to convert to, one of "matrix", "sparseMatrix", "igraph", "edgelist", or "network"}
+\item{attribs}{dataframe: vertex attributes to be assigned in igraph object}
+
+\item{convert}{class to convert to, one of "matrix", "Matrix", "igraph", or "edgelist"}
 }
 \value{
 backbone graph: Binary or signed backbone graph of class given in parameter \code{convert}.

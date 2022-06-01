@@ -22,14 +22,11 @@ The package also includes some utility functions:
 \itemize{
 \item \code{\link[=fastball]{fastball()}} - Fast marginal-preserving randomization of binary matrices
 \item \code{\link[=bicm]{bicm()}} - Compute probabilities under the bipartite configuration model
-\item \code{\link[=bipartite.from.probability]{bipartite.from.probability()}}, \code{\link[=bipartite.from.sequence]{bipartite.from.sequence()}}, and \code{\link[=bipartite.from.distribution]{bipartite.from.distribution()}} - Generate random bipartite networks with given edge probability, degree sequences, or degree distributions.
 }
 
 For additional documentation and background on the package functions, see \href{../doc/backbone.html}{\code{vignette("backbone")}}.
 For updates, papers, presentations, and other backbone news, please see \href{https://www.zacharyneal.com/backbone}{www.rbackbone.net}
 }
 \references{
-{Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. \emph{PLoS ONE, 16}, e0244363. \doi{10.1371/journal.pone.0244363}}
-
-{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 }

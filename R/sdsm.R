@@ -2,14 +2,12 @@
 #'
 #' `sdsm` extracts the backbone of a bipartite projection using the Stochastic Degree Sequence Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
-#' @param method string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
-#'     "RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #' @param ... optional arguments
@@ -35,9 +33,9 @@
 #'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
 #'    are ignored.
 #'
-#' @references
-#' {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
-#' {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
+#' @references sdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @export
 #'
@@ -60,7 +58,7 @@
 #' bb <- sdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An SDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
+sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -68,6 +66,7 @@ sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc 
   #### Class Conversion ####
   convert <- tomatrix(B)
   if (class == "original") {class <- convert$summary$class}
+  attribs <- convert$attribs
   B <- convert$G
   if (convert$summary$weighted==TRUE){stop("Graph must be unweighted.")}
   if (convert$summary$bipartite==FALSE){
@@ -78,29 +77,23 @@ sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
 
-  ### Create Positive and Negative Matrices to hold backbone ###
-  Pupper <- matrix(0, nrow(P), ncol(P))
-  Plower <- matrix(0, nrow(P), ncol(P))
-
   #### Compute Probabilities for SDSM ####
   prob.mat <- bicm(B,...)
 
-  #### Assemble and Probabilities ####
-  rows <- dim(prob.mat)[1]
+  #### Compute p-values ####
+  Pupper <- matrix(0, nrow(P), ncol(P))
+  Plower <- matrix(0, nrow(P), ncol(P))
+  for (col in 1:ncol(P)) {  #Loop over lower triangle
+    for (row in col:nrow(P)) {
+      probs <- prob.mat[row,]*prob.mat[col,]
+      Plower[row,col] <- pb(P[row,col], probs)
+      Pupper[row,col] <- pb(P[row,col]-1, probs, lower = FALSE)
+    }
+  }
+  Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangles
+  Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]
 
-  #### Create Backbone Object ####
-  for (i in 1:rows){
-    ### Compute prob.mat[i,]*prob.mat[j,] for each j ###
-    prob.imat <- sweep(prob.mat, MARGIN = 2, prob.mat[i,], `*`)
-
-    ### Find cdf, below or equal to value for negative, above or equal to value for positive ###
-    negative <- as.array(mapply(PoissonBinomial::ppbinom, x= as.data.frame(t(P[i,])), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal"))
-    positive <- as.array(mapply(PoissonBinomial::ppbinom, x=(as.data.frame(t(P[i,])-1)), probs = as.data.frame(t(prob.imat)), method = "RefinedNormal", lower.tail = FALSE))
-
-    ### Set values in Positive & Negative matrices ###
-    Pupper[i,] <- positive
-    Plower[i,] <- negative
-  } #end for i in rows
+  #### Assemble backbone object ####
   bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "sdsm")
   class(bb) <- "backbone"
 
@@ -108,10 +101,12 @@ sdsm <- function(B, method = "RefinedNormal", alpha = 0.05, signed = FALSE, mtc 
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
     backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    retained <- round((sum((backbone!=0)*1)) / (sum((P!=0)*1) - nrow(P)),3)*100
+    reduced_edges <- round(((sum(P!=0)-nrow(P)) - sum(backbone!=0)) / (sum(P!=0)-nrow(P)),3)*100  #Percent decrease in number of edges
+    reduced_nodes <- round((max(sum(rowSums(P)!=0),sum(colSums(P)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(P)!=0),sum(colSums(P)!=0)),3) * 100  #Percent decrease in number of connected nodes
     if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = FALSE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "sdsm", retained = retained)}
-    backbone <- frommatrix(backbone, convert = class)
+                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "sdsm",
+                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
+    backbone <- frommatrix(backbone, attribs, convert = class)
     return(backbone)
   }
 }

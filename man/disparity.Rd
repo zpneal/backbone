@@ -14,7 +14,7 @@ disparity(
 )
 }
 \arguments{
-\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.}
+\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -22,7 +22,7 @@ disparity(
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{W}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -76,5 +76,7 @@ bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
 plot(bb) #...preserves edges at multiple scales
 }
 \references{
-{Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
 }

@@ -6,7 +6,6 @@
 \usage{
 fixedcol(
   B,
-  method = "RefinedNormal",
   alpha = 0.05,
   signed = FALSE,
   mtc = "none",
@@ -15,11 +14,8 @@ fixedcol(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+\item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.}
-
-\item{method}{string: Specifies the method of the Poisson Binomial distribution computation used by the "ppbinom" function in \link[PoissonBinomial]{PoissonBinomial-Distribution}.
-"RefinedNormal" gives quick, very accurate approximations, while "DivideFFT" gives the quickest exact computations.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -27,7 +23,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -75,5 +71,7 @@ bb <- fixedcol(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedcol 
 plot(bb) #...is sparse with clear communities
 }
 \references{
-{Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+fixedcol: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
 }

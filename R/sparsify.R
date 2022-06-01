@@ -5,13 +5,13 @@
 #' network using a sparsification model described by a combination of an edge scoring metric, a
 #' edge score normalization, and an edge score filter.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification parameter
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
 #' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
@@ -49,6 +49,8 @@
 #' @return An unweighted, undirected, unipartite graph of class `class`.
 #' @export
 #'
+#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#'
 #' @examples
 #' U <- igraph::sbm.game(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
 #' plot(U) #A hairball
@@ -57,10 +59,23 @@
 #' plot(sparse) #Clearly visible communities
 sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE, class = "original", narrative = FALSE) {
 
+  #### Helper Function: Edge score ranking ####
+  nhood.rank <- function(x) {  #Ranking function - Highest value = 1
+    old <- sort(unique(x))      #Second highest value = 2
+    new <- c((length(old)):1)   #Missing edges = 0
+    new[which(new==max(new))] <- 0
+    x[x %in% old] <- new[match(x, old, nomatch = 0)]
+    return(x)
+  }
+
+  #### Helper Function: Symmetrize using maximum ####
+  sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( function(i,j) (max(m[i,j], m[j,i])))))}
+
   #### Convert supplied object to matrix ####
   G <- tomatrix(U)
   if (G$summary$bipartite==TRUE | G$summary$symmetric==FALSE | G$summary$weighted==TRUE) {stop("G must be an undirected, unweighted, unipartite network")}
   if (class == "original") {class <- G$summary$class}
+  attribs <- G$attribs
   original <- G$G  #Original graph
   G <- G$G  #Copy to be manipulated
 
@@ -231,28 +246,18 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   if (escore=="degree" & normalize=="rank" & filter=="degree" & umst==FALSE) {text <- model <- "degree"}
   if (escore=="quadrilateral embeddedness" & normalize=="embeddedness" & filter=="threshold" & umst==TRUE) {model <- "quadrilateral"}
   if (model=="") {model <- "sparify"}
-  retained <- round((sum((G!=0)*1)) / (sum((original!=0)*1) - nrow(original)),3)*100
-  if (narrative) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = FALSE, bipartite = FALSE, symmetric = TRUE,
-                                  signed = FALSE, mtc = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model, retained = retained)}
+  reduced_edges <- round((sum(original!=0) - sum(G!=0)) / sum(original!=0),3)*100  #Percent decrease in number of edges
+  reduced_nodes <- round((max(sum(rowSums(original)!=0),sum(colSums(original)!=0)) - max(sum(rowSums(G)!=0),sum(colSums(G)!=0))) / max(sum(rowSums(original)!=0),sum(colSums(original)!=0)),3) * 100  #Percent decrease in number of connected nodes
+  if (narrative == TRUE) {write.narrative(agents = nrow(original), artifacts = NULL, weighted = FALSE, bipartite = FALSE, symmetric = TRUE,
+                                          signed = FALSE, mtc = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model,
+                                          reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
 
   #### Return backbone in desired class ####
   rownames(G) <- rownames(original)  #Restore labels if they were lost
   colnames(G) <- colnames(original)
-  backbone <- frommatrix(G, convert = class)  #Convert to desired class
+  backbone <- frommatrix(G, attribs, convert = class)  #Convert to desired class
   return(backbone)
 }
-
-#### Helper Function: Edge score ranking ####
-nhood.rank <- function(x) {  #Ranking function - Highest value = 1
-  old <- sort(unique(x))      #Second highest value = 2
-  new <- c((length(old)):1)   #Missing edges = 0
-  new[which(new==max(new))] <- 0
-  x[x %in% old] <- new[match(x, old, nomatch = 0)]
-  return(x)
-}
-
-#### Helper Function: Symmetrize using maximum ####
-sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( function(i,j) (max(m[i,j], m[j,i])))))}
 
 #### Wrappers ####
 #' Extract Karger's (1999) skeleton backbone
@@ -261,14 +266,15 @@ sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( funct
 #' `sparsify.with.skeleton` is a wrapper for [sparsify()] that extracts the skeleton backbone described by Karger (1999),
 #' which preserves a specified proportion of random edges. It is equivalent to `sparsify(escore = "random", normalize = "none", filter = "proportion", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
 #' @export
 #'
 #' @examples
@@ -286,14 +292,15 @@ sparsify.with.skeleton <- function(U, s, class = "original", narrative = FALSE) 
 #' `sparsify.with.gspar` is a wrapper for [sparsify()] that extracts the G-spar backbone described by Satuluri et al. (2011).
 #' It is equivalent to `sparsify(escore = "jaccard", normalize = "none", filter = "proportion", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Proportion of edges to retain, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 #' @export
 #'
 #' @examples
@@ -311,14 +318,15 @@ sparsify.with.gspar <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.lspar` is a wrapper for [sparsify()] that extracts the L-spar backbone described by Satuluri et al. (2011).
 #' It is equivalent to `sparsify(escore = "jaccard", normalize = "rank", filter = "degree", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 #' @export
 #'
 #' @examples
@@ -336,14 +344,15 @@ sparsify.with.lspar <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.simmelian` is a wrapper for [sparsify()] that extracts the simmelian backbone described by Nick et al. (2013).
 #' It is equivalent to `sparsify(escore = "triangles", normalize = "embeddedness", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
 #' @export
 #'
 #' @examples
@@ -361,14 +370,15 @@ sparsify.with.simmelian <- function(U, s, class = "original", narrative = FALSE)
 #' `sparsify.with.jaccard` is a wrapper for [sparsify()] that extracts the jaccard backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "jaccard", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -386,14 +396,15 @@ sparsify.with.jaccard <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.meetmin` is a wrapper for [sparsify()] that extracts the meetmin backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "meetmin", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -411,14 +422,15 @@ sparsify.with.meetmin <- function(U, s, class = "original", narrative = FALSE) {
 #' `sparsify.with.geometric` is a wrapper for [sparsify()] that extracts the geometric backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "geometric", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -436,14 +448,15 @@ sparsify.with.geometric <- function(U, s, class = "original", narrative = FALSE)
 #' `sparsify.with.hypergeometric` is a wrapper for [sparsify()] that extracts the hypergeometric backbone described by Goldberg and Roth (2003).
 #' It is equivalent to `sparsify(escore = "hypergeometric", normalize = "none", filter = "threshold", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsificiation threshold, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. *Proceedings of the National Academy of Sciences, 100*, 4372-4376. \doi{10.1073/pnas.0735871100}}
 #' @export
 #'
 #' @examples
@@ -461,14 +474,15 @@ sparsify.with.hypergeometric <- function(U, s, class = "original", narrative = F
 #' `sparsify.with.localdegree` is a wrapper for [sparsify()] that extracts the local degree backbone described by Hamann et al. (2016).
 #' It is equivalent to `sparsify(escore = "degree", normalize = "rank", filter = "degree", umst = FALSE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. *Social Network Analysis and Mining, 6*, 22. \doi{10.1007/s13278-016-0332-2}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. *Social Network Analysis and Mining, 6*, 22. \doi{10.1007/s13278-016-0332-2}}
 #' @export
 #'
 #' @examples
@@ -486,14 +500,15 @@ sparsify.with.localdegree <- function(U, s, class = "original", narrative = FALS
 #' `sparsify.with.quadrilateral` is a wrapper for [sparsify()] that extracts the quadrilateral Simmelian backbone described by Nocaj et al. (2015).
 #' It is equivalent to `sparsify(escore = "quadrilateral embeddedness", normalize = "embeddedness", filter = "threshold", umst = TRUE)`.
 #'
-#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+#' @param U An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param s numeric: Sparsification exponent, 0 < s < 1; larger values yield sparser graphs
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @return An unweighted, undirected, unipartite graph of class `class`.
-#' @references {Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. *Journal of Graph Algorithms and Applications, 19*, 595-618. \doi{10.7155/jgaa.00370}}
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references model: {Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. *Journal of Graph Algorithms and Applications, 19*, 595-618. \doi{10.7155/jgaa.00370}}
 #' @export
 #'
 #' @examples

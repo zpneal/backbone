@@ -15,7 +15,7 @@ osdsm(
 )
 }
 \arguments{
-\item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object; (4) a \code{\link{network}} object.
+\item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
@@ -26,7 +26,7 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
-\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "sparseMatrix", "igraph", "network", "edgelist").
+\item{class}{string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
@@ -46,7 +46,7 @@ are ignored.
 The \code{osdsm} function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 expected in a projection obtained from a random bipartite network where both the rows and the columns contain
 approximately the same number of each value. The edges in \code{B} must be integers, and are assumed to represent an
-ordinal-level measure such as a Likert scale.
+ordinal-level measure such as a Likert scale that starts at 0.
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
@@ -76,9 +76,11 @@ plot(igraph::graph_from_adjacency_matrix(P, mode = "undirected",
                                          weighted = TRUE, diag = FALSE)) #...is a dense hairball
 
 bb <- osdsm(B, alpha = 0.05, narrative = TRUE,  #An oSDSM backbone...
-            class = "igraph", trials = 1000)
+            class = "igraph", trials = 100)
 plot(bb) #...is sparse with clear communities
 }
 \references{
-{Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. \emph{Environment and Planning A, 49}, 2859-2877. \doi{10.1177/0308518X16631339}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+osdsm: {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. \emph{Environment and Planning A, 49}, 2859-2877. \doi{10.1177/0308518X16631339}}
 }

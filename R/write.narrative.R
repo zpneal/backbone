@@ -15,11 +15,12 @@
 #' @param lt numeric: lower threshold (used in global threshold)
 #' @param trials: integer: number of trials used to estimate FDSM or oSDSM p-values
 #' @param model string: name of backbone null model
-#' @param retained numeric: percent of edges retained in the backbone
+#' @param reduced_edges numeric: percent reduction in number of edges
+#' @param reduced_nodes numeric: percent reduction in number of connected nodes
 #'
 #' @return NULL; only displays text in the console
 #' @keywords internal
-write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, retained) {
+write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, reduced_edges, reduced_nodes) {
 
   #### Prepare narrative components ####
   version <- utils::packageVersion("backbone")
@@ -30,7 +31,7 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (weighted & !symmetric & !bipartite) {type <- "a weighted and directed unipartite"}
   if (!weighted & symmetric & !bipartite) {type <- "an unweighted and undirected unipartite"}
   if (!weighted & !symmetric & !bipartite) {type <- "an unweighted and directed unipartite"}
-  if (signed) {signed <- "signed"} else {signed <- "binary"}
+  if (signed) {signed <- "signed"} else {signed <- "unweighted"}
   correction <- ""
   if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
   if (mtc == "holm") {correction <- ", Holm adjusted"}
@@ -59,35 +60,37 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (model == "quadrilateral") {desc <- "Nocaj et al.'s (2015) quadrilateral Simmelian model"}
 
   #### First sentence (descriptive) ####
-  text <- paste0("We used the backbone package for R (v", version, "; Domagalski, Neal, & Sagan, 2021) to extract the ", signed, " backbone")
+  text <- paste0("We used the backbone package for R (v", version, "; Neal, 2022) to extract the ", signed, " backbone")
   text <- paste0(text, " of ", type, " network containing ", contents, ".")
 
   #### Second sentence (model) ####
   #Statistical models
   if (!is.null(alpha)) {
-    text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant")
-    text <- paste0(text, " (alpha = ", alpha, correction, ") using ", desc,", which retained ", retained, "% of edges.")
+    text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ".")
     }
 
   #Sparsify models
   if (!is.null(s)) {
-    text <- paste0(text, " Specifically, we used ", desc, " with a sparsification threshold of ", s, ", which retained ", retained, "% of edges.")
+    text <- paste0(text, " Specifically, we used ", desc, " with a sparsification threshold of ", s, ".")
   }
 
   #Global threshold
   if (model == "global" & is.null(lt)) {  #Binary
-    text <- paste0(text, " An edge was retained if its weight was greater than ", round(ut, 3), ", resulting in the retention of ", retained, "% of edges.")
+    text <- paste0(text, " An edge was retained if its weight was greater than ", round(ut, 3), ".")
   }
   if (model == "global" & !is.null(lt)) {  #Signed
-    text <- paste0(text, " An edge was retained as positive if its weight was greater than ", round(ut, 3), ", and as negative if its weight was less than ", round(lt, 3), ", resulting in the retention of ", retained, "% of edges.")
+    text <- paste0(text, " An edge was retained as positive if its weight was greater than ", round(ut, 3), ", and as negative if its weight was less than ", round(lt, 3), ".")
   }
+
+  #### Third sentence (reduction) ####
+  text <- paste0(text, " This reduced the number of edges by ", reduced_edges, "%, and reduced the number of connected nodes by ", reduced_nodes, "%.")
 
   #### Display text ####
   message("")
   message("=== Suggested manuscript text and citations ===")
   message(text)
   message("")
-  message("Domagalski, R., Neal, Z. P., and Sagan, B. (2021). backbone: An R Package for Backbone Extraction of Weighted Graphs. PLoS ONE, 16, e0244363. https://doi.org/10.1371/journal.pone.0244363")
+  message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
   message("")
   if (model == "fixedfill") {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
   if (model == "fixedrow") {message("Neal. Z. P. (2013). Identifying statistically significant edges in one-mode projections. Social Network Analysis and Mining, 3, 915-924. https://doi.org/10.1007/s13278-013-0107-y")}
