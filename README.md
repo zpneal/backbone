@@ -16,7 +16,6 @@ The backbone package implements methods to extract the *backbone* of a network, 
 
 In addition, the package implements some other utility functions to:
 
-* Generate random bipartite networks
 * Randomize matrices while preserving the row and column sums
 * Estimate the Bipartite Configuration Model (BiCM)
 
