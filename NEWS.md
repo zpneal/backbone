@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.1.1
+
+* various speedups in `sparsify()`
+
 ## backbone 2.1.0
 
 * eliminated dependency on `PoissonBinomial`; `sdsm()` and `fixedcol()` now use an efficient implementation of the Refined Normal Approximation in base R
