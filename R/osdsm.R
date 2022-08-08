@@ -78,7 +78,10 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
   weights <- sort(unique(as.vector(B)))  #Unique edge weights
-  if (!all.equal(weights,c(0:max(weights)))) {stop("Edge weights must be measured on an ordinal scale starting with 0")}
+  if (sum(weights%%1)!=0) {stop("Edge weights must be integers that reflect values on an ordinal scale.")}
+  if (any(weights < 0)) {stop("Edge weights must be positive integers that reflect values on an ordinal scale.")}
+  if (!(0 %in% weights)) {warning("Although no edges have weight = 0, the weight scale is assumed to start at 0.")}
+  weights <- c(0:max(B))  #If weights are valid, this is the full scale
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
@@ -107,7 +110,7 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   #Compute conditional probabilities using logistic regression (see Neal, 2017)
   for (value in 1:max(weights)) {  #For each edge weight > 0
     dat <- data.frame(y = (A$value>=value)*1, x1 = stats::ave(A$value>=value,A$rowid,FUN=sum), x2 = stats::ave(A$value>=value,A$colid, FUN=sum))
-    fitted <- stats::glm(y ~ x1 + x2, data = dat[which(A$value>=(value-1)),], family = "binomial")
+    fitted <- suppressWarnings(stats::glm(y ~ x1 + x2, data = dat[which(A$value>=(value-1)),], family = "binomial"))
     A <- cbind(A, stats::predict(fitted, newdata = dat, type = "response"))
   }
 
