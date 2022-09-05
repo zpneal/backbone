@@ -103,7 +103,7 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   ### Create Positive and Negative Matrices to hold backbone ###
   rotate <- FALSE  #initialize
   Pupper <- matrix(0, nrow(P), ncol(P))  #Create positive matrix to hold number of times null co-occurence >= P
-  Plower <- matrix(0, nrow(P), ncol(P))  #Create negative matrix to hold number of times null co-occurence <] P
+  Plower <- matrix(0, nrow(P), ncol(P))  #Create negative matrix to hold number of times null co-occurence <= P
   if (nrow(B) > ncol(B)) {  #If B is long, make it wide before randomizing so that randomization is faster
     rotate <- TRUE
     B <- t(B)
