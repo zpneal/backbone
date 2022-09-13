@@ -10,23 +10,24 @@
 
 #' Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
 #'
-#' @param graph A graph object of class "matrix", "sparseMatrix", "dataframe", \link[igraph]{igraph}.
+#' @param graph A graph object of class "matrix", "Matrix", "dataframe", \link[igraph]{igraph}.
+#' @param reduce boolean: If TRUE and `graph` is bipartite, remove isolates and maximally-connected nodes
 #'
 #' @return a list(summary, G, attribs)
 #'    `summary` is a dataframe containing characteristics of the supplied object
 #'    `G` is an adjacency/incidence matrix
-#'    `attribs` is a dataframe containing node characteristics if present in `graph`
+#'    `attribs` is a dataframe containing vertex attributes (if present in `graph`)
 #'
 #' @keywords internal
 #'
 #' @examples
 #' M <- matrix(rbinom(5*5,1,.5),5,5)
 #' test <- backbone:::tomatrix(M)
-tomatrix <- function(graph){
+tomatrix <- function(graph, reduce = TRUE){
   class <- class(graph)[1]  #Identify class of supplied object
   isbipartite <- FALSE
 
-  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "data.frame"))) {stop("input bipartite data must be a matrix, Matrix, dataframe, or igraph object.")}
+  if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "data.frame"))) {stop("input data must be a matrix, Matrix, dataframe, or igraph object.")}
 
   #### Convert from matrix or Matrix object ####
   if (((methods::is(graph, "matrix")) | (methods::is(graph, "Matrix")))) {
@@ -34,6 +35,7 @@ tomatrix <- function(graph){
     class(G) <- "numeric"  #Coerce to numeric
     if (any(is.na(G))) {stop("The object contains non-numeric entries")}
 
+    ## Check if bipartite
     if (dim(G)[1]!=dim(G)[2]) {isbipartite <- TRUE}  #A rectangular matrix is treated as bipartite
     if (dim(G)[1]==dim(G)[2] & !is.null(rownames(G)) & !is.null(colnames(G))) { #A labeled square matrix is treated as bipartite if
       if (!identical(rownames(G),colnames(G)) &                                 #the row and column labels differ, and
@@ -51,14 +53,14 @@ tomatrix <- function(graph){
     colnames(G) <- LETTERS[1:dim(graph)[2]]  #Name columns A, B, and (if present) C
     isbipartite <- length(intersect(G[,1],G[,2])) == 0  #Treat as bipartite if there is no overlap in node lists A and B
 
-      if (isbipartite == TRUE) { #Bipartite
+      if (isbipartite == TRUE) { #If bipartite, create incidence matrix
         G <- igraph::graph_from_data_frame(G, directed = F)
         igraph::V(G)$type <- igraph::V(G)$name %in% graph[,2] #second column of edges is TRUE type
         if (dim(graph)[2] == 2) {G <- igraph::as_incidence_matrix(G, sparse = FALSE)} #Unweighted
         if (dim(graph)[2] == 3) {G <- igraph::as_incidence_matrix(G, attr = "C", sparse = FALSE)} #Weighted
       }
 
-      if (isbipartite == FALSE) { #Unipartite
+      if (isbipartite == FALSE) { #If unipartite, create adjacency matrix
         G <- igraph::graph_from_data_frame(G, directed = T)
         if (dim(graph)[2] == 2) {G <- igraph::as_adjacency_matrix(G, type = "both", sparse = FALSE)} #Unweighted
         if (dim(graph)[2] == 3) {G <- igraph::as_adjacency_matrix(G, type = "both", attr = "C", sparse = FALSE)} #Weighted
@@ -70,20 +72,23 @@ tomatrix <- function(graph){
 
     graph <- igraph::simplify(graph) #Remove any multi-edges and loops
 
-    if (igraph::is.bipartite(graph) == TRUE){ #Bipartite
+    ## For bipartite inputs
+    if (igraph::is.bipartite(graph) == TRUE){
       isbipartite <- TRUE  #Set type of graph
 
-      #Remove isolates and maximally connected nodes; similar as code below to remove empty/full rows/columns
-      isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
-      fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
-      fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
-      todrop <- c(isolates, fullrows, fullcols)
-      while (length(todrop)>0) {
-        graph <- igraph::delete.vertices(graph, todrop)
+      #Remove isolates and maximally connected nodes, if requested
+      if (reduce) {
         isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
         fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
         fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
         todrop <- c(isolates, fullrows, fullcols)
+        while (length(todrop)>0) {
+          graph <- igraph::delete.vertices(graph, todrop)
+          isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
+          fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
+          fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
+          todrop <- c(isolates, fullrows, fullcols)
+        }
       }
 
       #Capture attributes of FALSE (i.e. row) nodes
@@ -97,7 +102,8 @@ tomatrix <- function(graph){
         } else {G <- igraph::as_incidence_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted bipartite
     }
 
-    if (igraph::is.bipartite(graph) == FALSE){ #Unipartite
+    ## For unipartite inputs
+    if (igraph::is.bipartite(graph) == FALSE){
 
       #Capture attributes of nodes
       attribs <- as.data.frame(igraph::vertex_attr(graph))  #Get attributes
@@ -111,53 +117,50 @@ tomatrix <- function(graph){
     }
   }
 
-  #### If the graph is bipartite, remove rows/columns with zero sums (already done above if igraph ####
-  if (isbipartite){
+  #### If requested, remove isolates and maximally-connected nodes ####
+  if (isbipartite & reduce){
     while (any(rowSums(G)==0) | any(rowSums(G)==ncol(G)) | any(colSums(G)==0) | any(colSums(G)==nrow(G))) {  #If any rows/columns are empty/full
       G <- G[which(rowSums(G)!=0 & rowSums(G)!=ncol(G)),which(colSums(G)!=0 & colSums(G)!=nrow(G))]  #Remove them, check again
     }
   }
 
   #### Summary dataframe ####
-  if (isbipartite) {issymmetric <- FALSE} else {issymmetric <- isSymmetric(G)}
-  isweighted <- any(!(G%in%c(0,1)))
-  summary <- data.frame(
-    class = class,
-    bipartite = isbipartite,
-    symmetric = issymmetric,
-    weighted = isweighted)
+  if (isbipartite) {issymmetric <- FALSE} else {issymmetric <- isSymmetric(G)}  #Check if symmetric
+  isweighted <- any(!(G%in%c(0,1)))  #Check if weighted
+  summary <- data.frame(class = class, bipartite = isbipartite, symmetric = issymmetric, weighted = isweighted)  #Description
 
+  #### Return result ####
   if (exists("attribs")) {return(list(summary = summary, G = G, attribs = attribs))} else {return(list(summary = summary, G = G))}
 }
 
-#' Converts a backbone adjacency matrix to an object of specified class
+#' Converts a backbone adjacency matrix to a graph object of specified class
 #'
-#' @param graph a matrix
+#' @param mat an adjacency matrix
 #' @param attribs dataframe: vertex attributes to be assigned in igraph object
 #' @param convert class to convert to, one of "matrix", "Matrix", "igraph", or "edgelist"
 #'
-#' @return backbone graph: Binary or signed backbone graph of class given in parameter `convert`.
+#' @return backbone graph: Binary or signed backbone graph of class `convert`.
 #'
 #' @keywords internal
 #'
 #' @examples
 #' M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)
 #' test <- backbone:::frommatrix(M, "Matrix")
-frommatrix <- function(graph, attribs = NA, convert = "matrix"){
+frommatrix <- function(mat, attribs = NA, convert = "matrix"){
 
-  if (convert == "matrix"){G <- graph}
+  if (convert == "matrix"){G <- mat}
 
-  if (convert == "Matrix"){G <- Matrix::Matrix(graph)}
+  if (convert == "Matrix"){G <- Matrix::Matrix(mat)}
 
   if (convert == "edgelist"){
-    if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
-    if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
+    if (isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "undirected", weighted = TRUE)}
+    if (!isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "directed", weighted = TRUE)}
     G <- igraph::as_data_frame(G, what = "edges")
   }
 
   if (convert == "igraph"){
-    if (isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "undirected", weighted = TRUE)}
-    if (!isSymmetric(graph)) {G <- igraph::graph.adjacency(graph, mode = "directed", weighted = TRUE)}
+    if (isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "undirected", weighted = TRUE)}
+    if (!isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "directed", weighted = TRUE)}
     if (igraph::gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
 
     if (!is.null(attribs)) {  #If attributes are supplied, add them to the igraph object
