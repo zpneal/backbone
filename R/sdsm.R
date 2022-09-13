@@ -85,9 +85,9 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
   Plower <- matrix(0, nrow(P), ncol(P))
   for (col in 1:ncol(P)) {  #Loop over lower triangle
     for (row in col:nrow(P)) {
-      probs <- prob.mat[row,]*prob.mat[col,]
-      Plower[row,col] <- pb(P[row,col], probs)
-      Pupper[row,col] <- pb(P[row,col]-1, probs, lower = FALSE)
+      pvalues <- pb(P[row,col], prob.mat[row,]*prob.mat[col,])
+      Plower[row,col] <- pvalues[1]
+      Pupper[row,col] <- pvalues[2]
     }
   }
   Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangles

@@ -72,13 +72,23 @@ fixedcol <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "ori
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
+  
+  #### Parameters for computing p-values ####
   cs <- colSums(B)
   m = dim(B)[1]
-
-  #### Create Backbone Object ####
-  pt <- ((cs*(cs-1))/(m*(m-1)))  #Parameters for computing Poissonbinomial
-  Pupper <- matrix((pb(k = (P-1), p = pt, lower = FALSE)),nrow = m, ncol = m,byrow = TRUE)
-  Plower <- matrix(pb(k = P, p = pt),nrow = m, ncol = m,byrow = TRUE)
+  pt <- ((cs*(cs-1))/(m*(m-1)))
+  mu <- sum(pt)
+  sigma <- sqrt(sum(pt*(1-pt)))
+  gamma <- sum(pt*(1-pt)*(1-2*pt))
+  
+  #### Compute p-values using RNA-approximation of poisson-binomial ####
+  Pupper <- (P-1+.5-mu)/sigma
+  Pupper <- 1 - (stats::pnorm(Pupper)+gamma/(6*sigma^3)*(1-Pupper^2)*stats::dnorm(Pupper))
+  
+  Plower <- (P+.5-mu)/sigma
+  Plower <- stats::pnorm(Plower)+gamma/(6*sigma^3)*(1-Plower^2)*stats::dnorm(Plower)
+  
+  #### Assemble backbone object ####
   bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedcol")
   class(bb) <- "backbone"
 
