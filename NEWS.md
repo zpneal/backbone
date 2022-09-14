@@ -5,6 +5,8 @@ output: html_document
 ## backbone 2.1.1
 
 * various speedups in `sparsify()`
+* eliminate `hyperg()` as alternate name for `fixedrow()`
+* empty & full rows/cols no longer need to be removed from bipartite inputs
 
 ## backbone 2.1.0
 
