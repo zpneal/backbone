@@ -7,6 +7,7 @@ output: html_document
 * various speedups in `sparsify()`
 * eliminate `hyperg()` as alternate name for `fixedrow()`
 * empty & full rows/cols no longer need to be removed from bipartite inputs
+* replaced `testthat` with `tinytest`; expanded unit tests
 
 ## backbone 2.1.0
 
