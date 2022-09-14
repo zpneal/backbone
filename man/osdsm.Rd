@@ -15,8 +15,7 @@ osdsm(
 )
 }
 \arguments{
-\item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
-Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.}
+\item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 

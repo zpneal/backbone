@@ -4,12 +4,10 @@
 \alias{tomatrix}
 \title{Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics}
 \usage{
-tomatrix(graph, reduce = TRUE)
+tomatrix(graph)
 }
 \arguments{
 \item{graph}{A graph object of class "matrix", "Matrix", "dataframe", \link[igraph]{igraph}.}
-
-\item{reduce}{boolean: If TRUE and \code{graph} is bipartite, remove isolates and maximally-connected nodes}
 }
 \value{
 a list(summary, G, attribs)

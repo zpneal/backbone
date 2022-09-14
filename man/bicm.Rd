@@ -18,7 +18,7 @@ bicm(M, fitness = FALSE, tol = 1e-08, max_steps = 200, ...)
 \item{...}{optional arguments}
 }
 \value{
-a matrix of probabilities, or a list of fitnesses
+a matrix of probabilities or a list of fitnesses
 }
 \description{
 \code{bicm} estimates cell probabilities under the bipartite configuration model
@@ -30,11 +30,13 @@ the same row and column marginals as \strong{M}. The BiCM yields the closest app
 compared to other estimation methods (Neal et al., 2021), and is used by \code{\link[=sdsm]{sdsm()}} to extract the backbone of
 a bipartite projection using the stochastic degree sequence model.
 
-Optionally (if \code{fitness = TRUE}), \code{bicm()} instead returns a list of row and column fitnesses, which is faster and
-requires less memory. Given the \emph{i}th row's fitness Ri and the \emph{j}th column's fitness Rj, the entry Bij in the
-matrix can be computed as Ri\*Rj/(1+(Ri\*Rj)).
+Matrix \strong{M} is "conforming" if no rows and no columns contain only zeros or only ones. If \strong{M} is conforming, then
+\code{bicm()} is faster. Additionally, if \code{fitness = TRUE}, then \code{bicm()} returns a list of row and column fitnesses,
+which requires less memory. Given the \emph{i}th row's fitness Ri and the \emph{j}th column's fitness Rj, the entry Bij in
+the probability matrix can be computed as Ri x Rj/(1+(Ri x Rj)).
 
-\strong{Note}: M cannot contain any rows or columns that contain all 0s or all 1s.
+Matrix \strong{M} is "non-conforming" if any rows or any columns contain only zeros or only ones. If \strong{M} is non-conforming,
+then \code{bicm()} is slower and will only return a probability matrix.
 }
 \examples{
 M <- matrix(c(0,0,1,0,1,0,1,0,1),3,3)  #A binary matrix
