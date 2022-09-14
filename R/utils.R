@@ -11,7 +11,6 @@
 #' Converts an input graph object to an adjacency/incidence matrix and identifies its characteristics
 #'
 #' @param graph A graph object of class "matrix", "Matrix", "dataframe", \link[igraph]{igraph}.
-#' @param reduce boolean: If TRUE and `graph` is bipartite, remove isolates and maximally-connected nodes
 #'
 #' @return a list(summary, G, attribs)
 #'    `summary` is a dataframe containing characteristics of the supplied object
@@ -23,7 +22,7 @@
 #' @examples
 #' M <- matrix(rbinom(5*5,1,.5),5,5)
 #' test <- backbone:::tomatrix(M)
-tomatrix <- function(graph, reduce = TRUE){
+tomatrix <- function(graph){
   class <- class(graph)[1]  #Identify class of supplied object
   isbipartite <- FALSE
 
@@ -76,21 +75,6 @@ tomatrix <- function(graph, reduce = TRUE){
     if (igraph::is.bipartite(graph) == TRUE){
       isbipartite <- TRUE  #Set type of graph
 
-      #Remove isolates and maximally connected nodes, if requested
-      if (reduce) {
-        isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
-        fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
-        fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
-        todrop <- c(isolates, fullrows, fullcols)
-        while (length(todrop)>0) {
-          graph <- igraph::delete.vertices(graph, todrop)
-          isolates <- which(igraph::degree(graph)==0)  #Isolate nodes
-          fullrows <- which(igraph::degree(graph, v = igraph::V(graph)$type==FALSE) == sum(igraph::V(graph)$type==TRUE))  #FALSE nodes connected to all TRUE nodes
-          fullcols <- which(igraph::degree(graph, v = igraph::V(graph)$type==TRUE) == sum(igraph::V(graph)$type==FALSE))  #TRUE nodes connected to all FALSE nodes
-          todrop <- c(isolates, fullrows, fullcols)
-        }
-      }
-
       #Capture attributes of FALSE (i.e. row) nodes
       attribs <- as.data.frame(igraph::vertex_attr(graph, index = (igraph::V(graph)$type == FALSE)))  #Get attributes
       attribs <- attribs[,!colnames(attribs)%in%c("type","name"),drop=F]  #Do not need to keep type or name
@@ -114,13 +98,6 @@ tomatrix <- function(graph, reduce = TRUE){
       #Convert to adjacency matrix
       if (is.null(igraph::E(graph)$weight)) {G <- igraph::as_adjacency_matrix(graph, sparse = FALSE) #Unweighted unipartite
       } else {G <- igraph::as_adjacency_matrix(graph, attr = "weight", sparse = FALSE)} #Weighted unipartite
-    }
-  }
-
-  #### If requested, remove isolates and maximally-connected nodes ####
-  if (isbipartite & reduce){
-    while (any(rowSums(G)==0) | any(rowSums(G)==ncol(G)) | any(colSums(G)==0) | any(colSums(G)==nrow(G))) {  #If any rows/columns are empty/full
-      G <- G[which(rowSums(G)!=0 & rowSums(G)!=ncol(G)),which(colSums(G)!=0 & colSums(G)!=nrow(G))]  #Remove them, check again
     }
   }
 
@@ -335,22 +312,22 @@ fastball <- function(M, trades = 5 * nrow(M)) {
 #' @examples
 #' pb(50,runif(100))
 pb <-function(k, p, lower=TRUE) {
-  
+
   #Compute parameters
   mu <- sum(p)
   sigma <- sqrt(sum(p*(1-p)))
   gamma <- sum(p*(1-p)*(1-2*p))
-  
+
   #Lower tail p-value, if requested
   if (lower) {
     x <- (k+.5-mu)/sigma
     lower <- stats::pnorm(x)+gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x)
   } else {lower <- NA}
-  
+
   #Upper tail p-value
   x <- (k-1+.5-mu)/sigma
   upper <- 1 - (stats::pnorm(x)+gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x))
-  
+
   #Combine, truncate, return
   prob <- c(lower,upper)
   prob[prob<0] <- 0

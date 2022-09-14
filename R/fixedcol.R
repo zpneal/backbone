@@ -3,7 +3,6 @@
 #' `fixedcol` extracts the backbone of a bipartite projection using the Fixed Column Model.
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
-#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
@@ -72,7 +71,7 @@ fixedcol <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "ori
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
-  
+
   #### Parameters for computing p-values ####
   cs <- colSums(B)
   m = dim(B)[1]
@@ -80,14 +79,14 @@ fixedcol <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "ori
   mu <- sum(pt)
   sigma <- sqrt(sum(pt*(1-pt)))
   gamma <- sum(pt*(1-pt)*(1-2*pt))
-  
+
   #### Compute p-values using RNA-approximation of poisson-binomial ####
   Pupper <- (P-1+.5-mu)/sigma
   Pupper <- 1 - (stats::pnorm(Pupper)+gamma/(6*sigma^3)*(1-Pupper^2)*stats::dnorm(Pupper))
-  
+
   Plower <- (P+.5-mu)/sigma
   Plower <- stats::pnorm(Plower)+gamma/(6*sigma^3)*(1-Plower^2)*stats::dnorm(Plower)
-  
+
   #### Assemble backbone object ####
   bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedcol")
   class(bb) <- "backbone"
