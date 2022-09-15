@@ -23,13 +23,12 @@
 #' M <- matrix(rbinom(5*5,1,.5),5,5)
 #' test <- backbone:::tomatrix(M)
 tomatrix <- function(graph){
-  class <- class(graph)[1]  #Identify class of supplied object
   isbipartite <- FALSE
-
   if (!(methods::is(graph, "matrix")) & !(methods::is(graph, "Matrix")) & !(methods::is(graph, "igraph")) & !(methods::is(graph, "data.frame"))) {stop("input data must be a matrix, Matrix, dataframe, or igraph object.")}
 
   #### Convert from matrix or Matrix object ####
   if (((methods::is(graph, "matrix")) | (methods::is(graph, "Matrix")))) {
+    if (methods::is(graph, "Matrix")) {class <- "Matrix"} else {class <- "matrix"} #Set class
     G <- as.matrix(graph)  #Coerce to matrix
     class(G) <- "numeric"  #Coerce to numeric
     if (any(is.na(G))) {stop("The object contains non-numeric entries")}
@@ -68,7 +67,7 @@ tomatrix <- function(graph){
 
   #### Convert from igraph ####
   if (methods::is(graph, "igraph")) {
-
+    class <- "igraph"
     graph <- igraph::simplify(graph) #Remove any multi-edges and loops
 
     ## For bipartite inputs
