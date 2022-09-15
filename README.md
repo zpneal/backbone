@@ -40,4 +40,4 @@ install_github("zpneal/backbone", ref = "devel", build_vignettes = TRUE)
 ```
 
 ## Dependencies
-The `backbone` package adopts the [tinyverse](https://www.tinyverse.org/) philosophy, and therefore tries to minimize the number of dependencies.
+The `backbone` package adopts the [tinyverse](https://www.tinyverse.org/) philosophy, and therefore aims to keep dependencies at a minimum.
