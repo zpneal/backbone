@@ -25,10 +25,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
+#'    compute p-values, from which a backbone can subsequently be extracted using [backbone.extract()]. The `mtc`, `class`,
+#'    and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
@@ -87,16 +87,17 @@ fixedrow <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "ori
   ### Compute different in number of artifacts and row sum ###
   df$diff <- ncol(B)-df$row_sum_i
 
-  ### Probability of Pij or less ###
-  df$hgl <- stats::phyper(df$projvalue, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
+  ### Compute p-values ####
+  df$upper <- stats::phyper(df$projvalue-1, df$row_sum_i, df$diff, df$row_sum_j, lower.tail=FALSE)
+  Pupper <- matrix(as.numeric(df$upper), nrow = nrow(B), ncol = nrow(B))
 
-  ### Probability of Pij or more ###
-  df$hgu <- stats::phyper(df$projvalue-1, df$row_sum_i, df$diff, df$row_sum_j, lower.tail=FALSE)
+  if (signed) {
+    df$lower <- stats::phyper(df$projvalue, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
+    Plower <- matrix(as.numeric(df$lower), nrow = nrow(B), ncol = nrow(B))
+  }
 
   #### Create Backbone Object ####
-  Pupper <- matrix(as.numeric(df$hgu), nrow = nrow(B), ncol = nrow(B))
-  Plower <- matrix(as.numeric(df$hgl), nrow = nrow(B), ncol = nrow(B))
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedrow")
+  if (signed) {bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedrow")} else {bb <- list(G = P, Pupper = Pupper, model = "fixedrow")}
   class(bb) <- "backbone"
 
   #### Return result ####

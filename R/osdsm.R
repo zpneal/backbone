@@ -36,10 +36,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
+#'    compute p-values, from which a backbone can subsequently be extracted using [backbone.extract()]. The `mtc`, `class`,
+#'    and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references osdsm: {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. *Environment and Planning A, 49*, 2859-2877. \doi{10.1177/0308518X16631339}}
@@ -98,7 +98,7 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
 
   ### Create Positive and Negative Matrices to hold backbone ###
   Pupper <- matrix(0, nrow(P), ncol(P))
-  Plower <- matrix(0, nrow(P), ncol(P))
+  if (signed) {Plower <- matrix(0, nrow(P), ncol(P))}
 
   #### Compute probabilities for SDSM ####
   #Vectorize the bipartite data
@@ -137,7 +137,7 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
     #Construct Pstar from Bstar, check whether Pstar edge is larger/smaller than P edge
     Pstar <- tcrossprod(Bstar)
     Pupper <- Pupper + (Pstar > P)+0
-    Plower <- Plower + (Pstar < P)+0
+    if (signed) {Plower <- Plower + (Pstar < P)+0}
 
     #Increment progress bar
     utils::setTxtProgressBar(pb, i)
@@ -147,8 +147,8 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
 
   #### Create Backbone Object ####
   Pupper <- (Pupper/trials)
-  Plower <- (Plower/trials)
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "osdsm")
+  if (signed) {Plower <- (Plower/trials)}
+  if (signed) {bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "osdsm")} else {bb <- list(G = P, Pupper = Pupper, model = "osdsm")}
   class(bb) <- "backbone"
 
   #### Return result ####

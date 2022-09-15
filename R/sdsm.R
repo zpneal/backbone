@@ -27,10 +27,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
+#'    compute p-values, from which a backbone can subsequently be extracted using [backbone.extract()]. The `mtc`, `class`,
+#'    and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
@@ -79,21 +79,37 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
   #### Compute Probabilities for SDSM ####
   prob.mat <- bicm(B,...)
 
-  #### Compute p-values ####
-  Pupper <- matrix(0, nrow(P), ncol(P))
-  Plower <- matrix(0, nrow(P), ncol(P))
-  for (col in 1:ncol(P)) {  #Loop over lower triangle
-    for (row in col:nrow(P)) {
-      pvalues <- pb(P[row,col], prob.mat[row,]*prob.mat[col,])
-      Plower[row,col] <- pvalues[1]
-      Pupper[row,col] <- pvalues[2]
+  #### Compute p-values (for unsigned backbone, ignore lower-tail p-values) ####
+  if (!signed) {
+    Pupper <- matrix(1, nrow(P), ncol(P))  #Set upper-tail p-value to 1 initially
+    for (col in 1:ncol(P)) {  #Loop over lower triangle
+      for (row in col:nrow(P)) {
+        if (P[row,col] != 0) {  #Compute and update the upper-tail p-value only if the edge has non-zero weight
+          pvalues <- pb(P[row,col], prob.mat[row,]*prob.mat[col,], lower = FALSE)
+          Pupper[row,col] <- pvalues[2]
+        }
+      }
     }
+    Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangle
   }
-  Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangles
-  Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]
+
+  #### Compute p-values (for signed backbone) ####
+  if (signed) {
+    Pupper <- matrix(0, nrow(P), ncol(P))
+    Plower <- matrix(0, nrow(P), ncol(P))
+    for (col in 1:ncol(P)) {  #Loop over lower triangle
+      for (row in col:nrow(P)) {
+        pvalues <- pb(P[row,col], prob.mat[row,]*prob.mat[col,])
+        Plower[row,col] <- pvalues[1]
+        Pupper[row,col] <- pvalues[2]
+      }
+    }
+    Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangles
+    Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]
+  }
 
   #### Assemble backbone object ####
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "sdsm")
+  if (signed) {bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "sdsm")} else {bb <- list(G = P, Pupper = Pupper, model = "sdsm")}
   class(bb) <- "backbone"
 
   #### Return result ####

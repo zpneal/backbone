@@ -25,10 +25,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
+#'    compute p-values, from which a backbone can subsequently be extracted using [backbone.extract()]. The `mtc`, `class`,
+#'    and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references fixedcol: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
@@ -84,11 +84,13 @@ fixedcol <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "ori
   Pupper <- (P-1+.5-mu)/sigma
   Pupper <- 1 - (stats::pnorm(Pupper)+gamma/(6*sigma^3)*(1-Pupper^2)*stats::dnorm(Pupper))
 
-  Plower <- (P+.5-mu)/sigma
-  Plower <- stats::pnorm(Plower)+gamma/(6*sigma^3)*(1-Plower^2)*stats::dnorm(Plower)
+  if (signed) {
+    Plower <- (P+.5-mu)/sigma
+    Plower <- stats::pnorm(Plower)+gamma/(6*sigma^3)*(1-Plower^2)*stats::dnorm(Plower)
+  }
 
   #### Assemble backbone object ####
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedcol")
+  if (signed) {bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedcol")} else {bb <- list(G = P, Pupper = Pupper, model = "fixedcol")}
   class(bb) <- "backbone"
 
   #### Return result ####

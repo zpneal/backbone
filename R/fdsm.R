@@ -37,10 +37,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
+#'    compute p-values, from which a backbone can subsequently be extracted using [backbone.extract()]. The `mtc`, `class`,
+#'    and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. \doi{10.1038/s41598-021-03238-3}}
@@ -102,7 +102,7 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   ### Create Positive and Negative Matrices to hold backbone ###
   rotate <- FALSE  #initialize
   Pupper <- matrix(0, nrow(P), ncol(P))  #Create positive matrix to hold number of times null co-occurence >= P
-  Plower <- matrix(0, nrow(P), ncol(P))  #Create negative matrix to hold number of times null co-occurence <= P
+  if (signed) {Plower <- matrix(0, nrow(P), ncol(P))}  #Create negative matrix to hold number of times null co-occurence <= P
   if (nrow(B) > ncol(B)) {  #If B is long, make it wide before randomizing so that randomization is faster
     rotate <- TRUE
     B <- t(B)
@@ -126,7 +126,7 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
 
     ### Check whether Pstar edge is larger/smaller than P edge ###
     Pupper <- Pupper + (Pstar >= P)+0
-    Plower <- Plower + (Pstar <= P)+0
+    if (signed) {Plower <- Plower + (Pstar <= P)+0}
 
     ### Increment progress bar ###
     utils::setTxtProgressBar(pb, i)
@@ -137,8 +137,8 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   #### Create Backbone Object ####
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
   Pupper <- (Pupper/trials)
-  Plower <- (Plower/trials)
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fdsm")
+  if (signed) {Plower <- (Plower/trials)}
+  if (signed) {bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fdsm")} else {bb <- list(G = P, Pupper = Pupper, model = "fdsm")}
   class(bb) <- "backbone"
 
   #### Return result ####
