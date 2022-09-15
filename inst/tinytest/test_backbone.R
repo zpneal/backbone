@@ -134,10 +134,10 @@ expect_equal(igraph::V(test)$gender, c("M", "F", "F"))
 expect_equal(igraph::E(test)$weight, c(-1,-1,1,1))
 expect_equal(igraph::E(test)$sign, c(-1,-1,1,1))
 
-#### Bipartite Models ####
+#### Bipartite Bipartite Models ####
 ## SDSM
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- sdsm(M, alpha = NULL)
+test <- sdsm(M, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
 expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm")
 expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)), info = "sdsm")
@@ -146,7 +146,7 @@ expect_equal(test$model, "sdsm", info = "sdsm")
 ## FDSM
 set.seed(1)
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fdsm(M, trials = 1000, alpha = NULL)
+test <- fdsm(M, trials = 1000, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fdsm")
 expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)), info = "fdsm")
 expect_equal(round(test$Plower,3), rbind(c(1,.510,1),c(.51,1,.755),c(1,.755,1)), info = "fdsm")
@@ -154,7 +154,7 @@ expect_equal(test$model, "fdsm", info = "fdsm")
 
 ## FIXEDFILL
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedfill(M, alpha = NULL)
+test <- fixedfill(M, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedfill")
 expect_equal(round(test$Pupper,3), rbind(c(.004,1,.173),c(1,.732,1),c(.173,1,.173)), info = "fixedfill")
 expect_equal(round(test$Plower,3), rbind(c(1,.268,.996),c(.268,.827,.268),c(.996,.268,.996)), info = "fixedfill")
@@ -162,7 +162,7 @@ expect_equal(test$model, "fixedfill", info = "fixedfill")
 
 ## FIXEDROW
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedrow(M, alpha = NULL)
+test <- fixedrow(M, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedrow")
 expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow")
 expect_equal(round(test$Plower,3), rbind(c(1,.25,1),c(.25,1,.5),c(1,.5,1)), info = "fixedrow")
@@ -170,7 +170,7 @@ expect_equal(test$model, "fixedrow", info = "fixedrow")
 
 ## FIXEDCOL
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedcol(M, alpha = NULL)
+test <- fixedcol(M, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedcol")
 expect_equal(round(test$Pupper,3), rbind(c(.008,.975,.114),c(.975,.568,.975),c(.114,.975,.114)), info = "fixedcol")
 expect_equal(round(test$Plower,3), rbind(c(1,.432,.992),c(.432,.886,.432),c(.992,.432,.992)), info = "fixedcol")
@@ -179,7 +179,7 @@ expect_equal(test$model, "fixedcol", info = "fixedcol")
 #### Weighted Unipartite Models ####
 ## DISPARITY
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1),c(1,1,0,1))
-test <- disparity(M, alpha = NULL)
+test <- disparity(M, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M, info = "disparity")
 expect_equal(round(test$Pupper,3), rbind(c(.444,1,.444,.444),c(1,.5,1,1),c(.444,1,1,.444),c(.444,.444,1,.444)), info = "disparity")
 expect_equal(round(test$Plower,3), rbind(c(.556,1,.556,.556),c(1,.5,1,1),c(.556,1,1,.556),c(.556,.556,1,.556)), info = "disparity")
