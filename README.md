@@ -5,6 +5,7 @@
 [![](https://www.r-pkg.org/badges/version/backbone?color=orange)](https://cran.r-project.org/package=backbone)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/backbone?color=blue)](https://cran.r-project.org/package=backbone)
 [![](http://cranlogs.r-pkg.org/badges/last-month/backbone?color=green)](https://cran.r-project.org/package=backbone)
+[![status](https://tinyverse.netlify.com/badge/backbone)](https://CRAN.R-project.org/package=backbone)
 [![DOI:10.1371/journal.pone.0269137](http://img.shields.io/badge/DOI-10.1371/journal.pone.0269137-B31B1B.svg)](https://doi.org/10.1371/journal.pone.0269137)
 <!-- badges: end -->
 
@@ -37,3 +38,6 @@ The /devel branch contains the working beta version of the next release of the b
 library(devtools)
 install_github("zpneal/backbone", ref = "devel", build_vignettes = TRUE)
 ```
+
+## Dependencies
+The `backbone` package adopts the [tinyverse](https://www.tinyverse.org/) philosophy, and therefore aims to keep dependencies at a minimum.
