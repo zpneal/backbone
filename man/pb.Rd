@@ -4,14 +4,14 @@
 \alias{pb}
 \title{Poisson binomial distribution function}
 \usage{
-pb(k, p, lower = TRUE)
+pb(k, p, lowertail = TRUE)
 }
 \arguments{
 \item{k}{numeric: value where the pdf should be evaluated}
 
 \item{p}{vector: vector of success probabilities}
 
-\item{lower}{boolean: If TRUE return both upper & lower tail probabilities,
+\item{lowertail}{boolean: If TRUE return both upper & lower tail probabilities,
 if FALSE return only upper tail probability}
 }
 \value{
