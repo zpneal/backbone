@@ -85,7 +85,7 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
         if (P[row,col] != 0) {  #Compute and update the upper-tail p-value only if the edge has non-zero weight
-          pvalues <- pb(P[row,col], prob.mat[row,]*prob.mat[col,], lower = FALSE)
+          pvalues <- pb(P[row,col], prob.mat[row,]*prob.mat[col,], lowertail = FALSE)
           Pupper[row,col] <- pvalues[2]
         }
       }

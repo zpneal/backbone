@@ -291,7 +291,7 @@ fastball <- function(M, trades = 5 * nrow(M)) {
 #'
 #' @param k numeric: value where the pdf should be evaluated
 #' @param p vector: vector of success probabilities
-#' @param lower boolean: If TRUE return both upper & lower tail probabilities,
+#' @param lowertail boolean: If TRUE return both upper & lower tail probabilities,
 #'    if FALSE return only upper tail probability
 #'
 #' @details
@@ -310,7 +310,7 @@ fastball <- function(M, trades = 5 * nrow(M)) {
 #'
 #' @examples
 #' pb(50,runif(100))
-pb <-function(k, p, lower=TRUE) {
+pb <-function(k, p, lowertail=TRUE) {
 
   #Compute parameters
   mu <- sum(p)
@@ -318,7 +318,7 @@ pb <-function(k, p, lower=TRUE) {
   gamma <- sum(p*(1-p)*(1-2*p))
 
   #Lower tail p-value, if requested
-  if (lower) {
+  if (lowertail) {
     x <- (k+.5-mu)/sigma
     lower <- stats::pnorm(x)+gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x)
   } else {lower <- NA}
