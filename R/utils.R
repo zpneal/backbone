@@ -199,7 +199,8 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
       & (class != "igraph")
       & (class != "edgelist"))
   {stop("incorrect class type, must be one of c(matrix, Matrix, sparseMatrix, igraph, edgelist)")}
-
+  if (signed == TRUE & is.null(bb.object$Plower)) {stop(paste0("This backbone object does not contain lower-tail p-values, so a signed backbone cannot be extracted.\n       To extract a signed backbone, please re-run ", bb.object$model, "() and specify `signed = TRUE`."))}
+  
   #### Extract object components ####
   G <- bb.object$G
   Pupper <- bb.object$Pupper
