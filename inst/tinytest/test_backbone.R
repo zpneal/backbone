@@ -152,7 +152,7 @@ expect_equal(test$model, "sdsm", info = "sdsm")
 ## FDSM
 set.seed(1)
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fdsm(M, trials = 1000, alpha = NULL, signed = TRUE)
+test <- fdsm(M, trials = 1000, alpha = NULL, signed = TRUE, progress = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fdsm")
 expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)), info = "fdsm")
 expect_equal(round(test$Plower,3), rbind(c(1,.510,1),c(.51,1,.755),c(1,.755,1)), info = "fdsm")
@@ -160,7 +160,7 @@ expect_equal(test$model, "fdsm", info = "fdsm")
 
 set.seed(1)
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fdsm(M, trials = 1000, alpha = NULL, signed = FALSE)
+test <- fdsm(M, trials = 1000, alpha = NULL, signed = FALSE, progress = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fdsm")
 expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)), info = "fdsm")
 expect_equal(test$model, "fdsm", info = "fdsm")
@@ -206,6 +206,9 @@ test <- fixedcol(M, alpha = NULL, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fixedcol")
 expect_equal(round(test$Pupper,3), rbind(c(.008,.975,.114),c(.975,.568,.975),c(.114,.975,.114)), info = "fixedcol")
 expect_equal(test$model, "fixedcol", info = "fixedcol")
+
+## oSDSM
+# NEED TO ADD THESE
 
 #### Weighted Unipartite Models ####
 ## DISPARITY
