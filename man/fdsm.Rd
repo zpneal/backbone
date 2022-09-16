@@ -12,6 +12,7 @@ fdsm(
   mtc = "none",
   class = "original",
   narrative = FALSE,
+  progress = TRUE,
   ...
 )
 }
@@ -30,6 +31,8 @@ fdsm(
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
+
+\item{progress}{boolean: TRUE if the progress of Monte Carlo trials should be displayed.}
 
 \item{...}{optional arguments}
 }
