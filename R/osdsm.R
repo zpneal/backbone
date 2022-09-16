@@ -10,6 +10,7 @@
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' @param progress boolean: TRUE if the progress of Monte Carlo trials should be displayed.
 #'
 #' @details
 #' The `osdsm` function compares an edge's observed weight in the projection `B*t(B)` to the distribution of weights
@@ -61,7 +62,7 @@
 #'             class = "igraph", trials = 100)
 #' plot(bb) #...is sparse with clear communities
 
-osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE){
 
   #### Class Conversion and Argument Checks ####
   convert <- tomatrix(B)
@@ -126,8 +127,8 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   A$rand <- NA
 
   #### Build null models ####
-  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
-  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
+  if (progress) {message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))}
+  if (progress) {pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)}  #Start progress bar
   for (i in 1:trials){
 
     #Use probabilities to create an SDSM Bstar
@@ -140,10 +141,10 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
     if (signed) {Plower <- Plower + (Pstar < P)+0}
 
     #Increment progress bar
-    utils::setTxtProgressBar(pb, i)
+    if (progress) {utils::setTxtProgressBar(pb, i)}
 
   } #end for loop
-  close(pb) #End progress bar
+  if (progress) {close(pb)} #End progress bar
 
   #### Create Backbone Object ####
   Pupper <- (Pupper/trials)

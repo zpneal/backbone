@@ -10,6 +10,7 @@
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' @param progress boolean: TRUE if the progress of Monte Carlo trials should be displayed.
 #' @param ... optional arguments
 #'
 #' @details
@@ -66,7 +67,7 @@
 #' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
+fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE, ...){
 
   #### Argument Checks ####
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
@@ -111,8 +112,8 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   L <- lapply(asplit(B == 1, 1), which)  #Works on all R releases
 
   #### Build Null Models ####
-  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
-  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
+  if (progress) {message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))}
+  if (progress) {pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)}  #Start progress bar
   for (i in 1:trials){
 
     ### Generate an FDSM Bstar ###
@@ -129,10 +130,10 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
     if (signed) {Plower <- Plower + (Pstar <= P)+0}
 
     ### Increment progress bar ###
-    utils::setTxtProgressBar(pb, i)
+    if (progress) {utils::setTxtProgressBar(pb, i)}
 
   } #end for loop
-  close(pb) #End progress bar
+  if (progress) {close(pb)} #End progress bar
 
   #### Create Backbone Object ####
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
