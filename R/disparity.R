@@ -93,7 +93,7 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
     pvalues <- (1-P)^(degree-1)
     Pupper <- as.matrix(pvalues)          #Asymmetric p-values, one from the perspective of each node
     Pupper <- pmin(Pupper,t(Pupper))  #From Serrano: "satisfy the above criterion for at least one of the two nodes"
-    Plower <- 1-Pupper
+    if (signed) {Plower <- 1-Pupper}
   }
 
   if (symmetric == FALSE){
@@ -103,12 +103,12 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
     inp <- t(G)/(colSums(G))
     invalues <- t((1-inp)^(colSums(binary)-1))
     Pupper <- pmin(invalues,outvalues)
-    Plower <- 1-Pupper
+    if (signed) {Plower <- 1-Pupper}
   }
 
   ### If edge weight was zero, set to 1 in positive and negative so edge is not in backbone ###
   Pupper[zeros] <- 1
-  Plower[zeros] <- 1
+  if (signed) {Plower[zeros] <- 1}
 
   ### Create backbone object ###
   bb <- list(G = G,  #Preliminary backbone object
