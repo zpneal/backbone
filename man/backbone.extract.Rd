@@ -9,7 +9,8 @@ backbone.extract(
   signed = FALSE,
   alpha = 0.05,
   mtc = "none",
-  class = "matrix"
+  class = bb.object$class,
+  narrative = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ backbone.extract(
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{class}{string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "edgelist"), converted via \link{tomatrix}.}
+
+\item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
 }
 \value{
 backbone graph: Binary or signed backbone graph of class given in parameter \code{class}.
@@ -31,8 +34,9 @@ backbone graph: Binary or signed backbone graph of class given in parameter \cod
 containing the backbone that retains only the significant edges.
 }
 \details{
-The "backbone" S3 class object is composed of three matrices (the weighted graph, edges' upper-tail p-values,
-edges' lower-tail p-values), and a string indicating the null model used to compute p-values.
+The "backbone" S3 class object is composed of (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+matrix, (3, if \code{signed = TRUE}) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+(5) several properties of the original graph and backbone model
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
