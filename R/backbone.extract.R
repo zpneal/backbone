@@ -53,6 +53,7 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
   Pupper <- bb.object$Pupper
   Plower <- bb.object$Plower
   model <- bb.object$model
+  attribs <- bb.object$attribs
 
   #### Extract signed backbone (two-tailed test; all dyads considered) ####
   if (signed) {
@@ -99,6 +100,6 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
   }
 
   #### Return result ####
-  backbone <- frommatrix(backbone, convert = class)
+  backbone <- frommatrix(backbone, attribs, convert = class)
   return(backbone)
 }
