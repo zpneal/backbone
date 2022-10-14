@@ -31,9 +31,9 @@ If "original", the backbone graph returned is of the same class as \code{B}.}
 If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
 
 If \code{alpha} == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
-matrix, (3, if \code{signed = TRUE}) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
-compute p-values, from which a backbone can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{mtc}, \code{class},
-and \code{narrative} parameters are ignored.
+matrix, (3, if \code{signed = TRUE}) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+(5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
+using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{mtc}, \code{class}, and \code{narrative} parameters are ignored.
 }
 \description{
 \code{fixedfill} extracts the backbone of a bipartite projection using the Fixed Fill Model.

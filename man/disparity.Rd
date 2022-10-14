@@ -30,10 +30,10 @@ If "original", the backbone graph returned is of the same class as \code{W}.}
 \value{
 If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
 
-If \code{alpha} == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{mtc}, \code{class}, and \code{narrative} parameters
-are ignored.
+If \code{alpha} == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+matrix, (3, if \code{signed = TRUE}) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+(5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
+using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{mtc}, \code{class}, and \code{narrative} parameters are ignored.
 }
 \description{
 \code{disparity} extracts the backbone of a weighted network using the Disparity Filter.
