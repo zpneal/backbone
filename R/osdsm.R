@@ -39,8 +39,8 @@
 #'
 #' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
 #'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
-#'    (5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
-#'    using [backbone.extract()]. The `mtc`, `class`, and `narrative` parameters are ignored.
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references osdsm: {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. *Environment and Planning A, 49*, 2859-2877. \doi{10.1177/0308518X16631339}}
@@ -146,10 +146,20 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   } #end for loop
   if (progress) {close(pb)} #End progress bar
 
-  #### Create Backbone Object ####
+  #### Compute p-values ####
   Pupper <- (Pupper/trials)
   if (signed) {Plower <- (Plower/trials)}
-  bb <- list(G = P, Pupper = Pupper, model = "osdsm")  #Preliminary backbone object
+  
+  #### Create Backbone Object ####
+  bb <- list(G = P,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "osdsm",
+             agents = nrow(B),
+             artifacts = ncol(B),
+             weighted = FALSE,
+             bipartite = TRUE,
+             symmetric = TRUE,
+             trials = NULL)
   if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
   if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
 

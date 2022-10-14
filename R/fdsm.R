@@ -40,8 +40,8 @@
 #'
 #' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
 #'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
-#'    (5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
-#'    using [backbone.extract()]. The `mtc`, `class`, and `narrative` parameters are ignored.
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. \doi{10.1038/s41598-021-03238-3}}
@@ -135,11 +135,21 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   } #end for loop
   if (progress) {close(pb)} #End progress bar
 
-  #### Create Backbone Object ####
+  #### Compute p-values ####
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
   Pupper <- (Pupper/trials)
   if (signed) {Plower <- (Plower/trials)}
-  bb <- list(G = P, Pupper = Pupper, model = "fdsm")  #Preliminary backbone object
+  
+  #### Create Backbone Object ####
+  bb <- list(G = P,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "fdsm",
+             agents = nrow(B),
+             artifacts = ncol(B),
+             weighted = FALSE,
+             bipartite = TRUE,
+             symmetric = TRUE,
+             trials = trials)
   if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
   if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"

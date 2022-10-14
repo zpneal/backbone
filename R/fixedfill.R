@@ -28,8 +28,8 @@
 #'
 #' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
 #'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
-#'    (5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
-#'    using [backbone.extract()]. The `mtc`, `class`, and `narrative` parameters are ignored.
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references fixedfill: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
@@ -120,10 +120,20 @@ fixedfill <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   probs <- sapply(0:maxk, FUN = prob_log)  #Probability of observing each k, for 0 <= k <= maxk
   probs <- c(probs, 1 - sum(probs))  #Add one more entry for probability of observing any k > maxk (upper tail of PMF)
 
-  #### Create Backbone Object ####
+  #### Compute P-values ####
   Pupper <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(maxk+2)]))  #Sum of probabilities Pij <= k <= maxk and beyond
   if (signed) {Plower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))}  #Sum of probabilities 0 <= k <= Pij
-  bb <- list(G = P, Pupper = Pupper, model = "fixedfill")  #Preliminary backbone object
+  
+  #### Create Backbone Object ####
+  bb <- list(G = P,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "fixedfill",
+             agents = nrow(B),
+             artifacts = ncol(B),
+             weighted = FALSE,
+             bipartite = TRUE,
+             symmetric = TRUE,
+             trials = NULL)
   if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
   if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"
