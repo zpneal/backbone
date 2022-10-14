@@ -28,10 +28,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()]. The `mtc`, `class`, and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -111,7 +111,9 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   Plower[zeros] <- 1
 
   ### Create backbone object ###
-  bb <- list(G = G, Pupper = Pupper, Plower = Plower, model = "disparity")
+  bb <- list(G = G, Pupper = Pupper, model = "disparity")  #Preliminary backbone object
+  if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
+  if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"
 
   #### Return result ####

@@ -28,9 +28,9 @@
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
 #' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
-#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, and (4) a string indicating the null model used to
-#'    compute p-values, from which a backbone can subsequently be extracted using [backbone.extract()]. The `mtc`, `class`,
-#'    and `narrative` parameters are ignored.
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) a string indicating the null model used to compute p-values, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()]. The `mtc`, `class`, and `narrative` parameters are ignored.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
@@ -109,7 +109,9 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
   }
 
   #### Assemble backbone object ####
-  if (signed) {bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "sdsm")} else {bb <- list(G = P, Pupper = Pupper, model = "sdsm")}
+  bb <- list(G = P, Pupper = Pupper, model = "sdsm")  #Preliminary backbone object
+  if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
+  if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"
 
   #### Return result ####
