@@ -123,7 +123,7 @@ fixedfill <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   #### Compute P-values ####
   Pupper <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(maxk+2)]))  #Sum of probabilities Pij <= k <= maxk and beyond
   if (signed) {Plower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))}  #Sum of probabilities 0 <= k <= Pij
-  
+
   #### Create Backbone Object ####
   bb <- list(G = P,  #Preliminary backbone object
              Pupper = Pupper,
@@ -133,6 +133,7 @@ fixedfill <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
              weighted = FALSE,
              bipartite = TRUE,
              symmetric = TRUE,
+             class = class,
              trials = NULL)
   if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
   if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
@@ -141,13 +142,7 @@ fixedfill <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    reduced_edges <- round(((sum(P!=0)-nrow(P)) - sum(backbone!=0)) / (sum(P!=0)-nrow(P)),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(P)!=0),sum(colSums(P)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(P)!=0),sum(colSums(P)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = FALSE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "fixedfill",
-                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, attribs, convert = class)
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = class, narrative = narrative)
     return(backbone)
   }
 }

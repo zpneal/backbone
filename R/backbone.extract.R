@@ -8,10 +8,12 @@
 #' @param alpha Real: significance level of hypothesis test(s)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "edgelist"), converted via \link{tomatrix}.
+#' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #' @return backbone graph: Binary or signed backbone graph of class given in parameter `class`.
 #'
-#' @details The "backbone" S3 class object is composed of three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values.
+#' @details The "backbone" S3 class object is composed of (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) several properties of the original graph and backbone model
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 #'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
@@ -36,7 +38,7 @@
 #'
 #' backbone.object <- fixedrow(B, alpha = NULL)
 #' bb <- backbone.extract(backbone.object, alpha = 0.05)
-backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "none", class = "matrix"){
+backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "none", class = bb.object$class, narrative = FALSE){
 
   #### Argument Checks ####
   if ((alpha >= 1) | (alpha <= 0)) {stop("alpha must be between 0 and 1")}
@@ -47,12 +49,11 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
       & (class != "edgelist"))
   {stop("incorrect class type, must be one of c(matrix, Matrix, sparseMatrix, igraph, edgelist)")}
   if (signed == TRUE & is.null(bb.object$Plower)) {stop(paste0("This backbone object does not contain lower-tail p-values, so a signed backbone cannot be extracted.\n       To extract a signed backbone, please re-run ", bb.object$model, "() and specify `signed = TRUE`."))}
-  
+
   #### Extract object components ####
   G <- bb.object$G
   Pupper <- bb.object$Pupper
   Plower <- bb.object$Plower
-  model <- bb.object$model
   attribs <- bb.object$attribs
 
   #### Extract signed backbone (two-tailed test; all dyads considered) ####
@@ -97,6 +98,27 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
     backbone[which(is.na(backbone))] <- 0  #fill NAs with 0s
     rownames(backbone) <- rownames(G)
     colnames(backbone) <- rownames(G)
+  }
+
+  #### Display narrative, if requested ####
+  if (narrative) {
+    reduced_edges <- round(((sum(G!=0)-nrow(G)) - sum(backbone!=0)) / (sum(G!=0)-nrow(G)),3)*100  #Percent decrease in number of edges
+    reduced_nodes <- round((max(sum(rowSums(G)!=0),sum(colSums(G)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(G)!=0),sum(colSums(G)!=0)),3) * 100  #Percent decrease in number of connected nodes
+    write.narrative(agents = bb.object$agents,
+                    artifacts = bb.object$artifacts,
+                    weighted = bb.object$weighted,
+                    bipartite = bb.object$bipartite,
+                    symmetric = bb.object$symmetric,
+                    signed = signed,
+                    mtc = mtc,
+                    alpha = alpha,
+                    s = NULL,
+                    ut = NULL,
+                    lt = NULL,
+                    trials = NULL,
+                    model = bb.object$model,
+                    reduced_edges = reduced_edges,
+                    reduced_nodes = reduced_nodes)
   }
 
   #### Return result ####

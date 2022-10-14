@@ -119,6 +119,7 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
              weighted = TRUE,
              bipartite = FALSE,
              symmetric = symmetric,
+             class = class,
              trials = NULL)
   if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
   if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
@@ -127,13 +128,7 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    reduced_edges <- round((sum(G!=0) - sum(backbone!=0)) / sum(G!=0),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(G)!=0),sum(colSums(G)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(G)!=0),sum(colSums(G)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = symmetric,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity",
-                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, attribs, convert = class)
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = class, narrative = narrative)
     return(backbone)
   }
 }
