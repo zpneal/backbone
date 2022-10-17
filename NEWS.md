@@ -5,7 +5,7 @@ output: html_document
 ## backbone 2.1.1
 
 * speedups in `sparsify()` and all statistical backbone functions
-* eliminate `hyperg()` as alternate name for `fixedrow()`, eliminate `universal()` as alternate name for `global()`
+* eliminated `hyperg()` as alternate name for `fixedrow()`, eliminated `universal()` as alternate name for `global()`
 * empty & full rows/cols no longer need to be removed from bipartite inputs
 * replaced `testthat` with `tinytest`; expanded unit tests
 * backbone object includes node attributes, if present
