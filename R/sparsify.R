@@ -60,16 +60,22 @@
 sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE, class = "original", narrative = FALSE) {
 
   #### Helper Function: Edge score ranking ####
-  nhood.rank <- function(x) {  #Ranking function - Highest value = 1
-    old <- sort(unique(x))      #Second highest value = 2
-    new <- c((length(old)):1)   #Missing edges = 0
-    new[which(new==max(new))] <- 0
-    x[x %in% old] <- new[match(x, old, nomatch = 0)]
-    return(x)
+  nhood.rank <- function(x) {
+    if (max(x)==0) {return(x)} else {  #Do nothing for isolate nodes
+      old <- sort(unique(x))  #Find unique values
+      new <- c((length(old)):1)  #Rank them 1 = highest, 2 = second highest, etc
+      if (min(old)==0) {new[which(new==max(new))] <- 0}  #If zero was one of the values, rank them as 0
+      x <- new[match(x, old)]  #Replace original values with corresponding ranks
+      return(x)
+    }
   }
 
   #### Helper Function: Symmetrize using maximum ####
-  sym.max <- function(m) {return(outer(1:nrow(m),1:ncol(m), FUN = Vectorize( function(i,j) (max(m[i,j], m[j,i])))))}
+  sym.max <- function(m) {
+    m[lower.tri(m)] <- pmax(m[lower.tri(m)],t(m)[lower.tri(t(m))])
+    m[upper.tri(m)] <- t(m)[upper.tri(m)]
+    return(m)
+  }
 
   #### Convert supplied object to matrix ####
   G <- tomatrix(U)
@@ -110,8 +116,14 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
   if (escore == "jaccard") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) / (sum((G[i,]==1 | G[j,]==1)*1)) ))
-    G <- G * original
+    Gedge <- igraph::as_edgelist(igraph::graph_from_adjacency_matrix(original, mode = "undirected"))  #Get edgelist
+    Gedge <- cbind(Gedge, NA)  #Placeholder column for jaccards
+    G <- matrix(0, nrow(original), ncol(original))  #Initialize scored adjacency matrix
+    for (i in 1:nrow(Gedge)) {  #For each edge
+      Gedge[i,3] <- (sum((original[Gedge[i,1],]==1 & original[Gedge[i,2],]==1)*1)) / (sum((original[Gedge[i,1],]==1 | original[Gedge[i,2],]==1)*1))  #Compute jaccard
+      G[Gedge[i,1],Gedge[i,2]] <- Gedge[i,3]  #Insert value in adjacency matrix
+      G[Gedge[i,2],Gedge[i,1]] <- Gedge[i,3]
+    }
   }
 
   #Number of maximal 4-cliques, from Nocaj et al. (2015)
@@ -162,11 +174,11 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #### Normalize edge scores ####
   #Neighborhood rank, from Satuluri et al. (2011)
-  if (normalize == "rank") {G <- t(apply(G, 1, function(x) nhood.rank(x)))}
+  if (normalize == "rank") {for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}}
 
   #Embeddedness, from Nick et al. (2013) and Nocaj et al. (2015)
   if (normalize == "embeddedness") {
-    G <- t(apply(G, 1, function(x) nhood.rank(x)))  #Neighborhood rank is computed first
+    for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}  #Neighborhood rank is computed first
     scores <- matrix(0, nrow(G), ncol(G))  #Initialize matrix to hold embeddedness scores
     for (row1 in 1:nrow(G)) {
       for (row2 in 1:nrow(G)) {  #Loop over each pair of rows

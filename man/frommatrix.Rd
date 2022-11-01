@@ -2,22 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{frommatrix}
 \alias{frommatrix}
-\title{Converts a backbone adjacency matrix to an object of specified class}
+\title{Converts a backbone adjacency matrix to a graph object of specified class}
 \usage{
-frommatrix(graph, attribs = NA, convert = "matrix")
+frommatrix(mat, attribs = NA, convert = "matrix")
 }
 \arguments{
-\item{graph}{a matrix}
+\item{mat}{an adjacency matrix}
 
 \item{attribs}{dataframe: vertex attributes to be assigned in igraph object}
 
 \item{convert}{class to convert to, one of "matrix", "Matrix", "igraph", or "edgelist"}
 }
 \value{
-backbone graph: Binary or signed backbone graph of class given in parameter \code{convert}.
+backbone graph: Binary or signed backbone graph of class \code{convert}.
 }
 \description{
-Converts a backbone adjacency matrix to an object of specified class
+Converts a backbone adjacency matrix to a graph object of specified class
 }
 \examples{
 M <- matrix(sample(c(-1,0,1),5*5,replace=TRUE),5,5)

@@ -3,7 +3,6 @@
 #' `fdsm` extracts the backbone of a bipartite projection using the Fixed Degree Sequence Model.
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
-#'     Any rows and columns of the associated bipartite matrix that contain only zeros are automatically removed before computations.
 #' @param trials numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -11,6 +10,7 @@
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' @param progress boolean: TRUE if the progress of Monte Carlo trials should be displayed.
 #' @param ... optional arguments
 #'
 #' @details
@@ -38,10 +38,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports*. \doi{10.1038/s41598-021-03238-3}}
@@ -67,7 +67,7 @@
 #' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
+fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE, ...){
 
   #### Argument Checks ####
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
@@ -103,7 +103,7 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   ### Create Positive and Negative Matrices to hold backbone ###
   rotate <- FALSE  #initialize
   Pupper <- matrix(0, nrow(P), ncol(P))  #Create positive matrix to hold number of times null co-occurence >= P
-  Plower <- matrix(0, nrow(P), ncol(P))  #Create negative matrix to hold number of times null co-occurence <] P
+  if (signed) {Plower <- matrix(0, nrow(P), ncol(P))}  #Create negative matrix to hold number of times null co-occurence <= P
   if (nrow(B) > ncol(B)) {  #If B is long, make it wide before randomizing so that randomization is faster
     rotate <- TRUE
     B <- t(B)
@@ -112,8 +112,8 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   L <- lapply(asplit(B == 1, 1), which)  #Works on all R releases
 
   #### Build Null Models ####
-  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
-  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
+  if (progress) {message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))}
+  if (progress) {pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)}  #Start progress bar
   for (i in 1:trials){
 
     ### Generate an FDSM Bstar ###
@@ -127,31 +127,38 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
 
     ### Check whether Pstar edge is larger/smaller than P edge ###
     Pupper <- Pupper + (Pstar >= P)+0
-    Plower <- Plower + (Pstar <= P)+0
+    if (signed) {Plower <- Plower + (Pstar <= P)+0}
 
     ### Increment progress bar ###
-    utils::setTxtProgressBar(pb, i)
+    if (progress) {utils::setTxtProgressBar(pb, i)}
 
   } #end for loop
-  close(pb) #End progress bar
+  if (progress) {close(pb)} #End progress bar
 
-  #### Create Backbone Object ####
+  #### Compute p-values ####
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
   Pupper <- (Pupper/trials)
-  Plower <- (Plower/trials)
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fdsm")
+  if (signed) {Plower <- (Plower/trials)}
+
+  #### Create Backbone Object ####
+  bb <- list(G = P,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "fdsm",
+             agents = nrow(B),
+             artifacts = ncol(B),
+             weighted = FALSE,
+             bipartite = TRUE,
+             symmetric = TRUE,
+             class = class,
+             trials = trials)
+  if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
+  if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"
 
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    reduced_edges <- round(((sum(P!=0)-nrow(P)) - sum(backbone!=0)) / (sum(P!=0)-nrow(P)),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(P)!=0),sum(colSums(P)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(P)!=0),sum(colSums(P)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = FALSE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = trials, model = "fdsm",
-                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, attribs, convert = class)
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = class, narrative = narrative)
     return(backbone)
   }
 } #end fdsm function

@@ -28,10 +28,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -93,7 +93,7 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
     pvalues <- (1-P)^(degree-1)
     Pupper <- as.matrix(pvalues)          #Asymmetric p-values, one from the perspective of each node
     Pupper <- pmin(Pupper,t(Pupper))  #From Serrano: "satisfy the above criterion for at least one of the two nodes"
-    Plower <- 1-Pupper
+    if (signed) {Plower <- 1-Pupper}
   }
 
   if (symmetric == FALSE){
@@ -103,27 +103,32 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
     inp <- t(G)/(colSums(G))
     invalues <- t((1-inp)^(colSums(binary)-1))
     Pupper <- pmin(invalues,outvalues)
-    Plower <- 1-Pupper
+    if (signed) {Plower <- 1-Pupper}
   }
 
   ### If edge weight was zero, set to 1 in positive and negative so edge is not in backbone ###
   Pupper[zeros] <- 1
-  Plower[zeros] <- 1
+  if (signed) {Plower[zeros] <- 1}
 
   ### Create backbone object ###
-  bb <- list(G = G, Pupper = Pupper, Plower = Plower, model = "disparity")
+  bb <- list(G = G,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "disparity",
+             agents = nrow(G),
+             artifacts = NULL,
+             weighted = TRUE,
+             bipartite = FALSE,
+             symmetric = symmetric,
+             class = class,
+             trials = NULL)
+  if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
+  if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"
 
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    reduced_edges <- round((sum(G!=0) - sum(backbone!=0)) / sum(G!=0),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(G)!=0),sum(colSums(G)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(G)!=0),sum(colSums(G)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(G), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = symmetric,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "disparity",
-                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, attribs, convert = class)
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = class, narrative = narrative)
     return(backbone)
   }
 }

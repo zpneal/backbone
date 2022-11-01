@@ -3,7 +3,6 @@
 #' `osdsm` extracts the backbone of a bipartite projection using the Ordinal Stochastic Degree Sequence Model.
 #'
 #' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
-#'     Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.
 #' @param trials integer: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -11,6 +10,7 @@
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' @param progress boolean: TRUE if the progress of Monte Carlo trials should be displayed.
 #'
 #' @details
 #' The `osdsm` function compares an edge's observed weight in the projection `B*t(B)` to the distribution of weights
@@ -37,10 +37,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references osdsm: {Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. *Environment and Planning A, 49*, 2859-2877. \doi{10.1177/0308518X16631339}}
@@ -62,7 +62,7 @@
 #'             class = "igraph", trials = 100)
 #' plot(bb) #...is sparse with clear communities
 
-osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE){
 
   #### Class Conversion and Argument Checks ####
   convert <- tomatrix(B)
@@ -78,7 +78,10 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   if (is.null(trials) & is.null(alpha)) {stop("If trials = NULL, then alpha must be specified")}
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
   weights <- sort(unique(as.vector(B)))  #Unique edge weights
-  if (!all.equal(weights,c(0:max(weights)))) {stop("Edge weights must be measured on an ordinal scale starting with 0")}
+  if (sum(weights%%1)!=0) {stop("Edge weights must be integers that reflect values on an ordinal scale.")}
+  if (any(weights < 0)) {stop("Edge weights must be positive integers that reflect values on an ordinal scale.")}
+  if (!(0 %in% weights)) {warning("Although no edges have weight = 0, the weight scale is assumed to start at 0.")}
+  weights <- c(0:max(B))  #If weights are valid, this is the full scale
 
   #### Bipartite Projection ####
   P <- tcrossprod(B)
@@ -96,7 +99,7 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
 
   ### Create Positive and Negative Matrices to hold backbone ###
   Pupper <- matrix(0, nrow(P), ncol(P))
-  Plower <- matrix(0, nrow(P), ncol(P))
+  if (signed) {Plower <- matrix(0, nrow(P), ncol(P))}
 
   #### Compute probabilities for SDSM ####
   #Vectorize the bipartite data
@@ -107,7 +110,7 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   #Compute conditional probabilities using logistic regression (see Neal, 2017)
   for (value in 1:max(weights)) {  #For each edge weight > 0
     dat <- data.frame(y = (A$value>=value)*1, x1 = stats::ave(A$value>=value,A$rowid,FUN=sum), x2 = stats::ave(A$value>=value,A$colid, FUN=sum))
-    fitted <- stats::glm(y ~ x1 + x2, data = dat[which(A$value>=(value-1)),], family = "binomial")
+    fitted <- suppressWarnings(stats::glm(y ~ x1 + x2, data = dat[which(A$value>=(value-1)),], family = "binomial"))
     A <- cbind(A, stats::predict(fitted, newdata = dat, type = "response"))
   }
 
@@ -124,8 +127,8 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   A$rand <- NA
 
   #### Build null models ####
-  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
-  pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
+  if (progress) {message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))}
+  if (progress) {pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)}  #Start progress bar
   for (i in 1:trials){
 
     #Use probabilities to create an SDSM Bstar
@@ -135,30 +138,38 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
     #Construct Pstar from Bstar, check whether Pstar edge is larger/smaller than P edge
     Pstar <- tcrossprod(Bstar)
     Pupper <- Pupper + (Pstar > P)+0
-    Plower <- Plower + (Pstar < P)+0
+    if (signed) {Plower <- Plower + (Pstar < P)+0}
 
     #Increment progress bar
-    utils::setTxtProgressBar(pb, i)
+    if (progress) {utils::setTxtProgressBar(pb, i)}
 
   } #end for loop
-  close(pb) #End progress bar
+  if (progress) {close(pb)} #End progress bar
+
+  #### Compute p-values ####
+  Pupper <- (Pupper/trials)
+  if (signed) {Plower <- (Plower/trials)}
 
   #### Create Backbone Object ####
-  Pupper <- (Pupper/trials)
-  Plower <- (Plower/trials)
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "osdsm")
+  bb <- list(G = P,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "osdsm",
+             agents = nrow(B),
+             artifacts = ncol(B),
+             weighted = FALSE,
+             bipartite = TRUE,
+             symmetric = TRUE,
+             class = class,
+             trials = NULL)
+  if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
+  if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
+
   class(bb) <- "backbone"
 
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    reduced_edges <- round(((sum(P!=0)-nrow(P)) - sum(backbone!=0)) / (sum(P!=0)-nrow(P)),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(P)!=0),sum(colSums(P)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(P)!=0),sum(colSums(P)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = TRUE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "osdsm",
-                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, attribs, convert = class)
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = class, narrative = narrative)
     return(backbone)
   }
 }

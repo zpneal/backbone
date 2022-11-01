@@ -36,8 +36,7 @@ Binary or signed backbone graph of class given in parameter \code{class}.
 \details{
 The \code{global} function retains a edge in the backbone if its weight exceeds \code{upper}. If a \code{lower} threshold is also
 specified, it returns a signed backbone in which edge weights are set to 1 if above the given upper threshold,
-set to -1 if below the given lower threshold, and set to 0 otherwise. Prior to v2.0.0, the \code{global} function was
-called \code{\link[=universal]{universal()}}, which is now depricated.
+set to -1 if below the given lower threshold, and set to 0 otherwise.
 
 If \code{W} is an unweighted bipartite graph, any rows and columns that contain only zeros or only ones are removed, then
 the global threshold is applied to its weighted bipartite projection.

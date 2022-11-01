@@ -11,12 +11,12 @@ osdsm(
   signed = FALSE,
   mtc = "none",
   class = "original",
-  narrative = FALSE
+  narrative = FALSE,
+  progress = TRUE
 )
 }
 \arguments{
-\item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
-Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.}
+\item{B}{An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -30,14 +30,16 @@ Any rows and columns of the associated bipartite matrix that contain only zeros 
 If "original", the backbone graph returned is of the same class as \code{B}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
+
+\item{progress}{boolean: TRUE if the progress of Monte Carlo trials should be displayed.}
 }
 \value{
 If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
 
-If \code{alpha} == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-can subsequently be extracted using \code{\link[=backbone.extract]{backbone.extract()}}. The \code{signed}, \code{mtc}, \code{class}, and \code{narrative} parameters
-are ignored.
+If \code{alpha} == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+matrix, (3, if \code{signed = TRUE}) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+(5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+using \code{\link[=backbone.extract]{backbone.extract()}}.
 }
 \description{
 \code{osdsm} extracts the backbone of a bipartite projection using the Ordinal Stochastic Degree Sequence Model.

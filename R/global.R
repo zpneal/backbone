@@ -13,8 +13,7 @@
 #' @details
 #' The `global` function retains a edge in the backbone if its weight exceeds `upper`. If a `lower` threshold is also
 #'    specified, it returns a signed backbone in which edge weights are set to 1 if above the given upper threshold,
-#'    set to -1 if below the given lower threshold, and set to 0 otherwise. Prior to v2.0.0, the `global` function was
-#'    called [universal()], which is now depricated.
+#'    set to -1 if below the given lower threshold, and set to 0 otherwise.
 #'
 #' If `W` is an unweighted bipartite graph, any rows and columns that contain only zeros or only ones are removed, then
 #'    the global threshold is applied to its weighted bipartite projection.
@@ -76,18 +75,4 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
 
   backbone <- frommatrix(backbone, attribs, convert = class)
   return(backbone)
-}
-
-#' Wrapper for global()
-#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
-#' @param upper Real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
-#' @param lower Real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
-#' @param keepzeros Boolean: TRUE if zero-weight edges in `M` should be missing in the backbone
-#' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
-#'     If "original", the backbone graph returned is of the same class as `B`.
-#' @param narrative Boolean: TRUE if suggested text for a manuscript is to be returned
-#' @export
-universal <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
-  warning("The universal() function is now called global(); please use global() instead.")
-  global(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE)
 }

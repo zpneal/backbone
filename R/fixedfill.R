@@ -3,7 +3,6 @@
 #' `fixedfill` extracts the backbone of a bipartite projection using the Fixed Fill Model.
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
-#'     Any rows and columns of the associated bipartite matrix that contain only zeros or only ones are automatically removed before computations.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
@@ -27,10 +26,10 @@
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
-#' If `alpha` == NULL: An S3 backbone object containing three matrices (the weighted graph, edges' upper-tail p-values,
-#'    edges' lower-tail p-values), and a string indicating the null model used to compute p-values, from which a backbone
-#'    can subsequently be extracted using [backbone.extract()]. The `signed`, `mtc`, `class`, and `narrative` parameters
-#'    are ignored.
+#' If `alpha` == NULL: An S3 backbone object containing (1) the weighted graph as a matrix, (2) upper-tail p-values as a
+#'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
+#'    (5) several properties of the original graph and backbone model, from which a backbone can subsequently be extracted
+#'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references fixedfill: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
@@ -121,22 +120,29 @@ fixedfill <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   probs <- sapply(0:maxk, FUN = prob_log)  #Probability of observing each k, for 0 <= k <= maxk
   probs <- c(probs, 1 - sum(probs))  #Add one more entry for probability of observing any k > maxk (upper tail of PMF)
 
-  #### Create Backbone Object ####
+  #### Compute P-values ####
   Pupper <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(maxk+2)]))  #Sum of probabilities Pij <= k <= maxk and beyond
-  Plower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))  #Sum of probabilities 0 <= k <= Pij
-  bb <- list(G = P, Pupper = Pupper, Plower = Plower, model = "fixedfill")
+  if (signed) {Plower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))}  #Sum of probabilities 0 <= k <= Pij
+
+  #### Create Backbone Object ####
+  bb <- list(G = P,  #Preliminary backbone object
+             Pupper = Pupper,
+             model = "fixedfill",
+             agents = nrow(B),
+             artifacts = ncol(B),
+             weighted = FALSE,
+             bipartite = TRUE,
+             symmetric = TRUE,
+             class = class,
+             trials = NULL)
+  if (signed) {bb <- append(bb, list(Plower = Plower))}  #Add lower-tail values, if requested
+  if (!is.null(attribs)) {bb <- append(bb, list(attribs = attribs))}  #Add node attributes, if present
   class(bb) <- "backbone"
 
   #### Return result ####
   if (is.null(alpha)) {return(bb)}  #Return backbone object if `alpha` is not specified
   if (!is.null(alpha)) {            #Otherwise, return extracted backbone (and show narrative text if requested)
-    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = "matrix")
-    reduced_edges <- round(((sum(P!=0)-nrow(P)) - sum(backbone!=0)) / (sum(P!=0)-nrow(P)),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(P)!=0),sum(colSums(P)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(P)!=0),sum(colSums(P)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(B), artifacts = ncol(B), weighted = FALSE, bipartite = TRUE, symmetric = TRUE,
-                                            signed = signed, mtc = mtc, alpha = alpha, s = NULL, ut = NULL, lt = NULL, trials = NULL, model = "fixedfill",
-                                            reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
-    backbone <- frommatrix(backbone, attribs, convert = class)
+    backbone <- backbone.extract(bb, alpha = alpha, signed = signed, mtc = mtc, class = class, narrative = narrative)
     return(backbone)
   }
 }
