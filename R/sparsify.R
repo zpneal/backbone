@@ -118,7 +118,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   if (escore == "jaccard") {
     Gedge <- igraph::as_edgelist(igraph::graph_from_adjacency_matrix(original, mode = "undirected"))  #Get edgelist
     Gedge <- cbind(Gedge, NA)  #Placeholder column for jaccards
-    G <- matrix(0, nrow(original), ncol(original))  #Initialize scored adjacency matrix
+    G <- matrix(0, nrow(original), ncol(original), dimnames = dimnames(original))  #Initialize scored adjacency matrix
     for (i in 1:nrow(Gedge)) {  #For each edge
       Gedge[i,3] <- (sum((original[Gedge[i,1],]==1 & original[Gedge[i,2],]==1)*1)) / (sum((original[Gedge[i,1],]==1 | original[Gedge[i,2],]==1)*1))  #Compute jaccard
       G[Gedge[i,1],Gedge[i,2]] <- Gedge[i,3]  #Insert value in adjacency matrix
