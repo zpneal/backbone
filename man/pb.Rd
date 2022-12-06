@@ -25,7 +25,7 @@ successes when each trial has probability \code{p} of success.
 }
 \details{
 The Refined Normal Approximation (RNA) offers a close approximation when \code{length(p)} is
-large (Hong, 2013). This function is based on \code{ppoibin()} from the \code{poibin} package.
+large (Hong, 2013).
 }
 \examples{
 pb(50,runif(100))
