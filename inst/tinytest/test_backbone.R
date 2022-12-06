@@ -13,7 +13,7 @@ expect_equal(colSums(test), colSums(M), info = "fastball columns")
 ## PB (poisson-binomial)
 test <- pb(5, c(.123,.234,.345,.456,.567,.678,.789,.801,.911))
 expect_equal(test[1], 0.6773302, info = "pb lower")
-expect_equal(test[2], 0.6268476, info = "pb upper")
+expect_equal(test[2], 0.3226698, info = "pb upper")
 
 #### Internal Utility Functions ####
 ## TOMATRIX: convert from matrix
@@ -139,14 +139,14 @@ expect_equal(igraph::E(test)$sign, c(-1,-1,1,1))
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
 test <- sdsm(M, alpha = NULL, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
-expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm")
+expect_equal(round(test$Pupper,3), rbind(c(.091,.646,.156),c(.646,.046,.524),c(.156,.524,.058)), info = "sdsm")
 expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)), info = "sdsm")
 expect_equal(test$model, "sdsm", info = "sdsm")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
 test <- sdsm(M, alpha = NULL, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
-expect_equal(round(test$Pupper,3), rbind(c(.432,1,.549),c(1,.304,1),c(.549,1,.329)), info = "sdsm")
+expect_equal(round(test$Pupper,3), rbind(c(.091,1,.156),c(1,.046,1),c(.156,1,.058)), info = "sdsm")
 expect_equal(test$model, "sdsm", info = "sdsm")
 
 ## FDSM
