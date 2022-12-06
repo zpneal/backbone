@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.1.2
+
+* speedups and bug fixes in `pb()`
+
 ## backbone 2.1.1
 
 * speedups in `sparsify()` and all statistical backbone functions
