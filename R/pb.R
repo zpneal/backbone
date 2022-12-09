@@ -24,13 +24,23 @@
 #' @examples
 #' pb(50,runif(100))
 pb <-function(k, p, lowertail=TRUE) {
+  #Compute parameters
+  mu <- sum(p)
   pq <- p*(1-p)
   sigma <- sqrt(sum(pq))
-  k <- (k+.5-sum(p))/sigma  #Continuity-corrected evaluation point
-  na <- stats::pnorm(k)  #Normal approximation
-  refined <- (sum(pq*(1-2*p)))/(6*sigma^3)*(1-k^2)*stats::dnorm(k)  #Refined normal correction
-  upper <- (1-na)-refined  #Upper-tail p-value
-  if (lowertail) {lower <- na+refined} else {lower <- NA}  #Lower-tail p-value, if requested
+  gamma <- sum(pq*(1-2*p))
+  
+  #Lower tail p-value, if requested
+  if (lowertail) {
+    x <- (k+.5-mu)/sigma
+    lower <- stats::pnorm(x)+gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x)
+  } else {lower <- NA}
+  
+  #Upper tail p-value
+  x <- ((k-1)+.5-mu)/sigma
+  upper <- stats::pnorm(x,lower.tail=F)-gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x)
+  
+  #Combine, truncate, return
   prob <- c(lower,upper)
   prob[prob<0] <- 0
   prob[prob>1] <- 1
