@@ -4,7 +4,8 @@ output: html_document
 ---
 ## backbone 2.1.2
 
-* speedups and bug fixes in `pb()`
+* speedups in `pb()` and `sdsm()`
+* fixed tinytests in preparation for new `igraph` attribute rules
 
 ## backbone 2.1.1
 
