@@ -74,7 +74,7 @@ expect_equal(test$G,igraph::as_adjacency_matrix(M, sparse = F), info = "uniparti
 expect_equal(as.vector(test$attribs$names),LETTERS[1:10], info = "unipartite igraph")
 
 M <- igraph::bipartite.random.game(n1 = 10, n2 = 100, type = "gnm", m = 250, directed=FALSE)
-igraph::V(M)$names <- LETTERS[1:10]
+igraph::V(M)$names <- c(LETTERS[1:10],1:100)
 igraph::E(M)$weight <- runif(250)
 test <- backbone:::tomatrix(M)
 expect_equal(test$summary$class,"igraph", info = "bipartite igraph")
