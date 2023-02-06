@@ -58,7 +58,7 @@ The `backbone` package can be cited as:
 
 For additional resources on the backbone package, please see [https://www.rbackbone.net/](https://www.zacharyneal.com/backbone).
 
-If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)) or via Twitter ([\@zpneal](https://twitter.com/zpneal)). Please report bugs in the backbone package at [https://github.com/zpneal/backbone/issues](https://github.com/zpneal/backbone/issues).
+If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)) or via Mastodon ([\@zpneal@mastodon.social](https://mastodon.social/@zpneal)). Please report bugs in the backbone package at [https://github.com/zpneal/backbone/issues](https://github.com/zpneal/backbone/issues).
 
 ## Loading the package {#loading}
 The backbone package can be loaded in the usual way:
