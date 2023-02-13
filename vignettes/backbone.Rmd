@@ -20,6 +20,7 @@ knitr::opts_knit$set(global.par = TRUE)
 
 ```{r, echo = FALSE}
 set.seed(5)
+oldmar <- par()$mar
 par(mar = c(0, 0, 0, 0) + 0.1)
 ```
 
@@ -313,5 +314,9 @@ bicm(mat)
 ```
 
 [back to Table of Contents](#toc)
+
+```{r, echo = FALSE}
+par(mar = oldmar)
+```
 
 # References
