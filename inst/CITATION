@@ -1,14 +1,12 @@
-citHeader("To cite backbone in publications use:")
-
-citEntry(
-  entry    = "Article",
-  title    = "backbone: An R Package to Extract Network Backbones",
-  author   = "Zachary P. Neal",
-  journal  = "PLOS ONE",
-  year     = "2022",
-  volume   = "17",
-  number   = "5",
-  pages    = "e0269137",
-  doi      = "10.1371/journal.pone.0269137",
-  textVersion = paste("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE. https://doi.org/10.1371/journal.pone.0269137")
+rref <- bibentry(
+   bibtype = "Article",
+   title = "backbone: An R Package to Extract Network Backbones",
+   author = person("Zachary P Neal", email = "zpneal@msu.edu"),
+   journal  = "PLOS ONE",
+   year     = "2022",
+   volume   = "17",
+   number   = "5",
+   pages    = "e0269137",
+   doi      = "10.1371/journal.pone.0269137",
+   textVersion = paste("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE. https://doi.org/10.1371/journal.pone.0269137")
 )
