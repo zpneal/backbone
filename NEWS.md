@@ -2,6 +2,11 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.1.2
+
+* speedups in `pb()` and `sdsm()`
+* fixed minor bugs introduced by `igraph 1.4.0`
+
 ## backbone 2.1.1
 
 * speedups in `sparsify()` and all statistical backbone functions

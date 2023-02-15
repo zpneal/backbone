@@ -9,7 +9,7 @@ Rcpp::List fastball_cpp(Rcpp::List inputList, int numSwaps) {
   int numRows = inputList.length(); 
 
   //convert input list into a 2D std::vector
-  std::vector<std::vector<int>> oneLocs (numRows);
+  std::vector<std::vector<int> > oneLocs (numRows);
   for(int i = 0; i < numRows; i++) {
     oneLocs[i] = Rcpp::as<std::vector<int> > (inputList[i]);
   }

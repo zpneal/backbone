@@ -25,5 +25,5 @@ M <- matrix(rbinom(200,1,0.5),10,20)  #A random 10x20 binary matrix
 Mrand <- fastball(M)  #Random matrix with same row and column sums
 }
 \references{
-{Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{\emph{arXiv:2112.04017}}}
+fastball: {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \emph{Journal of Complex Networks} \doi{10.1093/comnet/cnac049}}
 }

@@ -93,5 +93,5 @@ package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbone
 
 fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports}. \doi{10.1038/s41598-021-03238-3}}
 
-fastball: {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \href{https://arxiv.org/abs/2112.04017}{\emph{arXiv:2112.04017}}}#'
+fastball: {Godard, Karl and Neal, Zachary P. 2022. fastball: A fast algorithm to sample bipartite graphs with fixed degree sequences. \emph{Journal of Complex Networks} \doi{10.1093/comnet/cnac049}}
 }
