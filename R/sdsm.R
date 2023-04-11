@@ -5,6 +5,7 @@
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
+#' @param model string: method for computing cellwise probabilities (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
@@ -23,6 +24,10 @@
 #'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
 #'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
 #'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
+#'
+#' The default method for computing cellwise probabilities is the Bipartite Configuration Model (BiCM) using \link{bicm},
+#'    which is the fastest and most accurate (Neal et al., 2021). The alternative logit model first described by Neal (2014)
+#'    is available using \link{logit}, but it should generally only be used when B contains structural 1s and/or structural 0s.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -57,7 +62,7 @@
 #' bb <- sdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An SDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
+sdsm <- function(B, alpha = 0.05, signed = FALSE, model = "bicm", mtc = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -67,18 +72,27 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   B <- convert$G
-  if (convert$summary$weighted==TRUE){stop("Graph must be unweighted.")}
+  if (convert$summary$weighted==TRUE){  #If G is not binary, check whether it contains structural 0s or 1s
+    if (any(!(B%in%c(0,1,10,11)))) {stop("Graph must be unweighted.")}
+    if (model=="bicm" & all(B%in%c(0,1,10,11))) {stop("BiCM does not support structural values. Use model=\"logit\" instead.")}
+    }
   if (convert$summary$bipartite==FALSE){
     warning("This object is being treated as a bipartite network.")
     convert$summary$bipartite <- TRUE
     }
 
   #### Bipartite Projection ####
-  P <- tcrossprod(B)
+  if (convert$summary$weighted==TRUE) {  #If B contains structural 1s and/or 0s, remove them then project
+    B_unweight <- B
+    B_unweight[B_unweight==10] <- 0
+    B_unweight[B_unweight==11] <- 1
+    P <- tcrossprod(B_unweight)
+  } else {P <- tcrossprod(B)}
 
   #### Compute Probabilities for SDSM ####
-  bicm.probs <- bicm(B,...)
-  bicm.probs <- lapply(seq_len(nrow(bicm.probs)), function(i) bicm.probs[i,])  #Store probabilities as list
+  if (model == "bicm") {probs <- bicm(B,...)}
+  if (model == "logit") {probs <- logit(B)}
+  probs <- lapply(seq_len(nrow(probs)), function(i) probs[i,])  #Store probabilities as list
 
   #### Compute p-values (for unsigned backbone, ignore lower-tail p-values) ####
   if (!signed) {
@@ -86,7 +100,7 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
         if (P[row,col] != 0) {  #Compute and update the upper-tail p-value only if the edge has non-zero weight
-          pvalues <- pb(P[row,col], unlist(Map('*',bicm.probs[row],bicm.probs[col])), lowertail = FALSE)
+          pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = FALSE)
           Pupper[row,col] <- pvalues[2]
         }
       }
@@ -100,7 +114,7 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
     Plower <- matrix(0, nrow(P), ncol(P))
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
-        pvalues <- pb(P[row,col], unlist(Map('*',bicm.probs[row],bicm.probs[col])))
+        pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])))
         Plower[row,col] <- pvalues[1]
         Pupper[row,col] <- pvalues[2]
       }
