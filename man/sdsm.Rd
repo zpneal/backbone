@@ -8,6 +8,7 @@ sdsm(
   B,
   alpha = 0.05,
   signed = FALSE,
+  model = "bicm",
   mtc = "none",
   class = "original",
   narrative = FALSE,
@@ -20,6 +21,8 @@ sdsm(
 \item{alpha}{real: significance level of hypothesis test(s)}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
+
+\item{model}{string: method for computing cellwise probabilities (see details)}
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
@@ -53,6 +56,10 @@ model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or w
 It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
 negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
 \emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
+
+The default method for computing cellwise probabilities is the Bipartite Configuration Model (BiCM) using \link{bicm},
+which is the fastest and most accurate (Neal et al., 2021). The alternative logit model first described by Neal (2014)
+is available using \link{logit}, but it should generally only be used when B contains structural 1s and/or structural 0s.
 }
 \examples{
 #A binary bipartite network of 30 agents & 75 artifacts; agents form three communities
