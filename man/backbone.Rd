@@ -3,6 +3,7 @@
 \docType{package}
 \name{backbone}
 \alias{backbone}
+\alias{backbone-package}
 \title{backbone: Extracts the Backbone from Graphs}
 \description{
 Provides methods for extracting from an unweighted and sparse subgraph (i.e., a backbone)
