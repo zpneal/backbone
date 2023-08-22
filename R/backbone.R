@@ -25,6 +25,7 @@
 #' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #'
 #' @docType package
+#' @aliases backbone-package
 #' @name backbone
 NULL
 
