@@ -45,13 +45,13 @@ write.narrative(
 
 \item{lt}{numeric: lower threshold (used in global threshold)}
 
+\item{trials}{integer: number of trials used to estimate FDSM or oSDSM p-values}
+
 \item{model}{string: name of backbone null model}
 
 \item{reduced_edges}{numeric: percent reduction in number of edges}
 
 \item{reduced_nodes}{numeric: percent reduction in number of connected nodes}
-
-\item{trials:}{integer: number of trials used to estimate FDSM or oSDSM p-values}
 }
 \value{
 NULL; only displays text in the console
