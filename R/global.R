@@ -2,7 +2,7 @@
 #'
 #' `global` extracts the backbone of a weighted network using a global threshold
 #'
-#' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param G A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param upper real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros boolean: TRUE if zero-weight edges in `W` should be excluded from (i.e. also be zero in) the backbone
@@ -11,12 +11,12 @@
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @details
-#' The `global` function retains a edge in the backbone if its weight exceeds `upper`. If a `lower` threshold is also
-#'    specified, it returns a signed backbone in which edge weights are set to 1 if above the given upper threshold,
-#'    set to -1 if below the given lower threshold, and set to 0 otherwise.
+#' The `global` function retains a edge with weight `W` if `W` > `upper`. If a `lower` threshold is also
+#'    specified, it returns a signed backbone in which an edge's weight is set to 1 if `W` > `upper`, 
+#'    is set to -1 if `W` < `lower`, and is set to 0 otherwise. The default is an unsigned backbone containing
+#'    all edges with non-zero weights.
 #'
-#' If `W` is an unweighted bipartite graph, any rows and columns that contain only zeros or only ones are removed, then
-#'    the global threshold is applied to its weighted bipartite projection.
+#' If `G` is an unweighted bipartite graph, the global threshold is applied to its weighted bipartite projection.
 #'
 #' @return Binary or signed backbone graph of class given in parameter `class`.
 #'
@@ -25,14 +25,14 @@
 #' @export
 #'
 #' @examples
-#' W <- matrix(sample(0:5, 100, replace = TRUE), 10) #Random weighted graph
-#' diag(W) <- 0
-#' W
-#' global(W, narrative = TRUE)  #Keep all non-zero edges
-#' global(W, upper = 4, lower = 2, narrative = TRUE)  #Signed with specified thresholds
-#' global(W, upper = function(x)mean(x),  #Above-average --> positive edges
+#' G <- matrix(sample(0:5, 100, replace = TRUE), 10) #Random weighted graph
+#' diag(G) <- 0
+#' G
+#' global(G, narrative = TRUE)  #Keep all non-zero edges
+#' global(G, upper = 4, lower = 2, narrative = TRUE)  #Signed with specified thresholds
+#' global(G, upper = function(x)mean(x),  #Above-average --> positive edges
 #'           lower = function(x)mean(x), narrative = TRUE)  #Below-average --> negative edges
-global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
+global <- function(G, upper = 0, lower = NULL, keepzeros = TRUE, class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!(methods::is(upper, "function")) & (!(methods::is(upper, "numeric"))) & (!(methods::is(upper, "NULL")))) {stop("upper must be either function, numeric, or NULL")}
@@ -40,7 +40,7 @@ global <- function(W, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   if (is.null(upper) & is.null(lower)) {stop("upper and lower cannot both be NULL")}
 
   #### Class Conversion ####
-  convert <- tomatrix(W)
+  convert <- tomatrix(G)
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   M <- convert$G
