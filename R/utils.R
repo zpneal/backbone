@@ -69,6 +69,7 @@ tomatrix <- function(graph){
   if (methods::is(graph, "igraph")) {
     class <- "igraph"
 
+    if (("weight" %in% igraph::edge_attr_names(graph)) & igraph::any_multiple(graph)) {stop("A weighted igraph cannot contain multi-edges.")}
     if (!("weight" %in% igraph::edge_attr_names(graph)) & igraph::any_multiple(graph)) {igraph::E(graph)$weight <- 1}  #If unweighted with multi-edges, give each edge a weight of 1
     graph <- igraph::simplify(graph, edge.attr.comb = "sum") #Remove any loops, and sum multi-edges into a weight attribute
 
