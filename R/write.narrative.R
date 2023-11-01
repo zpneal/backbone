@@ -13,14 +13,14 @@
 #' @param s numeric: sparsification parameter (used in sparsification models)
 #' @param ut numeric: upper threshold (used in global threshold)
 #' @param lt numeric: lower threshold (used in global threshold)
-#' @param trials: integer: number of trials used to estimate FDSM or oSDSM p-values
+#' @param trials integer: number of trials used to estimate FDSM or oSDSM p-values
 #' @param model string: name of backbone null model
 #' @param reduced_edges numeric: percent reduction in number of edges
 #' @param reduced_nodes numeric: percent reduction in number of connected nodes
 #'
 #' @return NULL; only displays text in the console
 #' @keywords internal
-write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt,  trials, model, reduced_edges, reduced_nodes) {
+write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt, trials, model, reduced_edges, reduced_nodes) {
 
   #### Prepare narrative components ####
   version <- utils::packageVersion("backbone")
