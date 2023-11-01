@@ -5,7 +5,7 @@
 \title{Compute global threshold backbone}
 \usage{
 global(
-  W,
+  G,
   upper = 0,
   lower = NULL,
   keepzeros = TRUE,
@@ -14,7 +14,7 @@ global(
 )
 }
 \arguments{
-\item{W}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
+\item{G}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{upper}{real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.}
 
@@ -34,20 +34,20 @@ Binary or signed backbone graph of class given in parameter \code{class}.
 \code{global} extracts the backbone of a weighted network using a global threshold
 }
 \details{
-The \code{global} function retains a edge in the backbone if its weight exceeds \code{upper}. If a \code{lower} threshold is also
-specified, it returns a signed backbone in which edge weights are set to 1 if above the given upper threshold,
-set to -1 if below the given lower threshold, and set to 0 otherwise.
+The \code{global} function retains a edge with weight \code{W} if \code{W} > \code{upper}. If a \code{lower} threshold is also
+specified, it returns a signed backbone in which an edge's weight is set to 1 if \code{W} > \code{upper},
+is set to -1 if \code{W} < \code{lower}, and is set to 0 otherwise. The default is an unsigned backbone containing
+all edges with non-zero weights.
 
-If \code{W} is an unweighted bipartite graph, any rows and columns that contain only zeros or only ones are removed, then
-the global threshold is applied to its weighted bipartite projection.
+If \code{G} is an unweighted bipartite graph, the global threshold is applied to its weighted bipartite projection.
 }
 \examples{
-W <- matrix(sample(0:5, 100, replace = TRUE), 10) #Random weighted graph
-diag(W) <- 0
-W
-global(W, narrative = TRUE)  #Keep all non-zero edges
-global(W, upper = 4, lower = 2, narrative = TRUE)  #Signed with specified thresholds
-global(W, upper = function(x)mean(x),  #Above-average --> positive edges
+G <- matrix(sample(0:5, 100, replace = TRUE), 10) #Random weighted graph
+diag(G) <- 0
+G
+global(G, narrative = TRUE)  #Keep all non-zero edges
+global(G, upper = 4, lower = 2, narrative = TRUE)  #Signed with specified thresholds
+global(G, upper = function(x)mean(x),  #Above-average --> positive edges
           lower = function(x)mean(x), narrative = TRUE)  #Below-average --> negative edges
 }
 \references{
