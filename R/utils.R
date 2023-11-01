@@ -68,7 +68,9 @@ tomatrix <- function(graph){
   #### Convert from igraph ####
   if (methods::is(graph, "igraph")) {
     class <- "igraph"
-    graph <- igraph::simplify(graph) #Remove any multi-edges and loops
+
+    if (!("weight" %in% igraph::edge_attr_names(graph)) & igraph::any_multiple(graph)) {igraph::E(graph)$weight <- 1}  #If unweighted with multi-edges, give each edge a weight of 1
+    graph <- igraph::simplify(graph, edge.attr.comb = "sum") #Remove any loops, and sum multi-edges into a weight attribute
 
     ## For bipartite inputs
     if (igraph::is.bipartite(graph) == TRUE){
