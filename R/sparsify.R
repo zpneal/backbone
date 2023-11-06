@@ -22,7 +22,9 @@
 #' * `random`: a random number drawn from a uniform distribution
 #' * `betweenness`: edge betweenness
 #' * `triangles`: number of triangles that include the edge
-#' * `jaccard`: jaccard coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
+#' * `jaccard`: jaccard similarity coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
+#' * `dice`: dice similarity coefficient of the neighborhoods of an edge's endpoints
+#' * `invlogweighted`: inverse log weighted similarity coefficient of the neighborhoods of an edge's endpoints
 #' * `quadrangles`: number of quadrangles that include the edge
 #' * `quadrilateral embeddedness`: geometric mean normalization of quadrangles
 #' * `degree`: degree of neighbor to which an edge is adjacent (asymmetric)
@@ -116,14 +118,23 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
   if (escore == "jaccard") {
-    Gedge <- igraph::as_edgelist(igraph::graph_from_adjacency_matrix(original, mode = "undirected"))  #Get edgelist
-    Gedge <- cbind(Gedge, NA)  #Placeholder column for jaccards
-    G <- matrix(0, nrow(original), ncol(original), dimnames = dimnames(original))  #Initialize scored adjacency matrix
-    for (i in 1:nrow(Gedge)) {  #For each edge
-      Gedge[i,3] <- (sum((original[Gedge[i,1],]==1 & original[Gedge[i,2],]==1)*1)) / (sum((original[Gedge[i,1],]==1 | original[Gedge[i,2],]==1)*1))  #Compute jaccard
-      G[Gedge[i,1],Gedge[i,2]] <- Gedge[i,3]  #Insert value in adjacency matrix
-      G[Gedge[i,2],Gedge[i,1]] <- Gedge[i,3]
-    }
+    G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
+    G <- igraph::similarity(G, mode = "all", method = "jaccard")
+    G <- G * original
+  }
+
+  #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
+  if (escore == "dice") {
+    G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
+    G <- igraph::similarity(G, mode = "all", method = "dice")
+    G <- G * original
+  }
+
+  #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
+  if (escore == "invlogweighted") {
+    G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
+    G <- igraph::similarity(G, mode = "all", method = "invlogweighted")
+    G <- G * original
   }
 
   #Number of maximal 4-cliques, from Nocaj et al. (2015)
