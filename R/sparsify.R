@@ -119,21 +119,21 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
   if (escore == "jaccard") {
     G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
-    G <- igraph::similarity(G, mode = "all", method = "jaccard")
+    G <- igraph::similarity(G, mode = "all", method = "jaccard", loops = FALSE)
     G <- G * original
   }
 
   #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
   if (escore == "dice") {
     G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
-    G <- igraph::similarity(G, mode = "all", method = "dice")
+    G <- igraph::similarity(G, mode = "all", method = "dice", loops = FALSE)
     G <- G * original
   }
 
   #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
   if (escore == "invlogweighted") {
     G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
-    G <- igraph::similarity(G, mode = "all", method = "invlogweighted")
+    G <- igraph::similarity(G, mode = "all", method = "invlogweighted", loops = FALSE)
     G <- G * original
   }
 
