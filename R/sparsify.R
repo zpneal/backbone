@@ -100,7 +100,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   #Random, from Karger (1994)
   if (escore == "random") {
     G <- G*stats::runif(length(G))  #Assign each edge a random weight
-    G[lower.tri(G)] = t(G)[lower.tri(G)]  #Make symmetric
+    G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Make symmetric
     }
 
   #Edge betweenness, from Melancon & Sallaberry (2008)
@@ -112,32 +112,36 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #Number of triangles, from Nick et al. (2013)
   if (escore == "triangles") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) ))
+    G <- tcrossprod(G)
     G <- G * original
   }
 
-  #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
+  #Jaccard coefficient (aka Neighborhood-normalized number of triangles), from Satuluri et al. (2011)
   if (escore == "jaccard") {
-    G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
-    G <- igraph::similarity(G, mode = "all", method = "jaccard", loops = FALSE)
+    N <- tcrossprod(G)  #Count triangles (union of neighborhoods, numerator of jaccard)
+    D <- nrow(G) - tcrossprod((!G)*1)  #Intersection of neighborhoods, denominator of jaccard
+    G <- N/D  #Jaccard coefficient
     G <- G * original
   }
 
-  #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
+  #Dice coefficient
   if (escore == "dice") {
-    G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
-    G <- igraph::similarity(G, mode = "all", method = "dice", loops = FALSE)
+    N <- tcrossprod(G)  #Count triangles
+    D <- matrix(1, nrow(G), ncol(G))  #Matrix of sum of degrees
+    D[lower.tri(D)] <- utils::combn(rowSums(G), 2, FUN = sum)
+    D[upper.tri(D)] <- t(D)[upper.tri(D)]
+    G <- (2*N)/D  #Dice coefficient
     G <- G * original
   }
 
-  #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
+  #Inverse log-weighted
   if (escore == "invlogweighted") {
     G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
     G <- igraph::similarity(G, mode = "all", method = "invlogweighted", loops = FALSE)
     G <- G * original
   }
 
-  #Number of maximal 4-cliques, from Nocaj et al. (2015)
+  #Number of maximal 4-cliques (i.e., quadrangles), from Nocaj et al. (2015)
   if (escore == "quadrangles" | escore == "quadrilateral embeddedness") {
     G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
     quads <- matrix(unlist(igraph::cliques(G, min=4, max=4)), nrow = 4) #Value can be replaced to count an edge's number of k-clique
@@ -152,34 +156,37 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   #Neighborhood-normalized quadrangle count, from Nocaj et al. (2015)
   if (escore == "quadrilateral embeddedness") {
     #G already contains the number of quadrangles per edge
-    denominator <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) sqrt(sum(G[i,]) * sum(G[j,])) ))
+    denominator <- sqrt(rowSums(G)%*%t(colSums(G)))
     G <- (G / denominator) * original
     G[is.nan(G)] <- 0
   }
 
   #Degree of alter, from Hamann et al. (2016)
   if (escore == "degree") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) sum(G[,j]) ))
+    G <- t(rowSums(G)*G)
     G <- G * original
   }
 
   #Meet/min, from Goldberg & Roth (2003)
   if (escore == "meetmin") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) / (min(sum(G[i,]),sum(G[j,]))) ))
-    G <- G * original
+    N <- tcrossprod(G)  #Shared neighbors
+    D <- pmin(G*rowSums(G), t(G*rowSums(G)))  #Minimum of i's and j's degree
+    G <- N/D  #Meet-min score
+    G[G==Inf | is.nan(G)] <- 0  #Fix divide-by-zero errors
   }
 
   #Geometric, from Goldberg & Roth (2003)
   if (escore == "geometric") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) ((sum((G[i,]==1 & G[j,]==1)*1))^2) / (sum(G[i,]) * sum(G[j,])) ))
+    N <- tcrossprod(G)^2  #Shared neighbors, squared
+    D <- rowSums(G)%*%t(rowSums(G))
+    G <- N/D  #Geometric score
     G <- G * original
   }
 
   #Hypergeometric, from Goldberg & Roth (2003)
   if (escore == "hypergeometric") {
-    triangles <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) ))
-    dat <- array(c(G,triangles), dim = c(nrow(G),ncol(G),2))  #Array with G and triangle counts
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) stats::phyper(dat[i,j,2]-1, sum(dat[i,,1])-1, (nrow(G)-2)-(sum(dat[i,,1])-1), sum(dat[j,,1])-1, lower.tail=FALSE) ))
+    triangles <- tcrossprod(G)
+    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) stats::phyper(triangles[i,j]-1, sum(G[i,])-1, (nrow(G)-2)-(sum(G[i,])-1), sum(G[j,])-1, lower.tail=FALSE) ))
     G <- G * original
   }
 
