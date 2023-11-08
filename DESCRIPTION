@@ -32,4 +32,3 @@ LinkingTo:
 VignetteBuilder: knitr
 URL: https://www.zacharyneal.com/backbone, https://github.com/zpneal/backbone
 BugReports: https://github.com/zpneal/backbone/issues
-Config/testthat/edition: 3
