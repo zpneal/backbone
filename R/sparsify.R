@@ -121,6 +121,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     N <- tcrossprod(G)  #Count triangles (union of neighborhoods, numerator of jaccard)
     D <- nrow(G) - tcrossprod((!G)*1)  #Intersection of neighborhoods, denominator of jaccard
     G <- N/D  #Jaccard coefficient
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original
   }
 
@@ -131,6 +132,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     D[lower.tri(D)] <- utils::combn(rowSums(G), 2, FUN = sum)
     D[upper.tri(D)] <- t(D)[upper.tri(D)]
     G <- (2*N)/D  #Dice coefficient
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original
   }
 
@@ -154,11 +156,10 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   }
 
   #Neighborhood-normalized quadrangle count, from Nocaj et al. (2015)
-  if (escore == "quadrilateral embeddedness") {
-    #G already contains the number of quadrangles per edge
+  if (escore == "quadrilateral embeddedness") {  #G already contains the number of quadrangles per edge
     denominator <- sqrt(rowSums(G)%*%t(colSums(G)))
     G <- (G / denominator) * original
-    G[is.nan(G)] <- 0
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
   }
 
   #Degree of alter, from Hamann et al. (2016)
@@ -172,7 +173,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     N <- tcrossprod(G)  #Shared neighbors
     D <- pmin(G*rowSums(G), t(G*rowSums(G)))  #Minimum of i's and j's degree
     G <- N/D  #Meet-min score
-    G[G==Inf | is.nan(G)] <- 0  #Fix divide-by-zero errors
+    G[G==Inf | is.nan(G)] <- 0  #Fix any divide-by-zero
   }
 
   #Geometric, from Goldberg & Roth (2003)
@@ -180,6 +181,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     N <- tcrossprod(G)^2  #Shared neighbors, squared
     D <- rowSums(G)%*%t(rowSums(G))
     G <- N/D  #Geometric score
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original
   }
 
@@ -192,33 +194,29 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #### Normalize edge scores ####
   #Neighborhood rank, from Satuluri et al. (2011)
-  if (normalize == "rank") {for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}}
+  if (normalize == "rank" | normalize == "embeddedness") {for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}}  #Rank edges by row (i.e., from perspective of each node)
 
   #Embeddedness, from Nick et al. (2013) and Nocaj et al. (2015)
-  if (normalize == "embeddedness") {
-    for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}  #Neighborhood rank is computed first
+  if (normalize == "embeddedness") {  #Scores will already be transformed as neighborhood ranks
     scores <- matrix(0, nrow(G), ncol(G))  #Initialize matrix to hold embeddedness scores
-    for (row1 in 1:nrow(G)) {
-      for (row2 in 1:nrow(G)) {  #Loop over each pair of rows
+    for (row1 in 1:(nrow(G)-1)) {
+      for (row2 in (row1+1):nrow(G)) {  #Loop over each pair of rows
         list1 <- G[row1,]  #Vector of ranked edges for row1
         list2 <- G[row2,]  #Vector of ranked edges for row2
-        score <- 0  #Initialize embeddedness score for this pair of rows
-        for (k in 1:max(list1,list2)) {  #Loop over possible values of k
-          list1_ <- list1
-          list1_[which(list1_>k)] <- 0
-          list1_[which(list1_>0)] <- 1  #Vector of top k-ranked edges for row1
-          list2_ <- list2
-          list2_[which(list2_>k)] <- 0
-          list2_[which(list2_>0)] <- 1  #Vector of top k-ranked edges for row1
-          j <- (sum(list1_==1 & list2_==1)*1) / (sum(list1_==1 | list2_==1)*1)  #Jaccard for top k-ranked edges in row1 and row2
-          if (is.nan(j)) {j <- 0}
-          if (j > score) {score <- j}  #Update embeddedness score if this Jaccard is higher
+        
+        #Find overlap between neighborhoods using non-parametric variant
+        k <- max(list1,list2)
+        if (k==0 | ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k))))==0) {  #If jaccard for max(k) is zero, stop
+          scores[row1,row2] <- 0
+        } else {  #Otherwise, compute jaccard for each k, use maximum
+          j <- NULL
+          for (k in 1:max(list1,list2)) {j <- c(j, ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k)))))}
+          scores[row1,row2] <- max(j)    
         }
-        scores[row1,row2] <- score  #Insert final score in matrix
       }
     }
     G <- scores
-    diag(G) <- 0
+    G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Make symmetric
   }
 
   #### Apply filter ####
