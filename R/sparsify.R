@@ -19,7 +19,6 @@
 #' @details
 #' The `escore` parameter determines how an unweighted edge's importance is calculated.
 #' Unless noted below, scores are symmetric and larger values represent more important edges.
-#' There are 12 options for assigning an edge's score; when `escore = `
 #' * `random`: a random number drawn from a uniform distribution
 #' * `betweenness`: edge betweenness
 #' * `triangles`: number of triangles that include the edge
@@ -34,19 +33,18 @@
 #' * `hypergeometric`: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (smaller is more important)
 #'
 #' The `normalize` parameter determines whether edge scores are normalized.
-#' There are three options; when `normalize = `
 #' * `none`: no normalization is performed
 #' * `rank`: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
 #' * `embeddedness`: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 #'
-#' Using `escore == "degree"` or `normalize == "rank"` can yield an assymmetric network. When `symmetrize == TRUE`, the network is
-#'  symmetrized before applying a filter by defining an edge between i and j if either i->j or i<-j.
-#'
 #' The `filter` parameter determines how edges are filtered based on their (normalized) edge scores.
-#' There are three options; when `filter = `
-#' * `threshold`: Edges with scores more important than `s` are retained in the backbone
-#' * `proportion`: Specifies the proportion of most important edges to retain in the backbone
+#' * `threshold`: Edges with scores >= `s` are retained in the backbone
+#' * `proportion`: Specifies the approximate proportion of edges to retain in the backbone
 #' * `degree`: Retains each node's d^`s` most important edges, where d is the node's degree (requires that `normalize = "rank"`)
+#' * `disparity`: Applies the disparity filter using [disparity()]
+#'
+#' Using `escore == "degree"` or `normalize == "rank"` can yield an assymmetric network. When `symmetrize == TRUE` (default),
+#'   after applying a filter, the network is symmetrized by such that i-j if i->j or i<-j.
 #'
 #' Specific combinations of `escore`, `normalize`, `filter`, and `umst` correspond to specific sparsification models in the literature, and are available via the following wrapper functions:
 #' [sparsify.with.skeleton()], [sparsify.with.gspar()], [sparsify.with.lspar()], [sparsify.with.simmelian()], [sparsify.with.jaccard()], [sparsify.with.meetmin()], [sparsify.with.geometric()], [sparsify.with.hypergeometric()], [sparsify.with.localdegree()], [sparsify.with.quadrilateral()].
@@ -213,13 +211,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
       }
     }
     G <- scores
-    G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Make symmetric
-  }
-
-  #### Symmetrize if requested ####
-  if (symmetrize) {
-    G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
-    G[upper.tri(G)] <- t(G)[upper.tri(G)]
+    G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Fill in rest of matrix
   }
 
   #### Apply filter ####
@@ -231,24 +223,24 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
 
   #Proportion
   if (filter == "proportion") {
-    scores <- G[lower.tri(G)][which(G[lower.tri(G)]!=0)]  #Vector of non-zero edge scores
-    tokeep <- ceiling(s*length(scores))  #Number of edges to keep
-    if (escore != "hypergeometric" & normalize != "rank") {  #Cases where large edge scores are stronger
-      keep.score <- sort(scores, decreasing = TRUE)[tokeep]  #Value of the tokeep^th edge score, starting from largest value
-      G <- (G >= keep.score)*1  #Keep edges with scores at least as large
-    }
-    if (escore == "hypergeometric" | normalize == "rank") {  #Cases where small edge scores are stronger
-      keep.score <- sort(scores, decreasing = FALSE)[tokeep]  #Value of the tokeep^th edge score, starting from smallest value
-      G <- (G <= keep.score)*1  #Keep edges with scores at least as small
-      G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-    }
+    scores <- G[which(G!=0)]  #Vector of non-zero edge scores
+    if (escore != "hypergeometric" & normalize != "rank") {G <- (G >= stats::quantile(scores, probs = (1-s)))*1}  #Cases where large edge scores are stronger
+    if (escore == "hypergeometric" | normalize == "rank") {G <- (G <= stats::quantile(scores, probs = s) & G != 0)*1}  #Cases where small edge scores are stronger
   }
 
   #Degree exponent, from Satuluri et al. (2011)
   if (filter == "degree") {
-    G <- (G <= (floor(rowSums(original)^s)))*1  #Keep edges with scores at least as small as degree^s
-    G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-    }
+    G <- (G <= (floor(rowSums(original)^s)) & G!=0)*1  #Keep edges with neighborhood rank scores at least as small as degree^s
+  }
+
+  #Disparity filter, from Serrano et al. (2009)
+  if (filter == "disparity") {G <- disparity(G, alpha = s)}
+
+  #### Symmetrize if requested ####
+  if (symmetrize) {
+    G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
+    G[upper.tri(G)] <- t(G)[upper.tri(G)]
+  }
 
   #### Add UMST if requested ####
   if (umst) {
