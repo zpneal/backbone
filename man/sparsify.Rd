@@ -7,9 +7,10 @@
 sparsify(
   U,
   s,
-  escore = "original",
+  escore,
   normalize,
   filter,
+  symmetrize = TRUE,
   umst = FALSE,
   class = "original",
   narrative = FALSE
@@ -25,6 +26,8 @@ sparsify(
 \item{normalize}{string: Method for normalizing edge scores}
 
 \item{filter}{string: Type of filter to apply}
+
+\item{symmetrize}{boolean: TRUE if the result should be symmetrized}
 
 \item{umst}{boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity}
 
@@ -44,7 +47,7 @@ edge score normalization, and an edge score filter.
 \details{
 The \code{escore} parameter determines how an unweighted edge's importance is calculated.
 Unless noted below, scores are symmetric and larger values represent more important edges.
-There are 10 options for assigning an edge's score; when \verb{escore = }
+There are 12 options for assigning an edge's score; when \verb{escore = }
 \itemize{
 \item \code{random}: a random number drawn from a uniform distribution
 \item \code{betweenness}: edge betweenness
@@ -67,6 +70,9 @@ There are three options; when \verb{normalize = }
 \item \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
 \item \code{embeddedness}: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 }
+
+Using \code{escore == "degree"} or \code{normalize == "rank"} can yield an assymmetric network. When \code{symmetrize == TRUE}, the network is
+symmetrized before applying a filter by defining an edge between i and j if either i->j or i<-j.
 
 The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores.
 There are three options; when \verb{filter = }
