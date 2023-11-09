@@ -10,6 +10,7 @@
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
+#' @param symmetrize boolean: TRUE if the result should be symmetrized
 #' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -18,7 +19,7 @@
 #' @details
 #' The `escore` parameter determines how an unweighted edge's importance is calculated.
 #' Unless noted below, scores are symmetric and larger values represent more important edges.
-#' There are 10 options for assigning an edge's score; when `escore = `
+#' There are 12 options for assigning an edge's score; when `escore = `
 #' * `random`: a random number drawn from a uniform distribution
 #' * `betweenness`: edge betweenness
 #' * `triangles`: number of triangles that include the edge
@@ -37,6 +38,9 @@
 #' * `none`: no normalization is performed
 #' * `rank`: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
 #' * `embeddedness`: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
+#'
+#' Using `escore == "degree"` or `normalize == "rank"` can yield an assymmetric network. When `symmetrize == TRUE`, the network is
+#'  symmetrized before applying a filter by defining an edge between i and j if either i->j or i<-j.
 #'
 #' The `filter` parameter determines how edges are filtered based on their (normalized) edge scores.
 #' There are three options; when `filter = `
@@ -59,7 +63,7 @@
 #' sparse <- sparsify(U, s = 0.6, escore = "jaccard", normalize = "rank",
 #' filter = "degree", narrative = TRUE)
 #' plot(sparse) #Clearly visible communities
-sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE, class = "original", narrative = FALSE) {
+sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = FALSE, class = "original", narrative = FALSE) {
 
   #### Helper Function: Edge score ranking ####
   nhood.rank <- function(x) {
@@ -72,13 +76,6 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     }
   }
 
-  #### Helper Function: Symmetrize using maximum ####
-  sym.max <- function(m) {
-    m[lower.tri(m)] <- pmax(m[lower.tri(m)],t(m)[lower.tri(t(m))])
-    m[upper.tri(m)] <- t(m)[upper.tri(m)]
-    return(m)
-  }
-
   #### Convert supplied object to matrix ####
   G <- tomatrix(U)
   if (G$summary$bipartite==TRUE | G$summary$symmetric==FALSE | G$summary$weighted==TRUE) {stop("G must be an undirected, unweighted, unipartite network")}
@@ -89,9 +86,9 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #### Sparsification model checks ####
   if (is.null(s)) {stop("A sparsification parameter `s` must be specified")}
-  if (escore != "original" & escore != "random" & escore != "betweenness" & escore != "triangles" & escore != "jaccard" &
+  if (escore != "random" & escore != "betweenness" & escore != "triangles" & escore != "jaccard" & escore != "dice" & escore != "invlogsquared" &
       escore != "quadrangles" & escore != "quadrilateral embeddedness" & escore != "degree" & escore != "meetmin" &
-      escore != "geometric" & escore != "hypergeometric") {stop("escore must be one of: original, random, betweenness, triangles, jaccard, quadrangles, quadrilateral embeddedness, degree, meetmin, geometric, hypergeometric")}
+      escore != "geometric" & escore != "hypergeometric") {stop("escore must be one of: random, betweenness, triangles, jaccard, dice, invlogsquared, quadrangles, quadrilateral embeddedness, degree, meetmin, geometric, hypergeometric")}
   if (normalize != "none" & normalize != "rank" & normalize != "embeddedness") {stop("normalize must be one of: none, rank, embeddedness")}
   if (filter != "threshold" & filter != "proportion" & filter != "degree") {stop("filter must be one of: threshold, proportion, degree")}
   if (filter == "degree" & normalize != "rank") {stop("The degree filter requires that normalize = \"rank\"")}  #Degree filter assumes edge scores are integer ranks
@@ -203,7 +200,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
       for (row2 in (row1+1):nrow(G)) {  #Loop over each pair of rows
         list1 <- G[row1,]  #Vector of ranked edges for row1
         list2 <- G[row2,]  #Vector of ranked edges for row2
-        
+
         #Find overlap between neighborhoods using non-parametric variant
         k <- max(list1,list2)
         if (k==0 | ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k))))==0) {  #If jaccard for max(k) is zero, stop
@@ -211,7 +208,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
         } else {  #Otherwise, compute jaccard for each k, use maximum
           j <- NULL
           for (k in 1:max(list1,list2)) {j <- c(j, ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k)))))}
-          scores[row1,row2] <- max(j)    
+          scores[row1,row2] <- max(j)
         }
       }
     }
@@ -219,20 +216,21 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Make symmetric
   }
 
+  #### Symmetrize if requested ####
+  if (symmetrize) {
+    G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
+    G[upper.tri(G)] <- t(G)[upper.tri(G)]
+  }
+
   #### Apply filter ####
   #Threshold
   if (filter == "threshold") {
     if (escore != "hypergeometric" & normalize != "rank") {G <- (G >= s)*1}  #Cases where large edge scores are stronger
-    if (escore == "hypergeometric" | normalize == "rank") {  #Cases where small edge scores are stronger
-      G <- (G <= s)*1  #Keep edges with scores below s
-      G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-      }
-    G <- sym.max(G)  #Ensure result is symmetric
+    if (escore == "hypergeometric" | normalize == "rank") {G <- (G<=s & G!=0)*1}  #Cases where small non-zero edge scores are stronger
     }
 
   #Proportion
   if (filter == "proportion") {
-    G <- sym.max(G)  #Start with a symmetric set of edge scores
     scores <- G[lower.tri(G)][which(G[lower.tri(G)]!=0)]  #Vector of non-zero edge scores
     tokeep <- ceiling(s*length(scores))  #Number of edges to keep
     if (escore != "hypergeometric" & normalize != "rank") {  #Cases where large edge scores are stronger
@@ -250,7 +248,6 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   if (filter == "degree") {
     G <- (G <= (floor(rowSums(original)^s)))*1  #Keep edges with scores at least as small as degree^s
     G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-    G <- sym.max(G)  #Ensure result is symmetric
     }
 
   #### Add UMST if requested ####
