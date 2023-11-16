@@ -12,7 +12,7 @@
 #'
 #' @details
 #' The `global` function retains a edge with weight `W` if `W` > `upper`. If a `lower` threshold is also
-#'    specified, it returns a signed backbone in which an edge's weight is set to 1 if `W` > `upper`, 
+#'    specified, it returns a signed backbone in which an edge's weight is set to 1 if `W` > `upper`,
 #'    is set to -1 if `W` < `lower`, and is set to 0 otherwise. The default is an unsigned backbone containing
 #'    all edges with non-zero weights.
 #'
@@ -68,8 +68,8 @@ global <- function(G, upper = 0, lower = NULL, keepzeros = TRUE, class = "origin
   if (narrative == TRUE) {
     reduced_edges <- round((sum(M!=0) - sum(backbone!=0)) / sum(M!=0),3)*100  #Percent decrease in number of edges
     reduced_nodes <- round((max(sum(rowSums(M)!=0),sum(colSums(M)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(M)!=0),sum(colSums(M)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    if (narrative == TRUE) {write.narrative(agents = nrow(M), artifacts = NULL, weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
-                                            signed = signed, mtc = "none", alpha = NULL, s = NULL, ut = ut, lt = lt, trials = NULL, model = "global",
+    if (narrative == TRUE) {write.narrative(agents = nrow(M), weighted = TRUE, bipartite = FALSE, symmetric = TRUE,
+                                            signed = signed, ut = ut, lt = lt, model = "global",
                                             reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
   }
 

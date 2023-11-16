@@ -251,7 +251,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
   }
 
   #### Display narrative if requested ####
-  model <- ""
+  model <- "sparsify"
   if (escore=="random" & normalize=="none" & filter=="proportion" & umst==FALSE & symmetrize==TRUE) {model <- "skeleton"}
   if (escore=="jaccard" & normalize=="none" & filter=="proportion" & umst==FALSE & symmetrize==TRUE) {model <- "gspar"}
   if (escore=="jaccard" & normalize=="rank" & filter=="degree" & umst==FALSE & symmetrize==TRUE) {model <- "lspar"}
@@ -260,14 +260,12 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
   if (escore=="meetmin" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "meetmin"}
   if (escore=="geometric" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "geometric"}
   if (escore=="hypergeometric" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "hypergeometric"}
-  if (escore=="degree" & normalize=="rank" & filter=="degree" & umst==FALSE & symmetrize==TRUE) {text <- model <- "degree"}
+  if (escore=="degree" & normalize=="rank" & filter=="degree" & umst==FALSE & symmetrize==TRUE) {model <- "degree"}
   if (escore=="quadrilateral embeddedness" & normalize=="embeddedness" & filter=="threshold" & umst==TRUE & symmetrize==TRUE) {model <- "quadrilateral"}
-  if (model=="") {model <- "sparify"}
   reduced_edges <- round((sum(original!=0) - sum(G!=0)) / sum(original!=0),3)*100  #Percent decrease in number of edges
   reduced_nodes <- round((max(sum(rowSums(original)!=0),sum(colSums(original)!=0)) - max(sum(rowSums(G)!=0),sum(colSums(G)!=0))) / max(sum(rowSums(original)!=0),sum(colSums(original)!=0)),3) * 100  #Percent decrease in number of connected nodes
-  if (narrative == TRUE) {write.narrative(agents = nrow(original), artifacts = NULL, weighted = FALSE, bipartite = FALSE, symmetric = TRUE,
-                                          signed = FALSE, mtc = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model,
-                                          reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
+  if (narrative == TRUE) {write.narrative(agents = nrow(original), weighted = FALSE, bipartite = FALSE, symmetric = TRUE, s = s,
+                                          signed = FALSE, model = model, reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
 
   #### Return backbone in desired class ####
   rownames(G) <- rownames(original)  #Restore labels if they were lost

@@ -55,6 +55,7 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
   Pupper <- bb.object$Pupper
   Plower <- bb.object$Plower
   attribs <- bb.object$attribs
+  trials <- bb.object$trials
 
   #### Extract signed backbone (two-tailed test; all dyads considered) ####
   if (signed) {
@@ -112,10 +113,7 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
                     signed = signed,
                     mtc = mtc,
                     alpha = alpha,
-                    s = NULL,
-                    ut = NULL,
-                    lt = NULL,
-                    trials = NULL,
+                    trials = trials,
                     model = bb.object$model,
                     reduced_edges = reduced_edges,
                     reduced_nodes = reduced_nodes)

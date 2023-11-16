@@ -20,10 +20,14 @@
 #'
 #' @return NULL; only displays text in the console
 #' @keywords internal
-write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, signed, mtc, alpha, s, ut, lt, trials, model, reduced_edges, reduced_nodes) {
+write.narrative <- function(agents = 0, artifacts = 0, weighted = FALSE, bipartite = FALSE, symmetric = FALSE,
+                            signed = FALSE, mtc = "none", alpha = NULL, s = NULL, ut = NULL, lt = NULL, trials = 0,
+                            model = "", reduced_edges = NULL, reduced_nodes = NULL) {
 
   #### Prepare narrative components ####
   version <- utils::packageVersion("backbone")
+
+  #Content of starting object
   if (bipartite) {contents <- paste0(agents, " agents and ", artifacts, " artifacts")} else {contents <- paste0(agents, " nodes")}
   if (weighted & bipartite) {type <- "the weighted projection of a weighted bipartite"}
   if (!weighted & bipartite) {type <- "the weighted projection of an unweighted bipartite"}
@@ -33,6 +37,8 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (!weighted & !symmetric & !bipartite) {type <- "an unweighted and directed unipartite"}
   if (signed) {signed <- "signed"} else {signed <- "unweighted"}
   correction <- ""
+
+  #Multiple test correction
   if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
   if (mtc == "holm") {correction <- ", Holm adjusted"}
   if (mtc == "hommel") {correction <- ", Hommel adjusted"}
@@ -40,6 +46,7 @@ write.narrative <- function(agents, artifacts, weighted, bipartite, symmetric, s
   if (mtc == "BH") {correction <- ", Benjamini & Hochberg adjusted"}
   if (mtc == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
 
+  #Typoe of model
   if (model == "fixedfill") {desc <- "the fixed fill model (FFM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "fixedrow") {desc <- "the fixed row model (FRM; Neal, 2013)"}
   if (model == "fixedcol") {desc <- "the fixed column model (FCM; Neal, Domagalski, and Sagan, 2021)"}
