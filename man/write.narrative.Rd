@@ -5,21 +5,25 @@
 \title{Generates suggested manuscript text}
 \usage{
 write.narrative(
-  agents,
-  artifacts,
-  weighted,
-  bipartite,
-  symmetric,
-  signed,
-  mtc,
-  alpha,
-  s,
-  ut,
-  lt,
-  trials,
-  model,
-  reduced_edges,
-  reduced_nodes
+  agents = 0,
+  artifacts = 0,
+  weighted = FALSE,
+  bipartite = FALSE,
+  symmetric = FALSE,
+  signed = FALSE,
+  mtc = "none",
+  alpha = NULL,
+  s = NULL,
+  ut = NULL,
+  lt = NULL,
+  trials = 0,
+  escore = NULL,
+  normalize = NULL,
+  filter = NULL,
+  umst = NULL,
+  model = "",
+  reduced_edges = NULL,
+  reduced_nodes = NULL
 )
 }
 \arguments{
@@ -47,11 +51,21 @@ write.narrative(
 
 \item{trials}{integer: number of trials used to estimate FDSM or oSDSM p-values}
 
-\item{model}{string: name of backbone null model}
+\item{escore}{string: Method for scoring edges' importance}
+
+\item{normalize}{string: Method for normalizing edge scores}
+
+\item{filter}{string: Type of filter to apply}
+
+\item{umst}{boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity}
+
+\item{model}{string: name of backbone model}
 
 \item{reduced_edges}{numeric: percent reduction in number of edges}
 
 \item{reduced_nodes}{numeric: percent reduction in number of connected nodes}
+
+\item{symmetrize}{boolean: TRUE if the result should be symmetrized}
 }
 \value{
 NULL; only displays text in the console
