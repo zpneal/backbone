@@ -74,7 +74,10 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, model = "bicm", mtc = "none", 
   B <- convert$G
   if (convert$summary$weighted==TRUE){  #If G is not binary, check whether it contains structural 0s or 1s
     if (any(!(B%in%c(0,1,10,11)))) {stop("Graph must be unweighted.")}
-    if (model=="bicm" & all(B%in%c(0,1,10,11))) {stop("BiCM does not support structural values. Use model=\"logit\" instead.")}
+    if (model=="bicm" & any(B%in%c(10,11))) {
+      model <- "logit"
+      warning("Using the logit model because this graph contains structural values.")
+      }
     }
   if (convert$summary$bipartite==FALSE){
     warning("This object is being treated as a bipartite network.")
@@ -82,12 +85,10 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, model = "bicm", mtc = "none", 
     }
 
   #### Bipartite Projection ####
-  if (convert$summary$weighted==TRUE) {  #If B contains structural 1s and/or 0s, remove them then project
-    B_unweight <- B
-    B_unweight[B_unweight==10] <- 0
-    B_unweight[B_unweight==11] <- 1
-    P <- tcrossprod(B_unweight)
-  } else {P <- tcrossprod(B)}
+  B_unweight <- B
+  B_unweight[B_unweight==10] <- 0  #make structural 0s ordinary 0
+  B_unweight[B_unweight==11] <- 1  #make structural 1s ordinary 1
+  P <- tcrossprod(B_unweight)  #Projection, not considering any structural 0s or 1s
 
   #### Compute Probabilities for SDSM ####
   if (model == "bicm") {probs <- bicm(B,...)}
