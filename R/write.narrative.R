@@ -91,7 +91,7 @@ write.narrative <- function(agents = 0, artifacts = 0, weighted = FALSE, biparti
   #Sparsify models
   if (!is.null(s)) {
     if (model != "sparsify") {text <- paste0(text, " Specifically, we used ", desc, " with a sparsification threshold of ", s, ".")}
-    if (model == "sparsify") {text <- paste0(text, " Specifically, we used a custom sparsification model with sparsification threshold of ", s, ". ", desc)}
+    if (model == "sparsify") {text <- paste0(text, " Specifically, we used an unweighted graph sparsification model with a sparsification threshold parameter of ", s, ". ", desc)}
   }
 
   #Global threshold
