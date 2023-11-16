@@ -265,6 +265,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
   reduced_edges <- round((sum(original!=0) - sum(G!=0)) / sum(original!=0),3)*100  #Percent decrease in number of edges
   reduced_nodes <- round((max(sum(rowSums(original)!=0),sum(colSums(original)!=0)) - max(sum(rowSums(G)!=0),sum(colSums(G)!=0))) / max(sum(rowSums(original)!=0),sum(colSums(original)!=0)),3) * 100  #Percent decrease in number of connected nodes
   if (narrative == TRUE) {write.narrative(agents = nrow(original), weighted = FALSE, bipartite = FALSE, symmetric = TRUE, s = s,
+                                          escore = escore, normalize = normalize, filter = filter, umst = umst,
                                           signed = FALSE, model = model, reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
 
   #### Return backbone in desired class ####
