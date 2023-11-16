@@ -13,7 +13,7 @@ Description: An implementation of methods for extracting an unweighted unipartit
    of a weighted bipartite graph (Neal, 2022 <doi:10.1371/journal.pone.0269137>).
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 2.10)
 Imports: 
