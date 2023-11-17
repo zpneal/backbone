@@ -48,10 +48,8 @@ yields a backbone that perserves edges whose weights are significantly \emph{str
 model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
 It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
 negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
-\emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
 
-If \code{W} is an unweighted bipartite graph, any rows and columns that contain only zeros or only ones are removed, then
-the global threshold is applied to its weighted bipartite projection.
+If \code{W} is an unweighted bipartite graph, then the disparity filter is applied to its weighted bipartite projection.
 }
 \examples{
 #A network with heterogeneous (i.e. multiscale) weights
