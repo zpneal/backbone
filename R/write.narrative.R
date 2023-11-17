@@ -60,6 +60,7 @@ write.narrative <- function(agents = 0, artifacts = 0, weighted = FALSE, biparti
   if (model == "fdsm") {desc <- paste0("the fixed degree sequence model (FDSM; Neal, 2014), where p-values were estimated from ", trials, " Monte Carlo trials")}
   if (model == "osdsm") {desc <- "the ordinal stochastic degree sequence model (oSDSM; Neal, 2017)"}
   if (model == "disparity") {desc <- "the disparity filter (Serrano et al., 2009)"}
+  if (model == "mlf") {desc <- "the marginal likelihood filter (Dianati, 2016)"}
   if (model == "skeleton") {desc <- "Karger's (1994) skeleton model"}
   if (model == "gspar") {desc <- "Satuluri et al.'s (2011) G-Spar model"}
   if (model == "lspar") {desc <- "Satuluri et al.'s (2011) L-Spar model"}
@@ -119,6 +120,7 @@ write.narrative <- function(agents = 0, artifacts = 0, weighted = FALSE, biparti
   if (model == "fdsm") {message("Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance and other co-behaviors. Social Networks, 39, 84-97. https://doi.org/10.1016/j.socnet.2014.06.001")}
   if (model == "osdsm") {message("Neal, Z. P. (2017). Well connected compared to what? Rethinking frames of reference in world city network research. Environment and Planning A, 49, 2859-2877. https://doi.org/10.1177/0308518X16631339")}
   if (model == "disparity") {message("Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Sciences, 106(16), 6483-6488. https://doi.org/10.1073/pnas.0808904106")}
+  if (model == "mlf") {message("Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93, 012304. https://doi.org/10.1103/PhysRevE.93.012304")}
   if (model == "skeleton") {message("Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. Mathematics of Operations Research, 24(2), 383-413. https://doi.org/10.1287/moor.24.2.383")}
   if (model == "gspar") {message("Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). https://doi.org/10.1145/1989323.1989399")}
   if (model == "lspar") {message("Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). https://doi.org/10.1145/1989323.1989399")}
