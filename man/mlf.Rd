@@ -41,7 +41,7 @@ using \code{\link[=backbone.extract]{backbone.extract()}}.
 \details{
 The \code{mlf} function applies the marginal likelihood filter (MLF; Dianati, 2016), which compares an edge's weight to
 its expected weight in a graph that preserves the total weight and preserves the degree sequence \emph{on average}.
-The graph may be directed or undirected, however the edge weights must be positive.
+The graph may be directed or undirected, however the edge weights must be positive integers.
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
