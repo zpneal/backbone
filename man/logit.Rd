@@ -39,5 +39,5 @@ package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbone
 
 logit model: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance and other co-behaviors. \emph{Social Networks, 39}, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 
-probability comparison: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing alternatives to the fixed degree sequence model for extracting the backbone of bipartite projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+logit model with constraints: {Neal, Z. P. and Neal, J. W. (2024). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. \emph{Proceedings of the 12th International Conference on Complex Networks and their Applications}. Springer.}
 }
