@@ -103,6 +103,7 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
 
   #### Display narrative, if requested ####
   if (narrative) {
+    if (signed) {alpha <- alpha * 2}  #Restore alpha to correct value for reporting
     reduced_edges <- round(((sum(G!=0)-nrow(G)) - sum(backbone!=0)) / (sum(G!=0)-nrow(G)),3)*100  #Percent decrease in number of edges
     reduced_nodes <- round((max(sum(rowSums(G)!=0),sum(colSums(G)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(G)!=0),sum(colSums(G)!=0)),3) * 100  #Percent decrease in number of connected nodes
     write.narrative(agents = bb.object$agents,
