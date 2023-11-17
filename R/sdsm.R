@@ -5,7 +5,6 @@
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param model string: method for computing cellwise probabilities (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `B`.
@@ -23,11 +22,12 @@
 #'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
 #'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
 #'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
-#'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
 #'
-#' The default method for computing cellwise probabilities is the Bipartite Configuration Model (BiCM) using \link{bicm},
-#'    which is the fastest and most accurate (Neal et al., 2021). The alternative logit model first described by Neal (2014)
-#'    is available using \link{logit}, but it should generally only be used when B contains structural 1s and/or structural 0s.
+#' The bipartite network `B` may contain some edges that are *required* in the null model (i.e., structural 1s); these edges should
+#'    have a weight of 11 (i.e., B_ik = 11). This network may also contain some edges that are *prohibited* in the null model
+#'    (i.e., structural 0s); these edges should have a weight of 10 (i.e., B_ik = 10). When `B` contains required or prohibited edges,
+#'    cellwise probabilities are computed using \link{logit} following Neal et al. (2024). Otherwise, cellwise probabilities are
+#'    computed using the faster and more accurate Bipartite Configuration Model with \link{bicm} (Neal et al. 2021).
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -39,7 +39,8 @@
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
-#' @references sdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
+#' @references bicm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
+#' @references logit: {Neal, Z. P. and Neal, J. W. (2024). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *Proceedings of the 12th International Conference on Complex Networks and their Applications*. Springer.}
 #'
 #' @export
 #'
@@ -62,7 +63,7 @@
 #' bb <- sdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An SDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-sdsm <- function(B, alpha = 0.05, signed = FALSE, model = "bicm", mtc = "none", class = "original", narrative = FALSE, ...){
+sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -72,13 +73,7 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, model = "bicm", mtc = "none", 
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   B <- convert$G
-  if (convert$summary$weighted==TRUE){  #If G is not binary, check whether it contains structural 0s or 1s
-    if (any(!(B%in%c(0,1,10,11)))) {stop("Graph must be unweighted.")}
-    if (model=="bicm" & any(B%in%c(10,11))) {
-      model <- "logit"
-      warning("Using the logit model because this graph contains structural values.")
-      }
-    }
+  if (convert$summary$weighted==TRUE) {if (any(!(B%in%c(0,1,10,11)))) {stop("Graph must be unweighted.")}}  #If G is not binary, check whether it only contains structural 0s or 1s
   if (convert$summary$bipartite==FALSE){
     warning("This object is being treated as a bipartite network.")
     convert$summary$bipartite <- TRUE
@@ -86,13 +81,12 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, model = "bicm", mtc = "none", 
 
   #### Bipartite Projection ####
   B_unweight <- B
-  B_unweight[B_unweight==10] <- 0  #make structural 0s ordinary 0
-  B_unweight[B_unweight==11] <- 1  #make structural 1s ordinary 1
+  B_unweight[B_unweight==10] <- 0  #Make structural 0s ordinary 0
+  B_unweight[B_unweight==11] <- 1  #Make structural 1s ordinary 1
   P <- tcrossprod(B_unweight)  #Projection, not considering any structural 0s or 1s
 
   #### Compute Probabilities for SDSM ####
-  if (model == "bicm") {probs <- bicm(B,...)}
-  if (model == "logit") {probs <- logit(B)}
+  if (any(B%in%c(10,11))) {probs <- logit(B)} else {probs <- bicm(B, ...)}
   probs <- lapply(seq_len(nrow(probs)), function(i) probs[i,])  #Store probabilities as list
 
   #### Compute p-values (for unsigned backbone, ignore lower-tail p-values) ####
