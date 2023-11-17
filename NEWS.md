@@ -6,6 +6,7 @@ output: html_document
 
 * added support for structural 0s and 1s in `sdsm()` via the `logit()` function
 * vectorized and added additional options to `sparsify()`
+* implemented Marginal Likelihood Filter in `mlf()`
 
 ## backbone 2.1.2
 
