@@ -94,7 +94,7 @@ mlf <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "original
       }
     }
     Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangle
-    if (signed) {Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]
+    if (signed) {Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]}
   }
 
   if (!symmetric) {
