@@ -20,10 +20,8 @@
 #'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
 #'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
 #'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
-#'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
 #'
-#' If `W` is an unweighted bipartite graph, any rows and columns that contain only zeros or only ones are removed, then
-#'    the global threshold is applied to its weighted bipartite projection.
+#' If `W` is an unweighted bipartite graph, then the disparity filter is applied to its weighted bipartite projection.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -71,7 +69,6 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   symmetric <- convert$summary$symmetric
   if (convert$summary$bipartite==TRUE){
     message("The input graph is bipartite; extraction is performed on its unipartite projection.")
-    artifacts <- ncol(G)
     G <- tcrossprod(G)
     }
 
@@ -88,15 +85,15 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   degree <- rowSums(binary)
   zeros <- G==0
 
-  if (symmetric == TRUE){
+  if (symmetric){
     P <- G/strength
     pvalues <- (1-P)^(degree-1)
-    Pupper <- as.matrix(pvalues)          #Asymmetric p-values, one from the perspective of each node
+    Pupper <- as.matrix(pvalues)      #Asymmetric p-values, one from the perspective of each node
     Pupper <- pmin(Pupper,t(Pupper))  #From Serrano: "satisfy the above criterion for at least one of the two nodes"
     if (signed) {Plower <- 1-Pupper}
   }
 
-  if (symmetric == FALSE){
+  if (!symmetric){
     ### Implies Directed ###
     outp <- G/strength
     outvalues <- (1-outp)^(degree-1)
