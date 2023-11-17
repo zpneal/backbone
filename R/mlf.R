@@ -13,7 +13,7 @@
 #' @details
 #' The `mlf` function applies the marginal likelihood filter (MLF; Dianati, 2016), which compares an edge's weight to
 #'    its expected weight in a graph that preserves the total weight and preserves the degree sequence *on average*.
-#'    The graph may be directed or undirected, however the edge weights must be positive.
+#'    The graph may be directed or undirected, however the edge weights must be positive integers.
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
 #'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
