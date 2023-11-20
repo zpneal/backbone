@@ -219,6 +219,15 @@ expect_equal(round(test$Pupper,3), rbind(c(.444,1,.444,.444),c(1,.5,1,1),c(.444,
 expect_equal(round(test$Plower,3), rbind(c(.556,1,.556,.556),c(1,.5,1,1),c(.556,1,1,.556),c(.556,.556,1,.556)), info = "disparity")
 expect_equal(test$model, "disparity", info = "disparity")
 
+## MAXIMUM LIKELIHOOD FILTER
+M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1),c(1,1,0,1))
+test <- mlf(M, alpha = NULL, signed = TRUE)
+expect_equal(test$G, M, info = "disparity")
+expect_equal(round(test$Pupper,3), rbind(c(.654,1,.288,.654),c(1,.201,1,1),c(.5,1,1,.5),c(.654,.5,1,.654)), info = "disparity")
+expect_equal(round(test$Plower,3), rbind(c(.736,1,.958,.736),c(1,.98,1,1),c(.860,1,1,.860),c(.736,.86,1,.736)), info = "disparity")
+expect_equal(test$model, "mlf", info = "disparity")
+
+## GLOBAL
 M <- rbind(c(0,2,3,4),c(1,0,5,2),c(8,2,0,2),c(1,7,2,0))
 test <- global(M, upper = 5, lower = 2)
 expect_equal(test, rbind(c(0,0,0,0), c(-1,0,0,0), c(1,0,0,0), c(-1,1,0,0)), info = "global threshold")
