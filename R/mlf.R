@@ -106,7 +106,7 @@ mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = 
   }
 
   if (!symmetric) {
-    Pupper <- matrix(NA, nrow(G), ncol(G))  #Set p-values to 1 initially
+    Pupper <- matrix(NA, nrow(G), ncol(G))
     if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
     T <- sum(rowSums(G))
     p <- (rowSums(G) %*% t(colSums(G))) / (T^2)
