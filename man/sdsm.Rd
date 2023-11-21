@@ -7,6 +7,7 @@
 sdsm(
   B,
   alpha = 0.05,
+  missing.as.zero = FALSE,
   signed = FALSE,
   mtc = "none",
   class = "original",
@@ -18,6 +19,8 @@ sdsm(
 \item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
+
+\item{missing.as.zero}{boolean: should missing edges be treated as edges with zero weight and tested for significance}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
@@ -47,11 +50,11 @@ expected in a projection obtained from a random bipartite network where both the
 vertex degrees are \emph{approximately} fixed at their values in \code{B}. It uses the Bipartite Configuration Model \link{bicm}
 to compute probabilities for the Poisson binomial distribution.
 
-When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
-model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
-negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
+When \code{signed = FALSE}, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+contains edges whose weights are significantly \emph{stronger} than expected in the null model. When \code{signed = TRUE}, a
+two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+positive edges for those whose weights are significantly \emph{stronger}, and negative edges for those whose weights are
+significantly \emph{weaker}, than expected in the null model.
 
 The bipartite network \code{B} may contain some edges that are \emph{required} in the null model (i.e., structural 1s); these edges should
 have a weight of 11 (i.e., B_ik = 11). This network may also contain some edges that are \emph{prohibited} in the null model
