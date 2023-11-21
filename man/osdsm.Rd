@@ -13,7 +13,8 @@ osdsm(
   mtc = "none",
   class = "original",
   narrative = FALSE,
-  progress = TRUE
+  progress = TRUE,
+  ...
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ If "original", the backbone graph returned is of the same class as \code{B}.}
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.}
 
 \item{progress}{boolean: TRUE if the progress of Monte Carlo trials should be displayed.}
+
+\item{...}{optional arguments}
 }
 \value{
 If \code{alpha} != NULL: Binary or signed backbone graph of class \code{class}.
