@@ -5,6 +5,7 @@
 #' @param B An ordinally weighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param trials integer: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
@@ -18,12 +19,11 @@
 #'    approximately the same number of each value. The edges in `B` must be integers, and are assumed to represent an
 #'    ordinal-level measure such as a Likert scale that starts at 0.
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
-#'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
 #'
 #' The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
 #'    `trials` performed affects the precision of these p-values, and the confidence that a given p-value is less than the
@@ -62,7 +62,7 @@
 #'             class = "igraph", trials = 100)
 #' plot(bb) #...is sparse with clear communities
 
-osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE){
+osdsm <- function(B, alpha = 0.05, trials = NULL, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE){
 
   #### Class Conversion and Argument Checks ####
   convert <- tomatrix(B)
@@ -149,6 +149,12 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", 
   #### Compute p-values ####
   Pupper <- (Pupper/trials)
   if (signed) {Plower <- (Plower/trials)}
+
+  #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
+  if (!missing.as.zero) {
+    Pupper[P == 0] <- NA
+    if (signed) {Plower[P == 0] <- NA}
+  }
 
   #### Create Backbone Object ####
   bb <- list(G = P,  #Preliminary backbone object

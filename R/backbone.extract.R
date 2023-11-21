@@ -4,8 +4,8 @@
 #'      containing the backbone that retains only the significant edges.
 #'
 #' @param bb.object backbone: backbone S3 class object.
-#' @param signed Boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param alpha Real: significance level of hypothesis test(s)
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
+#' @param alpha real: significance level of hypothesis test(s)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("matrix", "sparseMatrix", "igraph", "edgelist"), converted via \link{tomatrix}.
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
@@ -15,12 +15,11 @@
 #'    matrix, (3, if `signed = TRUE`) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
 #'    (5) several properties of the original graph and backbone model
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
-#'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
 #'
 #' @export
 #'
@@ -83,7 +82,6 @@ backbone.extract <- function(bb.object, signed = FALSE, alpha = 0.05, mtc = "non
 
   #### Extract binary backbone (one-tailed test; only positively-weighed edges considered) ####
   if (!signed) {
-    Pupper[which(G==0)] <- NA  #Eliminate p-values for zero-weight edges; not relevant
     diag(Pupper) <- NA  #Eliminate p-values for loops; not relevant
 
     if (mtc != "none") {  #Adjust p-values for familywise error, if requested

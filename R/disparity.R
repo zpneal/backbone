@@ -4,6 +4,7 @@
 #'
 #' @param W A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
@@ -15,11 +16,11 @@
 #'    its expected weight if a node's total degree was uniformly distributed across all its edges. The graph may be
 #'    directed or undirected, however the edge weights must be positive.
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
 #'
 #' If `W` is an unweighted bipartite graph, then the disparity filter is applied to its weighted bipartite projection.
 #'
@@ -56,7 +57,7 @@
 #'
 #' bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
 #' plot(bb) #...preserves edges at multiple scales
-disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -83,7 +84,6 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
   strength <- rowSums(G)
   binary <- (G>0)+0
   degree <- rowSums(binary)
-  zeros <- G==0
 
   if (symmetric){
     P <- G/strength
@@ -103,9 +103,11 @@ disparity <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "or
     if (signed) {Plower <- 1-Pupper}
   }
 
-  ### If edge weight was zero, set to 1 in positive and negative so edge is not in backbone ###
-  Pupper[zeros] <- 1
-  if (signed) {Plower[zeros] <- 1}
+  #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
+  if (!missing.as.zero) {
+    Pupper[G == 0] <- NA
+    if (signed) {Plower[G == 0] <- NA}
+  }
 
   ### Create backbone object ###
   bb <- list(G = G,  #Preliminary backbone object

@@ -4,6 +4,7 @@
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
@@ -17,11 +18,11 @@
 #'    vertex degrees are *approximately* fixed at their values in `B`. It uses the Bipartite Configuration Model \link{bicm}
 #'    to compute probabilities for the Poisson binomial distribution.
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
 #'
 #' The bipartite network `B` may contain some edges that are *required* in the null model (i.e., structural 1s); these edges should
 #'    have a weight of 11 (i.e., B_ik = 11). This network may also contain some edges that are *prohibited* in the null model
@@ -63,7 +64,7 @@
 #' bb <- sdsm(B, alpha = 0.05, narrative = TRUE, class = "igraph") #An SDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
+sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, ...){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -91,13 +92,20 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
 
   #### Compute p-values (for unsigned backbone, ignore lower-tail p-values) ####
   if (!signed) {
-    Pupper <- matrix(1, nrow(P), ncol(P))  #Set upper-tail p-value to 1 initially
+    Pupper <- matrix(NA, nrow(P), ncol(P))  #Set upper-tail p-value to NA initially
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
-        if (P[row,col] != 0) {  #Compute and update the upper-tail p-value only if the edge has non-zero weight
+
+        if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
           pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = FALSE)
           Pupper[row,col] <- pvalues[2]
         }
+
+        if (!missing.as.zero & P[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+          pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = FALSE)
+          Pupper[row,col] <- pvalues[2]
+        }
+
       }
     }
     Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangle
@@ -105,13 +113,23 @@ sdsm <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "origina
 
   #### Compute p-values (for signed backbone) ####
   if (signed) {
-    Pupper <- matrix(0, nrow(P), ncol(P))
-    Plower <- matrix(0, nrow(P), ncol(P))
+    Pupper <- matrix(NA, nrow(P), ncol(P))
+    Plower <- matrix(NA, nrow(P), ncol(P))
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
-        pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])))
-        Plower[row,col] <- pvalues[1]
-        Pupper[row,col] <- pvalues[2]
+
+        if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
+          pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])))
+          Plower[row,col] <- pvalues[1]
+          Pupper[row,col] <- pvalues[2]
+        }
+
+        if (!missing.as.zero  & P[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+          pvalues <- pb(P[row,col], unlist(Map('*',probs[row],probs[col])))
+          Plower[row,col] <- pvalues[1]
+          Pupper[row,col] <- pvalues[2]
+        }
+
       }
     }
     Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangles

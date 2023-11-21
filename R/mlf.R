@@ -4,6 +4,7 @@
 #'
 #' @param W An integer-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
@@ -15,11 +16,11 @@
 #'    its expected weight in a graph that preserves the total weight and preserves the degree sequence *on average*.
 #'    The graph may be directed or undirected, however the edge weights must be positive integers.
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
 #'
 #' If `W` is an unweighted bipartite graph, then the MLF is applied to its weighted bipartite projection.
 #'
@@ -56,7 +57,7 @@
 #'
 #' bb <- mlf(net, alpha = 0.05, narrative = TRUE) #An MLF backbone...
 #' plot(bb) #...preserves edges at multiple scales
-mlf <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -87,10 +88,17 @@ mlf <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "original
     p <- (rowSums(G) %*% t(rowSums(G))) / (2 * (T^2))
     for (col in 1:ncol(G)) {  #Loop over lower triangle
       for (row in col:nrow(G)) {
-        if (G[row,col] != 0) {  #Compute and update p-values only if the edge has non-zero weight
+
+        if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
           Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
           if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
         }
+
+        if (!missing.as.zero & G[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+          Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
+          if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
+        }
+
       }
     }
     Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangle
@@ -104,10 +112,17 @@ mlf <- function(W, alpha = 0.05, signed = FALSE, mtc = "none", class = "original
     p <- (rowSums(G) %*% t(colSums(G))) / (T^2)
     for (col in 1:ncol(G)) {  #Loop over full matrix
       for (row in 1:nrow(G)) {
-        if (G[row,col] != 0) {  #Compute and update p-values only if the edge has non-zero weight
+
+        if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
           Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
           if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
         }
+
+        if (!missing.as.zero & G[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+          Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
+          if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
+        }
+
       }
     }
   }
