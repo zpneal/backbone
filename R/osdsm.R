@@ -27,13 +27,10 @@
 #'    significantly *weaker*, than expected in the null model.
 #'
 #' The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
-#'    `trials` performed affects the precision of these p-values, and the confidence that a given p-value is less than the
-#'    desired `alpha` level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
-#'    in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
-#'    comparing a proportion (the p-value) to a known proportion (alpha). When `trials = NULL`, the `power.prop.test` function
-#'    is used to estimate the required number of trials to make such a comparison with a `alpha` type-I error rate, (1-`alpha`) power,
-#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `mtc` correction is applied,
-#'    for simplicity this estimation is based on a conservative Bonferroni correction.
+#'    `trials` performed affects the precision of these p-values. This precision impacts the confidence that a given edge's p-value
+#'    is less than the desired `alpha` level, and therefore represents a statistically significant edge that should be retained in
+#'    the backbone. When `trials = NULL`, [trials.needed()] is used to estimate the required number of trials to evaluate the
+#'    statistical significance of an edges' p-values.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.

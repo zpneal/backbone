@@ -158,11 +158,11 @@ frommatrix <- function(mat, attribs = NA, convert = "matrix"){
 #'
 #' `trials.needed` estimates the number of monte carlo trials needed to estimate edgewise p-values
 #'
-#' @param M matrix
-#' @param alpha real
-#' @param signed boolean
-#' @param missing.as.zero boolean
-#' @param mtc string
+#' @param M matrix: An adjacency matrix representing a network from which a backbone is is being extracted
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param how.close real: How close can the empirical p-value be to alpha and still be distinguishable, expressed as a proportion
 #'
 #' @return integer
