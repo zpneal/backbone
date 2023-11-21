@@ -7,15 +7,15 @@
 trials.needed(M, alpha, signed, missing.as.zero, mtc, how.close = 0.95)
 }
 \arguments{
-\item{M}{matrix}
+\item{M}{matrix: An adjacency matrix representing a network from which a backbone is is being extracted}
 
-\item{alpha}{real}
+\item{alpha}{real: significance level of hypothesis test(s)}
 
-\item{signed}{boolean}
+\item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone}
 
-\item{missing.as.zero}{boolean}
+\item{missing.as.zero}{boolean: should missing edges be treated as edges with zero weight and tested for significance}
 
-\item{mtc}{string}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
 \item{how.close}{real: How close can the empirical p-value be to alpha and still be distinguishable, expressed as a proportion}
 }
