@@ -88,17 +88,6 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, missing.as.zero = FALSE, signed
   #### Bipartite Projection ####
   P <- tcrossprod(B)
 
-  #### Compute number of trials needed ####
-  if (is.null(trials)) {
-    trials.alpha <- alpha
-    if (signed == TRUE) {trials.alpha <- trials.alpha / 2}  #Two-tailed test
-    if (mtc != "none") {  #Adjust trial.alpha using Bonferroni
-      if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
-      if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
-    }
-    trials <- ceiling((stats::power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
-  }
-
   #### Prepare for randomization loop ####
   ### Create Positive and Negative Matrices to hold backbone ###
   rotate <- FALSE  #initialize
@@ -117,6 +106,7 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, missing.as.zero = FALSE, signed
   }
 
   #### Build Null Models ####
+  if (is.null(trials)) {trials <- trials.needed(M = P, alpha = alpha, signed = signed, missing.as.zero = missing.as.zero, mtc = mtc, ...)}
   if (progress) {message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))}
   if (progress) {pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)}  #Start progress bar
   for (i in 1:trials){
