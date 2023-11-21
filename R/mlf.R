@@ -82,8 +82,8 @@ mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = 
 
   #### Compute p-values ####
   if (symmetric) {
-    Pupper <- matrix(1, nrow(G), ncol(G))  #Set p-values to 1 initially
-    if (signed) {Plower <- matrix(1, nrow(G), ncol(G))}
+    Pupper <- matrix(NA, nrow(G), ncol(G))
+    if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
     T <- sum(rowSums(G))/2
     p <- (rowSums(G) %*% t(rowSums(G))) / (2 * (T^2))
     for (col in 1:ncol(G)) {  #Loop over lower triangle
@@ -106,8 +106,8 @@ mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = 
   }
 
   if (!symmetric) {
-    Pupper <- matrix(1, nrow(G), ncol(G))  #Set p-values to 1 initially
-    if (signed) {Plower <- matrix(1, nrow(G), ncol(G))}
+    Pupper <- matrix(NA, nrow(G), ncol(G))  #Set p-values to 1 initially
+    if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
     T <- sum(rowSums(G))
     p <- (rowSums(G) %*% t(colSums(G))) / (T^2)
     for (col in 1:ncol(G)) {  #Loop over full matrix
