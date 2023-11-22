@@ -56,6 +56,7 @@ lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
   #### Class Conversion ####
   convert <- tomatrix(W)
   G <- convert$G
+  if (any(G<0)) {stop("Locally adaptive network sparsification requires that all weights are positive")}
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   symmetric <- convert$summary$symmetric

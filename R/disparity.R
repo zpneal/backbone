@@ -65,6 +65,7 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
   #### Class Conversion ####
   convert <- tomatrix(W)
   G <- convert$G
+  if (any(G<0)) {stop("The disparity filter requires that all weights are positive")}
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   symmetric <- convert$summary$symmetric
