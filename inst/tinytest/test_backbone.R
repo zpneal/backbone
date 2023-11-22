@@ -227,6 +227,18 @@ expect_equal(round(test$Pupper,3), rbind(c(.654,1,.288,.654),c(1,.201,1,1),c(.5,
 expect_equal(round(test$Plower,3), rbind(c(.736,.5,.958,.736),c(.712,.98,.894,.712),c(.860,.634,.799,.860),c(.736,.86,.712,.736)), info = "MLF")
 expect_equal(test$model, "mlf", info = "MLF")
 
+## LOCAL ADAPTIVE SPARSIFICATION NETWOKR
+M <- net <- matrix(c(0,2,2,2,2,
+                     2,0,1,1,0,
+                     2,1,0,0,1,
+                     2,1,0,0,1,
+                     2,0,1,1,0),5,5)
+test <- lans(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
+expect_equal(test$G, M, info = "LANS")
+expect_equal(round(test$Pupper,3), rbind(c(1,0,0,0,0),c(0,1,.333,.333,1),c(0,.333,1,1,.333),c(0,.333,1,1,.333),c(0,1,.333,.333,1)), info = "LANS")
+expect_equal(round(test$Plower,3), rbind(c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0)), info = "LANS")
+expect_equal(test$model, "lans", info = "LANS")
+
 ## GLOBAL
 M <- rbind(c(0,2,3,4),c(1,0,5,2),c(8,2,0,2),c(1,7,2,0))
 test <- global(M, upper = 5, lower = 2)
