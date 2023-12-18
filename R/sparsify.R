@@ -24,7 +24,6 @@
 #' * `triangles`: number of triangles that include the edge
 #' * `jaccard`: jaccard similarity coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
 #' * `dice`: dice similarity coefficient of the neighborhoods of an edge's endpoints
-#' * `invlogweighted`: inverse log weighted similarity coefficient of the neighborhoods of an edge's endpoints
 #' * `quadrangles`: number of quadrangles that include the edge
 #' * `quadrilateral embeddedness`: geometric mean normalization of quadrangles
 #' * `degree`: degree of neighbor to which an edge is adjacent (asymmetric)
@@ -84,9 +83,9 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
 
   #### Sparsification model checks ####
   if (is.null(s)) {stop("A sparsification parameter `s` must be specified")}
-  if (escore != "random" & escore != "betweenness" & escore != "triangles" & escore != "jaccard" & escore != "dice" & escore != "invlogsquared" &
+  if (escore != "random" & escore != "betweenness" & escore != "triangles" & escore != "jaccard" & escore != "dice" &
       escore != "quadrangles" & escore != "quadrilateral embeddedness" & escore != "degree" & escore != "meetmin" &
-      escore != "geometric" & escore != "hypergeometric") {stop("escore must be one of: random, betweenness, triangles, jaccard, dice, invlogsquared, quadrangles, quadrilateral embeddedness, degree, meetmin, geometric, hypergeometric")}
+      escore != "geometric" & escore != "hypergeometric") {stop("escore must be one of: random, betweenness, triangles, jaccard, dice, quadrangles, quadrilateral embeddedness, degree, meetmin, geometric, hypergeometric")}
   if (normalize != "none" & normalize != "rank" & normalize != "embeddedness") {stop("normalize must be one of: none, rank, embeddedness")}
   if (filter != "threshold" & filter != "proportion" & filter != "degree") {stop("filter must be one of: threshold, proportion, degree")}
   if (filter == "degree" & normalize != "rank") {stop("The degree filter requires that normalize = \"rank\"")}  #Degree filter assumes edge scores are integer ranks
@@ -113,11 +112,12 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
 
   #Jaccard coefficient (aka Neighborhood-normalized number of triangles), from Satuluri et al. (2011)
   if (escore == "jaccard") {
-    N <- tcrossprod(G)  #Count triangles (union of neighborhoods, numerator of jaccard)
-    D <- nrow(G) - tcrossprod((!G)*1)  #Intersection of neighborhoods, denominator of jaccard
+    N <- tcrossprod(G)  #Union of neighborhoods, excluding focal nodes
+    D <- nrow(G) - tcrossprod((!G)*1)  #Intersection of neighborhoods
+    D <- D - 2  #Exclude focal nodes from denominator
     G <- N/D  #Jaccard coefficient
     G[is.nan(G)] <- 0  #Fix any divide-by-zero
-    G <- G * original
+    G <- G * original  #Keep coefficient only for present edges
   }
 
   #Dice coefficient
@@ -126,16 +126,10 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
     D <- matrix(1, nrow(G), ncol(G))  #Matrix of sum of degrees
     D[lower.tri(D)] <- utils::combn(rowSums(G), 2, FUN = sum)
     D[upper.tri(D)] <- t(D)[upper.tri(D)]
+    D <- D - 2  #Exclude focal nodes from denominator
     G <- (2*N)/D  #Dice coefficient
     G[is.nan(G)] <- 0  #Fix any divide-by-zero
-    G <- G * original
-  }
-
-  #Inverse log-weighted
-  if (escore == "invlogweighted") {
-    G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
-    G <- igraph::similarity(G, mode = "all", method = "invlogweighted", loops = FALSE)
-    G <- G * original
+    G <- G * original  #Keep coefficient only for present edges
   }
 
   #Number of maximal 4-cliques (i.e., quadrangles), from Nocaj et al. (2015)

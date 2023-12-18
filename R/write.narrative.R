@@ -52,7 +52,7 @@ write.narrative <- function(agents = 0, artifacts = 0, weighted = FALSE, biparti
   if (mtc == "BH") {correction <- ", Benjamini & Hochberg adjusted"}
   if (mtc == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
 
-  #Typoe of model
+  #Type of model
   if (model == "fixedfill") {desc <- "the fixed fill model (FFM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "fixedrow") {desc <- "the fixed row model (FRM; Neal, 2013)"}
   if (model == "fixedcol") {desc <- "the fixed column model (FCM; Neal, Domagalski, and Sagan, 2021)"}
