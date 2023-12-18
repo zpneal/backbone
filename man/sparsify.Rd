@@ -53,7 +53,6 @@ Unless noted below, scores are symmetric and larger values represent more import
 \item \code{triangles}: number of triangles that include the edge
 \item \code{jaccard}: jaccard similarity coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
 \item \code{dice}: dice similarity coefficient of the neighborhoods of an edge's endpoints
-\item \code{invlogweighted}: inverse log weighted similarity coefficient of the neighborhoods of an edge's endpoints
 \item \code{quadrangles}: number of quadrangles that include the edge
 \item \verb{quadrilateral embeddedness}: geometric mean normalization of quadrangles
 \item \code{degree}: degree of neighbor to which an edge is adjacent (asymmetric)
