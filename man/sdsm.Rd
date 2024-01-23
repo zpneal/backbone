@@ -47,8 +47,7 @@ using \code{\link[=backbone.extract]{backbone.extract()}}.
 \details{
 The \code{sdsm} function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 expected in a projection obtained from a random bipartite network where both the row vertex degrees and column
-vertex degrees are \emph{approximately} fixed at their values in \code{B}. It uses the Bipartite Configuration Model \link{bicm}
-to compute probabilities for the Poisson binomial distribution.
+vertex degrees are \emph{approximately} fixed at their values in \code{B}.
 
 When \code{signed = FALSE}, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
 contains edges whose weights are significantly \emph{stronger} than expected in the null model. When \code{signed = TRUE}, a
