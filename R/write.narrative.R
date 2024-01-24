@@ -17,7 +17,6 @@
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
-#' @param symmetrize boolean: TRUE if the result should be symmetrized
 #' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
 #' @param model string: name of backbone model
 #' @param reduced_edges numeric: percent reduction in number of edges
