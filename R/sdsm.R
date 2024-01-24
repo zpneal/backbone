@@ -15,8 +15,7 @@
 #' @details
 #' The `sdsm` function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 #'    expected in a projection obtained from a random bipartite network where both the row vertex degrees and column
-#'    vertex degrees are *approximately* fixed at their values in `B`. It uses the Bipartite Configuration Model \link{bicm}
-#'    to compute probabilities for the Poisson binomial distribution.
+#'    vertex degrees are *approximately* fixed at their values in `B`.
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
 #'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
