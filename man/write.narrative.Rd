@@ -64,8 +64,6 @@ write.narrative(
 \item{reduced_edges}{numeric: percent reduction in number of edges}
 
 \item{reduced_nodes}{numeric: percent reduction in number of connected nodes}
-
-\item{symmetrize}{boolean: TRUE if the result should be symmetrized}
 }
 \value{
 NULL; only displays text in the console
