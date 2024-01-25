@@ -2,6 +2,8 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.1.4
+
 ## backbone 2.1.3
 
 * added support for structural 0s and 1s in `sdsm()` via the `logit()` function
