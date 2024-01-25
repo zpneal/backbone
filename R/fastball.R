@@ -19,8 +19,14 @@
 #' Mrand <- fastball(M)  #Random matrix with same row and column sums
 fastball <- function(M, trades = 5 * nrow(M)) {
   if (methods::is(M, "matrix")) {
-    #L <- apply(M==1, 1, which, simplify = FALSE)  #Slightly faster, but requires R > 4.1.0
-    L <- lapply(asplit(M == 1, 1), which)  #Ensures result is returned as a list
+    
+    #Convert matrix to adjacency list
+    if (as.numeric(R.Version()$major)>=4 & as.numeric(R.Version()$minor)>=1) {
+      L <- apply(M==1, 1, which, simplify = FALSE)  #Slightly faster, requires R 4.1.0
+    } else {
+      L <- lapply(asplit(M == 1, 1), which)  #Slightly slower, works for earlier version of R
+      }
+    
     Lrand <- fastball_cpp(L, trades)
     Mrand <- matrix(0,nrow(M),ncol(M))
     for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}

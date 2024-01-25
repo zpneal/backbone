@@ -1,6 +1,6 @@
-#' Extract backbone using the Disparity Filter
+#' Extract backbone using Locally Adaptive Network Sparsification
 #'
-#' `disparity` extracts the backbone of a weighted network using the Disparity Filter.
+#' `lans` extracts the backbone of a weighted network using Locally Adaptive Network Sparsification
 #'
 #' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
@@ -12,9 +12,9 @@
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @details
-#' The `disparity` function applies the disparity filter (Serrano et al., 2009), which compares an edge's weight to
-#'    its expected weight if a node's total degree was uniformly distributed across all its edges. The graph may be
-#'    directed or undirected, however the edge weights must be positive.
+#' The `lans` function applies Locally Adaptive Network Sparsification (LANS; Foti et al., 2011), which compares an edge's
+#'    fractional weight to the cumulative distribution function for the fractional edge weights of all edges connected to
+#'    a given node. The graph may be directed or undirected, however the edge weights must be positive.
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
 #'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
@@ -22,7 +22,7 @@
 #'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
 #'    significantly *weaker*, than expected in the null model.
 #'
-#' If `W` is an unweighted bipartite graph, then the disparity filter is applied to its weighted bipartite projection.
+#' If `W` is an unweighted bipartite graph, then LANS is applied to its weighted bipartite projection.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -33,31 +33,22 @@
 #'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
-#' @references disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
+#' @references lans: {Foti, N. J., Hughes, J. M., and Rockmore, D. N. (2011). Nonparametric Sparsification of Complex Multiscale Networks. *PLOS One, 6*, e16431. \doi{10.1371/journal.pone.0016431}}
 #' @export
 #'
 #' @examples
-#' #A network with heterogeneous (i.e. multiscale) weights
-#' net <- matrix(c(0,10,10,10,10,75,0,0,0,0,
-#'                 10,0,1,1,1,0,0,0,0,0,
-#'                 10,1,0,1,1,0,0,0,0,0,
-#'                 10,1,1,0,1,0,0,0,0,0,
-#'                 10,1,1,1,0,0,0,0,0,0,
-#'                 75,0,0,0,0,0,100,100,100,100,
-#'                 0,0,0,0,0,100,0,10,10,10,
-#'                 0,0,0,0,0,100,10,0,10,10,
-#'                 0,0,0,0,0,100,10,10,0,10,
-#'                 0,0,0,0,0,100,10,10,10,0),10)
-#'
+#' #Simple star from Foti et al. (2011), Figure 2
+#' net <- matrix(c(0,2,2,2,2,
+#'                 2,0,1,1,0,
+#'                 2,1,0,0,1,
+#'                 2,1,0,0,1,
+#'                 2,0,1,1,0),5,5)
 #' net <- igraph::graph_from_adjacency_matrix(net, mode = "undirected", weighted = TRUE)
-#' plot(net, edge.width = sqrt(igraph::E(net)$weight)) #A stronger clique & a weaker clique
+#' plot(net, edge.width = igraph::E(net)$weight^2)
 #'
-#' strong <- igraph::delete.edges(net, which(igraph::E(net)$weight < mean(igraph::E(net)$weight)))
-#' plot(strong) #A backbone of stronger-than-average edges ignores the weaker clique
-#'
-#' bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
-#' plot(bb) #...preserves edges at multiple scales
-disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+#' bb <- lans(net, alpha = 0.05, narrative = TRUE) #The LANS backbone
+#' plot(bb)
+lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -65,7 +56,7 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
   #### Class Conversion ####
   convert <- tomatrix(W)
   G <- convert$G
-  if (any(G<0)) {stop("The disparity filter requires that all weights are positive")}
+  if (any(G<0)) {stop("Locally adaptive network sparsification requires that all weights are positive")}
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   symmetric <- convert$summary$symmetric
@@ -81,27 +72,16 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
     message("This object looks like it could be a bipartite projection. If so, consider extracting the backbone using a model designed for bipartite projections: sdsm, fdsm, fixedfill, fixedrow, or fixedcol.")
   }
 
-  #### Set Parameters and Compute p-values ####
-  strength <- rowSums(G)
-  binary <- (G>0)+0
-  degree <- rowSums(binary)
+  #### Compute p-values ####
+  Pupper <- matrix(NA, nrow(G), ncol(G))
+  if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
+  p_ij <- G / rowSums(G)  #Fractional edge weight from i to j
+  for (row in 1:nrow(p_ij)) {Pupper[row,] <- 1 - unlist(lapply(p_ij[row,], function(i) sum(p_ij[row,] <= i & p_ij[row,]!=0))) / sum(p_ij[row,]!=0)}
+  if (signed) {for (row in 1:nrow(p_ij)) {Plower[row,] <- 1 - unlist(lapply(p_ij[row,], function(i) sum(p_ij[row,] >= i & p_ij[row,]!=0))) / sum(p_ij[row,]!=0)}}
 
-  if (symmetric){
-    P <- G/strength
-    pvalues <- (1-P)^(degree-1)
-    Pupper <- as.matrix(pvalues)      #Asymmetric p-values, one from the perspective of each node
-    Pupper <- pmin(Pupper,t(Pupper))  #From Serrano: "satisfy the above criterion for at least one of the two nodes"
-    if (signed) {Plower <- 1-Pupper}
-  }
-
-  if (!symmetric){
-    ### Implies Directed ###
-    outp <- G/strength
-    outvalues <- (1-outp)^(degree-1)
-    inp <- t(G)/(colSums(G))
-    invalues <- t((1-inp)^(colSums(binary)-1))
-    Pupper <- pmin(invalues,outvalues)
-    if (signed) {Plower <- 1-Pupper}
+  if (symmetric) {  #If network started as symmetric, backbone should be symmetric
+    Pupper <- pmin(Pupper,t(Pupper))  #Use smaller p-value from perspective of both nodes for a given edge
+    if (signed) {Plower <- pmin(Plower,t(Plower))}
   }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
@@ -113,7 +93,7 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
   ### Create backbone object ###
   bb <- list(G = G,  #Preliminary backbone object
              Pupper = Pupper,
-             model = "disparity",
+             model = "lans",
              agents = nrow(G),
              artifacts = NULL,
              weighted = TRUE,

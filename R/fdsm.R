@@ -5,6 +5,7 @@
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param trials numeric: the number of bipartite graphs generated to approximate the edge weight distribution. If NULL, the number of trials is selected based on `alpha` (see details)
 #' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
@@ -19,21 +20,17 @@
 #'    vertex degrees are *exactly* fixed at their values in `B`. It uses the [fastball()] algorithm to generate random
 #'    bipartite matrices with give row and column vertex degrees.
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected in the chosen null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
-#'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
 #'
 #' The p-values used to evaluate the statistical significance of each edge are computed using Monte Carlo methods. The number of
-#'    `trials` performed affects the precision of these p-values, and the confidence that a given p-value is less than the
-#'    desired `alpha` level. Because these p-values are proportions (i.e., the proportion of times an edge is weaker/stronger
-#'    in the projection of a random bipartite graphs), evaluating the statistical significance of an edge is equivalent to
-#'    comparing a proportion (the p-value) to a known proportion (alpha). When `trials = NULL`, the `power.prop.test` function
-#'    is used to estimate the required number of trials to make such a comparison with a `alpha` type-I error rate, (1-`alpha`) power,
-#'    and when the riskiest p-value being evaluated is at least 5% smaller than `alpha`. When any `mtc` correction is applied,
-#'    for simplicity this estimation is based on a conservative Bonferroni correction.
+#'    `trials` performed affects the precision of these p-values. This precision impacts the confidence that a given edge's p-value
+#'    is less than the desired `alpha` level, and therefore represents a statistically significant edge that should be retained in
+#'    the backbone. When `trials = NULL`, [trials.needed()] is used to estimate the required number of trials to evaluate the
+#'    statistical significance of an edges' p-values.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -67,7 +64,7 @@
 #' bb <- fdsm(B, alpha = 0.05, trials = 1000, narrative = TRUE, class = "igraph") #An FDSM backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE, ...){
+fdsm <- function(B, alpha = 0.05, trials = NULL, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE, progress = TRUE, ...){
 
   #### Argument Checks ####
   if (!is.null(trials)) {if (trials < 1 | trials%%1!=0) {stop("trials must be a positive integer")}}
@@ -88,17 +85,6 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   #### Bipartite Projection ####
   P <- tcrossprod(B)
 
-  #### Compute number of trials needed ####
-  if (is.null(trials)) {
-    trials.alpha <- alpha
-    if (signed == TRUE) {trials.alpha <- trials.alpha / 2}  #Two-tailed test
-    if (mtc != "none") {  #Adjust trial.alpha using Bonferroni
-      if (signed == TRUE) {trials.alpha <- trials.alpha / ((nrow(B)*(nrow(B)-1))/2)}  #Every edge must be tested
-      if (signed == FALSE) {trials.alpha <- trials.alpha / (sum(P>0)/2)}  #Every non-zero edge in the projection must be tested
-    }
-    trials <- ceiling((stats::power.prop.test(p1 = trials.alpha * 0.95, p2 = trials.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
-  }
-
   #### Prepare for randomization loop ####
   ### Create Positive and Negative Matrices to hold backbone ###
   rotate <- FALSE  #initialize
@@ -108,10 +94,16 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
     rotate <- TRUE
     B <- t(B)
   }
-  #L <- apply(B==1, 1, which)  #Convert B to an adjacency list, slightly faster but doesn't work on R < 4.1.0
-  L <- lapply(asplit(B == 1, 1), which)  #Works on all R releases
+
+  #Convert matrix to adjacency list
+  if (as.numeric(R.Version()$major)>=4 & as.numeric(R.Version()$minor)>=1) {
+    L <- apply(B==1, 1, which, simplify = FALSE)  #Slightly faster, requires R 4.1.0
+  } else {
+    L <- lapply(asplit(B == 1, 1), which)  #Slightly slower, works for earlier version of R
+  }
 
   #### Build Null Models ####
+  if (is.null(trials)) {trials <- trials.needed(M = P, alpha = alpha, signed = signed, missing.as.zero = missing.as.zero, mtc = mtc, ...)}
   if (progress) {message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))}
   if (progress) {pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)}  #Start progress bar
   for (i in 1:trials){
@@ -139,6 +131,12 @@ fdsm <- function(B, alpha = 0.05, trials = NULL, signed = FALSE, mtc = "none", c
   if (rotate) {B <- t(B)}  #If B got rotated from long to wide, rotate B back from wide to long
   Pupper <- (Pupper/trials)
   if (signed) {Plower <- (Plower/trials)}
+
+  #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
+  if (!missing.as.zero) {
+    Pupper[P == 0] <- NA
+    if (signed) {Plower[P == 0] <- NA}
+  }
 
   #### Create Backbone Object ####
   bb <- list(G = P,  #Preliminary backbone object

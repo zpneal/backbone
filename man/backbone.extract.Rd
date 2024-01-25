@@ -16,9 +16,9 @@ backbone.extract(
 \arguments{
 \item{bb.object}{backbone: backbone S3 class object.}
 
-\item{signed}{Boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
+\item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
-\item{alpha}{Real: significance level of hypothesis test(s)}
+\item{alpha}{real: significance level of hypothesis test(s)}
 
 \item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
 
@@ -38,12 +38,11 @@ The "backbone" S3 class object is composed of (1) the weighted graph as a matrix
 matrix, (3, if \code{signed = TRUE}) lower-tail p-values as a matrix, (4, if present) node attributes as a dataframe, and
 (5) several properties of the original graph and backbone model
 
-When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
-model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
-negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
-\emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
+When \code{signed = FALSE}, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+contains edges whose weights are significantly \emph{stronger} than expected in the null model. When \code{signed = TRUE}, a
+two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+positive edges for those whose weights are significantly \emph{stronger}, and negative edges for those whose weights are
+significantly \emph{weaker}, than expected in the null model.
 }
 \examples{
 #A binary bipartite network of 30 agents & 75 artifacts; agents form three communities

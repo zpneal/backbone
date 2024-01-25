@@ -4,6 +4,7 @@
 #'
 #' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
@@ -15,13 +16,12 @@
 #'     distribution of weights expected in a projection obtained from a random bipartite graph where
 #'     the *row* vertex degrees are fixed but the column vertex degrees are allowed to vary.
 #'
-#' When `signed = FALSE`, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-#'    yields a backbone that perserves edges whose weights are significantly *stronger* than expected under the null
-#'    model. When `signed = TRUE`, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-#'    It yields a backbone that contains positive edges for edges whose weights are significantly *stronger*, and
-#'    negative edges for edges whose weights are significantly *weaker*, than expected in the chosen null model.
-#'    *NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.*
-
+#' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+#'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
+#'    two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+#'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
+#'    significantly *weaker*, than expected in the null model.
+#'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
 #'
@@ -53,7 +53,7 @@
 #' bb <- fixedrow(B, alpha = 0.05, narrative = TRUE, class = "igraph") #A fixedrow backbone...
 #' plot(bb) #...is sparse with clear communities
 
-fixedrow <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -94,6 +94,12 @@ fixedrow <- function(B, alpha = 0.05, signed = FALSE, mtc = "none", class = "ori
   if (signed) {
     df$lower <- stats::phyper(df$projvalue, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
     Plower <- matrix(as.numeric(df$lower), nrow = nrow(B), ncol = nrow(B))
+  }
+
+  #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
+  if (!missing.as.zero) {
+    Pupper[P == 0] <- NA
+    if (signed) {Plower[P == 0] <- NA}
   }
 
   #### Create Backbone Object ####

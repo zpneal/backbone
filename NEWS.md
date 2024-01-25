@@ -2,6 +2,14 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 2.1.3
+
+* added support for structural 0s and 1s in `sdsm()` via the `logit()` function
+* vectorized and added additional options to `sparsify()`
+* implemented Marginal Likelihood Filter in `mlf()`
+* implemented Locally Adaptive Network Sparsification in `lans()`
+* added `missing.as.zero` option to statistical models
+
 ## backbone 2.1.2
 
 * speedups in `pb()` and `sdsm()`

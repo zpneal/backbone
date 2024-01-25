@@ -1,8 +1,8 @@
-#' Extract backbone using the Disparity Filter
+#' Extract backbone using the Marginal Likelihood Filter
 #'
-#' `disparity` extracts the backbone of a weighted network using the Disparity Filter.
+#' `mlf` extracts the backbone of a weighted network using the Marginal Likelihood Filter
 #'
-#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param W An integer-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -12,9 +12,9 @@
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #'
 #' @details
-#' The `disparity` function applies the disparity filter (Serrano et al., 2009), which compares an edge's weight to
-#'    its expected weight if a node's total degree was uniformly distributed across all its edges. The graph may be
-#'    directed or undirected, however the edge weights must be positive.
+#' The `mlf` function applies the marginal likelihood filter (MLF; Dianati, 2016), which compares an edge's weight to
+#'    its expected weight in a graph that preserves the total weight and preserves the degree sequence *on average*.
+#'    The graph may be directed or undirected, however the edge weights must be positive integers.
 #'
 #' When `signed = FALSE`, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
 #'    contains edges whose weights are significantly *stronger* than expected in the null model. When `signed = TRUE`, a
@@ -22,7 +22,7 @@
 #'    positive edges for those whose weights are significantly *stronger*, and negative edges for those whose weights are
 #'    significantly *weaker*, than expected in the null model.
 #'
-#' If `W` is an unweighted bipartite graph, then the disparity filter is applied to its weighted bipartite projection.
+#' If `W` is an unweighted bipartite graph, then the MLF is applied to its weighted bipartite projection.
 #'
 #' @return
 #' If `alpha` != NULL: Binary or signed backbone graph of class `class`.
@@ -33,11 +33,11 @@
 #'    using [backbone.extract()].
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
-#' @references disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
+#' @references mlf: {Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. *Physical Review E, 93*, 012304. \doi{10.1103/PhysRevE.93.012304}}
 #' @export
 #'
 #' @examples
-#' #A network with heterogeneous (i.e. multiscale) weights
+#' #A network with heterogeneous weights
 #' net <- matrix(c(0,10,10,10,10,75,0,0,0,0,
 #'                 10,0,1,1,1,0,0,0,0,0,
 #'                 10,1,0,1,1,0,0,0,0,0,
@@ -55,9 +55,9 @@
 #' strong <- igraph::delete.edges(net, which(igraph::E(net)$weight < mean(igraph::E(net)$weight)))
 #' plot(strong) #A backbone of stronger-than-average edges ignores the weaker clique
 #'
-#' bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...
+#' bb <- mlf(net, alpha = 0.05, narrative = TRUE) #An MLF backbone...
 #' plot(bb) #...preserves edges at multiple scales
-disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
+mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", class = "original", narrative = FALSE){
 
   #### Argument Checks ####
   if (!is.null(alpha)) {if (alpha < 0 | alpha > .5) {stop("alpha must be between 0 and 0.5")}}
@@ -65,7 +65,7 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
   #### Class Conversion ####
   convert <- tomatrix(W)
   G <- convert$G
-  if (any(G<0)) {stop("The disparity filter requires that all weights are positive")}
+  if (any(G<0) | any(G%%1>0)) {stop("The maximum likelihood filter requires that all weights are positive integers")}
   if (class == "original") {class <- convert$summary$class}
   attribs <- convert$attribs
   symmetric <- convert$summary$symmetric
@@ -81,39 +81,57 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
     message("This object looks like it could be a bipartite projection. If so, consider extracting the backbone using a model designed for bipartite projections: sdsm, fdsm, fixedfill, fixedrow, or fixedcol.")
   }
 
-  #### Set Parameters and Compute p-values ####
-  strength <- rowSums(G)
-  binary <- (G>0)+0
-  degree <- rowSums(binary)
+  #### Compute p-values ####
+  if (symmetric) {
+    Pupper <- matrix(NA, nrow(G), ncol(G))
+    if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
+    T <- sum(rowSums(G))/2
+    p <- (rowSums(G) %*% t(rowSums(G))) / (2 * (T^2))
+    for (col in 1:ncol(G)) {  #Loop over lower triangle
+      for (row in col:nrow(G)) {
 
-  if (symmetric){
-    P <- G/strength
-    pvalues <- (1-P)^(degree-1)
-    Pupper <- as.matrix(pvalues)      #Asymmetric p-values, one from the perspective of each node
-    Pupper <- pmin(Pupper,t(Pupper))  #From Serrano: "satisfy the above criterion for at least one of the two nodes"
-    if (signed) {Plower <- 1-Pupper}
+        if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
+          Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
+          if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
+        }
+
+        if (!missing.as.zero & G[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+          Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
+          if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
+        }
+
+      }
+    }
+    Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]  #Add upper triangle
+    if (signed) {Plower[upper.tri(Plower)] <- t(Plower)[upper.tri(Plower)]}
   }
 
-  if (!symmetric){
-    ### Implies Directed ###
-    outp <- G/strength
-    outvalues <- (1-outp)^(degree-1)
-    inp <- t(G)/(colSums(G))
-    invalues <- t((1-inp)^(colSums(binary)-1))
-    Pupper <- pmin(invalues,outvalues)
-    if (signed) {Plower <- 1-Pupper}
-  }
+  if (!symmetric) {
+    Pupper <- matrix(NA, nrow(G), ncol(G))
+    if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
+    T <- sum(rowSums(G))
+    p <- (rowSums(G) %*% t(colSums(G))) / (T^2)
+    for (col in 1:ncol(G)) {  #Loop over full matrix
+      for (row in 1:nrow(G)) {
 
-  #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
-  if (!missing.as.zero) {
-    Pupper[G == 0] <- NA
-    if (signed) {Plower[G == 0] <- NA}
+        if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
+          Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
+          if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
+        }
+
+        if (!missing.as.zero & G[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+          Pupper[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "greater")$p.value
+          if (signed) {Plower[row,col] <- stats::binom.test(G[row,col], T, p[row,col], alternative = "less")$p.value}
+        }
+
+      }
+    }
   }
 
   ### Create backbone object ###
   bb <- list(G = G,  #Preliminary backbone object
              Pupper = Pupper,
-             model = "disparity",
+             model = "mlf",
              agents = nrow(G),
              artifacts = NULL,
              weighted = TRUE,

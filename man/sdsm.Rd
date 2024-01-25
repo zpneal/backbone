@@ -7,6 +7,7 @@
 sdsm(
   B,
   alpha = 0.05,
+  missing.as.zero = FALSE,
   signed = FALSE,
   mtc = "none",
   class = "original",
@@ -18,6 +19,8 @@ sdsm(
 \item{B}{An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
+
+\item{missing.as.zero}{boolean: should missing edges be treated as edges with zero weight and tested for significance}
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
@@ -44,15 +47,19 @@ using \code{\link[=backbone.extract]{backbone.extract()}}.
 \details{
 The \code{sdsm} function compares an edge's observed weight in the projection \code{B*t(B)} to the distribution of weights
 expected in a projection obtained from a random bipartite network where both the row vertex degrees and column
-vertex degrees are \emph{approximately} fixed at their values in \code{B}. It uses the Bipartite Configuration Model \link{bicm}
-to compute probabilities for the Poisson binomial distribution.
+vertex degrees are \emph{approximately} fixed at their values in \code{B}.
 
-When \code{signed = FALSE}, a one-tailed test (is the weight stronger) is performed for each edge with a non-zero weight. It
-yields a backbone that perserves edges whose weights are significantly \emph{stronger} than expected in the chosen null
-model. When \code{signed = TRUE}, a two-tailed test (is the weight stronger or weaker) is performed for each every pair of nodes.
-It yields a backbone that contains positive edges for edges whose weights are significantly \emph{stronger}, and
-negative edges for edges whose weights are significantly \emph{weaker}, than expected in the chosen null model.
-\emph{NOTE: Before v2.0.0, all significance tests were two-tailed and zero-weight edges were evaluated.}
+When \code{signed = FALSE}, a one-tailed test (is the weight stronger?) is performed for each edge. The resulting backbone
+contains edges whose weights are significantly \emph{stronger} than expected in the null model. When \code{signed = TRUE}, a
+two-tailed test (is the weight stronger or weaker?) is performed for each edge. The resulting backbone contains
+positive edges for those whose weights are significantly \emph{stronger}, and negative edges for those whose weights are
+significantly \emph{weaker}, than expected in the null model.
+
+The bipartite network \code{B} may contain some edges that are \emph{required} in the null model (i.e., structural 1s); these edges should
+have a weight of 11 (i.e., B_ik = 11). This network may also contain some edges that are \emph{prohibited} in the null model
+(i.e., structural 0s); these edges should have a weight of 10 (i.e., B_ik = 10). When \code{B} contains required or prohibited edges,
+cellwise probabilities are computed using \link{logit} following Neal et al. (2024). Otherwise, cellwise probabilities are
+computed using the faster and more accurate Bipartite Configuration Model with \link{bicm} (Neal et al. 2021).
 }
 \examples{
 #A binary bipartite network of 30 agents & 75 artifacts; agents form three communities
@@ -78,5 +85,7 @@ package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbone
 
 sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. \emph{Social Networks, 39}, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 
-sdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+bicm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+
+logit: {Neal, Z. P. and Neal, J. W. (2024). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. \emph{Proceedings of the 12th International Conference on Complex Networks and their Applications}. Springer.}
 }

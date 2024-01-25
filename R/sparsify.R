@@ -10,6 +10,7 @@
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
+#' @param symmetrize boolean: TRUE if the result should be symmetrized
 #' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
 #' @param class string: the class of the returned backbone graph, one of c("original", "matrix", "Matrix", "igraph", "edgelist").
 #'     If "original", the backbone graph returned is of the same class as `U`.
@@ -18,11 +19,11 @@
 #' @details
 #' The `escore` parameter determines how an unweighted edge's importance is calculated.
 #' Unless noted below, scores are symmetric and larger values represent more important edges.
-#' There are 10 options for assigning an edge's score; when `escore = `
 #' * `random`: a random number drawn from a uniform distribution
 #' * `betweenness`: edge betweenness
 #' * `triangles`: number of triangles that include the edge
-#' * `jaccard`: jaccard coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
+#' * `jaccard`: jaccard similarity coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
+#' * `dice`: dice similarity coefficient of the neighborhoods of an edge's endpoints
 #' * `quadrangles`: number of quadrangles that include the edge
 #' * `quadrilateral embeddedness`: geometric mean normalization of quadrangles
 #' * `degree`: degree of neighbor to which an edge is adjacent (asymmetric)
@@ -31,16 +32,18 @@
 #' * `hypergeometric`: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (smaller is more important)
 #'
 #' The `normalize` parameter determines whether edge scores are normalized.
-#' There are three options; when `normalize = `
 #' * `none`: no normalization is performed
 #' * `rank`: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
 #' * `embeddedness`: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 #'
 #' The `filter` parameter determines how edges are filtered based on their (normalized) edge scores.
-#' There are three options; when `filter = `
-#' * `threshold`: Edges with scores more important than `s` are retained in the backbone
-#' * `proportion`: Specifies the proportion of most important edges to retain in the backbone
+#' * `threshold`: Edges with scores >= `s` are retained in the backbone
+#' * `proportion`: Specifies the approximate proportion of edges to retain in the backbone
 #' * `degree`: Retains each node's d^`s` most important edges, where d is the node's degree (requires that `normalize = "rank"`)
+#' * `disparity`: Applies the disparity filter using [disparity()]
+#'
+#' Using `escore == "degree"` or `normalize == "rank"` can yield an assymmetric network. When `symmetrize == TRUE` (default),
+#'   after applying a filter, the network is symmetrized by such that i-j if i->j or i<-j.
 #'
 #' Specific combinations of `escore`, `normalize`, `filter`, and `umst` correspond to specific sparsification models in the literature, and are available via the following wrapper functions:
 #' [sparsify.with.skeleton()], [sparsify.with.gspar()], [sparsify.with.lspar()], [sparsify.with.simmelian()], [sparsify.with.jaccard()], [sparsify.with.meetmin()], [sparsify.with.geometric()], [sparsify.with.hypergeometric()], [sparsify.with.localdegree()], [sparsify.with.quadrilateral()].
@@ -57,7 +60,7 @@
 #' sparse <- sparsify(U, s = 0.6, escore = "jaccard", normalize = "rank",
 #' filter = "degree", narrative = TRUE)
 #' plot(sparse) #Clearly visible communities
-sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE, class = "original", narrative = FALSE) {
+sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = FALSE, class = "original", narrative = FALSE) {
 
   #### Helper Function: Edge score ranking ####
   nhood.rank <- function(x) {
@@ -70,13 +73,6 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
     }
   }
 
-  #### Helper Function: Symmetrize using maximum ####
-  sym.max <- function(m) {
-    m[lower.tri(m)] <- pmax(m[lower.tri(m)],t(m)[lower.tri(t(m))])
-    m[upper.tri(m)] <- t(m)[upper.tri(m)]
-    return(m)
-  }
-
   #### Convert supplied object to matrix ####
   G <- tomatrix(U)
   if (G$summary$bipartite==TRUE | G$summary$symmetric==FALSE | G$summary$weighted==TRUE) {stop("G must be an undirected, unweighted, unipartite network")}
@@ -87,9 +83,9 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #### Sparsification model checks ####
   if (is.null(s)) {stop("A sparsification parameter `s` must be specified")}
-  if (escore != "original" & escore != "random" & escore != "betweenness" & escore != "triangles" & escore != "jaccard" &
+  if (escore != "random" & escore != "betweenness" & escore != "triangles" & escore != "jaccard" & escore != "dice" &
       escore != "quadrangles" & escore != "quadrilateral embeddedness" & escore != "degree" & escore != "meetmin" &
-      escore != "geometric" & escore != "hypergeometric") {stop("escore must be one of: original, random, betweenness, triangles, jaccard, quadrangles, quadrilateral embeddedness, degree, meetmin, geometric, hypergeometric")}
+      escore != "geometric" & escore != "hypergeometric") {stop("escore must be one of: random, betweenness, triangles, jaccard, dice, quadrangles, quadrilateral embeddedness, degree, meetmin, geometric, hypergeometric")}
   if (normalize != "none" & normalize != "rank" & normalize != "embeddedness") {stop("normalize must be one of: none, rank, embeddedness")}
   if (filter != "threshold" & filter != "proportion" & filter != "degree") {stop("filter must be one of: threshold, proportion, degree")}
   if (filter == "degree" & normalize != "rank") {stop("The degree filter requires that normalize = \"rank\"")}  #Degree filter assumes edge scores are integer ranks
@@ -98,7 +94,7 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   #Random, from Karger (1994)
   if (escore == "random") {
     G <- G*stats::runif(length(G))  #Assign each edge a random weight
-    G[lower.tri(G)] = t(G)[lower.tri(G)]  #Make symmetric
+    G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Make symmetric
     }
 
   #Edge betweenness, from Melancon & Sallaberry (2008)
@@ -110,23 +106,33 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
 
   #Number of triangles, from Nick et al. (2013)
   if (escore == "triangles") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) ))
+    G <- tcrossprod(G)
     G <- G * original
   }
 
-  #Neighborhood-normalized number of triangles, from Satuluri et al. (2011)
+  #Jaccard coefficient (aka Neighborhood-normalized number of triangles), from Satuluri et al. (2011)
   if (escore == "jaccard") {
-    Gedge <- igraph::as_edgelist(igraph::graph_from_adjacency_matrix(original, mode = "undirected"))  #Get edgelist
-    Gedge <- cbind(Gedge, NA)  #Placeholder column for jaccards
-    G <- matrix(0, nrow(original), ncol(original), dimnames = dimnames(original))  #Initialize scored adjacency matrix
-    for (i in 1:nrow(Gedge)) {  #For each edge
-      Gedge[i,3] <- (sum((original[Gedge[i,1],]==1 & original[Gedge[i,2],]==1)*1)) / (sum((original[Gedge[i,1],]==1 | original[Gedge[i,2],]==1)*1))  #Compute jaccard
-      G[Gedge[i,1],Gedge[i,2]] <- Gedge[i,3]  #Insert value in adjacency matrix
-      G[Gedge[i,2],Gedge[i,1]] <- Gedge[i,3]
-    }
+    N <- tcrossprod(G)  #Union of neighborhoods, excluding focal nodes
+    D <- nrow(G) - tcrossprod((!G)*1)  #Intersection of neighborhoods
+    D <- D - 2  #Exclude focal nodes from denominator
+    G <- N/D  #Jaccard coefficient
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
+    G <- G * original  #Keep coefficient only for present edges
   }
 
-  #Number of maximal 4-cliques, from Nocaj et al. (2015)
+  #Dice coefficient
+  if (escore == "dice") {
+    N <- tcrossprod(G)  #Count triangles
+    D <- matrix(1, nrow(G), ncol(G))  #Matrix of sum of degrees
+    D[lower.tri(D)] <- utils::combn(rowSums(G), 2, FUN = sum)
+    D[upper.tri(D)] <- t(D)[upper.tri(D)]
+    D <- D - 2  #Exclude focal nodes from denominator
+    G <- (2*N)/D  #Dice coefficient
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
+    G <- G * original  #Keep coefficient only for present edges
+  }
+
+  #Number of maximal 4-cliques (i.e., quadrangles), from Nocaj et al. (2015)
   if (escore == "quadrangles" | escore == "quadrilateral embeddedness") {
     G <- igraph::graph_from_adjacency_matrix(G,mode="undirected")
     quads <- matrix(unlist(igraph::cliques(G, min=4, max=4)), nrow = 4) #Value can be replaced to count an edge's number of k-clique
@@ -139,103 +145,96 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   }
 
   #Neighborhood-normalized quadrangle count, from Nocaj et al. (2015)
-  if (escore == "quadrilateral embeddedness") {
-    #G already contains the number of quadrangles per edge
-    denominator <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) sqrt(sum(G[i,]) * sum(G[j,])) ))
+  if (escore == "quadrilateral embeddedness") {  #G already contains the number of quadrangles per edge
+    denominator <- sqrt(rowSums(G)%*%t(colSums(G)))
     G <- (G / denominator) * original
-    G[is.nan(G)] <- 0
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
   }
 
   #Degree of alter, from Hamann et al. (2016)
   if (escore == "degree") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) sum(G[,j]) ))
+    G <- t(rowSums(G)*G)
     G <- G * original
   }
 
   #Meet/min, from Goldberg & Roth (2003)
   if (escore == "meetmin") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) / (min(sum(G[i,]),sum(G[j,]))) ))
-    G <- G * original
+    N <- tcrossprod(G)  #Shared neighbors
+    D <- pmin(G*rowSums(G), t(G*rowSums(G)))  #Minimum of i's and j's degree
+    G <- N/D  #Meet-min score
+    G[G==Inf | is.nan(G)] <- 0  #Fix any divide-by-zero
   }
 
   #Geometric, from Goldberg & Roth (2003)
   if (escore == "geometric") {
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) ((sum((G[i,]==1 & G[j,]==1)*1))^2) / (sum(G[i,]) * sum(G[j,])) ))
+    N <- tcrossprod(G)^2  #Shared neighbors, squared
+    D <- rowSums(G)%*%t(rowSums(G))
+    G <- N/D  #Geometric score
+    G[is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original
   }
 
   #Hypergeometric, from Goldberg & Roth (2003)
   if (escore == "hypergeometric") {
-    triangles <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) (sum((G[i,]==1 & G[j,]==1)*1)) ))
-    dat <- array(c(G,triangles), dim = c(nrow(G),ncol(G),2))  #Array with G and triangle counts
-    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) stats::phyper(dat[i,j,2]-1, sum(dat[i,,1])-1, (nrow(G)-2)-(sum(dat[i,,1])-1), sum(dat[j,,1])-1, lower.tail=FALSE) ))
+    triangles <- tcrossprod(G)
+    G <- outer(1:nrow(G),1:ncol(G), FUN = Vectorize( function(i,j) stats::phyper(triangles[i,j]-1, sum(G[i,])-1, (nrow(G)-2)-(sum(G[i,])-1), sum(G[j,])-1, lower.tail=FALSE) ))
     G <- G * original
   }
 
   #### Normalize edge scores ####
   #Neighborhood rank, from Satuluri et al. (2011)
-  if (normalize == "rank") {for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}}
+  if (normalize == "rank" | normalize == "embeddedness") {for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}}  #Rank edges by row (i.e., from perspective of each node)
 
   #Embeddedness, from Nick et al. (2013) and Nocaj et al. (2015)
-  if (normalize == "embeddedness") {
-    for (i in 1:nrow(G)) {G[i,] <- nhood.rank(G[i,])}  #Neighborhood rank is computed first
+  if (normalize == "embeddedness") {  #Scores will already be transformed as neighborhood ranks
     scores <- matrix(0, nrow(G), ncol(G))  #Initialize matrix to hold embeddedness scores
-    for (row1 in 1:nrow(G)) {
-      for (row2 in 1:nrow(G)) {  #Loop over each pair of rows
+    for (row1 in 1:(nrow(G)-1)) {
+      for (row2 in (row1+1):nrow(G)) {  #Loop over each pair of rows
         list1 <- G[row1,]  #Vector of ranked edges for row1
         list2 <- G[row2,]  #Vector of ranked edges for row2
-        score <- 0  #Initialize embeddedness score for this pair of rows
-        for (k in 1:max(list1,list2)) {  #Loop over possible values of k
-          list1_ <- list1
-          list1_[which(list1_>k)] <- 0
-          list1_[which(list1_>0)] <- 1  #Vector of top k-ranked edges for row1
-          list2_ <- list2
-          list2_[which(list2_>k)] <- 0
-          list2_[which(list2_>0)] <- 1  #Vector of top k-ranked edges for row1
-          j <- (sum(list1_==1 & list2_==1)*1) / (sum(list1_==1 | list2_==1)*1)  #Jaccard for top k-ranked edges in row1 and row2
-          if (is.nan(j)) {j <- 0}
-          if (j > score) {score <- j}  #Update embeddedness score if this Jaccard is higher
+
+        #Find overlap between neighborhoods using non-parametric variant
+        k <- max(list1,list2)
+        if (k==0 | ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k))))==0) {  #If jaccard for max(k) is zero, stop
+          scores[row1,row2] <- 0
+        } else {  #Otherwise, compute jaccard for each k, use maximum
+          j <- NULL
+          for (k in 1:max(list1,list2)) {j <- c(j, ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k)))))}
+          scores[row1,row2] <- max(j)
         }
-        scores[row1,row2] <- score  #Insert final score in matrix
       }
     }
     G <- scores
-    diag(G) <- 0
+    G[lower.tri(G)] <- t(G)[lower.tri(G)]  #Fill in rest of matrix
   }
 
   #### Apply filter ####
   #Threshold
   if (filter == "threshold") {
     if (escore != "hypergeometric" & normalize != "rank") {G <- (G >= s)*1}  #Cases where large edge scores are stronger
-    if (escore == "hypergeometric" | normalize == "rank") {  #Cases where small edge scores are stronger
-      G <- (G <= s)*1  #Keep edges with scores below s
-      G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-      }
-    G <- sym.max(G)  #Ensure result is symmetric
+    if (escore == "hypergeometric" | normalize == "rank") {G <- (G<=s & G!=0)*1}  #Cases where small non-zero edge scores are stronger
     }
 
   #Proportion
   if (filter == "proportion") {
-    G <- sym.max(G)  #Start with a symmetric set of edge scores
-    scores <- G[lower.tri(G)][which(G[lower.tri(G)]!=0)]  #Vector of non-zero edge scores
-    tokeep <- ceiling(s*length(scores))  #Number of edges to keep
-    if (escore != "hypergeometric" & normalize != "rank") {  #Cases where large edge scores are stronger
-      keep.score <- sort(scores, decreasing = TRUE)[tokeep]  #Value of the tokeep^th edge score, starting from largest value
-      G <- (G >= keep.score)*1  #Keep edges with scores at least as large
-    }
-    if (escore == "hypergeometric" | normalize == "rank") {  #Cases where small edge scores are stronger
-      keep.score <- sort(scores, decreasing = FALSE)[tokeep]  #Value of the tokeep^th edge score, starting from smallest value
-      G <- (G <= keep.score)*1  #Keep edges with scores at least as small
-      G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-    }
+    scores <- G[which(G!=0)]  #Vector of non-zero edge scores
+    if (escore != "hypergeometric" & normalize != "rank") {G <- (G >= stats::quantile(scores, probs = (1-s)))*1}  #Cases where large edge scores are stronger
+    if (escore == "hypergeometric" | normalize == "rank") {G <- (G <= stats::quantile(scores, probs = s) & G != 0)*1}  #Cases where small edge scores are stronger
   }
 
   #Degree exponent, from Satuluri et al. (2011)
   if (filter == "degree") {
-    G <- (G <= (floor(rowSums(original)^s)))*1  #Keep edges with scores at least as small as degree^s
-    G[which(original==0)] <- 0  #But, don't count edges with score = 0, which should be missing
-    G <- sym.max(G)  #Ensure result is symmetric
-    }
+    G <- (G <= (floor(rowSums(original)^s)) & G!=0)*1  #Keep edges with neighborhood rank scores at least as small as degree^s
+  }
+
+  #Disparity filter, from Serrano et al. (2009)
+  if (filter == "disparity") {G <- disparity(G, alpha = s)}
+
+  #### Symmetrize if requested ####
+  if (symmetrize) {
+    G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
+    G[upper.tri(G)] <- t(G)[upper.tri(G)]
+  }
 
   #### Add UMST if requested ####
   if (umst) {
@@ -246,23 +245,22 @@ sparsify <- function(U, s, escore = "original", normalize, filter, umst = FALSE,
   }
 
   #### Display narrative if requested ####
-  model <- ""
-  if (escore=="random" & normalize=="none" & filter=="proportion" & umst==FALSE) {model <- "skeleton"}
-  if (escore=="jaccard" & normalize=="none" & filter=="proportion" & umst==FALSE) {model <- "gspar"}
-  if (escore=="jaccard" & normalize=="rank" & filter=="degree" & umst==FALSE) {model <- "lspar"}
-  if (escore=="triangles" & normalize=="embeddedness" & filter=="threshold" & umst==FALSE) {model <- "simmelian"}
-  if (escore=="jaccard" & normalize=="none" & filter=="threshold" & umst==FALSE) {model <- "jaccard"}
-  if (escore=="meetmin" & normalize=="none" & filter=="threshold" & umst==FALSE) {model <- "meetmin"}
-  if (escore=="geometric" & normalize=="none" & filter=="threshold" & umst==FALSE) {model <- "geometric"}
-  if (escore=="hypergeometric" & normalize=="none" & filter=="threshold" & umst==FALSE) {model <- "hypergeometric"}
-  if (escore=="degree" & normalize=="rank" & filter=="degree" & umst==FALSE) {text <- model <- "degree"}
-  if (escore=="quadrilateral embeddedness" & normalize=="embeddedness" & filter=="threshold" & umst==TRUE) {model <- "quadrilateral"}
-  if (model=="") {model <- "sparify"}
+  model <- "sparsify"
+  if (escore=="random" & normalize=="none" & filter=="proportion" & umst==FALSE & symmetrize==TRUE) {model <- "skeleton"}
+  if (escore=="jaccard" & normalize=="none" & filter=="proportion" & umst==FALSE & symmetrize==TRUE) {model <- "gspar"}
+  if (escore=="jaccard" & normalize=="rank" & filter=="degree" & umst==FALSE & symmetrize==TRUE) {model <- "lspar"}
+  if (escore=="triangles" & normalize=="embeddedness" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "simmelian"}
+  if (escore=="jaccard" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "jaccard"}
+  if (escore=="meetmin" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "meetmin"}
+  if (escore=="geometric" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "geometric"}
+  if (escore=="hypergeometric" & normalize=="none" & filter=="threshold" & umst==FALSE & symmetrize==TRUE) {model <- "hypergeometric"}
+  if (escore=="degree" & normalize=="rank" & filter=="degree" & umst==FALSE & symmetrize==TRUE) {model <- "degree"}
+  if (escore=="quadrilateral embeddedness" & normalize=="embeddedness" & filter=="threshold" & umst==TRUE & symmetrize==TRUE) {model <- "quadrilateral"}
   reduced_edges <- round((sum(original!=0) - sum(G!=0)) / sum(original!=0),3)*100  #Percent decrease in number of edges
   reduced_nodes <- round((max(sum(rowSums(original)!=0),sum(colSums(original)!=0)) - max(sum(rowSums(G)!=0),sum(colSums(G)!=0))) / max(sum(rowSums(original)!=0),sum(colSums(original)!=0)),3) * 100  #Percent decrease in number of connected nodes
-  if (narrative == TRUE) {write.narrative(agents = nrow(original), artifacts = NULL, weighted = FALSE, bipartite = FALSE, symmetric = TRUE,
-                                          signed = FALSE, mtc = "none", alpha = NULL, s = s, ut = NULL, lt = NULL, trials = NULL, model = model,
-                                          reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
+  if (narrative == TRUE) {write.narrative(agents = nrow(original), weighted = FALSE, bipartite = FALSE, symmetric = TRUE, s = s,
+                                          escore = escore, normalize = normalize, filter = filter, umst = umst,
+                                          signed = FALSE, model = model, reduced_edges = reduced_edges, reduced_nodes = reduced_nodes)}
 
   #### Return backbone in desired class ####
   rownames(G) <- rownames(original)  #Restore labels if they were lost

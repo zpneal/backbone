@@ -7,9 +7,10 @@
 sparsify(
   U,
   s,
-  escore = "original",
+  escore,
   normalize,
   filter,
+  symmetrize = TRUE,
   umst = FALSE,
   class = "original",
   narrative = FALSE
@@ -25,6 +26,8 @@ sparsify(
 \item{normalize}{string: Method for normalizing edge scores}
 
 \item{filter}{string: Type of filter to apply}
+
+\item{symmetrize}{boolean: TRUE if the result should be symmetrized}
 
 \item{umst}{boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity}
 
@@ -44,12 +47,12 @@ edge score normalization, and an edge score filter.
 \details{
 The \code{escore} parameter determines how an unweighted edge's importance is calculated.
 Unless noted below, scores are symmetric and larger values represent more important edges.
-There are 10 options for assigning an edge's score; when \verb{escore = }
 \itemize{
 \item \code{random}: a random number drawn from a uniform distribution
 \item \code{betweenness}: edge betweenness
 \item \code{triangles}: number of triangles that include the edge
-\item \code{jaccard}: jaccard coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
+\item \code{jaccard}: jaccard similarity coefficient of the neighborhoods of an edge's endpoints, or alternatively, triangles normalized by the size of the union of the endpoints neighborhoods
+\item \code{dice}: dice similarity coefficient of the neighborhoods of an edge's endpoints
 \item \code{quadrangles}: number of quadrangles that include the edge
 \item \verb{quadrilateral embeddedness}: geometric mean normalization of quadrangles
 \item \code{degree}: degree of neighbor to which an edge is adjacent (asymmetric)
@@ -59,7 +62,6 @@ There are 10 options for assigning an edge's score; when \verb{escore = }
 }
 
 The \code{normalize} parameter determines whether edge scores are normalized.
-There are three options; when \verb{normalize = }
 \itemize{
 \item \code{none}: no normalization is performed
 \item \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
@@ -67,12 +69,15 @@ There are three options; when \verb{normalize = }
 }
 
 The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores.
-There are three options; when \verb{filter = }
 \itemize{
-\item \code{threshold}: Edges with scores more important than \code{s} are retained in the backbone
-\item \code{proportion}: Specifies the proportion of most important edges to retain in the backbone
+\item \code{threshold}: Edges with scores >= \code{s} are retained in the backbone
+\item \code{proportion}: Specifies the approximate proportion of edges to retain in the backbone
 \item \code{degree}: Retains each node's d^\code{s} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
+\item \code{disparity}: Applies the disparity filter using \code{\link[=disparity]{disparity()}}
 }
+
+Using \code{escore == "degree"} or \code{normalize == "rank"} can yield an assymmetric network. When \code{symmetrize == TRUE} (default),
+after applying a filter, the network is symmetrized by such that i-j if i->j or i<-j.
 
 Specific combinations of \code{escore}, \code{normalize}, \code{filter}, and \code{umst} correspond to specific sparsification models in the literature, and are available via the following wrapper functions:
 \code{\link[=sparsify.with.skeleton]{sparsify.with.skeleton()}}, \code{\link[=sparsify.with.gspar]{sparsify.with.gspar()}}, \code{\link[=sparsify.with.lspar]{sparsify.with.lspar()}}, \code{\link[=sparsify.with.simmelian]{sparsify.with.simmelian()}}, \code{\link[=sparsify.with.jaccard]{sparsify.with.jaccard()}}, \code{\link[=sparsify.with.meetmin]{sparsify.with.meetmin()}}, \code{\link[=sparsify.with.geometric]{sparsify.with.geometric()}}, \code{\link[=sparsify.with.hypergeometric]{sparsify.with.hypergeometric()}}, \code{\link[=sparsify.with.localdegree]{sparsify.with.localdegree()}}, \code{\link[=sparsify.with.quadrilateral]{sparsify.with.quadrilateral()}}.

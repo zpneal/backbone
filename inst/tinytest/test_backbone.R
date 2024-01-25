@@ -137,22 +137,22 @@ expect_equal(igraph::E(test)$sign, c(-1,-1,1,1))
 #### Bipartite Bipartite Models ####
 ## SDSM
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- sdsm(M, alpha = NULL, signed = TRUE)
+test <- sdsm(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
 expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm")
 expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)), info = "sdsm")
 expect_equal(test$model, "sdsm", info = "sdsm")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- sdsm(M, alpha = NULL, signed = FALSE)
+test <- sdsm(M, alpha = NULL, missing.as.zero = TRUE, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
-expect_equal(round(test$Pupper,3), rbind(c(.432,1,.549),c(1,.304,1),c(.549,1,.329)), info = "sdsm")
+expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm")
 expect_equal(test$model, "sdsm", info = "sdsm")
 
 ## FDSM
 set.seed(1)
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fdsm(M, trials = 1000, alpha = NULL, signed = TRUE, progress = FALSE)
+test <- fdsm(M, trials = 1000, alpha = NULL, missing.as.zero = TRUE, signed = TRUE, progress = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fdsm")
 expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)), info = "fdsm")
 expect_equal(round(test$Plower,3), rbind(c(1,.510,1),c(.51,1,.755),c(1,.755,1)), info = "fdsm")
@@ -160,49 +160,49 @@ expect_equal(test$model, "fdsm", info = "fdsm")
 
 set.seed(1)
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fdsm(M, trials = 1000, alpha = NULL, signed = FALSE, progress = FALSE)
+test <- fdsm(M, trials = 1000, alpha = NULL, missing.as.zero = TRUE, signed = FALSE, progress = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fdsm")
 expect_equal(round(test$Pupper,3), rbind(c(1,1,.265),c(1,1,1),c(.265,1,1)), info = "fdsm")
 expect_equal(test$model, "fdsm", info = "fdsm")
 
 ## FIXEDFILL
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedfill(M, alpha = NULL, signed = TRUE)
+test <- fixedfill(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedfill")
 expect_equal(round(test$Pupper,3), rbind(c(.004,1,.173),c(1,.732,1),c(.173,1,.173)), info = "fixedfill")
 expect_equal(round(test$Plower,3), rbind(c(1,.268,.996),c(.268,.827,.268),c(.996,.268,.996)), info = "fixedfill")
 expect_equal(test$model, "fixedfill", info = "fixedfill")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedfill(M, alpha = NULL, signed = FALSE)
+test <- fixedfill(M, alpha = NULL, missing.as.zero = TRUE, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fixedfill")
 expect_equal(round(test$Pupper,3), rbind(c(.004,1,.173),c(1,.732,1),c(.173,1,.173)), info = "fixedfill")
 expect_equal(test$model, "fixedfill", info = "fixedfill")
 
 ## FIXEDROW
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedrow(M, alpha = NULL, signed = TRUE)
+test <- fixedrow(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedrow")
 expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow")
 expect_equal(round(test$Plower,3), rbind(c(1,.25,1),c(.25,1,.5),c(1,.5,1)), info = "fixedrow")
 expect_equal(test$model, "fixedrow", info = "fixedrow")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedrow(M, alpha = NULL, signed = FALSE)
+test <- fixedrow(M, alpha = NULL, missing.as.zero = TRUE, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fixedrow")
 expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow")
 expect_equal(test$model, "fixedrow", info = "fixedrow")
 
 ## FIXEDCOL
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedcol(M, alpha = NULL, signed = TRUE)
+test <- fixedcol(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedcol")
 expect_equal(round(test$Pupper,3), rbind(c(.008,.975,.114),c(.975,.568,.975),c(.114,.975,.114)), info = "fixedcol")
 expect_equal(round(test$Plower,3), rbind(c(1,.432,.992),c(.432,.886,.432),c(.992,.432,.992)), info = "fixedcol")
 expect_equal(test$model, "fixedcol", info = "fixedcol")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
-test <- fixedcol(M, alpha = NULL, signed = FALSE)
+test <- fixedcol(M, alpha = NULL, missing.as.zero = TRUE, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fixedcol")
 expect_equal(round(test$Pupper,3), rbind(c(.008,.975,.114),c(.975,.568,.975),c(.114,.975,.114)), info = "fixedcol")
 expect_equal(test$model, "fixedcol", info = "fixedcol")
@@ -213,12 +213,33 @@ expect_equal(test$model, "fixedcol", info = "fixedcol")
 #### Weighted Unipartite Models ####
 ## DISPARITY
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1),c(1,1,0,1))
-test <- disparity(M, alpha = NULL, signed = TRUE)
+test <- disparity(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M, info = "disparity")
 expect_equal(round(test$Pupper,3), rbind(c(.444,1,.444,.444),c(1,.5,1,1),c(.444,1,1,.444),c(.444,.444,1,.444)), info = "disparity")
-expect_equal(round(test$Plower,3), rbind(c(.556,1,.556,.556),c(1,.5,1,1),c(.556,1,1,.556),c(.556,.556,1,.556)), info = "disparity")
+expect_equal(round(test$Plower,3), rbind(c(.556,0,.556,.556),c(0,.5,0,0),c(.556,0,0,.556),c(.556,.556,0,.556)), info = "disparity")
 expect_equal(test$model, "disparity", info = "disparity")
 
+## MAXIMUM LIKELIHOOD FILTER
+M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1),c(1,1,0,1))
+test <- mlf(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
+expect_equal(test$G, M, info = "MLF")
+expect_equal(round(test$Pupper,3), rbind(c(.654,1,.288,.654),c(1,.201,1,1),c(.5,1,1,.5),c(.654,.5,1,.654)), info = "MLF")
+expect_equal(round(test$Plower,3), rbind(c(.736,.5,.958,.736),c(.712,.98,.894,.712),c(.860,.634,.799,.860),c(.736,.86,.712,.736)), info = "MLF")
+expect_equal(test$model, "mlf", info = "MLF")
+
+## LOCAL ADAPTIVE SPARSIFICATION NETWOKR
+M <- net <- matrix(c(0,2,2,2,2,
+                     2,0,1,1,0,
+                     2,1,0,0,1,
+                     2,1,0,0,1,
+                     2,0,1,1,0),5,5)
+test <- lans(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
+expect_equal(test$G, M, info = "LANS")
+expect_equal(round(test$Pupper,3), rbind(c(1,0,0,0,0),c(0,1,.333,.333,1),c(0,.333,1,1,.333),c(0,.333,1,1,.333),c(0,1,.333,.333,1)), info = "LANS")
+expect_equal(round(test$Plower,3), rbind(c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0)), info = "LANS")
+expect_equal(test$model, "lans", info = "LANS")
+
+## GLOBAL
 M <- rbind(c(0,2,3,4),c(1,0,5,2),c(8,2,0,2),c(1,7,2,0))
 test <- global(M, upper = 5, lower = 2)
 expect_equal(test, rbind(c(0,0,0,0), c(-1,0,0,0), c(1,0,0,0), c(-1,1,0,0)), info = "global threshold")

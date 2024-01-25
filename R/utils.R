@@ -68,7 +68,10 @@ tomatrix <- function(graph){
   #### Convert from igraph ####
   if (methods::is(graph, "igraph")) {
     class <- "igraph"
-    graph <- igraph::simplify(graph) #Remove any multi-edges and loops
+
+    if (("weight" %in% igraph::edge_attr_names(graph)) & igraph::any_multiple(graph)) {stop("A weighted igraph cannot contain multi-edges.")}
+    if (!("weight" %in% igraph::edge_attr_names(graph)) & igraph::any_multiple(graph)) {igraph::E(graph)$weight <- 1}  #If unweighted with multi-edges, give each edge a weight of 1
+    graph <- igraph::simplify(graph, edge.attr.comb = "sum") #Remove any loops, and sum multi-edges into a weight attribute
 
     ## For bipartite inputs
     if (igraph::is.bipartite(graph) == TRUE){
@@ -149,4 +152,37 @@ frommatrix <- function(mat, attribs = NA, convert = "matrix"){
   }
 
   return(G)
+}
+
+#' Estimate number of monte carlo trials needed to estimate p-value
+#'
+#' `trials.needed` estimates the number of monte carlo trials needed to estimate edgewise p-values
+#'
+#' @param M matrix: An adjacency matrix representing a network from which a backbone is is being extracted
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param how.close real: How close can the empirical p-value be to alpha and still be distinguishable, expressed as a proportion
+#'
+#' @return integer
+#' @keywords internal
+trials.needed <- function(M, alpha, signed, missing.as.zero, mtc, how.close = 0.95) {
+  #In signed network, empirical p-value is compared to alpha/2
+  if (signed == TRUE) {test.alpha <- alpha / 2} else {test.alpha <- alpha}
+
+  #If a multiple test correction will be performed, conservatively adjust alpha using Bonferroni (i.e., based on number of tests performed)
+  if (mtc != "none") {
+    if (isSymmetric(M) & !missing.as.zero) {tests <- sum(lower.tri(M) & M!=0)}  #Non-zero entries in lower triangle
+    if (isSymmetric(M) & missing.as.zero) {tests <- sum(lower.tri(M))}  #Entries in lower triangle
+    if (!isSymmetric(M) & !missing.as.zero) {tests <- sum(lower.tri(M) & M!=0) + sum(upper.tri(M) & M!=0)}  #Non-zero entries in lower and upper triangles
+    if (!isSymmetric(M) & missing.as.zero) {tests <- nrow(M)^2 - nrow(M)}  #Entries in upper and lower triangle
+    test.alpha <- test.alpha / tests
+  }
+
+  #p1 = A close-to-alpha hypothetical empirical monte carlo p-value we want to evaluate
+  #p2 = The alpha level against which we are evaluating p1, with any one-tailed or mtc adjustments
+  #Because type-I errors (a false edge is included in the backbone) is as bad as type-II errors (a true edge is omitted from the backbone), therefore power = alpha
+  trials <- ceiling((stats::power.prop.test(p1 = test.alpha * how.close, p2 = test.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
+  return(trials)
 }
