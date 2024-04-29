@@ -8,7 +8,7 @@
 #'    \itemize{
 #'    \item For weighted bipartite projections of weighted bipartite networks: [osdsm()].
 #'    \item For weighted bipartite projections of binary bipartite networks: [fixedfill()], [fixedrow()], [fixedcol()], [sdsm()], and [fdsm()].
-#'    \item For non-projection weighted networks: [global()], [disparity()].
+#'    \item For non-projection weighted networks: [global()], [disparity()], [mlf()], [lans()].
 #'    \item For unweighted networks: [sparsify()], [sparsify.with.skeleton()], [sparsify.with.gspar()], [sparsify.with.lspar()], [sparsify.with.simmelian()], [sparsify.with.jaccard()], [sparsify.with.meetmin()], [sparsify.with.geometric()], [sparsify.with.hypergeometric()], [sparsify.with.localdegree()], [sparsify.with.quadrilateral()].
 #'    \item For all networks: [backbone.suggest()] will examine the data and suggest an appropriate backbone function
 #'    }
