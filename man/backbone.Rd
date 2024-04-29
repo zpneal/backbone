@@ -14,7 +14,7 @@ Available backbone extraction functions include:
 \itemize{
 \item For weighted bipartite projections of weighted bipartite networks: \code{\link[=osdsm]{osdsm()}}.
 \item For weighted bipartite projections of binary bipartite networks: \code{\link[=fixedfill]{fixedfill()}}, \code{\link[=fixedrow]{fixedrow()}}, \code{\link[=fixedcol]{fixedcol()}}, \code{\link[=sdsm]{sdsm()}}, and \code{\link[=fdsm]{fdsm()}}.
-\item For non-projection weighted networks: \code{\link[=global]{global()}}, \code{\link[=disparity]{disparity()}}.
+\item For non-projection weighted networks: \code{\link[=global]{global()}}, \code{\link[=disparity]{disparity()}}, \code{\link[=mlf]{mlf()}}, \code{\link[=lans]{lans()}}.
 \item For unweighted networks: \code{\link[=sparsify]{sparsify()}}, \code{\link[=sparsify.with.skeleton]{sparsify.with.skeleton()}}, \code{\link[=sparsify.with.gspar]{sparsify.with.gspar()}}, \code{\link[=sparsify.with.lspar]{sparsify.with.lspar()}}, \code{\link[=sparsify.with.simmelian]{sparsify.with.simmelian()}}, \code{\link[=sparsify.with.jaccard]{sparsify.with.jaccard()}}, \code{\link[=sparsify.with.meetmin]{sparsify.with.meetmin()}}, \code{\link[=sparsify.with.geometric]{sparsify.with.geometric()}}, \code{\link[=sparsify.with.hypergeometric]{sparsify.with.hypergeometric()}}, \code{\link[=sparsify.with.localdegree]{sparsify.with.localdegree()}}, \code{\link[=sparsify.with.quadrilateral]{sparsify.with.quadrilateral()}}.
 \item For all networks: \code{\link[=backbone.suggest]{backbone.suggest()}} will examine the data and suggest an appropriate backbone function
 }
