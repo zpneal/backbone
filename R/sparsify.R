@@ -116,7 +116,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
     D <- nrow(G) - tcrossprod((!G)*1)  #Intersection of neighborhoods
     D <- D - 2  #Exclude focal nodes from denominator
     G <- N/D  #Jaccard coefficient
-    G[is.nan(G)] <- 0  #Fix any divide-by-zero
+    G[G==Inf | is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original  #Keep coefficient only for present edges
   }
 
@@ -128,7 +128,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
     D[upper.tri(D)] <- t(D)[upper.tri(D)]
     D <- D - 2  #Exclude focal nodes from denominator
     G <- (2*N)/D  #Dice coefficient
-    G[is.nan(G)] <- 0  #Fix any divide-by-zero
+    G[G==Inf | is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original  #Keep coefficient only for present edges
   }
 
@@ -148,7 +148,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
   if (escore == "quadrilateral embeddedness") {  #G already contains the number of quadrangles per edge
     denominator <- sqrt(rowSums(G)%*%t(colSums(G)))
     G <- (G / denominator) * original
-    G[is.nan(G)] <- 0  #Fix any divide-by-zero
+    G[G==Inf | is.nan(G)] <- 0  #Fix any divide-by-zero
   }
 
   #Degree of alter, from Hamann et al. (2016)
@@ -170,7 +170,7 @@ sparsify <- function(U, s, escore, normalize, filter, symmetrize = TRUE, umst = 
     N <- tcrossprod(G)^2  #Shared neighbors, squared
     D <- rowSums(G)%*%t(rowSums(G))
     G <- N/D  #Geometric score
-    G[is.nan(G)] <- 0  #Fix any divide-by-zero
+    G[G==Inf | is.nan(G)] <- 0  #Fix any divide-by-zero
     G <- G * original
   }
 
