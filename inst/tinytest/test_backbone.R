@@ -126,12 +126,11 @@ M <- rbind(c(-1,-1,1),c(0,0,0),c(1,0,0))
 attrib <- data.frame(name = c("A", "B", "C"), gender = c("M", "F", "F"))
 test <- backbone:::frommatrix(M, attribs = attrib, convert = "igraph")
 expect_true(methods::is(test,"igraph"), info = "convert to igraph")
-expect_equal(igraph::as_adjacency_matrix(test, sparse = F, attr = 'weight'),
+expect_equal(igraph::as_adjacency_matrix(test, sparse = F, attr = 'sign'),
              matrix(c(-1,0,1,-1,0,0,1,0,0),3,3,dimnames=list(c("A","B","C"),c("A","B","C"))),
              info = "convert to igraph")
 expect_equal(igraph::V(test)$name, c("A", "B", "C"))
 expect_equal(igraph::V(test)$gender, c("M", "F", "F"))
-expect_equal(igraph::E(test)$weight, c(-1,-1,1,1))
 expect_equal(igraph::E(test)$sign, c(-1,-1,1,1))
 
 #### Bipartite Bipartite Models ####
