@@ -140,7 +140,11 @@ frommatrix <- function(mat, attribs = NA, convert = "matrix"){
   if (convert == "igraph"){
     if (isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "undirected", weighted = TRUE)}
     if (!isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "directed", weighted = TRUE)}
-    if (igraph::gsize(G)!=0) {igraph::E(G)$sign <- igraph::E(G)$weight}  #To facilitate use with library(signnet)
+    if (igraph::gsize(G)!=0) {  #If backbone is signed, put signs in `sign` attribute to facilitate analysis with library(signnet)
+      if (any(igraph::E(G)$weight==-1)) {igraph::E(G)$sign <- igraph::E(G)$weight}
+        G <- igraph::delete_edge_attr(G, "weight")
+        }
+      }
 
     if (!is.null(attribs)) {  #If attributes are supplied, add them to the igraph object
       attribs.to.add <- colnames(attribs)
@@ -149,10 +153,8 @@ frommatrix <- function(mat, attribs = NA, convert = "matrix"){
       }
     }
 
-  }
-
   return(G)
-}
+  }
 
 #' Estimate number of monte carlo trials needed to estimate p-value
 #'
