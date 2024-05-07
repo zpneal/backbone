@@ -81,7 +81,7 @@ expect_equal(test$summary$class,"igraph", info = "bipartite igraph")
 expect_true(test$summary$bipartite, info = "bipartite igraph")
 expect_false(test$summary$symmetric, info = "bipartite igraph")
 expect_true(test$summary$weighted, info = "bipartite igraph")
-expect_equal(test$G,igraph::as_incidence_matrix(M, sparse = F, attr = 'weight'), info = "bipartite igraph")
+expect_equal(test$G,igraph::as_biadjacency_matrix(M, sparse = F, attr = 'weight'), info = "bipartite igraph")
 expect_equal(as.vector(test$attribs$names),LETTERS[1:10], info = "bipartite igraph")
 
 ## TOMATRIX: convert from edgelist
