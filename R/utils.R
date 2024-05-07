@@ -132,14 +132,14 @@ frommatrix <- function(mat, attribs = NA, convert = "matrix"){
   if (convert == "Matrix"){G <- Matrix::Matrix(mat)}
 
   if (convert == "edgelist"){
-    if (isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "undirected", weighted = TRUE)}
-    if (!isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "directed", weighted = TRUE)}
+    if (isSymmetric(mat)) {G <- igraph::graph_from_adjacency_matrix(mat, mode = "undirected", weighted = TRUE)}
+    if (!isSymmetric(mat)) {G <- igraph::graph_from_adjacency_matrix(mat, mode = "directed", weighted = TRUE)}
     G <- igraph::as_data_frame(G, what = "edges")
   }
 
   if (convert == "igraph"){
-    if (isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "undirected", weighted = TRUE)}
-    if (!isSymmetric(mat)) {G <- igraph::graph.adjacency(mat, mode = "directed", weighted = TRUE)}
+    if (isSymmetric(mat)) {G <- igraph::graph_from_adjacency_matrix(mat, mode = "undirected", weighted = TRUE)}
+    if (!isSymmetric(mat)) {G <- igraph::graph_from_adjacency_matrix(mat, mode = "directed", weighted = TRUE)}
     if (igraph::gsize(G)!=0) {  #If backbone is signed, put signs in `sign` attribute to facilitate analysis with library(signnet)
       if (any(igraph::E(G)$weight==-1)) {igraph::E(G)$sign <- igraph::E(G)$weight}
         G <- igraph::delete_edge_attr(G, "weight")
