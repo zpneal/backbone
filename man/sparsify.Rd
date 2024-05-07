@@ -84,7 +84,7 @@ Specific combinations of \code{escore}, \code{normalize}, \code{filter}, and \co
 See the documentation for these wrapper functions for more details and the associated citation.
 }
 \examples{
-U <- igraph::sbm.game(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
+U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
 plot(U) #A hairball
 sparse <- sparsify(U, s = 0.6, escore = "jaccard", normalize = "rank",
 filter = "degree", narrative = TRUE)
