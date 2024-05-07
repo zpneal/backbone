@@ -139,14 +139,14 @@ expect_equal(igraph::E(test)$sign, c(-1,-1,1,1))
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
 test <- sdsm(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
-expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm")
-expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)), info = "sdsm")
+expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm", check.attributes = FALSE)
+expect_equal(round(test$Plower,3), rbind(c(.909,.354,.844),c(.354,.954,.476),c(.844,.476,.942)), info = "sdsm", check.attributes = FALSE)
 expect_equal(test$model, "sdsm", info = "sdsm")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
 test <- sdsm(M, alpha = NULL, missing.as.zero = TRUE, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "sdsm")
-expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm")
+expect_equal(round(test$Pupper,3), rbind(c(.432,.977,.549),c(.977,.304,.972),c(.549,.972,.329)), info = "sdsm", check.attributes = FALSE)
 expect_equal(test$model, "sdsm", info = "sdsm")
 
 ## FDSM
@@ -183,14 +183,14 @@ expect_equal(test$model, "fixedfill", info = "fixedfill")
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
 test <- fixedrow(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M%*%t(M), info = "fixedrow")
-expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow")
-expect_equal(round(test$Plower,3), rbind(c(1,.25,1),c(.25,1,.5),c(1,.5,1)), info = "fixedrow")
+expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow", check.attributes = FALSE)
+expect_equal(round(test$Plower,3), rbind(c(1,.25,1),c(.25,1,.5),c(1,.5,1)), info = "fixedrow", check.attributes = FALSE)
 expect_equal(test$model, "fixedrow", info = "fixedrow")
 
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1))
 test <- fixedrow(M, alpha = NULL, missing.as.zero = TRUE, signed = FALSE)
 expect_equal(test$G, M%*%t(M), info = "fixedrow")
-expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow")
+expect_equal(round(test$Pupper,3), rbind(c(.25,1,.5),c(1,.25,1),c(.5,1,.167)), info = "fixedrow", check.attributes = FALSE)
 expect_equal(test$model, "fixedrow", info = "fixedrow")
 
 ## FIXEDCOL
@@ -223,11 +223,11 @@ expect_equal(test$model, "disparity", info = "disparity")
 M <- rbind(c(1,0,1,1),c(0,1,0,0),c(1,0,0,1),c(1,1,0,1))
 test <- mlf(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M, info = "MLF")
-expect_equal(round(test$Pupper,3), rbind(c(.654,1,.288,.654),c(1,.201,1,1),c(.5,1,1,.5),c(.654,.5,1,.654)), info = "MLF")
-expect_equal(round(test$Plower,3), rbind(c(.736,.5,.958,.736),c(.712,.98,.894,.712),c(.860,.634,.799,.860),c(.736,.86,.712,.736)), info = "MLF")
+expect_equal(round(test$Pupper,3), rbind(c(.654,1,.288,.654),c(1,.201,1,1),c(.5,1,1,.5),c(.654,.5,1,.654)), info = "MLF", check.attributes = FALSE)
+expect_equal(round(test$Plower,3), rbind(c(.736,.5,.958,.736),c(.712,.98,.894,.712),c(.860,.634,.799,.860),c(.736,.86,.712,.736)), info = "MLF", check.attributes = FALSE)
 expect_equal(test$model, "mlf", info = "MLF")
 
-## LOCAL ADAPTIVE SPARSIFICATION NETWOKR
+## LOCAL ADAPTIVE NETWORK SPARSIFICATION
 M <- net <- matrix(c(0,2,2,2,2,
                      2,0,1,1,0,
                      2,1,0,0,1,
@@ -235,8 +235,8 @@ M <- net <- matrix(c(0,2,2,2,2,
                      2,0,1,1,0),5,5)
 test <- lans(M, alpha = NULL, missing.as.zero = TRUE, signed = TRUE)
 expect_equal(test$G, M, info = "LANS")
-expect_equal(round(test$Pupper,3), rbind(c(1,0,0,0,0),c(0,1,.333,.333,1),c(0,.333,1,1,.333),c(0,.333,1,1,.333),c(0,1,.333,.333,1)), info = "LANS")
-expect_equal(round(test$Plower,3), rbind(c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0)), info = "LANS")
+expect_equal(round(test$Pupper,3), rbind(c(1,0,0,0,0),c(0,1,.333,.333,1),c(0,.333,1,1,.333),c(0,.333,1,1,.333),c(0,1,.333,.333,1)), info = "LANS", check.attributes = FALSE)
+expect_equal(round(test$Plower,3), rbind(c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0),c(0,0,0,0,0)), info = "LANS", check.attributes = FALSE)
 expect_equal(test$model, "lans", info = "LANS")
 
 ## GLOBAL
