@@ -91,7 +91,7 @@ sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 
   #### Compute p-values (for unsigned backbone, ignore lower-tail p-values) ####
   if (!signed) {
-    Pupper <- matrix(NA, nrow(P), ncol(P))  #Set upper-tail p-value to NA initially
+    Pupper <- matrix(NA, nrow(P), ncol(P), dimnames = list(rownames(P),colnames(P)))  #Set upper-tail p-value to NA initially
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
 
@@ -112,8 +112,8 @@ sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 
   #### Compute p-values (for signed backbone) ####
   if (signed) {
-    Pupper <- matrix(NA, nrow(P), ncol(P))
-    Plower <- matrix(NA, nrow(P), ncol(P))
+    Pupper <- matrix(NA, nrow(P), ncol(P), dimnames = list(rownames(P),colnames(P)))  #Set upper-tail p-value to NA initially
+    Plower <- matrix(NA, nrow(P), ncol(P), dimnames = list(rownames(P),colnames(P)))  #Set lower-tail p-value to NA initially
     for (col in 1:ncol(P)) {  #Loop over lower triangle
       for (row in col:nrow(P)) {
 

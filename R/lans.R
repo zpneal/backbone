@@ -73,8 +73,8 @@ lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
   }
 
   #### Compute p-values ####
-  Pupper <- matrix(NA, nrow(G), ncol(G))
-  if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
+  Pupper <- matrix(NA, nrow(G), ncol(G), dimnames = list(rownames(G),colnames(G)))
+  if (signed) {Plower <- matrix(NA, nrow(G), ncol(G), dimnames = list(rownames(G),colnames(G)))}
   p_ij <- G / rowSums(G)  #Fractional edge weight from i to j
   for (row in 1:nrow(p_ij)) {Pupper[row,] <- 1 - unlist(lapply(p_ij[row,], function(i) sum(p_ij[row,] <= i & p_ij[row,]!=0))) / sum(p_ij[row,]!=0)}
   if (signed) {for (row in 1:nrow(p_ij)) {Plower[row,] <- 1 - unlist(lapply(p_ij[row,], function(i) sum(p_ij[row,] >= i & p_ij[row,]!=0))) / sum(p_ij[row,]!=0)}}

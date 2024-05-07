@@ -89,11 +89,11 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 
   ### Compute p-values ####
   df$upper <- stats::phyper(df$projvalue-1, df$row_sum_i, df$diff, df$row_sum_j, lower.tail=FALSE)
-  Pupper <- matrix(as.numeric(df$upper), nrow = nrow(B), ncol = nrow(B))
+  Pupper <- matrix(as.numeric(df$upper), nrow = nrow(B), ncol = nrow(B), dimnames = list(rownames(P),colnames(P)))
 
   if (signed) {
     df$lower <- stats::phyper(df$projvalue, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
-    Plower <- matrix(as.numeric(df$lower), nrow = nrow(B), ncol = nrow(B))
+    Plower <- matrix(as.numeric(df$lower), nrow = nrow(B), ncol = nrow(B), dimnames = list(rownames(P),colnames(P)))
   }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####

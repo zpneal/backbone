@@ -85,8 +85,8 @@ osdsm <- function(B, alpha = 0.05, trials = NULL, missing.as.zero = FALSE, signe
   P <- tcrossprod(B)
 
   ### Create Positive and Negative Matrices to hold backbone ###
-  Pupper <- matrix(0, nrow(P), ncol(P))
-  if (signed) {Plower <- matrix(0, nrow(P), ncol(P))}
+  Pupper <- matrix(0, nrow(P), ncol(P), dimnames = list(rownames(P),colnames(P)))
+  if (signed) {Plower <- matrix(0, nrow(P), ncol(P), dimnames = list(rownames(P),colnames(P)))}
 
   #### Compute probabilities for SDSM ####
   #Vectorize the bipartite data
