@@ -93,8 +93,8 @@
 #' Given a binary matrix **M**, the Bipartite Configuration Model (BiCM; Saracco et. al. 2015) returns a valued matrix
 #'    **B** in which Bij is the *approximate* probability that Mij = 1 in the space of all binary matrices with
 #'    the same row and column marginals as **M**. The BiCM yields the closest approximations of the true probabilities
-#'    compared to other estimation methods (Neal et al., 2021), and is used by [sdsm()] to extract the backbone of
-#'    a bipartite projection using the stochastic degree sequence model.
+#'    compared to other estimation methods (Neal et al., 2021), and is used to extract the backbone of a bipartite
+#'    projection with the stochastic degree sequence model.
 #'
 #' Matrix **M** is "conforming" if no rows and no columns contain only zeros or only ones. If **M** is conforming, then
 #'   `bicm()` is faster. Additionally, if `fitness = TRUE`, then `bicm()` returns a list of row and column fitnesses,
