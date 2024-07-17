@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 3.0.0
+
+* TBD
+
 ## backbone 2.1.4
 
 * updated depricated `igraph` functions
