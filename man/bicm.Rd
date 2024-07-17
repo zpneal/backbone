@@ -27,8 +27,8 @@ a matrix of probabilities or a list of fitnesses
 Given a binary matrix \strong{M}, the Bipartite Configuration Model (BiCM; Saracco et. al. 2015) returns a valued matrix
 \strong{B} in which Bij is the \emph{approximate} probability that Mij = 1 in the space of all binary matrices with
 the same row and column marginals as \strong{M}. The BiCM yields the closest approximations of the true probabilities
-compared to other estimation methods (Neal et al., 2021), and is used by \code{\link[=sdsm]{sdsm()}} to extract the backbone of
-a bipartite projection using the stochastic degree sequence model.
+compared to other estimation methods (Neal et al., 2021), and is used to extract the backbone of a bipartite
+projection with the stochastic degree sequence model.
 
 Matrix \strong{M} is "conforming" if no rows and no columns contain only zeros or only ones. If \strong{M} is conforming, then
 \code{bicm()} is faster. Additionally, if \code{fitness = TRUE}, then \code{bicm()} returns a list of row and column fitnesses,
