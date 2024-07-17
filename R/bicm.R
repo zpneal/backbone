@@ -4,8 +4,8 @@
 #' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
 #'
 #' @return loglikelihood
-#' @keywords internal
-loglikelihood_prime_bicm <- function(x0, args){
+#' @noRd
+.loglikelihood_prime_bicm <- function(x0, args){
   r_dseq_rows <- args[[1]]
   r_dseq_cols <- args[[2]]
   rows_multiplicity = args[[3]]
@@ -27,15 +27,14 @@ loglikelihood_prime_bicm <- function(x0, args){
   return(c)
 }
 
-
 #' Computes the loglikelihood hessian for the \link{bicm} function
 #'
 #' @param x0 vector, probabilities given by current step in bicm function
 #' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
 #'
 #' @return hessian matrix
-#' @keywords internal
-loglikelihood_hessian_diag_bicm <- function(x0, args){
+#' @noRd
+.loglikelihood_hessian_diag_bicm <- function(x0, args){
   r_dseq_rows <- args[[1]]
   r_dseq_cols <- args[[2]]
   rows_multiplicity = args[[3]]
@@ -65,8 +64,8 @@ loglikelihood_hessian_diag_bicm <- function(x0, args){
 #' @param args list, c(degree sequence of rows, degree sequence of cols, multiplicity of rows, multiplicity of columns)
 #'
 #' @return loglikelihood, numeric
-#' @keywords internal
-loglikelihood_bicm <- function(x0, args){
+#' @noRd
+.loglikelihood_bicm <- function(x0, args){
   r_dseq_rows <- args[[1]] #originally 0, have to shift everything by 1
   r_dseq_cols <- args[[2]]
   rows_multiplicity = args[[3]]
@@ -87,7 +86,7 @@ loglikelihood_bicm <- function(x0, args){
 #' @param M matrix: a binary matrix
 #' @param fitness boolean: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only
 #' @param tol numeric, tolerance of algorithm
-#' @param max_steps numeric, number of times to run \link{loglikelihood_prime_bicm} algorithm
+#' @param max_steps numeric, number of times to run .loglikelihood_prime_bicm algorithm
 #' @param ... optional arguments
 #'
 #' @details
@@ -146,23 +145,23 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
     ## initialize problem
     args = list(r_rows_deg, r_cols_deg, rows_multiplicity, cols_multiplicity)
     n_steps <- 0
-    f_x <- loglikelihood_prime_bicm(x,args)
+    f_x <- .loglikelihood_prime_bicm(x,args)
     norm <- norm(as.matrix(f_x), type = "F")
     diff <- 1
 
     ## solve problem
     while ((norm > tol) & (diff > tol) & (n_steps < max_steps)){
       x_old <- x
-      B <- as.array(loglikelihood_hessian_diag_bicm(x,args))
+      B <- as.array(.loglikelihood_hessian_diag_bicm(x,args))
       dx <- -f_x/B
       alpha <- 1
       i <- 0
-      while ((!(-loglikelihood_bicm(x,args)>-loglikelihood_bicm(x + alpha * dx,args)))&(i<50)){
+      while ((!(-.loglikelihood_bicm(x,args)>-.loglikelihood_bicm(x + alpha * dx,args)))&(i<50)){
         alpha <- alpha*.5
         i <- i+1
       }#end while sdc
       x <- x+alpha*dx
-      f_x <- loglikelihood_prime_bicm(x,args)
+      f_x <- .loglikelihood_prime_bicm(x,args)
       norm <- norm(as.matrix(f_x), type = "F")
       diff <- norm(as.matrix(x-x_old), type = "F")
       n_steps <- n_steps + 1
@@ -262,24 +261,24 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
     ## initialize problem
     args = list(r_rows_deg, r_cols_deg, rows_multiplicity, cols_multiplicity)
     n_steps <- 0
-    f_x <- loglikelihood_prime_bicm(x,args)
+    f_x <- .loglikelihood_prime_bicm(x,args)
     norm <- norm(as.matrix(f_x), type = "F")
     diff <- 1
 
     ## solve problem
     while ((norm > tol) & (diff > tol) & (n_steps < max_steps)){
       x_old <- x
-      B <- as.array(loglikelihood_hessian_diag_bicm(x,args))
+      B <- as.array(.loglikelihood_hessian_diag_bicm(x,args))
       dx <- -f_x/B
       alpha <- 1
       i <- 0
-      while ((!(-loglikelihood_bicm(x,args)>-loglikelihood_bicm(x + alpha * dx,args)))&
+      while ((!(-.loglikelihood_bicm(x,args)>-.loglikelihood_bicm(x + alpha * dx,args)))&
              (i<50)){
         alpha <- alpha*.5
         i <- i+1
       }#end while sdc
       x <- x+alpha*dx
-      f_x <- loglikelihood_prime_bicm(x,args)
+      f_x <- .loglikelihood_prime_bicm(x,args)
       norm <- norm(as.matrix(f_x), type = "F")
       diff <- norm(as.matrix(x-x_old), type = "F")
       n_steps <- n_steps + 1
