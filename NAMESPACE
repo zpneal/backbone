@@ -2,5 +2,3 @@
 
 export(bicm)
 export(fastball)
-importFrom(Rcpp,sourceCpp)
-useDynLib(backbone, .registration = TRUE)
