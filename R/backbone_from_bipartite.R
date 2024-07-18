@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_bipartite} extracts the unweighted backbone from the weighted projection of a bipartite network.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object (see details)
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model. This must be one of: \code{"sdsm"}, \code{"sdsm-ec"} \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
@@ -28,8 +28,11 @@
 #' * \code{fdsm} - Exactly constrain the agent and artifact degrees
 #' 
 #' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
-#' bipartite network itself, and not the weighted projection. This is necessary because the models use information in the bipartite
-#' network that is missing in the projection.
+#' bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
+#' network that is missing from the projection. The nodes that should appear in the projection must be represented by rows if \code{B}
+#' is an incidence matrix, or \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
+#' must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when prohibited" edges can be represented with weight = 10
+#' and "required" edges can be represented with weight = 11.
 #'
 #' @return A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a matrix of edgewise p-values)
 #'
@@ -66,8 +69,11 @@ backbone_from_bipartite <- function(B,
   if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}}
 
   #Convert input to matrix
-  if (methods::is(B,"matrix")) {I <- B}
-  if (methods::is(B,"igraph")) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE)}
+  if (methods::is(B,"matrix")) {I <- B}  #matrix --> matrix
+  if (methods::is(B,"igraph")) {
+    if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE, attr = "weight")}  #weighted igraph --> weighted incidence
+    if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE)}  #unweighted igraph --> binary incidence
+  }
 
   #Check if input may be a weighted projection
   if (!all(I %in% c(0,1)) &    #The entries are not binary, and
