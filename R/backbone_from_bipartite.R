@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_bipartite} extracts the unweighted backbone from the weighted projection of a bipartite network.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix, a binary incidence \code{\link{Matrix}}, or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model. This must be onf of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
@@ -26,7 +26,7 @@
 #' * \code{sdsm} - Approximately constrain the agent and artifact degrees in \code{B} (the default)
 #' * \code{fdsm} - Exactly constrain the agent and artifact degrees in \code{B}
 #'
-#' @return A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a Matrix of edgewise p-values)
+#' @return A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a matrix of edgewise p-values)
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references models: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
@@ -55,25 +55,24 @@ backbone_from_bipartite <- function(B,
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
 
   #### Check and format input ####
-  #Check that input is matrix, Matrix, or igraph (and if igraph, that it is bipartite)
-  if (!methods::is(B,"matrix") & !methods::is(B,"Matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
+  #Check that input is matrix or igraph (and if igraph, that it is bipartite)
+  if (!methods::is(B,"matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
   if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}}
 
   #Convert input to sparse matrix
-  if (methods::is(B,"matrix")) {mat <- Matrix::Matrix(B)}
-  if (methods::is(B,"Matrix")) {mat <- B}
-  if (methods::is(B,"igraph")) {mat <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE)}
+  if (methods::is(B,"matrix")) {I <- B}
+  if (methods::is(B,"igraph")) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE)}
 
   #Check if input may be a weighted projection
-  if (!all(as.vector(mat) %in% c(0,1)) &    #The entries are not binary, and
-      Matrix::isSymmetric(mat) &            #The matrix is symmetric, and
-      all(as.vector(mat)%%1==0)) {          #The entries are all integers
+  if (!all(I %in% c(0,1)) &    #The entries are not binary, and
+      isSymmetric(I) &         #The matrix is symmetric, and
+      all(I%%1==0)) {          #The entries are all integers
       stop("`B` looks like it may be a weighted bipartite projection. The input to backbone_from_bipartite()
        must be the original bipartite network, not its weighted projection. If you only have the weighted
        bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
 
   #Check that input is binary
-  if (!all(as.vector(mat) %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
+  if (!all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
 
   #### Compute p-values ####
 
