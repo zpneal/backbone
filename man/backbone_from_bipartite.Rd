@@ -16,7 +16,7 @@ backbone_from_bipartite(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite network as a matrix, \code{\link{Matrix}}, or \code{\link{igraph}} object}
+\item{B}{An unweighted bipartite network as a binary incidence matrix, a binary incidence \code{\link{Matrix}}, or a binary bipartite \code{\link{igraph}} object}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -33,11 +33,33 @@ backbone_from_bipartite(
 \item{narrative}{boolean: display suggested text & citations}
 }
 \value{
-TBD
+A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a Matrix of edgewise p-values)
 }
 \description{
 \code{backbone_from_bipartite} extracts the unweighted backbone from the weighted projection of a bipartite network.
 }
+\details{
+The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network. The backbone is
+is unweighted network that contains only edges whose weights in the projection are statistically significant. When \code{signed = FALSE},
+the backbone contains edges that are statistically significantly strong under a one-tailed test. When \code{signed = TRUE},
+the backbone contains positive edges that are statistically significantly strong, and negative edges that are statistically
+significantly weak, under a two-tailed test.
+
+The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. Each null model
+imposes a unique set of constraints on \code{B} (Neal et al., 2021). In increasing order of constraints and computational complexity:
+\itemize{
+\item \code{fixedfill} - Exactly constrain the total number of edges in (i.e., sum of) \code{B}
+\item \code{fixedrow} - Exactly constrain the agent degrees in (i.e., row sums of) \code{B}
+\item \code{fixedcol} - Exactly constrain the artifact degrees in (i.e., column sums of) \code{B}
+\item \code{sdsm} - Approximately constrain the agent and artifact degrees in \code{B} (the default)
+\item \code{fdsm} - Exactly constrain the agent and artifact degrees in \code{B}
+}
+}
 \examples{
 #TBD
+}
+\references{
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+
+models: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
 }
