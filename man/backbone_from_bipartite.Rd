@@ -16,7 +16,7 @@ backbone_from_bipartite(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite network as a binary incidence matrix, a binary incidence \code{\link{Matrix}}, or a binary bipartite \code{\link{igraph}} object}
+\item{B}{An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -33,7 +33,7 @@ backbone_from_bipartite(
 \item{narrative}{boolean: display suggested text & citations}
 }
 \value{
-A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a Matrix of edgewise p-values)
+A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a matrix of edgewise p-values)
 }
 \description{
 \code{backbone_from_bipartite} extracts the unweighted backbone from the weighted projection of a bipartite network.
