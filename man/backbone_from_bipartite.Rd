@@ -20,7 +20,7 @@ backbone_from_bipartite(
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
-\item{model}{string: backbone model. This must be onf of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}}
+\item{model}{string: backbone model. This must be one of: \code{"sdsm"}, \code{"sdsm-ec"} \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}}
 
 \item{signed}{boolean: return a signed backbone}
 
@@ -48,12 +48,17 @@ significantly weak, under a two-tailed test.
 The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. Each null model
 imposes a unique set of constraints on \code{B} (Neal et al., 2021). In increasing order of constraints and computational complexity:
 \itemize{
-\item \code{fixedfill} - Exactly constrain the total number of edges in (i.e., sum of) \code{B}
-\item \code{fixedrow} - Exactly constrain the agent degrees in (i.e., row sums of) \code{B}
-\item \code{fixedcol} - Exactly constrain the artifact degrees in (i.e., column sums of) \code{B}
-\item \code{sdsm} - Approximately constrain the agent and artifact degrees in \code{B} (the default)
-\item \code{fdsm} - Exactly constrain the agent and artifact degrees in \code{B}
+\item \code{fixedfill} - Exactly constrain the total number of edges (i.e., sum)
+\item \code{fixedrow} - Exactly constrain the agent degrees (i.e., row sums)
+\item \code{fixedcol} - Exactly constrain the artifact degrees (i.e., column sums)
+\item \code{sdsm} - Approximately constrain the agent and artifact degrees (the default)
+\item \code{sdsm-ec} - Approximately constrain the agent and artifact degrees, and exactly constrain edges that are prohibited (weight = 10) or required (weight = 11)
+\item \code{fdsm} - Exactly constrain the agent and artifact degrees
 }
+
+Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
+bipartite network itself, and not the weighted projection. This is necessary because the models use information in the bipartite
+network that is missing in the projection.
 }
 \examples{
 #TBD
@@ -61,5 +66,7 @@ imposes a unique set of constraints on \code{B} (Neal et al., 2021). In increasi
 \references{
 package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-models: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
+sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. \emph{International Conference on Complex Networks and Their Applications, 12}, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
+
+all other models: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. \emph{Scientific Reports, 11}, 23929. \doi{10.1038/s41598-021-03238-3}}
 }
