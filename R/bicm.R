@@ -211,8 +211,8 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
         r_bipart <- r_bipart[, -zero_cols]
         good_cols <- good_cols[-zero_cols]
       }
-      full_rows = which(Matrix::rowSums(r_bipart) == dim(r_bipart)[2])
-      full_cols = which(Matrix::colSums(r_bipart) == dim(r_bipart)[1])
+      full_rows = which(rowSums(r_bipart) == dim(r_bipart)[2])
+      full_cols = which(colSums(r_bipart) == dim(r_bipart)[1])
       num_full_rows = num_full_rows + length(full_rows)
       num_full_cols = num_full_cols + length(full_cols)
       probs[good_rows[full_rows],good_cols] <- 1
@@ -225,8 +225,8 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
         good_cols <- good_cols[-full_cols]
         r_bipart <- r_bipart[,-full_cols]
       }
-      zero_rows <- which(Matrix::rowSums(r_bipart) == 0)
-      zero_cols <- which(Matrix::colSums(r_bipart) == 0)
+      zero_rows <- which(rowSums(r_bipart) == 0)
+      zero_cols <- which(colSums(r_bipart) == 0)
     } #end while
     nonfixed_rows = good_rows
     fixed_rows = seq(1,n_rows)[-good_rows]
