@@ -16,7 +16,7 @@ backbone_from_bipartite(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object}
+\item{B}{An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object (see details)}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -57,8 +57,11 @@ imposes a unique set of constraints on \code{B} (Neal et al., 2021). In increasi
 }
 
 Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
-bipartite network itself, and not the weighted projection. This is necessary because the models use information in the bipartite
-network that is missing in the projection.
+bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
+network that is missing from the projection. The nodes that should appear in the projection must be represented by rows if \code{B}
+is an incidence matrix, or \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
+must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when prohibited" edges can be represented with weight = 10
+and "required" edges can be represented with weight = 11.
 }
 \examples{
 #TBD
