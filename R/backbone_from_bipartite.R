@@ -12,24 +12,24 @@
 #' @param narrative boolean: display suggested text & citations
 #'
 #' @details
-#' The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network. The backbone is
-#' is unweighted network that contains only edges whose weights in the projection are statistically significant. When \code{signed = FALSE},
-#' the backbone contains edges that are statistically significantly strong under a one-tailed test. When \code{signed = TRUE},
-#' the backbone contains positive edges that are statistically significantly strong, and negative edges that are statistically
-#' significantly weak, under a two-tailed test.
+#' The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
+#' nodes and *m* "artifact" nodes. The backbone is an unweighted unipartite network of agents that contains only edges whose weights
+#' in the projection are statistically significant. When \code{signed = FALSE}, the backbone contains edges that are statistically
+#' significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are statistically
+#' significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 #'
-#' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. Each null model
-#' imposes a unique set of constraints on \code{B} (Neal et al., 2021). In increasing order of constraints and computational complexity:
-#' * \code{fixedfill} - Exactly constrain the total number of edges (i.e., sum)
-#' * \code{fixedrow} - Exactly constrain the agent degrees (i.e., row sums)
-#' * \code{fixedcol} - Exactly constrain the artifact degrees (i.e., column sums)
-#' * \code{sdsm} - Approximately constrain the agent and artifact degrees (the default)
-#' * \code{sdsm-ec} - Approximately constrain the agent and artifact degrees, and exactly constrain edges that are prohibited (weight = 10) or required (weight = 11)
-#' * \code{fdsm} - Exactly constrain the agent and artifact degrees
+#' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights, each of which
+#' imposes a unique set of constraints on \code{B}:
+#' * \code{fixedfill} - Use the "fixed fill" model (Neal et al., 2021), which exactly constrains the total number of edges (i.e., sum)
+#' * \code{fixedrow} - Use the "fixed row" model (Neal et al., 2021), which exactly constrains the agent degrees (i.e., row sums)
+#' * \code{fixedcol} - Use the "fixed column" model (Neal et al., 2021), which exactly constrains the artifact degrees (i.e., column sums)
+#' * \code{sdsm} - Use the "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021), which pproximately constrains the agent and artifact degrees (the default)
+#' * \code{sdsm-ec} - Use the "SDSM with Edge Constraints" (Neal & Neal, 2023), which approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11)
+#' * \code{fdsm} - Use the "Fixed Degree Sequence Model" (Neal et al., 2021), which exactly constrain the agent and artifact degrees
 #' 
 #' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
 #' bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
-#' network that is missing from the projection. The nodes that should appear in the projection must be represented by rows if \code{B}
+#' network that is missing from the projection. The "agent" nodes that appear in the projection must be represented by rows if \code{B}
 #' is an incidence matrix, or \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
 #' must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when prohibited" edges can be represented with weight = 10
 #' and "required" edges can be represented with weight = 11.
