@@ -21,7 +21,7 @@
   probs <- lapply(seq_len(nrow(probs)), function(i) probs[i,])  #Store probabilities as list
 
   #### Compute p-values ####
-  upper <- matrix(NA, nrow(P), ncol(P))                #Set upper-tail p-value to NA initially
+  upper <- matrix(NA, nrow(P), ncol(P))                #Set upper-tail p-value to NA initially, untested edges have p = NA
   if (signed) {lower <- matrix(NA, nrow(P), ncol(P))}  #If signed, set lower-tail p-value to NA initially
 
   for (col in 1:ncol(P)) {  #Loop over lower triangle of projection
