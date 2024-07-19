@@ -9,6 +9,7 @@
 #' @param mtc string: type of Multiple Test Correction; can be either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing_as_zero boolean: treat missing edges be treated as edges with zero weight and test them for significance
 #' @param only_pvalues boolean: return only a matrix of edgewise p-values; all parameters except \code{model} are ignored
+#' @param trials integer: number of Monte Carlo trials used for FDSM (ignored if \code{model != "fdsm"})
 #' @param narrative boolean: display suggested text & citations
 #'
 #' @details
@@ -26,7 +27,7 @@
 #' * \code{sdsm} - Use the "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021), which pproximately constrains the agent and artifact degrees (the default)
 #' * \code{sdsm-ec} - Use the "SDSM with Edge Constraints" (Neal & Neal, 2023), which approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11)
 #' * \code{fdsm} - Use the "Fixed Degree Sequence Model" (Neal et al., 2021), which exactly constrain the agent and artifact degrees
-#' 
+#'
 #' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
 #' bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
 #' network that is missing from the projection. The "agent" nodes that appear in the projection must be represented by rows if \code{B}
@@ -51,6 +52,7 @@ backbone_from_bipartite <- function(B,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
                                     only_pvalues = FALSE,
+                                    trials = NULL,
                                     narrative = FALSE) {
 
   #### Check parameters ####
@@ -85,18 +87,57 @@ backbone_from_bipartite <- function(B,
 
   #Check that input is binary, or contains structural values and model=SDSM
   if (model!="sdsm-ec" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
-  
+
   if (model=="sdsm-ec" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
                                                           where required edges have weight 10 and prohibited edges have weight 11")}
-  
-  #### Compute p-values ####
 
+  #### Compute p-values ####
+  if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
 
   #### Retain edges ####
-
+  backbone <- .retain(p, signed, alpha, mtc)
 
   #### Display narrative ####
+  if (narrative) {
+  # First sentence (descriptive)
+  if (signed) {signed <- "signed"} else {signed <- "unweighted"}
 
+  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", signed, " backbone of the weighted projection of an unweighted bipartite network containing ", nrow(I), " agents and ", ncol(I), "artifacts.")
+
+  # Second sentence (model)
+  if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
+  if (mtc == "holm") {correction <- ", Holm adjusted"}
+  if (mtc == "hommel") {correction <- ", Hommel adjusted"}
+  if (mtc == "hochberg") {correction <- ", Hochberg adjusted"}
+  if (mtc == "BH" | mtc == "fdr") {correction <- ", Benjamini & Hochberg adjusted"}
+  if (mtc == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
+
+  if (model == "fixedfill") {desc <- "the fixed fill model (FFM; Neal, Domagalski, and Sagan, 2021)"}
+  if (model == "fixedrow") {desc <- "the fixed row model (FRM; Neal, Domagalski, and Sagan, 2021)"}
+  if (model == "fixedcol") {desc <- "the fixed column model (FCM; Neal, Domagalski, and Sagan, 2021)"}
+  if (model == "sdsm") {desc <- "the stochastic degree sequence model (SDSM; Neal, Domagalski, and Sagan, 2021)"}
+  if (model == "sdsm-ec") {desc <- "the stochastic degree sequence model with edge constraints (SDSM-EC; Neal & Neal, 2023)"}
+  if (model == "fdsm") {desc <- paste0("the fixed degree sequence model (FDSM; Neal, Domagalski, and Sagan, 2021), where p-values were estimated from ", trials, " Monte Carlo trials")}
+
+  text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ".")
+
+  # Third sentence (reduction)
+  old <- sum(p$upper!=0, na.rm=TRUE)  #Number of edges in projection (i.e., number of edges tested, and that have an upper-tail p-value)
+  new <- sum(backbone!=0)  #Number of edges in backbone
+  reduced_edges <- round(((old - new) / old)*100,2)
+
+  text <- paste0(text, " This reduced the number of edges by ", reduced_edges, "%.")
+
+  # Display
+  message("")
+  message("=== Suggested text and citations ===")
+  message(text)
+  message("")
+  message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
+  message("")
+  if (model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill")) {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
+  if (model == "sdsm-ec") {message("Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. International Conference on Complex Networks and Their Applications, 12, 127-136. https://doi.org/10.1007/978-3-031-53468-3_11")}
+  }
 
   #### Return backbone ####
 
