@@ -140,5 +140,23 @@ backbone_from_bipartite <- function(B,
   }
 
   #### Return backbone ####
+  if (methods::is(B,"matrix")) {
+    rownames(backbone) <- rownames(B)
+    colnames(backbone) <- rownames(B)
+    return(backbone)
+  }
+
+  if (methods::is(B,"igraph")) {
+    P <- igraph::bipartite_projection(B, which="false")  #Generate weighted projection, with any agent attributes
+    igraph::E(P)$oldweight <- igraph::E(P)$weight  #Save old edge weights
+    P <- igraph::delete_edge_attr(P, "weight")  #Delete weight attribute
+
+    backbone <- igraph::graph_from_adjacency_matrix(backbone, mode = "undirected", weighted = TRUE)  #Generate igraph backbone
+    backbone <- igraph::as_data_frame(backbone, what = "edges")  #Generate backbone edgelist
+
+    #==> Need to set a "weight" attribute in P for each edge listed in backbone
+
+    return(P)
+  }
 
 }
