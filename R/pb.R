@@ -14,7 +14,7 @@
 #' {Hong, Y. (2013). On computing the distribution function for the Poisson binomial distribution. *Computational Statistics and Data Analysis, 59*, 41-51. \doi{10.1016/j.csda.2012.10.006}}
 #'
 #' @noRd
-.pb <-function(k, p, lowertail=TRUE) {
+.pb <-function(k, p, lowertail) {
   #Compute parameters
   mu <- sum(p)
   pq <- p*(1-p)

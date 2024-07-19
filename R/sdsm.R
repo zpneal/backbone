@@ -13,7 +13,7 @@
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 #'
 #' @noRd
-.sdsm <- function(I, missing.as.zero = FALSE, signed = FALSE){
+.sdsm <- function(I, missing.as.zero, signed){
   
   P <- tcrossprod(I)  #Weighted bipartite projection
 
