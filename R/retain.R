@@ -5,75 +5,48 @@
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
 #'
-#' @return unweighted adjacency matrix
+#' @return unweighted (signed, if `signed = TRUE`) adjacency matrix
 #'
 #' @noRd
 .retain <- function(p, signed, alpha, mtc){
 
   #### Extract binary backbone (one-tailed test; only positively-weighed edges considered) ####
   if (!signed) {
-    diag(upper) <- NA  #Eliminate p-values for loops; not relevant
+    diag(p$upper) <- NA  #Eliminate p-values for loops; not relevant
 
     if (mtc != "none") {  #Adjust p-values for familywise error, if requested
-      if (isSymmetric(upper)) {upper[upper.tri(upper)] <- NA}  #If undirected, ignore upper triangle
-      p <- as.vector(upper)  #Vector of p-values
-      m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
-      upper <- matrix(p, nrow = nrow(upper), ncol = ncol(upper))  #Put adjusted p-values in original p-value matrix
-      if (all(is.na(upper[upper.tri(upper)]))) {upper[upper.tri(upper)] <- t(upper)[upper.tri(upper)]}  #If upper triangle is missing, put it back
+      if (isSymmetric(p$upper)) {p$upper[upper.tri(p$upper)] <- NA}  #If undirected, ignore upper triangle
+      pvalues <- as.vector(p$upper)  #Vector of p-values
+      pvalues <- stats::p.adjust(pvalues, method = mtc, n = sum(!is.na(pvalues)))  #Adjust p-values, where number of comparisons is number of non-missing p-values
+      upper <- matrix(pvalues, nrow = nrow(p$upper), ncol = ncol(p$upper))  #Put adjusted p-values in original p-value matrix
+      if (all(is.na(p$upper[upper.tri(p$upper)]))) {p$upper[upper.tri(p$upper)] <- t(p$upper)[upper.tri(p$upper)]}  #If upper triangle is missing, put it back
     }
 
-    backbone <- (upper < alpha)*1  #Identify all significant edges
-    backbone[which(is.na(backbone))] <- 0  #fill NAs with 0s
-    rownames(backbone) <- rownames(G)
-    colnames(backbone) <- rownames(G)
+    backbone <- (upper < alpha)*1  #Identify all significant edges, code as 1
+    backbone[which(is.na(backbone))] <- 0  #fill NAs (missing and non-significant edges) with 0s
   }
 
 
   #### Extract signed backbone (two-tailed test; all dyads considered) ####
   if (signed) {
     alpha <- alpha / 2  #Use two-tailed test
-    Psmaller <- pmin(upper,lower)  #Find smaller p-value
-    diag(Psmaller) <- NA
-    Ptail <- (upper < lower)  #Find tail of smaller p-value (TRUE if smaller p-value is in upper tail)
-    diag(Ptail) <- NA
+    smaller_p <- pmin(p$upper,p$lower)  #Find smaller p-value (upper-tail or lower-tail) for each edge
+    diag(smaller_p) <- NA
+    upper_tail <- (p$upper < p$lower)  #Find tail of smaller p-value (TRUE if smaller p-value is in upper tail)
+    diag(upper_tail) <- NA
 
     if (mtc != "none") {  #Adjust p-values for familywise error, if requested
-      if (isSymmetric(Psmaller)) {Psmaller[upper.tri(Psmaller)] <- NA}  #If undirected, ignore upper triangle
-      p <- as.vector(Psmaller)  #Vector of p-values
-      m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
-      Psmaller <- matrix(p, nrow = nrow(Psmaller), ncol = ncol(Psmaller))  #Put adjusted p-values in original p-value matrix
-      if (all(is.na(Psmaller[upper.tri(Psmaller)]))) {Psmaller[upper.tri(Psmaller)] <- t(Psmaller)[upper.tri(Psmaller)]}  #If upper triangle is missing, put it back
+      if (isSymmetric(smaller_p)) {smaller_p[upper.tri(smaller_p)] <- NA}  #If undirected, ignore upper triangle
+      pvalues <- as.vector(smaller_p)  #Vector of p-values
+      pvalues <- stats::p.adjust(pvalues, method = mtc, n = sum(!is.na(pvalues)))  #Adjust p-values, where number of comparisons is number of non-missing p-values
+      smaller_p <- matrix(pvalues, nrow = nrow(smaller_p), ncol = ncol(smaller_p))  #Put adjusted p-values in original p-value matrix
+      if (all(is.na(smaller_p[upper.tri(smaller_p)]))) {smaller_p[upper.tri(smaller_p)] <- t(smaller_p)[upper.tri(smaller_p)]}  #If upper triangle is missing, put it back
     }
 
-    backbone <- (Psmaller < alpha)*1  #Identify all significant edges
-    backbone[which(Ptail==FALSE)] <- backbone[which(Ptail==FALSE)] * -1  #Make lower-tail significant edges negative
-    backbone[which(is.na(backbone))] <- 0  #fill NAs with 0s
-    rownames(backbone) <- rownames(G)
-    colnames(backbone) <- rownames(G)
+    backbone <- (smaller_p < alpha)*1  #Identify all significant edges, code as 1
+    backbone[which(upper_tail==FALSE)] <- backbone[which(upper_tail==FALSE)] * -1  #Re-code edges significant in lower-tail as -1
+    backbone[which(is.na(backbone))] <- 0  #fill NAs (missing and non-significant edges) with 0s
   }
 
-  #### Display narrative, if requested ####
-  if (narrative) {
-    if (signed) {alpha <- alpha * 2}  #Restore alpha to correct value for reporting
-    reduced_edges <- round(((sum(G!=0)-nrow(G)) - sum(backbone!=0)) / (sum(G!=0)-nrow(G)),3)*100  #Percent decrease in number of edges
-    reduced_nodes <- round((max(sum(rowSums(G)!=0),sum(colSums(G)!=0)) - max(sum(rowSums(backbone)!=0),sum(colSums(backbone)!=0))) / max(sum(rowSums(G)!=0),sum(colSums(G)!=0)),3) * 100  #Percent decrease in number of connected nodes
-    write.narrative(agents = bb.object$agents,
-                    artifacts = bb.object$artifacts,
-                    weighted = bb.object$weighted,
-                    bipartite = bb.object$bipartite,
-                    symmetric = bb.object$symmetric,
-                    signed = signed,
-                    mtc = mtc,
-                    alpha = alpha,
-                    trials = trials,
-                    model = bb.object$model,
-                    reduced_edges = reduced_edges,
-                    reduced_nodes = reduced_nodes)
-  }
-
-  #### Return result ####
-  backbone <- frommatrix(backbone, attribs, convert = class)
   return(backbone)
 }
