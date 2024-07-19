@@ -4,18 +4,38 @@
 #' @param signed boolean: return a signed backbone
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
-#' 
+#'
 #' @return unweighted adjacency matrix
-#' 
-#' #' @noRd
+#'
+#' @noRd
 .retain <- function(p, signed, alpha, mtc){
+
+  #### Extract binary backbone (one-tailed test; only positively-weighed edges considered) ####
+  if (!signed) {
+    diag(upper) <- NA  #Eliminate p-values for loops; not relevant
+
+    if (mtc != "none") {  #Adjust p-values for familywise error, if requested
+      if (isSymmetric(upper)) {upper[upper.tri(upper)] <- NA}  #If undirected, ignore upper triangle
+      p <- as.vector(upper)  #Vector of p-values
+      m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
+      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
+      upper <- matrix(p, nrow = nrow(upper), ncol = ncol(upper))  #Put adjusted p-values in original p-value matrix
+      if (all(is.na(upper[upper.tri(upper)]))) {upper[upper.tri(upper)] <- t(upper)[upper.tri(upper)]}  #If upper triangle is missing, put it back
+    }
+
+    backbone <- (upper < alpha)*1  #Identify all significant edges
+    backbone[which(is.na(backbone))] <- 0  #fill NAs with 0s
+    rownames(backbone) <- rownames(G)
+    colnames(backbone) <- rownames(G)
+  }
+
 
   #### Extract signed backbone (two-tailed test; all dyads considered) ####
   if (signed) {
     alpha <- alpha / 2  #Use two-tailed test
-    Psmaller <- pmin(Pupper,Plower)  #Find smaller p-value
+    Psmaller <- pmin(upper,lower)  #Find smaller p-value
     diag(Psmaller) <- NA
-    Ptail <- (Pupper < Plower)  #Find tail of smaller p-value (TRUE if smaller p-value is in upper tail)
+    Ptail <- (upper < lower)  #Find tail of smaller p-value (TRUE if smaller p-value is in upper tail)
     diag(Ptail) <- NA
 
     if (mtc != "none") {  #Adjust p-values for familywise error, if requested
@@ -29,25 +49,6 @@
 
     backbone <- (Psmaller < alpha)*1  #Identify all significant edges
     backbone[which(Ptail==FALSE)] <- backbone[which(Ptail==FALSE)] * -1  #Make lower-tail significant edges negative
-    backbone[which(is.na(backbone))] <- 0  #fill NAs with 0s
-    rownames(backbone) <- rownames(G)
-    colnames(backbone) <- rownames(G)
-  }
-
-  #### Extract binary backbone (one-tailed test; only positively-weighed edges considered) ####
-  if (!signed) {
-    diag(Pupper) <- NA  #Eliminate p-values for loops; not relevant
-
-    if (mtc != "none") {  #Adjust p-values for familywise error, if requested
-      if (isSymmetric(Pupper)) {Pupper[upper.tri(Pupper)] <- NA}  #If undirected, ignore upper triangle
-      p <- as.vector(Pupper)  #Vector of p-values
-      m <- sum((!is.na(p))*1)  #Number of p-values to evaluate, number of independent edges to test
-      p <- stats::p.adjust(p, method = mtc, m)  #Adjust p-values
-      Pupper <- matrix(p, nrow = nrow(Pupper), ncol = ncol(Pupper))  #Put adjusted p-values in original p-value matrix
-      if (all(is.na(Pupper[upper.tri(Pupper)]))) {Pupper[upper.tri(Pupper)] <- t(Pupper)[upper.tri(Pupper)]}  #If upper triangle is missing, put it back
-    }
-
-    backbone <- (Pupper < alpha)*1  #Identify all significant edges
     backbone[which(is.na(backbone))] <- 0  #fill NAs with 0s
     rownames(backbone) <- rownames(G)
     colnames(backbone) <- rownames(G)
