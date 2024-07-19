@@ -12,6 +12,7 @@ backbone_from_bipartite(
   mtc = "none",
   missing_as_zero = FALSE,
   only_pvalues = FALSE,
+  trials = NULL,
   narrative = FALSE
 )
 }
@@ -29,6 +30,8 @@ backbone_from_bipartite(
 \item{missing_as_zero}{boolean: treat missing edges be treated as edges with zero weight and test them for significance}
 
 \item{only_pvalues}{boolean: return only a matrix of edgewise p-values; all parameters except \code{model} are ignored}
+
+\item{trials}{integer: number of Monte Carlo trials used for FDSM (ignored if \code{model != "fdsm"})}
 
 \item{narrative}{boolean: display suggested text & citations}
 }
