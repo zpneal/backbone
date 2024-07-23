@@ -152,7 +152,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
     P <- igraph::bipartite_projection(B, which="false")  #Generate weighted projection, with any agent attributes
     igraph::E(P)$oldweight <- igraph::E(P)$weight  #Save old edge weights
     P <- igraph::delete_edge_attr(P, "weight")  #Delete weight attribute
-    P <- igraph::set_edge_attr(P, "retain", value = backbone[igraph::as_edgelist(P)])  #Insert edge retention marker as attribute
+    P <- igraph::set_edge_attr(P, "retain", value = backbone[igraph::as_edgelist(P, names = FALSE)])  #Insert edge retention marker as attribute
     P <- igraph::delete_edges(P, which(igraph::E(P)$retain==0))  #Delete any edges that should not be retained
     P <- igraph::delete_edge_attr(P, "retain")  #Delete edge retention marker
     return(P)
