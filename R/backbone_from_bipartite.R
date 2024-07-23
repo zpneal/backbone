@@ -108,7 +108,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", signed, " backbone of the weighted projection of an unweighted bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
 
-  # Second sentence (model)
+  # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
   if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
   if (mtc == "holm") {correction <- ", Holm adjusted"}
@@ -124,14 +124,11 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (model == "sdsm-ec") {desc <- "the stochastic degree sequence model with edge constraints (SDSM-EC; Neal & Neal, 2023)"}
   if (model == "fdsm") {desc <- paste0("the fixed degree sequence model (FDSM; Neal, Domagalski, and Sagan, 2021), where p-values were estimated from ", trials, " Monte Carlo trials")}
 
-  text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ".")
-
-  # Third sentence (reduction)
   old <- sum(p$upper!=0, na.rm=TRUE)  #Number of edges in projection (i.e., number of edges tested, and that have an upper-tail p-value)
   new <- sum(backbone!=0)  #Number of edges in backbone
   reduced_edges <- round(((old - new) / old)*100,2)
-
-  text <- paste0(text, " This reduced the number of edges by ", reduced_edges, "%.")
+    
+  text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
 
   # Display
   message("")
