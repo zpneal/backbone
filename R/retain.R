@@ -18,11 +18,11 @@
       if (isSymmetric(p$upper)) {p$upper[upper.tri(p$upper)] <- NA}  #If undirected, ignore upper triangle
       pvalues <- as.vector(p$upper)  #Vector of p-values
       pvalues <- stats::p.adjust(pvalues, method = mtc, n = sum(!is.na(pvalues)))  #Adjust p-values, where number of comparisons is number of non-missing p-values
-      upper <- matrix(pvalues, nrow = nrow(p$upper), ncol = ncol(p$upper))  #Put adjusted p-values in original p-value matrix
+      p$upper <- matrix(pvalues, nrow = nrow(p$upper), ncol = ncol(p$upper))  #Put adjusted p-values in original p-value matrix
       if (all(is.na(p$upper[upper.tri(p$upper)]))) {p$upper[upper.tri(p$upper)] <- t(p$upper)[upper.tri(p$upper)]}  #If upper triangle is missing, put it back
     }
 
-    backbone <- (upper < alpha)*1  #Identify all significant edges, code as 1
+    backbone <- (p$upper < alpha)*1  #Identify all significant edges, code as 1
     backbone[which(is.na(backbone))] <- 0  #fill NAs (missing and non-significant edges) with 0s
   }
 
