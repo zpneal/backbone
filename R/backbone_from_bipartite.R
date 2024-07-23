@@ -102,9 +102,10 @@ backbone_from_bipartite <- function(B,
   # First sentence (descriptive)
   if (signed) {signed <- "signed"} else {signed <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", signed, " backbone of the weighted projection of an unweighted bipartite network containing ", nrow(I), " agents and ", ncol(I), "artifacts.")
+  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", signed, " backbone of the weighted projection of an unweighted bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
 
   # Second sentence (model)
+  if (mtc == "none") {correction <- ""}
   if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
   if (mtc == "holm") {correction <- ", Holm adjusted"}
   if (mtc == "hommel") {correction <- ", Hommel adjusted"}
