@@ -52,7 +52,7 @@ backbone_from_bipartite <- function(B,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
                                     only_pvalues = FALSE,
-                                    trials = NULL,
+                                    trials = 1000,
                                     narrative = FALSE) {
 
   #### Check parameters ####
