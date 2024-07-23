@@ -81,9 +81,10 @@ backbone_from_bipartite <- function(B,
   if (!all(I %in% c(0,1)) &    #The entries are not binary, and
       isSymmetric(I) &         #The matrix is symmetric, and
       all(I%%1==0)) {          #The entries are all integers
-      stop("`B` looks like it may be a weighted bipartite projection. The input to backbone_from_bipartite()
-       must be the original bipartite network, not its weighted projection. If you only have the weighted
-       bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
+      stop("
+`B` looks like it may be a weighted bipartite projection. The input to backbone_from_bipartite()
+must be the original bipartite network, not its weighted projection. If you only have the weighted
+bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
 
   #Check that input is binary, or contains structural values and model=SDSM
   if (model!="sdsm-ec" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
