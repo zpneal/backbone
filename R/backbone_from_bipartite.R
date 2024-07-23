@@ -96,6 +96,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
+  if (only_pvalues) {return(p)}
 
   #### Retain edges ####
   backbone <- .retain(p, signed, alpha, mtc)
