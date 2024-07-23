@@ -75,8 +75,8 @@ backbone_from_bipartite <- function(B,
   #Convert input to matrix
   if (methods::is(B,"matrix")) {I <- B}  #matrix --> matrix
   if (methods::is(B,"igraph")) {
-    if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE, attr = "weight")}  #weighted igraph --> weighted incidence
-    if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = TRUE)}  #unweighted igraph --> binary incidence
+    if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted incidence
+    if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary incidence
   }
 
   #Check if input may be a weighted projection
