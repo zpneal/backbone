@@ -11,8 +11,7 @@ backbone_from_bipartite(
   signed = FALSE,
   mtc = "none",
   missing_as_zero = FALSE,
-  only_pvalues = FALSE,
-  trials = NULL,
+  trials = 1000,
   narrative = FALSE
 )
 }
@@ -28,8 +27,6 @@ backbone_from_bipartite(
 \item{mtc}{string: type of Multiple Test Correction; can be either \code{"none"} or a method allowed by \code{\link{p.adjust}}.}
 
 \item{missing_as_zero}{boolean: treat missing edges be treated as edges with zero weight and test them for significance}
-
-\item{only_pvalues}{boolean: return only a matrix of edgewise p-values; all parameters except \code{model} are ignored}
 
 \item{trials}{integer: number of Monte Carlo trials used for FDSM (ignored if \code{model != "fdsm"})}
 
