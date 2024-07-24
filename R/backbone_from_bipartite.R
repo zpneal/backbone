@@ -80,10 +80,9 @@ backbone_from_bipartite <- function(B,
   if (exists("trials") & model=="fdsm") {  #If FDSM and `trials` is supplied, check it
     if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
     if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
-  } else {  #Otherwise, set it to 0 as a marker to have .fdsm() choose the correct value
-    message("The `trials` argument is only valid when `model = \"fdsm\"`. It is being ignored.")
-    trials <- 0
-  }  
+  } 
+  if (!exists("trials") & model=="fdsm") {trials <- 0}  #If FDSM and `trials` not supplied, set to 0 now and ask .fdsm() to choose a value
+  if (exists("trials") & model!="fdsm") {message("The `trials` argument is only valid when `model = \"fdsm\"`. It is being ignored.")}  
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
 
   #### Check and format input ####
