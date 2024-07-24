@@ -11,8 +11,8 @@ backbone_from_bipartite(
   signed = FALSE,
   mtc = "none",
   missing_as_zero = FALSE,
-  trials = 1000,
-  narrative = FALSE
+  narrative = FALSE,
+  ...
 )
 }
 \arguments{
@@ -28,9 +28,9 @@ backbone_from_bipartite(
 
 \item{missing_as_zero}{boolean: treat missing edges be treated as edges with zero weight and test them for significance}
 
-\item{trials}{integer: number of Monte Carlo trials used for FDSM (ignored if \code{model != "fdsm"})}
-
 \item{narrative}{boolean: display suggested text & citations}
+
+\item{...}{arguments passed to internal functions}
 }
 \value{
 A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a matrix of edgewise p-values)
