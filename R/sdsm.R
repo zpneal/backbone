@@ -1,7 +1,7 @@
 #' Compute edgewise p-values under the Stochastic Degree Sequence Model
 #'
 #' @param I a binary incidence matrix
-#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
+#' @param missing_as_zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
 #'
 #' @return
@@ -13,7 +13,7 @@
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 #'
 #' @noRd
-.sdsm <- function(I, missing.as.zero, signed){
+.sdsm <- function(I, missing_as_zero, signed){
 
   P <- tcrossprod(I)  #Weighted bipartite projection
 
@@ -27,7 +27,7 @@
   for (col in 1:ncol(P)) {  #Loop over lower triangle of projection
     for (row in col:nrow(P)) {
 
-      if (missing.as.zero) {  #If missing edges should be treated as zero, test each one
+      if (missing_as_zero) {  #If missing edges should be treated as zero, test each one
         if (!signed) {pvalues <- .pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = FALSE)}
         if (signed) {pvalues <- .pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = TRUE)}
 
@@ -35,7 +35,7 @@
         upper[row,col] <- pvalues[2]
       }
 
-      if (!missing.as.zero & P[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
+      if (!missing_as_zero & P[row,col] != 0) {  #If missing edges should not be treated as zero, test only edges with non-zero weight
         if (!signed) {pvalues <- .pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = FALSE)}
         if (signed) {pvalues <- .pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = TRUE)}
 
