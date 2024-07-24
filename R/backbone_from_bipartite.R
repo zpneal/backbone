@@ -123,9 +123,9 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   #### Display narrative ####
   if (narrative) {
   # First sentence (descriptive)
-  if (signed) {signed <- "signed"} else {signed <- "unweighted"}
+  if (signed) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", signed, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
+  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
