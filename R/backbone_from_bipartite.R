@@ -8,8 +8,8 @@
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction; can be either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing_as_zero boolean: treat missing edges be treated as edges with zero weight and test them for significance
-#' @param trials integer: number of Monte Carlo trials used for FDSM (ignored if \code{model != "fdsm"})
 #' @param narrative boolean: display suggested text & citations
+#' @param ... arguments passed to internal functions
 #'
 #' @details
 #' The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
@@ -50,8 +50,8 @@ backbone_from_bipartite <- function(B,
                                     signed = FALSE,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
-                                    trials = 1000,
-                                    narrative = FALSE) {
+                                    narrative = FALSE,
+                                    ...) {
 
   #### Check parameters ####
   if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
@@ -60,8 +60,10 @@ backbone_from_bipartite <- function(B,
   if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
   if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
-  if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
+  if (exists("trials") & model=="fdsm") {  #If FDSM and `trials` is supplied, check it
+    if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
+    if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
+  } else {trials <- 0}  #Otherwise, set it to 0 as a marker to have .fdsm() choose the correct value
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
 
   #### Check and format input ####
@@ -123,7 +125,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   old <- sum(p$upper!=0, na.rm=TRUE)  #Number of edges in projection (i.e., number of edges tested, and that have an upper-tail p-value)
   new <- sum(backbone!=0)  #Number of edges in backbone
   reduced_edges <- round(((old - new) / old)*100,2)
-    
+
   text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
 
   # Display
