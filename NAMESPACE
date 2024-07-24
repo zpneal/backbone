@@ -3,5 +3,6 @@
 export(backbone_from_bipartite)
 export(bicm)
 export(fastball)
+export(sdsm)
 importFrom(Rcpp,sourceCpp)
 useDynLib(backbone, .registration = TRUE)
