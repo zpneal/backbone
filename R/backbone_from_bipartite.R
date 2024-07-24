@@ -1,13 +1,13 @@
 #' Extract the backbone from a bipartite projection
 #'
-#' \code{backbone_from_bipartite} extracts the unweighted backbone from the weighted projection of a bipartite network.
+#' \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object (see details)
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
 #' @param alpha real: significance level of hypothesis test(s)
-#' @param model string: backbone model. This must be one of: \code{"sdsm"}, \code{"sdsm-ec"} \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
+#' @param model string: backbone model, one of: \code{"sdsm"}, \code{"sdsm-ec"} \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction; can be either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
-#' @param missing_as_zero boolean: treat missing edges be treated as edges with zero weight and test them for significance
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #' @param ... arguments passed to internal functions
 #'
@@ -18,23 +18,25 @@
 #' significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are statistically
 #' significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 #'
-#' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights, each of which
-#' imposes a unique set of constraints on \code{B}:
-#' * \code{fixedfill} - Use the "fixed fill" model (Neal et al., 2021), which exactly constrains the total number of edges (i.e., sum)
-#' * \code{fixedrow} - Use the "fixed row" model (Neal et al., 2021), which exactly constrains the agent degrees (i.e., row sums)
-#' * \code{fixedcol} - Use the "fixed column" model (Neal et al., 2021), which exactly constrains the artifact degrees (i.e., column sums)
-#' * \code{sdsm} - Use the "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021), which pproximately constrains the agent and artifact degrees (the default)
-#' * \code{sdsm-ec} - Use the "SDSM with Edge Constraints" (Neal & Neal, 2023), which approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11)
-#' * \code{fdsm} - Use the "Fixed Degree Sequence Model" (Neal et al., 2021), which exactly constrain the agent and artifact degrees
+#' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. The available models
+#' differ in the constraints they impose on \code{B}:
+#' * \code{fixedfill} - The "fixed fill" model (Neal et al., 2021) exactly constrains the total number of edges (i.e., sum)
+#' * \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
+#' * \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
+#' * \code{sdsm} - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees (the default)
+#' * \code{sdsm-ec} - The "SDSM with Edge Constraints" (Neal & Neal, 2023) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11)
+#' * \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
 #'
 #' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
 #' bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
 #' network that is missing from the projection. The "agent" nodes that appear in the projection must be represented by rows if \code{B}
-#' is an incidence matrix, or \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
-#' must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when prohibited" edges can be represented with weight = 10
+#' is an incidence matrix, or by \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
+#' must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when "prohibited" edges can be represented with weight = 10
 #' and "required" edges can be represented with weight = 11.
 #'
-#' @return A backbone in the same class as \code{B} (or if \code{only_pvalues = TRUE}, a matrix of edgewise p-values)
+#' @return A backbone in the same class as \code{B}. If \code{B} was an igraph object, the resulting igraph backbone preserves any node
+#' attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and (if \code{signed = TRUE})
+#' includes a "sign" edge attribute indicating the edges' sign.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
@@ -80,9 +82,9 @@ backbone_from_bipartite <- function(B,
   if (exists("trials") & model=="fdsm") {  #If FDSM and `trials` is supplied, check it
     if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
     if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
-  } 
+  }
   if (!exists("trials") & model=="fdsm") {trials <- 0}  #If FDSM and `trials` not supplied, set to 0 now and ask .fdsm() to choose a value
-  if (exists("trials") & model!="fdsm") {message("The `trials` argument is only valid when `model = \"fdsm\"`. It is being ignored.")}  
+  if (exists("trials") & model!="fdsm") {message("The `trials` argument is only valid when `model = \"fdsm\"`. It is being ignored.")}
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
 
   #### Check and format input ####
@@ -170,9 +172,9 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
     igraph::E(P)$oldweight <- igraph::E(P)$weight  #Save old edge weights
     P <- igraph::delete_edge_attr(P, "weight")  #Delete weight attribute
     for (attr in igraph::vertex_attr_names(P)) {if (all(is.na(igraph::vertex_attr(P, attr)))) {P <- igraph::delete_vertex_attr(P, attr)}}  #Delete attributes of artifact nodes
-    P <- igraph::set_edge_attr(P, "retain", value = backbone[igraph::as_edgelist(P, names = FALSE)])  #Insert edge retention marker as attribute
+    P <- igraph::set_edge_attr(P, "sign", value = backbone[igraph::as_edgelist(P, names = FALSE)])  #Insert edge retention marker as attribute
     P <- igraph::delete_edges(P, which(igraph::E(P)$retain==0))  #Delete any edges that should not be retained
-    P <- igraph::delete_edge_attr(P, "retain")  #Delete edge retention marker
+    if (!signed) {P <- igraph::delete_edge_attr(P, "sign")}  #If backbone is not signed, remove edge retention marker
     return(P)
   }
 
