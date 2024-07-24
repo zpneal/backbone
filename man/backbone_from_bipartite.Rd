@@ -64,7 +64,24 @@ must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when prohibi
 and "required" edges can be represented with weight = 11.
 }
 \examples{
-#TBD
+#A binary bipartite network of 30 agents & 75 artifacts
+#The agents form three communities
+B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
+                 matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.2),10)),
+           cbind(matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.8),10),
+                 matrix(rbinom(250,1,.2),10)),
+           cbind(matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.8),10)))
+B <- igraph::graph_from_biadjacency_matrix(B)
+
+P <- igraph::bipartite_projection(B, which = "true")  #An ordinary weighted projection...
+plot(P)                                               #...is a dense hairball
+
+backbone <- backbone_from_bipartite(B)  #A backbone...
+plot(backbone)                          #...is sparse with clear communities
 }
 \references{
 package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
