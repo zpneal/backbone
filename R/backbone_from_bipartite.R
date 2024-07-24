@@ -8,7 +8,6 @@
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction; can be either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing_as_zero boolean: treat missing edges be treated as edges with zero weight and test them for significance
-#' @param only_pvalues boolean: return only a matrix of edgewise p-values; all parameters except \code{model} are ignored
 #' @param trials integer: number of Monte Carlo trials used for FDSM (ignored if \code{model != "fdsm"})
 #' @param narrative boolean: display suggested text & citations
 #'
@@ -51,7 +50,6 @@ backbone_from_bipartite <- function(B,
                                     signed = FALSE,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
-                                    only_pvalues = FALSE,
                                     trials = 1000,
                                     narrative = FALSE) {
 
@@ -62,7 +60,6 @@ backbone_from_bipartite <- function(B,
   if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
   if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (!is.logical(only_pvalues)) {stop("`only_pvalues` must be either TRUE or FALSE")}
   if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
   if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
@@ -96,7 +93,6 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
-  if (only_pvalues) {return(p)}
 
   #### Retain edges ####
   backbone <- .retain(p, signed, alpha, mtc)
