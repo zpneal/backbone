@@ -173,7 +173,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
     P <- igraph::delete_edge_attr(P, "weight")  #Delete weight attribute
     for (attr in igraph::vertex_attr_names(P)) {if (all(is.na(igraph::vertex_attr(P, attr)))) {P <- igraph::delete_vertex_attr(P, attr)}}  #Delete attributes of artifact nodes
     P <- igraph::set_edge_attr(P, "sign", value = backbone[igraph::as_edgelist(P, names = FALSE)])  #Insert edge retention marker as attribute
-    P <- igraph::delete_edges(P, which(igraph::E(P)$retain==0))  #Delete any edges that should not be retained
+    P <- igraph::delete_edges(P, which(igraph::E(P)$sign==0))  #Delete any edges that should not be retained
     if (!signed) {P <- igraph::delete_edge_attr(P, "sign")}  #If backbone is not signed, remove edge retention marker
     return(P)
   }
