@@ -1,10 +1,10 @@
 # backbone <img src='man/figures/logo.png' align="right" height="139" />
 
 <!-- badges: start -->
-
 [![](https://www.r-pkg.org/badges/version/backbone?color=orange)](https://cran.r-project.org/package=backbone)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/backbone?color=blue)](https://cran.r-project.org/package=backbone)
-[![](http://cranlogs.r-pkg.org/badges/last-month/backbone?color=green)](https://cran.r-project.org/package=backbone)
+[![Downloads](https://cranlogs.r-pkg.org/badges/backbone?color=orange)](https://CRAN.R-project.org/package=backbone)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/backbone?color=orange)](https://CRAN.R-project.org/package=backbone)
+[![status](https://tinyverse.netlify.app/badge/backbone)](https://CRAN.R-project.org/package=backbone)
 [![DOI:10.1371/journal.pone.0269137](http://img.shields.io/badge/DOI-10.1371/journal.pone.0269137-B31B1B.svg)](https://doi.org/10.1371/journal.pone.0269137)
 <!-- badges: end -->
 
