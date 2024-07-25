@@ -19,8 +19,7 @@
 
   #### Prepare dyad list ####
   #Although P is symmetric, this is a complete list of dyads; AFTER TESTING, TRY TO RE-WRITE WITH ONLY NECESSARY EDGES
-  df <- data.frame(as.vector(P))  #Dataframe of dyads
-  names(df)[names(df)=="as.vector.P."] <- "weight"
+  df <- data.frame(weight = as.vector(P))  #Dataframe of dyads
 
   rs <- rowSums(I)  #Find row sums in bipartite (agent degrees)
   df$row_sum_i <- rep(rs, times = nrow(I))  #Add rowsums to dataframe
