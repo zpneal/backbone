@@ -116,6 +116,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
+  if (model == "fixedrow") {p <- .fixedrow(I, missing_as_zero, signed)}
 
   #### Retain edges ####
   backbone <- .retain(p, alpha, mtc)
