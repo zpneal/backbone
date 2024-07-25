@@ -29,11 +29,11 @@
 
   #### Compute p-values ####
   df$upper <- stats::phyper(df$weight-1, df$row_sum_i, df$diff, df$row_sum_j, lower.tail=FALSE)
-  upper <- matrix(as.numeric(df$upper), nrow = nrow(I), ncol = nrow(I), dimnames = list(rownames(P),colnames(P)))
+  upper <- matrix(as.numeric(df$upper), nrow = nrow(I), ncol = nrow(I))
 
   if (signed) {
     df$lower <- stats::phyper(df$weight, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
-    lower <- matrix(as.numeric(df$lower), nrow = nrow(I), ncol = nrow(I), dimnames = list(rownames(P),colnames(P)))
+    lower <- matrix(as.numeric(df$lower), nrow = nrow(I), ncol = nrow(I))
   }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
