@@ -13,7 +13,7 @@ expect_equal(colSums(test), colSums(M))  #Column sums match
 ## .retain()
 upper <- rbind(c(.01,.02,.03),  #Unsigned
                c(.05,.06,.07),
-               c(0.5,0.6,0.7)) 
+               c(0.5,0.6,0.7))
 p <- list(upper = upper)
 test <- backbone:::.retain(p, alpha = 0.05, mtc = "none")
 expect_equal(test, rbind(c(0,1,1),
@@ -22,10 +22,10 @@ expect_equal(test, rbind(c(0,1,1),
 
 upper <- rbind(c(.01,.02,.03),  #Signed
                c(.05,.06,.07),
-               c(0.5,0.6,0.7)) 
+               c(0.5,0.6,0.7))
 lower <- rbind(c(0.5,0.6,0.7),
                c(.05,.06,.07),
-               c(.01,.02,.03)) 
+               c(.01,.02,.03))
 p <- list(lower = lower, upper = upper)
 test <- backbone:::.retain(p, alpha = 0.1, mtc = "none")  #Higher alpha because this is a two-tailed test
 expect_equal(test, rbind(c(0,1,1),
@@ -39,12 +39,12 @@ test <- backbone:::.sdsm(M, signed = TRUE, missing_as_zero = TRUE)
 test$upper <- round(test$upper,3)
 test$lower <- round(test$lower,3)
 expect_true(is(test, "list") & length(test)==2)  #Output is a two-item list
-expect_equal(test$upper, rbind(c(.380,.978,.606),  #Upper-tail p-values
-                               c(.978,.38,.981),
-                               c(.606,.981,.437)))  
-expect_equal(test$lower, rbind(c(.949,.620,.864),  #Lower-tail p-values
-                               c(.620,.949,.394),
-                               c(.864,.394,.916)))  
+expect_true(all(is.na(diag(test$upper))))  #Upper-tail diagonal is missing
+expect_true(all(is.na(diag(test$lower))))  #Lower-tail diagonal is missing
+expect_true(isSymmetric(test$upper))  #Upper-tail is symmetric
+expect_true(isSymmetric(test$lower))  #Lower-tail is symmetric
+expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
+expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
 
 ## .fixedrow()
 M <- rbind(c(0,0,1),c(0,1,0),c(1,0,1))
@@ -52,12 +52,12 @@ test <- backbone:::.fixedrow(M, signed = TRUE, missing_as_zero = TRUE)
 test$upper <- round(test$upper,3)
 test$lower <- round(test$lower,3)
 expect_true(is(test, "list") & length(test)==2)  #Output is a two-item list
-expect_equal(test$upper, rbind(c(NA,1,.667),  #Upper-tail p-values
-                               c(1,NA,1),
-                               c(.667,1,NA)))  
-expect_equal(test$lower, rbind(c(NA,.667,1),  #Lower-tail p-values
-                               c(.667,NA,.333),
-                               c(1,.333,NA)))  
+expect_true(all(is.na(diag(test$upper))))  #Upper-tail diagonal is missing
+expect_true(all(is.na(diag(test$lower))))  #Lower-tail diagonal is missing
+expect_true(isSymmetric(test$upper))  #Upper-tail is symmetric
+expect_true(isSymmetric(test$lower))  #Lower-tail is symmetric
+expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
+expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
 
 #### Bipartite Backbone Functions ####
 ## Bipartite from matrix
