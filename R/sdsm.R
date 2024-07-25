@@ -24,8 +24,8 @@
   upper <- matrix(NA, nrow(P), ncol(P))                #Set upper-tail p-value to NA initially, untested edges have p = NA
   if (signed) {lower <- matrix(NA, nrow(P), ncol(P))}  #If signed, set lower-tail p-value to NA initially
 
-  for (col in 1:ncol(P)) {  #Loop over lower triangle of projection
-    for (row in col:nrow(P)) {
+  for (col in 1:(ncol(P)-1)) {  #Loop over lower triangle of projection
+    for (row in (col+1):nrow(P)) {
 
       if (missing_as_zero) {  #If missing edges should be treated as zero, test each one
         if (!signed) {pvalues <- .pb(P[row,col], unlist(Map('*',probs[row],probs[col])), lowertail = FALSE)}
