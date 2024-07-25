@@ -21,33 +21,25 @@
   df <- data.frame(row = row(P)[upper.tri(P)],            #Dataframe of dyads in upper triangle
                    col = col(P)[upper.tri(P)], 
                    weight = as.vector(P[upper.tri(P)]))  
-
-  if (missing_as_zero) {df <- df[which(df$weight!=0),]}  #If missing edges should not be tested, remove zero-weight dyads
   
   rs <- rowSums(I)  #Find row sums in bipartite (agent degrees)
   df$row_sum_i <- rs[df$row]
   df$row_sum_j <- rs[df$col]
   df$diff <- ncol(I)-df$row_sum_i  #Difference in total number of artifacts and i's degree
 
+  if (!missing_as_zero) {df$weight[which(df$weight==0)] <- NA}  #If missing edges should not be tested, replace weight with NA
+  
   #### Compute p-values ####
   df$upper <- stats::phyper(df$weight-1, df$row_sum_i, df$diff, df$row_sum_j, lower.tail=FALSE)
-  upper <- matrix(NA, nrow = nrow(I), ncol = nrow(I))  #Start with empty matrix of upper-tail p-values
-  for (i in 1:nrow(df)) {  #Insert p-values
-    row <- df$row[i]
-    col <- df$col[i]
-    upper[row,col] <- df$upper[i]
-    upper[col,row] <- df$upper[i]
-  }
+  upper <- matrix(NA, nrow = nrow(P), ncol = nrow(P))  #Start with empty matrix of upper-tail p-values
+  upper[upper.tri(upper)] <- df$upper  #Insert upper-tail p-values
+  upper[lower.tri(upper)] = t(upper)[lower.tri(upper)]  #Make symmetric
 
   if (signed) {
     df$lower <- stats::phyper(df$weight, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
-    lower <- matrix(NA, nrow = nrow(I), ncol = nrow(I))  #Start with empty matrix of upper-tail p-values
-    for (i in 1:nrow(df)) {  #Insert p-values
-      row <- df$row[i]
-      col <- df$col[i]
-      lower[row,col] <- df$lower[i]
-      lower[col,row] <- df$lower[i]
-    }
+    lower <- matrix(NA, nrow = nrow(P), ncol = nrow(P))  #Start with empty matrix of upper-tail p-values
+    lower[upper.tri(lower)] <- df$lower
+    lower[lower.tri(lower)] = t(lower)[lower.tri(lower)]
   }
 
   if (signed) {return(list(lower = lower, upper = upper))}
