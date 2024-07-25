@@ -118,7 +118,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
 
   #### Retain edges ####
-  backbone <- .retain(p, signed, alpha, mtc)
+  backbone <- .retain(p, alpha, mtc)
 
   #### Display narrative ####
   if (narrative) {
