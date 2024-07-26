@@ -27,7 +27,7 @@ fixedcol(
 \item{narrative}{boolean: display suggested text & citations}
 }
 \description{
-\code{fixedrow()} was replaced by \code{backbone_from_bipartite(model = "fixedrow")}.
+\code{fixedcol()} was replaced by \code{backbone_from_bipartite(model = "fixedcol")}.
 }
 \details{
 See backbone v2.1.4 for original documentation
