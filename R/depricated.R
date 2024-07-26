@@ -58,7 +58,7 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 
 #' Depricated function to extract Fixed Column backbone
 #'
-#' \code{fixedrow()} was replaced by \code{backbone_from_bipartite(model = "fixedrow")}.
+#' \code{fixedcol()} was replaced by \code{backbone_from_bipartite(model = "fixedcol")}.
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
 #' @param alpha real: significance level of hypothesis test(s)
@@ -72,7 +72,7 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #'
 #' @export
 fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
-  .Deprecated("backbone_from_bipartite(model = \"fixedrow\")")
+  .Deprecated("backbone_from_bipartite(model = \"fixedcol\")")
 
   return(
     backbone_from_bipartite(B,
