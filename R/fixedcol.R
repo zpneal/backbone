@@ -32,8 +32,8 @@
   upper <- 1 - (stats::pnorm(upper)+gamma/(6*sigma^3)*(1-upper^2)*stats::dnorm(upper))
 
   if (signed) {
-    Plower <- (P+.5-mu)/sigma
-    Plower <- stats::pnorm(lower)+gamma/(6*sigma^3)*(1-lower^2)*stats::dnorm(lower)
+    lower <- (P+.5-mu)/sigma
+    lower <- stats::pnorm(lower)+gamma/(6*sigma^3)*(1-lower^2)*stats::dnorm(lower)
   }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
