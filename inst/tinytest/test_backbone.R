@@ -60,6 +60,11 @@ expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test
 expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
 
 #### Bipartite Backbone Functions ####
+## Define function to compute triangle index
+trace <- function(x){sum(diag(x))}
+matcube <- function(x){x%*%x%*%x}
+triangle_index <- function(x){(trace(matcube(x)) + trace(matcube(abs(x))))/(2 * trace(matcube(abs(x))))}
+
 ## Bipartite from matrix
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
                  matrix(rbinom(250,1,.2),10),
@@ -77,6 +82,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.9)    #Is nearly balanced
 
 bb <- backbone_from_bipartite(B, model = "fixedrow", signed = TRUE)  #Extract from matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -84,6 +90,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.9)    #Is nearly balanced
 
 ## Bipartite from igraph
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
