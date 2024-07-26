@@ -76,7 +76,7 @@ B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matr
                  matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.8),10)))
 
-bb <- backbone_from_bipartite(B, model = "sdsm", signed = TRUE)  #Extract from matrix as signed
+bb <- backbone_from_bipartite(B, model = "sdsm", signed = TRUE)  #Extract SDSM matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
 expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
@@ -84,7 +84,15 @@ expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
 expect_true(triangle_index(bb)>.9)    #Is nearly balanced
 
-bb <- backbone_from_bipartite(B, model = "fixedrow", signed = TRUE)  #Extract from matrix as signed
+bb <- backbone_from_bipartite(B, model = "fixedrow", signed = TRUE)  #Extract fixedrow matrix as signed
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.9)    #Is nearly balanced
+
+bb <- backbone_from_bipartite(B, model = "fixedcol", signed = TRUE)  #Extract fixedcol matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
 expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
@@ -106,13 +114,19 @@ B <- igraph::graph_from_biadjacency_matrix(B)          #Convert to igraph
 igraph::V(B)$agent_attrib <- c(c(1:30),rep(NA,75))     #Add agent attribute
 igraph::V(B)$artifact_attrib <- c(rep(NA,30),c(1:75))  #Add artifact attribute
 
-bb <- backbone_from_bipartite(B, model = "sdsm")                              #Extract from igraph with defaults
+bb <- backbone_from_bipartite(B, model = "sdsm")                              #Extract SDSM igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
 
-bb <- backbone_from_bipartite(B, model = "fixedrow")                          #Extract from igraph with defaults
+bb <- backbone_from_bipartite(B, model = "fixedrow")                          #Extract fixedrow igraph with defaults
+expect_true(is(bb,"igraph"))                                                  #Returns as igraph
+expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
+expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+
+bb <- backbone_from_bipartite(B, model = "fixedrow")                          #Extract fixedcol igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
