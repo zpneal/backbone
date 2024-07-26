@@ -2,7 +2,7 @@
 % Please edit documentation in R/depricated.R
 \name{sdsm}
 \alias{sdsm}
-\title{Depricated function to extract SDSM backbone}
+\title{Depricated function to extract Stochastic Degree Sequence Model (SDSM) backbone}
 \usage{
 sdsm(
   B,
