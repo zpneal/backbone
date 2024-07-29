@@ -100,6 +100,14 @@ expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
 expect_true(triangle_index(bb)>.9)    #Is nearly balanced
 
+bb <- backbone_from_bipartite(B, model = "fixedfill", signed = TRUE)  #Extract fixedfill matrix as signed
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.9)    #Is nearly balanced
+
 ## Bipartite from igraph
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
                  matrix(rbinom(250,1,.2),10),
@@ -127,6 +135,12 @@ expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #C
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
 
 bb <- backbone_from_bipartite(B, model = "fixedrow")                          #Extract fixedcol igraph with defaults
+expect_true(is(bb,"igraph"))                                                  #Returns as igraph
+expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
+expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+
+bb <- backbone_from_bipartite(B, model = "fixedfill")                         #Extract fixedcol igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
