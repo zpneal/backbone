@@ -15,8 +15,12 @@
 #' @noRd
 .sdsm_ec <- function(I, missing_as_zero, signed){
 
-  P <- tcrossprod(I)  #Weighted bipartite projection
-
+  #### Construct weighted projection ####
+  I_unweighted <- I
+  I_unweighted[I_unweighted==10] <- 0  #Make structural 0s ordinary 0
+  I_unweighted[I_unweighted==11] <- 1  #Make structural 1s ordinary 1
+  P <- tcrossprod(I_unweighted)  #Projection, not considering any structural 0s or 1s
+  
   #### Compute probabilities with edge constraints using Logit ####
   # Prepare dyad list
   A <- data.frame(edge = as.vector(I),     #Data frame of bipartite dyads
