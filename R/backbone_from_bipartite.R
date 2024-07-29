@@ -4,7 +4,7 @@
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
 #' @param alpha real: significance level of hypothesis test(s)
-#' @param model string: backbone model, one of: \code{"sdsm"}, \code{"sdsm-ec"} \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
+#' @param model string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
@@ -20,18 +20,17 @@
 #'
 #' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. The available models
 #' differ in the constraints they impose on \code{B}:
+#' * \code{sdsm} (default) - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11; Neal & Neal, 2023)
+#' * \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
 #' * \code{fixedfill} - The "fixed fill" model (Neal et al., 2021) exactly constrains the total number of edges (i.e., sum)
 #' * \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
 #' * \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
-#' * \code{sdsm} - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees (the default)
-#' * \code{sdsm-ec} - The "SDSM with Edge Constraints" (Neal & Neal, 2023) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11)
-#' * \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
 #'
 #' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
 #' bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
 #' network that is missing from the projection. The "agent" nodes that appear in the projection must be represented by rows if \code{B}
 #' is an incidence matrix, or by \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
-#' must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when "prohibited" edges can be represented with weight = 10
+#' must be binary (i.e., unweighted), unless \code{model = "sdsm"}, when "prohibited" edges can be represented with weight = 10
 #' and "required" edges can be represented with weight = 11.
 #'
 #' @return A backbone in the same class as \code{B}. If \code{B} was an igraph object, the resulting igraph backbone preserves any node
@@ -109,14 +108,16 @@ must be the original bipartite network, not its weighted projection. If you only
 bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
 
   #Check that input is binary, or contains structural values and model=SDSM
-  if (model!="sdsm-ec" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
+  if (model!="sdsm" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
 
-  if (model=="sdsm-ec" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
-                                                          where required edges have weight 10 and prohibited edges have weight 11")}
+  if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
+                                                        where required edges have weight 10 and prohibited edges have weight 11")}
+
+  if (model=="sdsm") {if (all(I %in% c(0,1))) {model=="sdsm"} else {model=="sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
-  if (model == "sdsm-ec") {p <- .sdsm_ec(I, missing_as_zero, signed)}
+  if (model == "sdsm_ec") {p <- .sdsm_ec(I, missing_as_zero, signed)}
   if (model == "fixedrow") {p <- .fixedrow(I, missing_as_zero, signed)}
   if (model == "fixedcol") {p <- .fixedcol(I, missing_as_zero, signed)}
   if (model == "fixedfill") {p <- .fixedfill(I, missing_as_zero, signed)}
@@ -144,7 +145,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (model == "fixedrow") {desc <- "the fixed row model (FRM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "fixedcol") {desc <- "the fixed column model (FCM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "sdsm") {desc <- "the stochastic degree sequence model (SDSM; Neal, Domagalski, and Sagan, 2021)"}
-  if (model == "sdsm-ec") {desc <- "the stochastic degree sequence model with edge constraints (SDSM-EC; Neal & Neal, 2023)"}
+  if (model == "sdsm_ec") {desc <- "the stochastic degree sequence model with edge constraints (SDSM-EC; Neal & Neal, 2023)"}
   if (model == "fdsm") {desc <- paste0("the fixed degree sequence model (FDSM; Neal, Domagalski, and Sagan, 2021), where p-values were estimated from ", trials, " Monte Carlo trials")}
 
   old <- sum(p$upper!=0, na.rm=TRUE)  #Number of edges in projection (i.e., number of edges tested, and that have an upper-tail p-value)
@@ -161,7 +162,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
   message("")
   if (model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill")) {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
-  if (model == "sdsm-ec") {message("Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. International Conference on Complex Networks and Their Applications, 12, 127-136. https://doi.org/10.1007/978-3-031-53468-3_11")}
+  if (model == "sdsm_ec") {message("Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. International Conference on Complex Networks and Their Applications, 12, 127-136. https://doi.org/10.1007/978-3-031-53468-3_11")}
   }
 
   #### Return backbone ####
