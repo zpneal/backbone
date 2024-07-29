@@ -20,7 +20,7 @@ backbone_from_bipartite(
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
-\item{model}{string: backbone model, one of: \code{"sdsm"}, \code{"sdsm-ec"} \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}}
+\item{model}{string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}}
 
 \item{signed}{boolean: return a signed backbone}
 
@@ -50,19 +50,18 @@ significantly strong, and negative edges that are statistically significantly we
 The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. The available models
 differ in the constraints they impose on \code{B}:
 \itemize{
+\item \code{sdsm} (default) - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11; Neal & Neal, 2023)
+\item \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
 \item \code{fixedfill} - The "fixed fill" model (Neal et al., 2021) exactly constrains the total number of edges (i.e., sum)
 \item \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
 \item \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
-\item \code{sdsm} - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees (the default)
-\item \code{sdsm-ec} - The "SDSM with Edge Constraints" (Neal & Neal, 2023) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11)
-\item \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
 }
 
 Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
 bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
 network that is missing from the projection. The "agent" nodes that appear in the projection must be represented by rows if \code{B}
 is an incidence matrix, or by \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
-must be binary (i.e., unweighted), unless \code{model = "sdsm-ec"}, when "prohibited" edges can be represented with weight = 10
+must be binary (i.e., unweighted), unless \code{model = "sdsm"}, when "prohibited" edges can be represented with weight = 10
 and "required" edges can be represented with weight = 11.
 }
 \examples{
