@@ -116,6 +116,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
+  if (model == "sdsm-ec") {p <- .sdsm_ec(I, missing_as_zero, signed)}
   if (model == "fixedrow") {p <- .fixedrow(I, missing_as_zero, signed)}
   if (model == "fixedcol") {p <- .fixedcol(I, missing_as_zero, signed)}
   if (model == "fixedfill") {p <- .fixedfill(I, missing_as_zero, signed)}
