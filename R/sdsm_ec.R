@@ -26,11 +26,13 @@
   A <- data.frame(edge = as.vector(I),     #Data frame of bipartite dyads
                   row = as.vector(row(I)),
                   col = as.vector(col(I)))
-  A$edge2 <- A$edge  #Set structural edges to NA so they're excluded from degrees and logit
-  A$rowmarg <- stats::ave(A$edge2,A$row,FUN=sum)  #Compute rowsums (agent degree), excluding structural edges
-  A$colmarg <- stats::ave(A$edge2,A$col,FUN=sum)  #Compute colsums (artifact degree), excluding structural edges
+  A$edge2 <- A$edge  #Copy of edges
+  A$edge2[which(A$edge2>1)] <- 0  #Set structural edges to 0 so they're not considered in marginals
+  A$rowmarg <- stats::ave(A$edge2,A$row,FUN=sum,na.rm=TRUE)  #Compute rowsums (agent degree), excluding structural edges
+  A$colmarg <- stats::ave(A$edge2,A$col,FUN=sum,na.rm=TRUE)  #Compute colsums (artifact degree), excluding structural edges
 
   #Compute probabilities on non-structural edges using logit
+  A$edge2[which(A$edge2>1)] <- NA  #Set structural edges to NA so they're not considered in marginals
   model.estimates <- suppressWarnings(stats::glm(formula = edge2 ~ rowmarg + colmarg, family = stats::binomial(link="logit"), data=A))
   A$probs <- as.vector(suppressWarnings(stats::predict(model.estimates, newdata = A, type = "response")))
   
