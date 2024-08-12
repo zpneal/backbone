@@ -173,7 +173,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   }
 
   if (methods::is(B,"igraph")) {
-    if (model=="sdsm_ec") {B <- igraph::delete_edges(B, which(E(B)$weight==10))}  #If there are prohibited edges in an igraph object, remove them
+    if (model=="sdsm_ec") {B <- igraph::delete_edges(B, which(igraph::E(B)$weight==10))}  #If there are prohibited edges in an igraph object, remove them
     P <- igraph::bipartite_projection(B, which="false")  #Generate weighted projection, with any agent attributes
     igraph::E(P)$oldweight <- igraph::E(P)$weight  #Save old edge weights
     P <- igraph::delete_edge_attr(P, "weight")  #Delete weight attribute
