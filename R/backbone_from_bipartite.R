@@ -113,7 +113,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
                                                         where required edges have weight 10 and prohibited edges have weight 11")}
 
-  if (model=="sdsm") {if (all(I %in% c(0,1))) {model=="sdsm"} else {model=="sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
+  if (model=="sdsm") {if (all(I %in% c(0,1))) {model <- "sdsm"} else {model <- "sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
