@@ -46,6 +46,19 @@ expect_true(isSymmetric(test$lower))  #Lower-tail is symmetric
 expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
 expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
 
+## .sdsm_ec()
+M <- rbind(c(10,0,1),c(0,11,0),c(1,0,1))
+test <- backbone:::.sdsm_ec(M, signed = TRUE, missing_as_zero = TRUE)
+test$upper <- round(test$upper,3)
+test$lower <- round(test$lower,3)
+expect_true(is(test, "list") & length(test)==2)  #Output is a two-item list
+expect_true(all(is.na(diag(test$upper))))  #Upper-tail diagonal is missing
+expect_true(all(is.na(diag(test$lower))))  #Lower-tail diagonal is missing
+expect_true(isSymmetric(test$upper))  #Upper-tail is symmetric
+expect_true(isSymmetric(test$lower))  #Lower-tail is symmetric
+expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
+expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
+
 ## .fixedrow()
 M <- rbind(c(0,0,1),c(0,1,0),c(1,0,1))
 test <- backbone:::.fixedrow(M, signed = TRUE, missing_as_zero = TRUE)
@@ -108,6 +121,20 @@ expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
 expect_true(triangle_index(bb)>.9)    #Is nearly balanced
 
+B <- as.vector(B)
+make_prohibited <- sample(which(B==0), 5, replace = FALSE)  #Pick some missing edges to prohibit
+B[make_prohibited] <- 10
+make_required <- sample(which(B==1), 5, replace = FALSE)  #Pick some present edges to require
+B[make_required] <- 11
+B <- matrix(B, 30, 75)  #Reassemble as matrix
+bb <- backbone_from_bipartite(B, model = "sdsm", signed = TRUE)  #Extract SDSM matrix as signed, considering structural values
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.9)    #Is nearly balanced
+
 ## Bipartite from igraph
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
                  matrix(rbinom(250,1,.2),10),
@@ -145,3 +172,12 @@ expect_true(is(bb,"igraph"))                                                  #R
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+
+igraph::E(B)$weight <- NA
+igraph::E(B)$weight <- sample(c(1,11), length(igraph::E(B)$weight), replace = TRUE, prob = c(.9,.1))
+bb <- backbone_from_bipartite(B, model = "sdsm")                              #Extract SDSM igraph with defaults, considering structural values
+expect_true(is(bb,"igraph"))                                                  #Returns as igraph
+expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
+expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+
