@@ -174,8 +174,8 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   if (methods::is(B,"igraph")) {
     if (model=="sdsm_ec") {  #If there are structural values, remove them
-      B[B==10] <- 0  #Make structural 0s ordinary 0
-      B[B==11] <- 1  #Make structural 1s ordinary 1
+      E(B)$weight[which(E(B)$weight==10)] <- 0  #Make structural 0s ordinary 0
+      E(B)$weight[which(E(B)$weight==11)] <- 1  #Make structural 1s ordinary 1
     }
     P <- igraph::bipartite_projection(B, which="false")  #Generate weighted projection, with any agent attributes
     igraph::E(P)$oldweight <- igraph::E(P)$weight  #Save old edge weights
