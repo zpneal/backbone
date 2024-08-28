@@ -86,6 +86,6 @@
     if (signed) {lower[P == 0] <- NA}
   }
 
-  if (signed) {return(list(lower = lower, upper = upper, trials = trials))}
-  if (!signed) {return(list(upper = upper, trials = trials))}
+  if (signed) {return(list(lower = lower, upper = upper))}
+  if (!signed) {return(list(upper = upper))}
   }
