@@ -78,12 +78,12 @@ backbone_from_bipartite <- function(B,
   if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
   if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (model=="fdsm" & !is.null("trials")) {  #If FDSM and `trials` is supplied, check it
+  if (model=="fdsm" & !is.null(trials)) {  #If FDSM and `trials` is supplied, check it
     if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
     if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
   }
-  if (model=="fdsm" & is.null("trials")) {trials <- 0}  #If FDSM and `trials` not supplied, set to 0 now and ask .fdsm() to choose a value
-  if (model!="fdsm" & !is.null("trials")) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
+  if (model=="fdsm" & is.null(trials)) {trials <- 0}  #If FDSM and `trials` not supplied, set to 0 now and ask .fdsm() to choose a value
+  if (model!="fdsm" & !is.null(trials)) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
 
   #### Check and format input ####
