@@ -3,6 +3,7 @@
 export(backbone_from_bipartite)
 export(bicm)
 export(fastball)
+export(fdsm)
 export(fixedcol)
 export(fixedfill)
 export(fixedrow)
