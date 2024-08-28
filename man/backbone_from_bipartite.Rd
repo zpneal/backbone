@@ -12,7 +12,7 @@ backbone_from_bipartite(
   mtc = "none",
   missing_as_zero = FALSE,
   narrative = FALSE,
-  ...
+  trials = NULL
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ backbone_from_bipartite(
 
 \item{narrative}{boolean: display suggested text & citations}
 
-\item{...}{arguments passed to internal functions}
+\item{trials}{numeric: if \code{model == "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution}
 }
 \value{
 A backbone in the same class as \code{B}. If \code{B} was an igraph object, the resulting igraph backbone preserves any node
