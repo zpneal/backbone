@@ -147,7 +147,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (model == "fixedcol") {desc <- "the fixed column model (FCM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "sdsm") {desc <- "the stochastic degree sequence model (SDSM; Neal, Domagalski, and Sagan, 2021)"}
   if (model == "sdsm_ec") {desc <- "the stochastic degree sequence model with edge constraints (SDSM-EC; Neal & Neal, 2023)"}
-  if (model == "fdsm") {desc <- paste0("the fixed degree sequence model (FDSM; Neal, Domagalski, and Sagan, 2021), where p-values were estimated from ", trials, " Monte Carlo trials")}
+  if (model == "fdsm") {desc <- paste0("the fixed degree sequence model (FDSM; Neal, Domagalski, and Sagan, 2021), where p-values were estimated from ", p$trials, " Monte Carlo trials")}
 
   old <- sum(p$upper!=0, na.rm=TRUE)  #Number of edges in projection (i.e., number of edges tested, and that have an upper-tail p-value)
   new <- sum(backbone!=0)  #Number of edges in backbone
