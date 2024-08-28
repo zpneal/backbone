@@ -9,7 +9,7 @@
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
-#' @param ... arguments passed to internal functions
+#' @param trials numeric: if \code{model == "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution
 #'
 #' @details
 #' The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
@@ -69,7 +69,7 @@ backbone_from_bipartite <- function(B,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
                                     narrative = FALSE,
-                                    ...) {
+                                    trials = NULL) {
 
   #### Check parameters ####
   if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
@@ -78,12 +78,12 @@ backbone_from_bipartite <- function(B,
   if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
   if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (exists("trials") & model=="fdsm") {  #If FDSM and `trials` is supplied, check it
+  if (model=="fdsm" & !is.null("trials")) {  #If FDSM and `trials` is supplied, check it
     if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
     if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
   }
-  if (!exists("trials") & model=="fdsm") {trials <- 0}  #If FDSM and `trials` not supplied, set to 0 now and ask .fdsm() to choose a value
-  if (exists("trials") & model!="fdsm") {message("The `trials` argument is only valid when `model = \"fdsm\"`. It is being ignored.")}
+  if (model=="fdsm" & is.null("trials")) {trials <- 0}  #If FDSM and `trials` not supplied, set to 0 now and ask .fdsm() to choose a value
+  if (model!="fdsm" & !is.null("trials")) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
 
   #### Check and format input ####
