@@ -74,7 +74,7 @@ backbone_from_bipartite <- function(B,
   #### Check parameters ####
   if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
   if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
-  if (!(model %in% c("sdsm", "sdsm-ec", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"sdsm-ec\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
+  if (!(model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
   if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
   if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
