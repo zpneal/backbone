@@ -42,6 +42,12 @@
     lower[lower.tri(lower)] = t(lower)[lower.tri(lower)]
   }
 
+  #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
+  if (!missing.as.zero) {
+    upper[P == 0] <- NA
+    if (signed) {lower[P == 0] <- NA}
+  }
+  
   if (signed) {return(list(lower = lower, upper = upper))}
   if (!signed) {return(list(upper = upper))}
   }
