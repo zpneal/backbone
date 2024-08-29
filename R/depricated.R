@@ -124,12 +124,13 @@ fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing.as.zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
+#' @param trials numeric: the number of bipartite graphs generated using fastball to approximate the edge weight distribution
 #'
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
 #' @export
-fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
+fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE, trials = NULL){
   .Deprecated("backbone_from_bipartite(model = \"fdsm\")")
 
   return(
