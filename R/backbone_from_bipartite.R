@@ -9,10 +9,10 @@
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
-#' @param trials numeric: if \code{model == "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution
+#' @param trials numeric: if \code{model = "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution
 #'
 #' @details
-#' The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
+#' The \code{backbone_from_bipartite} function extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
 #' nodes and *m* "artifact" nodes. The backbone is an unweighted unipartite network of agents that contains only edges whose weights
 #' in the projection are statistically significant. When \code{signed = FALSE}, the backbone contains edges that are statistically
 #' significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are statistically
@@ -21,7 +21,7 @@
 #' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. The available models
 #' differ in the constraints they impose on \code{B}:
 #' * \code{sdsm} (default) - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11; Neal & Neal, 2023)
-#' * \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
+#' * \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrains the agent and artifact degrees
 #' * \code{fixedfill} - The "fixed fill" model (Neal et al., 2021) exactly constrains the total number of edges (i.e., sum)
 #' * \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
 #' * \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
@@ -68,7 +68,7 @@ backbone_from_bipartite <- function(B,
                                     signed = FALSE,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
-                                    narrative = FALSE,
+                                    narrative = TRUE,
                                     trials = NULL) {
 
   #### Check parameters ####
