@@ -10,7 +10,8 @@ fdsm(
   missing.as.zero = FALSE,
   signed = FALSE,
   mtc = "none",
-  narrative = FALSE
+  narrative = FALSE,
+  trials = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ fdsm(
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.}
 
 \item{narrative}{boolean: display suggested text & citations}
+
+\item{trials}{numeric: the number of bipartite graphs generated using fastball to approximate the edge weight distribution}
 }
 \description{
 \code{fdsm()} was replaced by \code{backbone_from_bipartite(model = "fdsm")}.
