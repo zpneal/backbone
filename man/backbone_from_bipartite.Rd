@@ -11,7 +11,7 @@ backbone_from_bipartite(
   signed = FALSE,
   mtc = "none",
   missing_as_zero = FALSE,
-  narrative = FALSE,
+  narrative = TRUE,
   trials = NULL
 )
 }
@@ -30,7 +30,7 @@ backbone_from_bipartite(
 
 \item{narrative}{boolean: display suggested text & citations}
 
-\item{trials}{numeric: if \code{model == "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution}
+\item{trials}{numeric: if \code{model = "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution}
 }
 \value{
 A backbone in the same class as \code{B}. If \code{B} was an igraph object, the resulting igraph backbone preserves any node
@@ -41,7 +41,7 @@ includes a "sign" edge attribute indicating the edges' sign.
 \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network.
 }
 \details{
-The \code{backbone_from_bipartite} extracts the backbone from the weighted projection of a bipartite network composed of \emph{n} "agent"
+The \code{backbone_from_bipartite} function extracts the backbone from the weighted projection of a bipartite network composed of \emph{n} "agent"
 nodes and \emph{m} "artifact" nodes. The backbone is an unweighted unipartite network of agents that contains only edges whose weights
 in the projection are statistically significant. When \code{signed = FALSE}, the backbone contains edges that are statistically
 significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are statistically
@@ -51,7 +51,7 @@ The \code{model} parameter controls the null model used to evaluate the statisti
 differ in the constraints they impose on \code{B}:
 \itemize{
 \item \code{sdsm} (default) - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11; Neal & Neal, 2023)
-\item \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrain the agent and artifact degrees
+\item \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrains the agent and artifact degrees
 \item \code{fixedfill} - The "fixed fill" model (Neal et al., 2021) exactly constrains the total number of edges (i.e., sum)
 \item \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
 \item \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
