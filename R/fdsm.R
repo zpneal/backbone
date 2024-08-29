@@ -29,10 +29,10 @@
       if (missing_as_zero) {tests <- sum(lower.tri(P))}  #Entries in lower triangle
       test.alpha <- test.alpha / tests
     }
-    #p1 = A hypothetical empirical monte carlo p-value we want to evaluate that is close to (5% smaller than) the alpha level
+    #p1 = A hypothetical empirical monte carlo p-value we want to evaluate that is close to (within alpha percent of) the alpha level
     #p2 = The alpha level against which we are evaluating p1, with any two-tailed or mtc adjustments
     #Because type-I errors (a false edge is included in the backbone) is as bad as type-II errors (a true edge is omitted from the backbone), therefore power = alpha
-    trials <- ceiling((stats::power.prop.test(p1 = test.alpha * 0.95, p2 = test.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
+    trials <- ceiling((stats::power.prop.test(p1 = test.alpha * (1 - alpha), p2 = test.alpha, sig.level = alpha, power = (1-alpha), alternative = "one.sided")$n)/2)
   }
 
   #### Prepare for randomization loop ####
@@ -53,7 +53,7 @@
   }
 
   #### Build Null Models ####
-  message(paste0("Constructing empirical edgewise p-values using ", trials, " trials -" ))
+  message(paste0("Constructing edges' Monte Carlo p-values" ))
   pb <- utils::txtProgressBar(min = 0, max = trials, style = 3)  #Start progress bar
   for (i in 1:trials){
 
