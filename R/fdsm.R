@@ -17,12 +17,12 @@
 #' @references fastball: {Godard, K. and Neal, Z. P. (2022). fastball: A fast algorithm to randomly sample bipartite graphs with fixed degree sequences. *Journal of Complex Networks, 10*, cnac049. \doi{10.1093/comnet/cnac049}}
 #'
 #' @noRd
-.fdsm <- function(I, missing_as_zero, signed, alpha, mtc, trials = NULL){
+.fdsm <- function(I, missing_as_zero, signed, alpha, mtc, trials){
 
   P <- tcrossprod(I)  #Weighted bipartite projection
 
   #### Compute number of trials required ####
-  if (trials == 0) {
+  if (is.null(trials)) {
     if (signed == TRUE) {test.alpha <- alpha / 2} else {test.alpha <- alpha}  #Adjust alpha if two-tailed test
     if (mtc != "none") {  #If multiple test correction is requested, conservatively adjust alpha using Bonferroni
       if (!missing_as_zero) {tests <- sum(lower.tri(P) & P!=0)}  #Non-zero entries in lower triangle
@@ -78,7 +78,12 @@
 
   #### Compute p-values ####
   upper <- (upper / trials)
-  if (signed) {lower <- (lower / trials)}
+  diag(upper) <- NA
+
+  if (signed) {
+    lower <- (lower / trials)
+    diag(lower) <- NA
+    }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
   if (!missing_as_zero) {

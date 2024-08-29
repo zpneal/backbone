@@ -66,7 +66,12 @@
 
   #### Compute P-values ####
   upper <- apply(P, c(1,2), FUN = function(k)sum(probs[(k+1):(max_w+2)]))  #Sum of probabilities Pij <= w <= max_w and beyond
-  if (signed) {lower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))}  #Sum of probabilities 0 <= k <= Pij
+  diag(upper) <- NA
+
+  if (signed) {
+    lower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))  #Sum of probabilities 0 <= k <= Pij
+    diag(lower) <- NA
+    }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
   if (!missing_as_zero) {

@@ -30,10 +30,12 @@
   #### Compute p-values using RNA-approximation of poisson-binomial ####
   upper <- ((P-1)+.5-mu)/sigma
   upper <- 1 - (stats::pnorm(upper)+gamma/(6*sigma^3)*(1-upper^2)*stats::dnorm(upper))
+  diag(upper) <- NA
 
   if (signed) {
     lower <- (P+.5-mu)/sigma
     lower <- stats::pnorm(lower)+gamma/(6*sigma^3)*(1-lower^2)*stats::dnorm(lower)
+    diag(lower) <- NA
   }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
