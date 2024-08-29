@@ -140,6 +140,7 @@ fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
                             signed = signed,
                             mtc = mtc,
                             missing_as_zero = missing.as.zero,
-                            narrative = TRUE)
+                            narrative = TRUE,
+                            trials = trials)
   )
 }
