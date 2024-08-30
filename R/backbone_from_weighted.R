@@ -2,8 +2,9 @@
 #'
 #' \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
 #'
-#' @param W A weighted network as a valued incidence matrix or a weighted unipartite \code{\link{igraph}} object
-#' @param alpha real: significance level of hypothesis test(s)
+#' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object
+#' @param alpha real: significance level of hypothesis test(s), used for statistical models
+#' @param threshold real or FUN: threshold value or functions that evaluates to a threshold value when applied to the weighted matrix, used for structural models
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
@@ -64,6 +65,7 @@
 #' plot(bb) #...preserves edges at multiple scales
 backbone_from_weighted <- function(W,
                                    alpha = 0.05,
+                                   threshold,
                                    model = "disparity",
                                    signed = FALSE,
                                    mtc = "none",
