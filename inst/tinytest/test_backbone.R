@@ -120,6 +120,24 @@ expect_true(is(test, "list") & length(test)==2)  #Output is a two-item list
 expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
 expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
 
+## .lans()
+M <- rbind(c(0,0,1),c(0,1,0),c(1,0,1))
+test <- backbone:::.lans(M, signed = TRUE, missing_as_zero = TRUE)
+test$upper <- round(test$upper,3)
+test$lower <- round(test$lower,3)
+expect_true(is(test, "list") & length(test)==2)  #Output is a two-item list
+expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
+expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
+
+## .mlf()
+M <- rbind(c(0,0,1),c(0,1,0),c(1,0,1))
+test <- backbone:::.mlf(M, signed = TRUE, missing_as_zero = TRUE)
+test$upper <- round(test$upper,3)
+test$lower <- round(test$lower,3)
+expect_true(is(test, "list") & length(test)==2)  #Output is a two-item list
+expect_true(all(test$upper[upper.tri(test$upper)]>=0 & test$upper[upper.tri(test$upper)]<=1))  #Upper-tail p-values between 0 and 1
+expect_true(all(test$lower[upper.tri(test$lower)]>=0 & test$lower[upper.tri(test$lower)]<=1))  #Lower-tail p-values between 0 and 1
+
 #### Bipartite Backbone Functions ####
 ## Define function to compute triangle index
 trace <- function(x){sum(diag(x))}
@@ -261,10 +279,28 @@ expect_true(is(bb,"matrix"))                          #Returns as matrix
 bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
 expect_true(igraph::is_tree(bb))                      #Backbone is a tree
 
+bb <- backbone_from_weighted(W, model = "lans")       #Extract lans backbone
+expect_true(is(bb,"matrix"))                          #Returns as matrix
+bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
+expect_true(igraph::is_tree(bb))                      #Backbone is a tree
+
+bb <- backbone_from_weighted(W, model = "mlf")        #Extract mlf backbone
+expect_true(is(bb,"matrix"))                          #Returns as matrix
+bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
+expect_true(igraph::is_tree(bb))                      #Backbone is a tree
+
 ## Multiscale weighted igraph
 W <- igraph::graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE)
 
 bb <- backbone_from_weighted(W, model = "disparity")  #Extract disparity backbone
+expect_true(is(bb,"igraph"))                          #Returns as igraph
+expect_true(igraph::is_tree(bb))                      #Backbone is a tree
+
+bb <- backbone_from_weighted(W, model = "lans")       #Extract lans backbone
+expect_true(is(bb,"igraph"))                          #Returns as igraph
+expect_true(igraph::is_tree(bb))                      #Backbone is a tree
+
+bb <- backbone_from_weighted(W, model = "mlf")        #Extract mlf backbone
 expect_true(is(bb,"igraph"))                          #Returns as igraph
 expect_true(igraph::is_tree(bb))                      #Backbone is a tree
 
@@ -281,6 +317,22 @@ W <- rbind(cbind(matrix(rbinom(250,1,.8),10),
 W <- W%*%t(W)
 
 bb <- backbone_from_weighted(W, model = "disparity", signed = TRUE, alpha = 0.5)  #Extract signed disparity matrix
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
+
+bb <- backbone_from_weighted(W, model = "lans", signed = TRUE, alpha = 0.5)  #Extract signed lans matrix
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
+
+bb <- backbone_from_weighted(W, model = "mlf", signed = TRUE, alpha = 0.5)  #Extract signed mlf matrix
 expect_true(is(bb,"matrix"))         #Returns as matrix
 expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
@@ -308,4 +360,14 @@ expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #C
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
 
+bb <- backbone_from_weighted(W, model = "lans", alpha = 0.25)                 #Extract unweighted lans igraph
+expect_true(is(bb,"igraph"))                                                  #Returns as igraph
+expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
+expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
 
+bb <- backbone_from_weighted(W, model = "mlf", alpha = 0.25)                  #Extract unweighted mlf igraph
+expect_true(is(bb,"igraph"))                                                  #Returns as igraph
+expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
+expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
