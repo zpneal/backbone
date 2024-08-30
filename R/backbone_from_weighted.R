@@ -4,7 +4,7 @@
 #'
 #' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object
 #' @param alpha real: significance level of hypothesis test(s), used for statistical models
-#' @param threshold real or FUN: threshold value or functions that evaluates to a threshold value when applied to the weighted matrix, used for structural models
+#' @param threshold real or FUN: global threshold value or function that evaluates to a global threshold value when applied to the weighted matrix
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
@@ -19,14 +19,14 @@
 #' statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 #'
 #' The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
-#' *Statistical Models*
+#' *Statistical Models* (all controlled by `alpha`)
 #' * \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 #' * \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
 #' * \code{mlf} - Marginal likelihood filter (Dianati, 2016)
 #'
 #' *Structural Models*
-#' * \code{global} - A global threshold in which all edges with weights above a user-specified threshold are preserved (as positive, and
-#'   equal to or below a user-specified threshold are preserved as negative)
+#' * \code{global} - Edges with weights above `threshold` are preserved (if `signed = TRUE` as positive, and edges with weights
+#'   equal to or below `threshold` are preserved as negative)
 #'
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
