@@ -7,6 +7,7 @@
 backbone_from_weighted(
   W,
   alpha = 0.05,
+  threshold,
   model = "disparity",
   signed = FALSE,
   mtc = "none",
@@ -15,9 +16,11 @@ backbone_from_weighted(
 )
 }
 \arguments{
-\item{W}{A weighted network as a valued incidence matrix or a weighted unipartite \code{\link{igraph}} object}
+\item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object}
 
-\item{alpha}{real: significance level of hypothesis test(s)}
+\item{alpha}{real: significance level of hypothesis test(s), used for statistical models}
+
+\item{threshold}{real or FUN: threshold value or functions that evaluates to a threshold value when applied to the weighted matrix, used for structural models}
 
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 
