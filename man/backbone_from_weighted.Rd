@@ -58,7 +58,7 @@ The \code{model} parameter controls the model used to evaluate the edge weights.
 \emph{Structural Models}
 \itemize{
 \item \code{global} - A global threshold in which all edges with weights above a user-specified threshold are preserved (as positive, and
-below a user-specified threshold are preserved as negative)
+equal to or below a user-specified threshold are preserved as negative)
 }
 
 The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
