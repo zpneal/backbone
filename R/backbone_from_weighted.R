@@ -105,7 +105,7 @@ backbone_from_weighted <- function(W,
   if (model == "disparity" | model == "lans" | model == "mlf") {backbone <- .retain(p, alpha, mtc)}
   
   #### Structural Models ####
-  #if (model == "global") {backbone <- .global(A, missing_as_zero, threshold)}
+  #if (model == "global") {backbone <- .global(A, missing_as_zero, signed, threshold)}
 
   #### Display narrative ####
   if (narrative) {
