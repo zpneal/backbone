@@ -26,7 +26,7 @@
 #'
 #' *Structural Models*
 #' * \code{global} - A global threshold in which all edges with weights above a user-specified threshold are preserved (as positive, and
-#'   below a user-specified threshold are preserved as negative)
+#'   equal to or below a user-specified threshold are preserved as negative)
 #'
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
@@ -98,14 +98,14 @@ backbone_from_weighted <- function(W,
   if (methods::is(W,"matrix")) {A <- W}  #matrix --> matrix
   if (methods::is(W,"igraph")) {A <- igraph::as_adjacency_matrix(W, names = FALSE, sparse = FALSE, attr = "weight")}
 
-  #### Compute p-values ####
+  #### Statistical Models ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}
   if (model == "lans") {p <- .lans(A, missing_as_zero, signed)}
   if (model == "mlf") {p <- .mlf(A, missing_as_zero, signed)}
-  #if (model == "global") {p <- .global(A, missing_as_zero, signed)}
-
-  #### Retain edges ####
-  backbone <- .retain(p, alpha, mtc)
+  if (model == "disparity" | model == "lans" | model == "mlf") {backbone <- .retain(p, alpha, mtc)}
+  
+  #### Structural Models ####
+  #if (model == "global") {backbone <- .global(A, missing_as_zero, threshold)}
 
   #### Display narrative ####
   if (narrative) {
