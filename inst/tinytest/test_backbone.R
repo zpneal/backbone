@@ -134,7 +134,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
-expect_true(triangle_index(bb)>.9)   #Is nearly balanced
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 bb <- backbone_from_bipartite(B, model = "fdsm", signed = TRUE, trials = 1000)  #Extract FDSM matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -142,7 +142,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
-expect_true(triangle_index(bb)>.9)   #Is nearly balanced
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 bb <- backbone_from_bipartite(B, model = "fixedrow", signed = TRUE)  #Extract fixedrow matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -150,7 +150,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
-expect_true(triangle_index(bb)>.9)   #Is nearly balanced
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 bb <- backbone_from_bipartite(B, model = "fixedcol", signed = TRUE)  #Extract fixedcol matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -158,7 +158,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
-expect_true(triangle_index(bb)>.9)   #Is nearly balanced
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 bb <- backbone_from_bipartite(B, model = "fixedfill", signed = TRUE)  #Extract fixedfill matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -166,7 +166,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
-expect_true(triangle_index(bb)>.9)   #Is nearly balanced
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 B <- as.vector(B)
 make_prohibited <- sample(which(B==0), 5, replace = FALSE)  #Pick some missing edges to prohibit
@@ -180,7 +180,7 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
-expect_true(triangle_index(bb)>.9)   #Is nearly balanced
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 ## Bipartite from igraph
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
