@@ -20,7 +20,7 @@ backbone_from_weighted(
 
 \item{alpha}{real: significance level of hypothesis test(s), used for statistical models}
 
-\item{threshold}{real or FUN: threshold value or functions that evaluates to a threshold value when applied to the weighted matrix, used for structural models}
+\item{threshold}{real or FUN: global threshold value or function that evaluates to a global threshold value when applied to the weighted matrix}
 
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 
@@ -48,7 +48,7 @@ statistically significantly strong under a one-tailed test. When \code{signed = 
 statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 
 The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
-\emph{Statistical Models}
+\emph{Statistical Models} (all controlled by \code{alpha})
 \itemize{
 \item \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 \item \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
@@ -57,8 +57,8 @@ The \code{model} parameter controls the model used to evaluate the edge weights.
 
 \emph{Structural Models}
 \itemize{
-\item \code{global} - A global threshold in which all edges with weights above a user-specified threshold are preserved (as positive, and
-equal to or below a user-specified threshold are preserved as negative)
+\item \code{global} - Edges with weights above \code{threshold} are preserved (if \code{signed = TRUE} as positive, and edges with weights
+equal to or below \code{threshold} are preserved as negative)
 }
 
 The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
