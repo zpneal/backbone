@@ -98,8 +98,8 @@ backbone_from_weighted <- function(W,
 
   #### Compute p-values ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}
-  #if (model == "lans") {p <- .lans(A, missing_as_zero, signed)}
-  #if (model == "mlf") {p <- .mlf(A, missing_as_zero, signed)}
+  if (model == "lans") {p <- .lans(A, missing_as_zero, signed)}
+  if (model == "mlf") {p <- .mlf(A, missing_as_zero, signed)}
   #if (model == "global") {p <- .global(A, missing_as_zero, signed)}
 
   #### Retain edges ####

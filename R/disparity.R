@@ -2,7 +2,7 @@
 #'
 #' @param A A weighted adjacency matrix
 #' @param missing_as_zero boolean: should missing edges be treated as edges with zero weight and tested for significance
-#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone
 #'
 #' @return
 #' If `signed = FALSE` a list containing a matrix of upper-tail p-values.

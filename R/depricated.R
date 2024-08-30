@@ -173,3 +173,61 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
                            narrative = TRUE)
   )
 }
+
+#' Depricated function to extract LANS backbone
+#'
+#' \code{lans()} was replaced by \code{backbone_from_weighted(model = "lans")}.
+#'
+#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' #'
+#' @details
+#' See backbone v2.1.4 for original documentation
+#'
+#' @export
+lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
+  .Deprecated("backbone_from_weighted(model = \"lans\")")
+
+  return(
+    backbone_from_weighted(W,
+                           model = "lans",
+                           alpha = alpha,
+                           signed = signed,
+                           mtc = mtc,
+                           missing_as_zero = missing.as.zero,
+                           narrative = TRUE)
+  )
+}
+
+#' Depricated function to extract MLF backbone
+#'
+#' \code{mlf()} was replaced by \code{backbone_from_weighted(model = "mlf")}.
+#'
+#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' #'
+#' @details
+#' See backbone v2.1.4 for original documentation
+#'
+#' @export
+mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
+  .Deprecated("backbone_from_weighted(model = \"mlf\")")
+
+  return(
+    backbone_from_weighted(W,
+                           model = "mlf",
+                           alpha = alpha,
+                           signed = signed,
+                           mtc = mtc,
+                           missing_as_zero = missing.as.zero,
+                           narrative = TRUE)
+  )
+}
