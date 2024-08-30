@@ -1,0 +1,165 @@
+#' Extract the backbone from a weighted network
+#'
+#' \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
+#'
+#' @param W A weighted network as a valued incidence matrix or a weighted unipartite \code{\link{igraph}} object
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
+#' @param signed boolean: return a signed backbone
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
+#' @param narrative boolean: display suggested text & citations
+#'
+#' @details
+#' The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
+#' unipartite network that contains only edges whose weights in the projection are statistically significant (for statistical models), or
+#' which exhibit certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
+#' statistically significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are
+#' statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
+#'
+#' The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
+#' *Statistical Models*
+#' * \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
+#' * \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
+#' * \code{mlf} - Marginal likelihood filter (Dianati, 2016)
+#'
+#' *Structural Models*
+#' * \code{global} - A global threshold in which all edges with weights above a user-specified threshold are preserved (as positive, and
+#'   below a user-specified threshold are preserved as negative)
+#'
+#' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
+#' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
+#'
+#' @return A backbone in the same class as \code{W}. If \code{W} was an igraph object, the resulting igraph backbone preserves any node
+#' attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and (if \code{signed = TRUE})
+#' includes a "sign" edge attribute indicating the edges' sign.
+#'
+#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Aciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
+#' @references lans: {Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. *PLOS One, 6*, e16431. \doi{10.1371/journal.pone.0016431}}
+#' @references mlf: {Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. *Physical Review E, 93*, 012304. \doi{10.1103/PhysRevE.93.012304}}
+#'
+#' @export
+#'
+#' @examples
+#' #A weighted network with heterogeneous (i.e. multiscale) weights
+#' W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
+#'               10,0,1,1,1,0,0,0,0,0,
+#'               10,1,0,1,1,0,0,0,0,0,
+#'               10,1,1,0,1,0,0,0,0,0,
+#'               10,1,1,1,0,0,0,0,0,0,
+#'               75,0,0,0,0,0,100,100,100,100,
+#'               0,0,0,0,0,100,0,10,10,10,
+#'               0,0,0,0,0,100,10,0,10,10,
+#'               0,0,0,0,0,100,10,10,0,10,
+#'               0,0,0,0,0,100,10,10,10,0),10)
+#'
+#' W <- igraph::graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE)
+#' plot(W, edge.width = sqrt(igraph::E(W)$weight)) #A stronger clique & a weaker clique
+#'
+#' #bb <- backbone_from_weighted(W, model = "global")  #A backbone with stronger-than-average edges...
+#' #plot(bb) #...ignores the weaker clique
+#'
+#' bb <- backbone_from_weighted(W, model = "disparity") #A disparity filter backbone...
+#' plot(bb) #...preserves edges at multiple scales
+backbone_from_weighted <- function(W,
+                                   alpha = 0.05,
+                                   model = "disparity",
+                                   signed = FALSE,
+                                   mtc = "none",
+                                   missing_as_zero = FALSE,
+                                   narrative = TRUE) {
+
+  #### Check parameters ####
+  if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
+  if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
+  if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
+  if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
+  if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
+  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
+
+  #### Check and format input ####
+  #Check that input is a weighted adjacency matrix or weighted unipartite igraph
+  if (!methods::is(W,"matrix") & !methods::is(W,"igraph")) {stop("`W` must be an incidence matrix or igraph object")}
+
+  if (methods::is(W,"matrix")) {
+    if (dim(W)[1] != dim(W)[2]) {stop("`W` must be a square adjacency matrix")}
+    if (all(W %in% c(0,1))) {stop("The entries of `W` must represent edge weights")}
+  }
+
+  if (methods::is(W,"igraph")) {
+    if (igraph::is_bipartite(W)) {stop("`W` must be a unipartite igraph object")}
+    if (!"weight" %in% igraph::edge_attr_names(W)) {stop("`W` must contain an edge weight attribute")}
+    }
+
+  #Convert input to adjacency matrix
+  if (methods::is(W,"matrix")) {A <- W}  #matrix --> matrix
+  if (methods::is(W,"igraph")) {A <- igraph::as_adjacency_matrix(W, names = FALSE, sparse = FALSE, attr = "weight")}
+
+  #### Compute p-values ####
+  if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}
+  #if (model == "lans") {p <- .lans(A, missing_as_zero, signed)}
+  #if (model == "mlf") {p <- .mlf(A, missing_as_zero, signed)}
+  #if (model == "global") {p <- .global(A, missing_as_zero, signed)}
+
+  #### Retain edges ####
+  backbone <- .retain(p, alpha, mtc)
+
+  #### Display narrative ####
+  if (narrative) {
+  # First sentence (descriptive)
+  if (signed) {type <- "signed"} else {type <- "unweighted"}
+
+  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
+
+  # Second sentence (model and outcome)
+  if (mtc == "none") {correction <- ""}
+  if (mtc == "bonferroni") {correction <- ", Bonferroni adjusted"}
+  if (mtc == "holm") {correction <- ", Holm adjusted"}
+  if (mtc == "hommel") {correction <- ", Hommel adjusted"}
+  if (mtc == "hochberg") {correction <- ", Hochberg adjusted"}
+  if (mtc == "BH" | mtc == "fdr") {correction <- ", Benjamini & Hochberg adjusted"}
+  if (mtc == "BY") {correction <- ", Benjamini & Yekutieli adjusted"}
+
+  if (model == "disparity") {desc <- "the disparity filter (Serrano et al., 2009)"}
+  if (model == "lans") {desc <- "locally adaptive network sparsification (LANS; Foti et al., 2011)"}
+  if (model == "mlf") {desc <- "the marginal likelihood filter (MLF; Dianati, 2016)"}
+
+  old <- sum(A!=0, na.rm=TRUE)  #Number of edges in weighted network
+  new <- sum(backbone!=0)  #Number of edges in backbone
+  reduced_edges <- round(((old - new) / old)*100,2)
+
+  if (model != "global") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")}
+
+  #EDIT THIS ONCE GLOBAL IS IMPLEMENTED
+  if (model == "global") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")}
+
+  # Display
+  message("")
+  message("=== Suggested text and citations ===")
+  message(text)
+  message("")
+  message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
+  message("")
+  if (model == "disparity") {message("Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Aciences, 106, 6483-6488. https://doi.org10.1073/pnas.0808904106")}
+  if (model == "lans") {message("Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. PLOS One, 6, e16431. https://doi.org/10.1371/journal.pone.0016431")}
+  if (model == "mlf") {message("Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93, 012304. https://doi.org/10.1103/PhysRevE.93.012304")}
+  }
+
+  #### Return backbone ####
+  if (methods::is(W,"matrix")) {
+    rownames(backbone) <- rownames(W)
+    colnames(backbone) <- rownames(W)
+    return(backbone)
+  }
+
+  if (methods::is(W,"igraph")) {
+    igraph::E(W)$oldweight <- igraph::E(W)$weight  #Save old edge weights
+    W <- igraph::delete_edge_attr(W, "weight")  #Delete weight attribute
+    W <- igraph::set_edge_attr(W, "sign", value = backbone[igraph::as_edgelist(W, names = FALSE)])  #Insert edge retention marker as attribute
+    W <- igraph::delete_edges(W, which(igraph::E(W)$sign==0))  #Delete any edges that should not be retained
+    if (!signed) {W <- igraph::delete_edge_attr(W, "sign")}  #If backbone is not signed, remove edge retention marker
+    return(W)
+  }
+
+}

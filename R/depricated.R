@@ -144,3 +144,32 @@ fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
                             trials = trials)
   )
 }
+
+#' Depricated function to extract disparity filter backbone
+#'
+#' \code{disparity()} was replaced by \code{backbone_from_weighted(model = "disparity")}.
+#'
+#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
+#' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param narrative boolean: TRUE if suggested text & citations should be displayed.
+#' #'
+#' @details
+#' See backbone v2.1.4 for original documentation
+#'
+#' @export
+disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
+  .Deprecated("backbone_from_weighted(model = \"disparity\")")
+
+  return(
+    backbone_from_weighted(W,
+                           model = "disparity",
+                           alpha = alpha,
+                           signed = signed,
+                           mtc = mtc,
+                           missing_as_zero = missing.as.zero,
+                           narrative = TRUE)
+  )
+}
