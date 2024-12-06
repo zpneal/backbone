@@ -81,8 +81,10 @@ W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
 W <- igraph::graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE)
 plot(W, edge.width = sqrt(igraph::E(W)$weight)) #A stronger clique & a weaker clique
 
-#bb <- backbone_from_weighted(W, model = "global")  #A backbone with stronger-than-average edges...
-#plot(bb) #...ignores the weaker clique
+mean_weight <- mean(igraph::E(W)$weight)  #Find average edge weight
+bb <- backbone_from_weighted(W, model = "global", #A backbone with stronger-than-average edges...
+      parameter = mean_weight)
+plot(bb) #...ignores the weaker clique
 
 bb <- backbone_from_weighted(W, model = "disparity") #A disparity filter backbone...
 plot(bb) #...preserves edges at multiple scales
@@ -90,7 +92,7 @@ plot(bb) #...preserves edges at multiple scales
 \references{
 package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 
-disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Aciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
+disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. \emph{Proceedings of the National Academy of Sciences, 106}, 6483-6488. \doi{10.1073/pnas.0808904106}}
 
 lans: {Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. \emph{PLOS One, 6}, e16431. \doi{10.1371/journal.pone.0016431}}
 
