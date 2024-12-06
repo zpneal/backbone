@@ -8,7 +8,7 @@
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
-#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
+#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
 #' @param narrative boolean: display suggested text & citations
 #'
 #' @details
@@ -28,7 +28,7 @@
 #' * \code{global} - \code{parameter} is a numeric vector of length 1 or 2. If \code{length(parameter)==1}, then edges with weights
 #'   above \code{parameter} are preserved. If \code{length(parameter)==2}, then edges with weights above \code{max(parameter)} are
 #'   preserved as positive, and edges with weights above \code{min(parameter)} are preserved as negative.
-#'   
+#'
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
 #'
@@ -104,9 +104,9 @@ backbone_from_weighted <- function(W,
   if (model == "lans") {p <- .lans(A, missing_as_zero, signed)}
   if (model == "mlf") {p <- .mlf(A, missing_as_zero, signed)}
   if (model == "disparity" | model == "lans" | model == "mlf") {backbone <- .retain(p, alpha, mtc)}
-  
+
   #### Structural Models ####
-  if (model == "global") {backbone <- .global(A, parameter)}
+  if (model == "global") {backbone <- .global(A, missing_as_zero, parameter)}
 
   #### Display narrative ####
   if (narrative) {
