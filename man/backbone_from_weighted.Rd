@@ -7,7 +7,7 @@
 backbone_from_weighted(
   W,
   alpha = 0.05,
-  threshold,
+  parameter = 0,
   model = "disparity",
   signed = FALSE,
   mtc = "none",
@@ -20,7 +20,7 @@ backbone_from_weighted(
 
 \item{alpha}{real: significance level of hypothesis test(s), used for statistical models}
 
-\item{threshold}{real or FUN: global threshold value or function that evaluates to a global threshold value when applied to the weighted matrix}
+\item{parameter}{real: parameter used to control structural backbone models (see details)}
 
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 
@@ -42,8 +42,8 @@ includes a "sign" edge attribute indicating the edges' sign.
 }
 \details{
 The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
-unipartite network that contains only edges whose weights in the projection are statistically significant (for statistical models), or
-which exhibit certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
+unipartite network that contains only edges whose weights are statistically significant (for statistical models), or which exhibit
+certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
 statistically significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are
 statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 
@@ -57,8 +57,9 @@ The \code{model} parameter controls the model used to evaluate the edge weights.
 
 \emph{Structural Models} (controlled by \code{parameter})
 \itemize{
-\item \code{global} - Edges with weights above \code{threshold} are preserved (if \code{signed = TRUE} as positive, and edges with weights
-equal to or below \code{threshold} are preserved as negative)
+\item \code{global} - \code{parameter} is a numeric vector of length 1 or 2. If \code{length(parameter)==1}, then edges with weights
+above \code{parameter} are preserved. If \code{length(parameter)==2}, then edges with weights above \code{max(parameter)} are
+preserved as positive, and edges with weights above \code{min(parameter)} are preserved as negative.
 }
 
 The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
