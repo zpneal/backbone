@@ -161,7 +161,8 @@ backbone_from_weighted <- function(W,
     W <- igraph::delete_edge_attr(W, "weight")  #Delete weight attribute
     W <- igraph::set_edge_attr(W, "sign", value = backbone[igraph::as_edgelist(W, names = FALSE)])  #Insert edge retention marker as attribute
     W <- igraph::delete_edges(W, which(igraph::E(W)$sign==0))  #Delete any edges that should not be retained
-    if (!signed) {W <- igraph::delete_edge_attr(W, "sign")}  #If backbone is not signed, remove edge retention marker
+    if (!signed & (model == "disparity" | model == "lans" | model == "mlf")) {W <- igraph::delete_edge_attr(W, "sign")}  #If backbone is not signed, remove edge retention marker
+    if (length(parameter)!=2 & (model == "global")) {W <- igraph::delete_edge_attr(W, "sign")}  #If backbone is not signed, remove edge retention marker
     return(W)
   }
 
