@@ -28,7 +28,7 @@ backbone_from_weighted(
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.}
 
-\item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and test them for significance}
+\item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
 
 \item{narrative}{boolean: display suggested text & citations}
 }
