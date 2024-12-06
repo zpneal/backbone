@@ -48,14 +48,14 @@ statistically significantly strong under a one-tailed test. When \code{signed = 
 statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 
 The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
-\emph{Statistical Models} (all controlled by \code{alpha})
+\emph{Statistical Models} (controlled by \code{alpha})
 \itemize{
 \item \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 \item \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
 \item \code{mlf} - Marginal likelihood filter (Dianati, 2016)
 }
 
-\emph{Structural Models}
+\emph{Structural Models} (controlled by \code{parameter})
 \itemize{
 \item \code{global} - Edges with weights above \code{threshold} are preserved (if \code{signed = TRUE} as positive, and edges with weights
 equal to or below \code{threshold} are preserved as negative)

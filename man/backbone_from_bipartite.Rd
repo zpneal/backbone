@@ -47,8 +47,8 @@ in the projection are statistically significant. When \code{signed = FALSE}, the
 significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are statistically
 significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 
-The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. The available models
-differ in the constraints they impose on \code{B}:
+The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. All available models
+are \emph{statistical models} that are controlled by \code{alpha}, and differ in the constraints they impose on \code{B}:
 \itemize{
 \item \code{sdsm} (default) - The "Stochastic Degree Sequence Model" (SDSM; Neal et al., 2021) approximately constrains the agent and artifact degrees, and exactly constrains edges that are prohibited (weight = 10) or required (weight = 11; Neal & Neal, 2023)
 \item \code{fdsm} - The "Fixed Degree Sequence Model" (Neal et al., 2021) exactly constrains the agent and artifact degrees
