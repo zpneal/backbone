@@ -4,7 +4,7 @@
 #'
 #' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object
 #' @param alpha real: significance level of hypothesis test(s), used for statistical models
-#' @param threshold real or FUN: global threshold value or function that evaluates to a global threshold value when applied to the weighted matrix
+#' @param parameter real: parameter used to control structural backbone models (see details)
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
@@ -13,8 +13,8 @@
 #'
 #' @details
 #' The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
-#' unipartite network that contains only edges whose weights in the projection are statistically significant (for statistical models), or
-#' which exhibit certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
+#' unipartite network that contains only edges whose weights are statistically significant (for statistical models), or which exhibit
+#' certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
 #' statistically significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are
 #' statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 #'
@@ -25,9 +25,10 @@
 #' * \code{mlf} - Marginal likelihood filter (Dianati, 2016)
 #'
 #' *Structural Models* (controlled by \code{parameter})
-#' * \code{global} - Edges with weights above `threshold` are preserved (if `signed = TRUE` as positive, and edges with weights
-#'   equal to or below `threshold` are preserved as negative)
-#'
+#' * \code{global} - \code{parameter} is a numeric vector of length 1 or 2. If \code{length(parameter)==1}, then edges with weights
+#'   above \code{parameter} are preserved. If \code{length(parameter)==2}, then edges with weights above \code{max(parameter)} are
+#'   preserved as positive, and edges with weights above \code{min(parameter)} are preserved as negative.
+#'   
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
 #'
@@ -65,7 +66,7 @@
 #' plot(bb) #...preserves edges at multiple scales
 backbone_from_weighted <- function(W,
                                    alpha = 0.05,
-                                   threshold,
+                                   parameter = 0,
                                    model = "disparity",
                                    signed = FALSE,
                                    mtc = "none",
@@ -105,12 +106,13 @@ backbone_from_weighted <- function(W,
   if (model == "disparity" | model == "lans" | model == "mlf") {backbone <- .retain(p, alpha, mtc)}
   
   #### Structural Models ####
-  #if (model == "global") {backbone <- .global(A, missing_as_zero, signed, threshold)}
+  if (model == "global") {backbone <- .global(A, parameter)}
 
   #### Display narrative ####
   if (narrative) {
   # First sentence (descriptive)
-  if (signed) {type <- "signed"} else {type <- "unweighted"}
+  if (signed & (model == "disparity" | model == "lans" | model == "mlf")) {type <- "signed"} else {type <- "unweighted"}
+  if (model == "global" & length(parameter)==2) {type <- "signed"} else {type <- "unweighted"}
 
   text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
 
@@ -131,10 +133,9 @@ backbone_from_weighted <- function(W,
   new <- sum(backbone!=0)  #Number of edges in backbone
   reduced_edges <- round(((old - new) / old)*100,2)
 
-  if (model != "global") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")}
-
-  #EDIT THIS ONCE GLOBAL IS IMPLEMENTED
-  if (model == "global") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")}
+  if (model == "disparity" | model == "lans" | model == "mlf") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")}
+  if (model == "global" & length(parameter)==1) {text <- paste0(text, " An edge was retained in the backbone if its weight was larger than ", max(parameter), ", which reduced the number of edges by ", reduced_edges, "%.")}
+  if (model == "global" & length(parameter)==2) {text <- paste0(text, " An edge was retained in the backbone as positive if its weight was larger than ", max(parameter), " and as negative if its weight was smaller than ", min(parameter), " which reduced the number of edges by ", reduced_edges, "%.")}
 
   # Display
   message("")
