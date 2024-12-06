@@ -19,12 +19,12 @@
 #' statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
 #'
 #' The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
-#' *Statistical Models* (all controlled by `alpha`)
+#' *Statistical Models* (controlled by \code{alpha})
 #' * \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 #' * \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
 #' * \code{mlf} - Marginal likelihood filter (Dianati, 2016)
 #'
-#' *Structural Models*
+#' *Structural Models* (controlled by \code{parameter})
 #' * \code{global} - Edges with weights above `threshold` are preserved (if `signed = TRUE` as positive, and edges with weights
 #'   equal to or below `threshold` are preserved as negative)
 #'
