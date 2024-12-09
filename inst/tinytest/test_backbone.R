@@ -399,7 +399,7 @@ expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #C
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
 
 threshold <- mean(igraph::E(W)$weight) + sd(igraph::E(W)$weight)              #Use mean + sd as edge threshold
-bb <- backbone_from_weighted(W, model = "global", parameter = mean_edge+sd_edge)      #Extract unweighted global igraph
+bb <- backbone_from_weighted(W, model = "global", parameter = threshold)      #Extract unweighted global igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
