@@ -6,11 +6,11 @@
 \usage{
 backbone_from_weighted(
   W,
-  alpha = 0.05,
-  parameter = 0,
   model = "disparity",
+  alpha = 0.05,
   signed = FALSE,
   mtc = "none",
+  parameter = 0,
   missing_as_zero = FALSE,
   narrative = TRUE
 )
@@ -18,15 +18,15 @@ backbone_from_weighted(
 \arguments{
 \item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object}
 
-\item{alpha}{real: significance level of hypothesis test(s), used for statistical models}
-
-\item{parameter}{real: parameter used to control structural backbone models (see details)}
-
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 
-\item{signed}{boolean: return a signed backbone}
+\item{alpha}{real: significance level of hypothesis test(s) in statistical models}
+
+\item{signed}{boolean: return a signed backbone from a statistical model}
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.}
+
+\item{parameter}{real: parameter used to control structural backbone models (see details)}
 
 \item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
 
@@ -34,21 +34,22 @@ backbone_from_weighted(
 }
 \value{
 A backbone in the same class as \code{W}. If \code{W} was an igraph object, the resulting igraph backbone preserves any node
-attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and (if \code{signed = TRUE})
-includes a "sign" edge attribute indicating the edges' sign.
+attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and includes a "sign"
+edge attribute indicating the edges' sign if the backbone is signed.
 }
 \description{
 \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
 }
 \details{
 The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
-unipartite network that contains only edges whose weights are statistically significant (for statistical models), or which exhibit
-certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
-statistically significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are
-statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
+unipartite network that contains only edges whose weights are statistically significant (based on \code{alpha} for statistical models),
+or which exhibit certain structural properties (based on \code{parameter} for structural models). For statistical models, when
+\code{signed = FALSE}, the backbone contains edges that are statistically significantly strong under a one-tailed test. When
+\code{signed = TRUE}, the backbone contains positive edges that are statistically significantly strong, and negative edges that are
+statistically significantly weak, under a two-tailed test.
 
 The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
-\emph{Statistical Models} (controlled by \code{alpha})
+\emph{Statistical Models} (controlled by \code{alpha}, \code{signed}, and \code{mtc})
 \itemize{
 \item \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 \item \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
