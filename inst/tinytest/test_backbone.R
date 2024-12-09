@@ -289,6 +289,12 @@ expect_true(is(bb,"matrix"))                          #Returns as matrix
 bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
 expect_true(igraph::is_tree(bb))                      #Backbone is a tree
 
+bb <- backbone_from_weighted(W, model = "global")     #Extract global backbone (unsigned)
+expect_true(is(bb,"matrix"))                          #Returns as matrix
+expect_true(table(bb)[1]==58 & table(bb)[2]==42)      #Contains 58 0s and 42 1s
+bb <- backbone_from_weighted(W, model = "global", parameter = c(10,74))     #Extract global backbone (signed)
+expect_true(table(bb)[1]==12 & table(bb)[2]==78 & table(bb)[3]==10)      #Contains 12 -1s, 78 0s, and 10 1s
+
 ## Multiscale weighted igraph
 W <- igraph::graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE)
 
@@ -304,6 +310,14 @@ bb <- backbone_from_weighted(W, model = "mlf")        #Extract mlf backbone
 expect_true(is(bb,"igraph"))                          #Returns as igraph
 expect_true(igraph::is_tree(bb))                      #Backbone is a tree
 
+bb <- backbone_from_weighted(W, model = "global")     #Extract global backbone (unsigned)
+expect_true(is(bb,"igraph"))                          #Returns as matrix
+bb <- igraph::as_adjacency_matrix(bb, sparse = FALSE)   #Get matrix
+expect_true(table(bb)[1]==58 & table(bb)[2]==42)      #Contains 58 0s and 42 1s
+bb <- backbone_from_weighted(W, model = "global", parameter = c(10,74))     #Extract global backbone (signed)
+bb <- igraph::as_adjacency_matrix(bb, sparse = FALSE, attr = "sign")   #Get matrix
+expect_true(table(bb)[1]==12 & table(bb)[2]==78 & table(bb)[3]==10)      #Contains 12 -1s, 78 0s, and 10 1s
+
 ## Projection of bipartite matrix
 W <- rbind(cbind(matrix(rbinom(250,1,.8),10),
                  matrix(rbinom(250,1,.2),10),
@@ -315,6 +329,7 @@ W <- rbind(cbind(matrix(rbinom(250,1,.8),10),
                  matrix(rbinom(250,1,.2),10),
                  matrix(rbinom(250,1,.8),10)))
 W <- W%*%t(W)
+diag(W) <- 0
 
 bb <- backbone_from_weighted(W, model = "disparity", signed = TRUE, alpha = 0.5)  #Extract signed disparity matrix
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -338,6 +353,17 @@ expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
 expect_true(any(bb %in% c(-1)))      #Contains some negative edges
 expect_true(any(bb %in% c(0)))       #Contains some missing edges
 expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
+
+upper <- mean(W) + sd(W)             #Use mean + sd as positive edge threshold
+lower <- mean(W) - sd(W)             #Use mean - sd as negative edge threshold
+bb <- backbone_from_weighted(W, model = "global", parameter = c(lower, upper))  #Extract signed global matrix
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+triangle_index(bb)
 expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 ## Projection of bipartite igraph
@@ -367,6 +393,13 @@ expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #C
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
 
 bb <- backbone_from_weighted(W, model = "mlf", alpha = 0.25)                  #Extract unweighted mlf igraph
+expect_true(is(bb,"igraph"))                                                  #Returns as igraph
+expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
+expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+
+threshold <- mean(igraph::E(W)$weight) + sd(igraph::E(W)$weight)              #Use mean + sd as edge threshold
+bb <- backbone_from_weighted(W, model = "global", parameter = mean_edge+sd_edge)      #Extract unweighted global igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
