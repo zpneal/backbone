@@ -145,15 +145,15 @@ matcube <- function(x){x%*%x%*%x}
 triangle_index <- function(x){(trace(matcube(x)) + trace(matcube(abs(x))))/(2 * trace(matcube(abs(x))))}
 
 ## Bipartite from matrix
-B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10)))
+B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence matrix
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10)))
 
 bb <- backbone_from_bipartite(B, model = "sdsm", signed = TRUE)  #Extract SDSM matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -210,15 +210,15 @@ expect_true(any(bb %in% c(1)))       #Contains some positive edges
 expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 ## Bipartite from igraph
-B <- rbind(cbind(matrix(rbinom(250,1,.8),10),   #An example block incidence matrix
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10)))
+B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence matrix
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10)))
 B <- igraph::graph_from_biadjacency_matrix(B)          #Convert to igraph
 igraph::V(B)$agent_attrib <- c(c(1:30),rep(NA,75))     #Add agent attribute
 igraph::V(B)$artifact_attrib <- c(rep(NA,30),c(1:75))  #Add artifact attribute
@@ -319,15 +319,15 @@ bb <- igraph::as_adjacency_matrix(bb, sparse = FALSE, attr = "sign")   #Get matr
 expect_true(table(bb)[1]==12 & table(bb)[2]==78 & table(bb)[3]==10)      #Contains 12 -1s, 78 0s, and 10 1s
 
 ## Projection of bipartite matrix
-W <- rbind(cbind(matrix(rbinom(250,1,.8),10),
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10)))
+W <- rbind(cbind(matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10)))
 W <- W%*%t(W)
 diag(W) <- 0
 
@@ -367,15 +367,15 @@ triangle_index(bb)
 expect_true(triangle_index(bb)>.8)   #Is nearly balanced
 
 ## Projection of bipartite igraph
-W <- rbind(cbind(matrix(rbinom(250,1,.8),10),
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10),
-                 matrix(rbinom(250,1,.2),10)),
-           cbind(matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.2),10),
-                 matrix(rbinom(250,1,.8),10)))
+W <- rbind(cbind(matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10)))
 W <- igraph::graph_from_biadjacency_matrix(W)
 W <- igraph::bipartite_projection(W, which = "false")
 igraph::V(W)$agent_attrib <- c(c(1:30))     #Add agent attribute
