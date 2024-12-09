@@ -3,23 +3,24 @@
 #' \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
 #'
 #' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object
-#' @param alpha real: significance level of hypothesis test(s), used for statistical models
-#' @param parameter real: parameter used to control structural backbone models (see details)
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
-#' @param signed boolean: return a signed backbone
+#' @param alpha real: significance level of hypothesis test(s) in statistical models
+#' @param signed boolean: return a signed backbone from a statistical model
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param parameter real: parameter used to control structural backbone models (see details)
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
 #' @param narrative boolean: display suggested text & citations
 #'
 #' @details
 #' The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
-#' unipartite network that contains only edges whose weights are statistically significant (for statistical models), or which exhibit
-#' certain structural properties (for structural models). When \code{signed = FALSE}, the backbone contains edges that are
-#' statistically significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are
-#' statistically significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
+#' unipartite network that contains only edges whose weights are statistically significant (based on \code{alpha} for statistical models),
+#' or which exhibit certain structural properties (based on \code{parameter} for structural models). For statistical models, when
+#' \code{signed = FALSE}, the backbone contains edges that are statistically significantly strong under a one-tailed test. When
+#' \code{signed = TRUE}, the backbone contains positive edges that are statistically significantly strong, and negative edges that are
+#' statistically significantly weak, under a two-tailed test.
 #'
 #' The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
-#' *Statistical Models* (controlled by \code{alpha})
+#' *Statistical Models* (controlled by \code{alpha}, \code{signed}, and \code{mtc})
 #' * \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 #' * \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
 #' * \code{mlf} - Marginal likelihood filter (Dianati, 2016)
@@ -33,8 +34,8 @@
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
 #'
 #' @return A backbone in the same class as \code{W}. If \code{W} was an igraph object, the resulting igraph backbone preserves any node
-#' attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and (if \code{signed = TRUE})
-#' includes a "sign" edge attribute indicating the edges' sign.
+#' attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and includes a "sign"
+#' edge attribute indicating the edges' sign if the backbone is signed.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -67,21 +68,32 @@
 #' bb <- backbone_from_weighted(W, model = "disparity") #A disparity filter backbone...
 #' plot(bb) #...preserves edges at multiple scales
 backbone_from_weighted <- function(W,
-                                   alpha = 0.05,
-                                   parameter = 0,
                                    model = "disparity",
+                                   alpha = 0.05,
                                    signed = FALSE,
                                    mtc = "none",
+                                   parameter = 0,
                                    missing_as_zero = FALSE,
                                    narrative = TRUE) {
 
   #### Check parameters ####
-  if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
-  if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
+  #All models
   if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
-  if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
-  if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
+
+  #Statistical models
+  if (model %in% c("disparity", "lans", "mlf")) {
+    if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
+    if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
+    if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
+    if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
+  }
+
+  #Structural models
+  if (model %in% c("global")) {
+    if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
+    if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
+  }
 
   #### Check and format input ####
   #Check that input is a weighted adjacency matrix or weighted unipartite igraph

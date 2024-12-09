@@ -13,10 +13,6 @@
 #' @noRd
 .global <- function(A, missing_as_zero, parameter){
 
-  #### Check Parameter ####
-  if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
-  if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
-
   #### Apply Global Thresholds ####
   backbone <- matrix(NA, nrow(A), ncol(A))  #Start with empty adjacency matrix
 
