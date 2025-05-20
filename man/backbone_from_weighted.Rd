@@ -49,6 +49,7 @@ or which exhibit certain structural properties (based on \code{parameter} for st
 statistically significantly weak, under a two-tailed test.
 
 The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
+
 \emph{Statistical Models} (controlled by \code{alpha}, \code{signed}, and \code{mtc})
 \itemize{
 \item \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
