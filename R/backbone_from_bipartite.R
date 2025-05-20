@@ -10,6 +10,7 @@
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #' @param trials numeric: if \code{model = "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution
+#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'
 #' @details
 #' The \code{backbone_from_bipartite} function extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
@@ -33,9 +34,9 @@
 #' must be binary (i.e., unweighted), unless \code{model = "sdsm"}, when "prohibited" edges can be represented with weight = 10
 #' and "required" edges can be represented with weight = 11.
 #'
-#' @return A backbone in the same class as \code{B}. If \code{B} was an igraph object, the resulting igraph backbone preserves any node
-#' attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and (if \code{signed = TRUE})
-#' includes a "sign" edge attribute indicating the edges' sign.
+#' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+#' is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, narrative
+#' description, and edgewise p-values.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
@@ -69,7 +70,8 @@ backbone_from_bipartite <- function(B,
                                     mtc = "none",
                                     missing_as_zero = FALSE,
                                     narrative = TRUE,
-                                    trials = NULL) {
+                                    trials = NULL,
+                                    return = "backbone") {
 
   #### Check parameters ####
   if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
@@ -166,23 +168,28 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (model == "sdsm_ec") {message("Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. International Conference on Complex Networks and Their Applications, 12, 127-136. https://doi.org/10.1007/978-3-031-53468-3_11")}
   }
 
-  #### Return backbone ####
+  #### Prepare backbone ####
   if (methods::is(B,"matrix")) {
     rownames(backbone) <- rownames(B)
     colnames(backbone) <- rownames(B)
-    return(backbone)
+    P <- B%*%t(B)  #Generate weighted projection, with any agent attributes
   }
 
   if (methods::is(B,"igraph")) {
-    if (model=="sdsm_ec") {B <- igraph::delete_edges(B, which(igraph::E(B)$weight==10))}  #If there are prohibited edges in an igraph object, remove them
-    P <- igraph::bipartite_projection(B, which="false")  #Generate weighted projection, with any agent attributes
-    igraph::E(P)$oldweight <- igraph::E(P)$weight  #Save old edge weights
-    P <- igraph::delete_edge_attr(P, "weight")  #Delete weight attribute
-    for (attr in igraph::vertex_attr_names(P)) {if (all(is.na(igraph::vertex_attr(P, attr)))) {P <- igraph::delete_vertex_attr(P, attr)}}  #Delete attributes of artifact nodes
-    P <- igraph::set_edge_attr(P, "sign", value = backbone[igraph::as_edgelist(P, names = FALSE)])  #Insert edge retention marker as attribute
-    P <- igraph::delete_edges(P, which(igraph::E(P)$sign==0))  #Delete any edges that should not be retained
-    if (!signed) {P <- igraph::delete_edge_attr(P, "sign")}  #If backbone is not signed, remove edge retention marker
-    return(P)
-  }
+    tempB <- B  #Temporary Bipartite
+    if (model=="sdsm_ec") {tempB <- igraph::delete_edges(tempB, which(igraph::E(tempB)$weight==10))}  #If there are prohibited edges in an igraph object, remove them
+    P <- igraph::bipartite_projection(tempB, which="false")  #Generate weighted projection, with any agent attributes
+    tempP <- P  #Placeholder for backbone
+    igraph::E(tempP)$oldweight <- igraph::E(tempP)$weight  #Save old edge weights
+    tempP <- igraph::delete_edge_attr(tempP, "weight")  #Delete weight attribute
+    for (attr in igraph::vertex_attr_names(tempP)) {if (all(is.na(igraph::vertex_attr(tempP, attr)))) {tempP <- igraph::delete_vertex_attr(tempP, attr)}}  #Delete attributes of artifact nodes
+    tempP <- igraph::set_edge_attr(tempP, "sign", value = backbone[igraph::as_edgelist(tempP, names = FALSE)])  #Insert edge retention marker as attribute
+    tempP <- igraph::delete_edges(tempP, which(igraph::E(tempP)$sign==0))  #Delete any edges that should not be retained
+    if (!signed) {tempP <- igraph::delete_edge_attr(tempP, "sign")}  #If backbone is not signed, remove edge retention marker
+    backbone <- tempP
+    }
 
+  #### Return ####
+  if (return == "backbone") {return(backbone)}
+  if (return == "everything") {return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text))}
 }

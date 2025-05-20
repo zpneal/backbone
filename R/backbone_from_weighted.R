@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
 #'
-#' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object
+#' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{igraph} object
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param alpha real: significance level of hypothesis test(s) in statistical models
 #' @param signed boolean: return a signed backbone from a statistical model
@@ -10,6 +10,7 @@
 #' @param parameter real: parameter used to control structural backbone models (see details)
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
 #' @param narrative boolean: display suggested text & citations
+#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'
 #' @details
 #' The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
@@ -34,9 +35,9 @@
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
 #'
-#' @return A backbone in the same class as \code{W}. If \code{W} was an igraph object, the resulting igraph backbone preserves any node
-#' attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and includes a "sign"
-#' edge attribute indicating the edges' sign if the backbone is signed.
+#' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+#' is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
+#' backbone models) the edgewise p-values.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -75,7 +76,8 @@ backbone_from_weighted <- function(W,
                                    mtc = "none",
                                    parameter = 0,
                                    missing_as_zero = FALSE,
-                                   narrative = TRUE) {
+                                   narrative = TRUE,
+                                   return = "backbone") {
 
   #### Check parameters ####
   #All models
@@ -164,21 +166,25 @@ backbone_from_weighted <- function(W,
   if (model == "mlf") {message("Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93, 012304. https://doi.org/10.1103/PhysRevE.93.012304")}
   }
 
-  #### Return backbone ####
+  #### Prepare backbone ####
   if (methods::is(W,"matrix")) {
     rownames(backbone) <- rownames(W)
     colnames(backbone) <- rownames(W)
-    return(backbone)
   }
 
   if (methods::is(W,"igraph")) {
-    igraph::E(W)$oldweight <- igraph::E(W)$weight  #Save old edge weights
-    W <- igraph::delete_edge_attr(W, "weight")  #Delete weight attribute
-    W <- igraph::set_edge_attr(W, "sign", value = backbone[igraph::as_edgelist(W, names = FALSE)])  #Insert edge retention marker as attribute
-    W <- igraph::delete_edges(W, which(igraph::E(W)$sign==0))  #Delete any edges that should not be retained
-    if (!signed & (model == "disparity" | model == "lans" | model == "mlf")) {W <- igraph::delete_edge_attr(W, "sign")}  #If backbone is not signed, remove edge retention marker
-    if (length(parameter)!=2 & (model == "global")) {W <- igraph::delete_edge_attr(W, "sign")}  #If backbone is not signed, remove edge retention marker
-    return(W)
+    temp <- W  #Placeholder for backbone
+    igraph::E(temp)$oldweight <- igraph::E(temp)$weight  #Save old edge weights
+    temp <- igraph::delete_edge_attr(temp, "weight")  #Delete weight attribute
+    temp <- igraph::set_edge_attr(temp, "sign", value = backbone[igraph::as_edgelist(temp, names = FALSE)])  #Insert edge retention marker as attribute
+    temp <- igraph::delete_edges(temp, which(igraph::E(temp)$sign==0))  #Delete any edges that should not be retained
+    if (!signed & (model == "disparity" | model == "lans" | model == "mlf")) {temp <- igraph::delete_edge_attr(temp, "sign")}  #If backbone is not signed, remove edge retention marker
+    if (length(parameter)!=2 & (model == "global")) {temp <- igraph::delete_edge_attr(temp, "sign")}  #If backbone is not signed, remove edge retention marker
+    backbone <- temp
   }
 
+  #### Return ####
+  if (return == "backbone") {return(backbone)}
+  if (return == "everything" & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text))}
+  if (return == "everything" & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text))}
 }
