@@ -12,11 +12,12 @@ backbone_from_weighted(
   mtc = "none",
   parameter = 0,
   missing_as_zero = FALSE,
-  narrative = TRUE
+  narrative = TRUE,
+  return = "backbone"
 )
 }
 \arguments{
-\item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \code{\link{igraph}} object}
+\item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \code{igraph} object}
 
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 
@@ -31,11 +32,13 @@ backbone_from_weighted(
 \item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
 
 \item{narrative}{boolean: display suggested text & citations}
+
+\item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
 }
 \value{
-A backbone in the same class as \code{W}. If \code{W} was an igraph object, the resulting igraph backbone preserves any node
-attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and includes a "sign"
-edge attribute indicating the edges' sign if the backbone is signed.
+If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
+backbone models) the edgewise p-values.
 }
 \description{
 \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network

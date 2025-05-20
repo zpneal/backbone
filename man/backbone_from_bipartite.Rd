@@ -12,7 +12,8 @@ backbone_from_bipartite(
   mtc = "none",
   missing_as_zero = FALSE,
   narrative = TRUE,
-  trials = NULL
+  trials = NULL,
+  return = "backbone"
 )
 }
 \arguments{
@@ -31,11 +32,13 @@ backbone_from_bipartite(
 \item{narrative}{boolean: display suggested text & citations}
 
 \item{trials}{numeric: if \code{model = "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution}
+
+\item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
 }
 \value{
-A backbone in the same class as \code{B}. If \code{B} was an igraph object, the resulting igraph backbone preserves any node
-attributes, includes an "oldweight" edge attribute containing the edges' original weights in the projection, and (if \code{signed = TRUE})
-includes a "sign" edge attribute indicating the edges' sign.
+If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, narrative
+description, and edgewise p-values.
 }
 \description{
 \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network.
