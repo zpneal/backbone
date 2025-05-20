@@ -20,6 +20,7 @@
 #' statistically significantly weak, under a two-tailed test.
 #'
 #' The \code{model} parameter controls the model used to evaluate the edge weights. The available models include:
+#'
 #' *Statistical Models* (controlled by \code{alpha}, \code{signed}, and \code{mtc})
 #' * \code{disparity} (default) - The disparity filter (Serrano et al., 2009)
 #' * \code{lans} - Locally adaptive network sparsification (Foti et al., 2011)
