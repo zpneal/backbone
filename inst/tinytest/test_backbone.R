@@ -155,6 +155,14 @@ B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence mat
                  matrix(rbinom(250,1,.15),10),
                  matrix(rbinom(250,1,.85),10)))
 
+bb <- backbone_from_bipartite(B, model = "sdsm", return = "everything")  #Extract SDSM matrix, return everything
+expect_equal(length(bb),5)  #Returned object contains five elements
+expect_equal(class(bb$bipartite)[1],"matrix")
+expect_equal(class(bb$projection)[1],"matrix")
+expect_equal(class(bb$backbone)[1],"matrix")
+expect_equal(class(bb$pvalues$upper)[1],"matrix")
+expect_equal(class(bb$narrative)[1],"character")
+
 bb <- backbone_from_bipartite(B, model = "sdsm", signed = TRUE)  #Extract SDSM matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
 expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
@@ -223,6 +231,17 @@ B <- igraph::graph_from_biadjacency_matrix(B)          #Convert to igraph
 igraph::V(B)$agent_attrib <- c(c(1:30),rep(NA,75))     #Add agent attribute
 igraph::V(B)$artifact_attrib <- c(rep(NA,30),c(1:75))  #Add artifact attribute
 
+bb <- backbone_from_bipartite(B, model = "sdsm", return = "everything")  #Extract SDSM igraph, return everything
+expect_equal(length(bb),5)  #Returned object contains five elements
+expect_equal(class(bb$bipartite)[1],"igraph")
+expect_true(igraph::is_bipartite(bb$bipartite))
+expect_equal(class(bb$projection)[1],"igraph")
+expect_false(igraph::is_directed(bb$projection))
+expect_equal(class(bb$backbone)[1],"igraph")
+expect_false(igraph::is_directed(bb$backbone))
+expect_equal(class(bb$pvalues$upper)[1],"matrix")
+expect_equal(class(bb$narrative)[1],"character")
+
 bb <- backbone_from_bipartite(B, model = "sdsm")                              #Extract SDSM igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
@@ -273,6 +292,13 @@ W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
               0,0,0,0,0,100,10,0,10,10,
               0,0,0,0,0,100,10,10,0,10,
               0,0,0,0,0,100,10,10,10,0),10)
+
+bb <- backbone_from_weighted(W, model = "disparity", return = "everything")  #Extract disparity backbone, return everything
+expect_equal(length(bb),4)  #Returned object contains four elements
+expect_equal(class(bb$weighted)[1],"matrix")
+expect_equal(class(bb$backbone)[1],"matrix")
+expect_equal(class(bb$pvalues$upper)[1],"matrix")
+expect_equal(class(bb$narrative)[1],"character")
 
 bb <- backbone_from_weighted(W, model = "disparity")  #Extract disparity backbone
 expect_true(is(bb,"matrix"))                          #Returns as matrix
@@ -379,6 +405,13 @@ W <- rbind(cbind(matrix(rbinom(250,1,.85),10),
 W <- igraph::graph_from_biadjacency_matrix(W)
 W <- igraph::bipartite_projection(W, which = "false")
 igraph::V(W)$agent_attrib <- c(c(1:30))     #Add agent attribute
+
+bb <- backbone_from_weighted(W, model = "disparity", return = "everything")  #Extract disparity igraph, return everything
+expect_equal(length(bb),4)  #Returned object contains four elements
+expect_equal(class(bb$weighted)[1],"igraph")
+expect_equal(class(bb$backbone)[1],"igraph")
+expect_equal(class(bb$pvalues$upper)[1],"matrix")
+expect_equal(class(bb$narrative)[1],"character")
 
 bb <- backbone_from_weighted(W, model = "disparity", alpha = 0.25)            #Extract unweighted disparity igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
