@@ -2,7 +2,7 @@
 #'
 #' `global` extracts the backbone of a weighted network using a global threshold
 #'
-#' @param G A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param G A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \link[igraph]{igraph} object.
 #' @param upper real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.
 #' @param lower real, FUN, or NULL: lower threshold value or function that evaluates to a lower threshold value.
 #' @param keepzeros boolean: TRUE if zero-weight edges in `W` should be excluded from (i.e. also be zero in) the backbone

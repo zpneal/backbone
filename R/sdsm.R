@@ -2,7 +2,7 @@
 #'
 #' `sdsm` extracts the backbone of a bipartite projection using the Stochastic Degree Sequence Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a two-column dataframe; (3) an \link[igraph]{igraph} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
