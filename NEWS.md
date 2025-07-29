@@ -6,6 +6,7 @@ output: html_document
 
 * updated depricated `igraph` functions
 * ensure row/column labels are included in p-value matrices
+* corrected usage of \link{} in documentation
 
 ## backbone 2.1.3
 
