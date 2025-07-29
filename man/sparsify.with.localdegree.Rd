@@ -7,7 +7,7 @@
 sparsify.with.localdegree(U, s, class = "original", narrative = FALSE)
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a two-column dataframe; (3) an \link[igraph]{igraph} object.}
 
 \item{s}{numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs}
 

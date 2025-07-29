@@ -31,3 +31,23 @@ For updates, papers, presentations, and other backbone news, please see \href{ht
 \references{
 {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://www.zacharyneal.com/backbone}
+  \item \url{https://github.com/zpneal/backbone}
+  \item Report bugs at \url{https://github.com/zpneal/backbone/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Zachary Neal \email{zpneal@msu.edu} (\href{https://orcid.org/0000-0003-3076-4995}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Rachel Domagalski \email{domagal9@msu.edu} [contributor]
+  \item Bruce Sagan \email{bsagan@msu.edu} [contributor]
+  \item Karl Godard \email{godardk@umich.edu} [contributor]
+}
+
+}

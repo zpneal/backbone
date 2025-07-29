@@ -14,7 +14,7 @@ global(
 )
 }
 \arguments{
-\item{G}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
+\item{G}{A weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}, or dataframe; (2) an edgelist in the form of a three-column dataframe; (3) an \link[igraph]{igraph} object.}
 
 \item{upper}{real, FUN, or NULL: upper threshold value or function that evaluates to an upper threshold value.}
 
