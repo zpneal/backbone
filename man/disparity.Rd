@@ -15,7 +15,7 @@ disparity(
 )
 }
 \arguments{
-\item{W}{A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
+\item{W}{A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a three-column dataframe; (3) an \link[igraph]{igraph} object.}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -70,7 +70,7 @@ net <- matrix(c(0,10,10,10,10,75,0,0,0,0,
 net <- igraph::graph_from_adjacency_matrix(net, mode = "undirected", weighted = TRUE)
 plot(net, edge.width = sqrt(igraph::E(net)$weight)) #A stronger clique & a weaker clique
 
-strong <- igraph::delete.edges(net, which(igraph::E(net)$weight < mean(igraph::E(net)$weight)))
+strong <- igraph::delete_edges(net, which(igraph::E(net)$weight < mean(igraph::E(net)$weight)))
 plot(strong) #A backbone of stronger-than-average edges ignores the weaker clique
 
 bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...

@@ -2,7 +2,7 @@
 #'
 #' `fixedrow` extracts the backbone of a bipartite projection using the Fixed Row Model.
 #'
-#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param B An unweighted bipartite graph, as: (1) an incidence matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a two-column dataframe; (3) an \link[igraph]{igraph} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -89,11 +89,11 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 
   ### Compute p-values ####
   df$upper <- stats::phyper(df$projvalue-1, df$row_sum_i, df$diff, df$row_sum_j, lower.tail=FALSE)
-  Pupper <- matrix(as.numeric(df$upper), nrow = nrow(B), ncol = nrow(B))
+  Pupper <- matrix(as.numeric(df$upper), nrow = nrow(B), ncol = nrow(B), dimnames = list(rownames(P),colnames(P)))
 
   if (signed) {
     df$lower <- stats::phyper(df$projvalue, df$row_sum_i, df$diff, df$row_sum_j, lower.tail = TRUE)
-    Plower <- matrix(as.numeric(df$lower), nrow = nrow(B), ncol = nrow(B))
+    Plower <- matrix(as.numeric(df$lower), nrow = nrow(B), ncol = nrow(B), dimnames = list(rownames(P),colnames(P)))
   }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####

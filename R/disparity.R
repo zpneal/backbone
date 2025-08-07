@@ -2,7 +2,7 @@
 #'
 #' `disparity` extracts the backbone of a weighted network using the Disparity Filter.
 #'
-#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a three-column dataframe; (3) an \link[igraph]{igraph} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -52,7 +52,7 @@
 #' net <- igraph::graph_from_adjacency_matrix(net, mode = "undirected", weighted = TRUE)
 #' plot(net, edge.width = sqrt(igraph::E(net)$weight)) #A stronger clique & a weaker clique
 #'
-#' strong <- igraph::delete.edges(net, which(igraph::E(net)$weight < mean(igraph::E(net)$weight)))
+#' strong <- igraph::delete_edges(net, which(igraph::E(net)$weight < mean(igraph::E(net)$weight)))
 #' plot(strong) #A backbone of stronger-than-average edges ignores the weaker clique
 #'
 #' bb <- disparity(net, alpha = 0.05, narrative = TRUE) #A disparity backbone...

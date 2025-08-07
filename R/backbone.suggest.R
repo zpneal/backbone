@@ -2,7 +2,7 @@
 #'
 #' `backbone.suggest` suggests and optionally runs an appropriate backbone model for a graph object.
 #'
-#' @param G graph: A graph represented in an object of class matrix, sparse \code{\link{Matrix}}, dataframe, or \code{\link{igraph}}.
+#' @param G graph: A graph represented in an object of class matrix, sparse \link[Matrix]{Matrix}, dataframe, or \link[igraph]{igraph}.
 #' @param s numeric: If provided, a backbone is extracted using this value as the significance level or sparsification parameter.
 #'
 #' @return If `s` == NULL: NULL, but a message is displayed with a suggested model.

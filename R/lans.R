@@ -2,7 +2,7 @@
 #'
 #' `lans` extracts the backbone of a weighted network using Locally Adaptive Network Sparsification
 #'
-#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a three-column dataframe; (3) an \link[igraph]{igraph} object.
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
@@ -73,8 +73,8 @@ lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
   }
 
   #### Compute p-values ####
-  Pupper <- matrix(NA, nrow(G), ncol(G))
-  if (signed) {Plower <- matrix(NA, nrow(G), ncol(G))}
+  Pupper <- matrix(NA, nrow(G), ncol(G), dimnames = list(rownames(G),colnames(G)))
+  if (signed) {Plower <- matrix(NA, nrow(G), ncol(G), dimnames = list(rownames(G),colnames(G)))}
   p_ij <- G / rowSums(G)  #Fractional edge weight from i to j
   for (row in 1:nrow(p_ij)) {Pupper[row,] <- 1 - unlist(lapply(p_ij[row,], function(i) sum(p_ij[row,] <= i & p_ij[row,]!=0))) / sum(p_ij[row,]!=0)}
   if (signed) {for (row in 1:nrow(p_ij)) {Plower[row,] <- 1 - unlist(lapply(p_ij[row,], function(i) sum(p_ij[row,] >= i & p_ij[row,]!=0))) / sum(p_ij[row,]!=0)}}

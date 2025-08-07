@@ -7,7 +7,7 @@
 sparsify.with.lspar(U, s, class = "original", narrative = FALSE)
 }
 \arguments{
-\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a two-column dataframe; (3) an \code{\link{igraph}} object.}
+\item{U}{An unweighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \link[Matrix]{Matrix}; (2) an edgelist in the form of a two-column dataframe; (3) an \link[igraph]{igraph} object.}
 
 \item{s}{numeric: Sparsification exponent, 0 < s < 1; smaller values yield sparser graphs}
 
@@ -24,7 +24,7 @@ An unweighted, undirected, unipartite graph of class \code{class}.
 It is equivalent to \code{sparsify(escore = "jaccard", normalize = "rank", filter = "degree", umst = FALSE)}.
 }
 \examples{
-U <- igraph::sbm.game(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
+U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
 plot(U) #A hairball
 sparse <- sparsify.with.lspar(U, s = 0.6, narrative = TRUE)
 plot(sparse) #Clearly visible communities
