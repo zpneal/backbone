@@ -100,7 +100,7 @@ backbone_from_weighted <- function(W,
 
   #### Check and format input ####
   #Check that input is a weighted adjacency matrix or weighted unipartite igraph
-  if (!methods::is(W,"matrix") & !methods::is(W,"igraph")) {stop("`W` must be an incidence matrix or igraph object")}
+  if (!methods::is(W,"matrix") & !methods::is(W,"igraph")) {stop("`W` must be an adjacency matrix or igraph object")}
 
   if (methods::is(W,"matrix")) {
     if (dim(W)[1] != dim(W)[2]) {stop("`W` must be a square adjacency matrix")}
