@@ -83,7 +83,9 @@ backbone_from_weighted <- function(W,
   #All models
   if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-
+  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}  
+  if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
+  
   #Statistical models
   if (model %in% c("disparity", "lans", "mlf")) {
     if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
