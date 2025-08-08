@@ -7,7 +7,7 @@ output: html_document
 * streamlined functions to focus on input network type, rather than backbone model
 * keep attributes of retained edges in `igraph` objects
 * functions renamed in snake_case, to match naming conventions in `igraph`
-* eliminated support for edgelist inputs, because thy can be ambiguous
+* eliminated support for edgelist inputs, because they can be ambiguous
 * eliminated ordinal stochastic degree sequence model (oSDSM) for bipartite projections, because it has limited applications and has not been formally validated
 * all functions have associated unit tests
 
