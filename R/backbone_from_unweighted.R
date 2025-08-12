@@ -1,14 +1,13 @@
-#' Extract the backbone from a weighted network
+#' Extract the backbone from an unweighted, undirected network
 #'
-#' \code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted network
+#' \code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted, undirected network
 #'
-#' @param U An unweighted network as an adjacency matrix or an unweighted unipartite \code{igraph} object
+#' @param U An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \code{igraph} object
 #' @param model string: backbone model
 #' @param parameter real: parameter used to control structural backbone models
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
-#' @param symmetrize boolean: TRUE if the result should be symmetrized
 #' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
 #' @param narrative boolean: display suggested text & citations
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
@@ -28,7 +27,7 @@
 #' * \code{hyper} - Goldberg and Roth's (2003) Hypergeometric backbone
 #' * \code{degree} - Hamann et al.'s (2016) Local Degree backbone
 #' * \code{quadrilateral} - Nocaj et al.'s (2015) Quadrilateral Simmelian backbone
-#' * \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, \code{symmetrize}, and \code{umst}
+#' * \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, and \code{umst}
 #'
 #' The \code{escore} parameter determines how an unweighted edge's importance is calculated.
 #' Unless noted below, scores are symmetric and larger values represent more important edges.
@@ -55,9 +54,6 @@
 #' * \code{degree}: Retains each node's d^`s` most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
 #' * \code{disparity}: Applies the disparity filter using [disparity()]
 #'
-#' Using \code{escore == "degree"} or \code{normalize == "rank"} can yield an assymmetric network. When \code{symmetrize == TRUE} (default),
-#'   after applying a filter, the network is symmetrized by such that i-j if i->j or i<-j.
-#'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
 #' is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
 #' backbone models) the edgewise p-values.
@@ -79,7 +75,6 @@ backbone_from_unweighted <- function(U,
                                      escore,
                                      normalize,
                                      filter,
-                                     symmetrize,
                                      umst,
                                      narrative = TRUE,
                                      return = "backbone") {
@@ -93,23 +88,22 @@ backbone_from_unweighted <- function(U,
   if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
 
   #If existing model specification, set model parameters
-  if (model == "skeleton") {escore <- "random"; normalize <- "none"; filter <- "proportion"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "gspar") {escore <- "jaccard"; normalize <- "none"; filter <- "proportion"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "lspar") {escore <- "jaccard"; normalize <- "rank"; filter <- "degree"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "simmelian") {escore <- "triangles"; normalize <- "embeddedness"; filter <- "threshold"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "jaccard") {escore <- "jaccard"; normalize <- "none"; filter <- "threshold"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "meetmin") {escore <- "meetmin"; normalize <- "none"; filter <- "threshold"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "geometric") {escore <- "geometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "hyper") {escore <- "hypergeometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "degree") {escore <- "degree"; normalize <- "rank"; filter <- "degree"; umst <- FALSE; symmetrize <- TRUE}
-  if (model == "quadrilateral") {escore <- "quadrilateral"; normalize <- "embeddedness"; filter <- "threshold"; umst <- TRUE; symmetrize <- TRUE}
+  if (model == "skeleton") {escore <- "random"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
+  if (model == "gspar") {escore <- "jaccard"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
+  if (model == "lspar") {escore <- "jaccard"; normalize <- "rank"; filter <- "degree"; umst <- FALSE}
+  if (model == "simmelian") {escore <- "triangles"; normalize <- "embeddedness"; filter <- "threshold"; umst <- FALSE}
+  if (model == "jaccard") {escore <- "jaccard"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
+  if (model == "meetmin") {escore <- "meetmin"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
+  if (model == "geometric") {escore <- "geometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
+  if (model == "hyper") {escore <- "hypergeometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
+  if (model == "degree") {escore <- "degree"; normalize <- "rank"; filter <- "degree"; umst <- FALSE}
+  if (model == "quadrilateral") {escore <- "quadrilateral"; normalize <- "embeddedness"; filter <- "threshold"; umst <- TRUE}
 
   #If custom model specification, check model parameters
   if (model == "custom") {
     if (!(escore %in% c("random", "betweenness", "triangles", "jaccard", "dice", "quadrangles", "quadrilateral", "degree", "meetmin", "geometric" , "hypergeometric"))) {stop("`escore` must be one of: \"random\", \"betweenness\", \"triangles\", \"jaccard\", \"dice\", \"quadrangles\", \"quadrilateral\", \"degree\", \"meetmin\", \"geometric\" , \"hypergeometric\"")}
     if (!(normalize %in% c("none", "rank", "embeddedness"))) {stop("`normalize` must be one of: \"none\", \"rank\", \"embeddedness\"")}
     if (!(filter %in% c("threshold", "proportion", "degree"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\"")}
-    if (!is.logical(symmetrize)) {stop("`symmetrize` must be either TRUE or FALSE")}
     if (!is.logical(umst)) {stop("`umst` must be either TRUE or FALSE")}
   }
 
@@ -118,18 +112,22 @@ backbone_from_unweighted <- function(U,
   if (!methods::is(U,"matrix") & !methods::is(U,"igraph")) {stop("`U` must be an adjacency matrix or igraph object")}
 
   if (methods::is(U,"matrix")) {
-    if (dim(U)[1] != dim(U)[2]) {stop("`U` must be a square adjacency matrix")}
+    if (dim(U)[1] != dim(U)[2]) {stop("`U` must be a symmetric adjacency matrix")}
     if (!all(U %in% c(0,1))) {stop("The entries of `U` must be either 0 or 1")}
+    if (!isSymmetric(U)) {stop("`U` must be a symmetric adjacency matrix")}
   }
 
   if (methods::is(U,"igraph")) {
-    if (igraph::is_bipartite(U)) {stop("`U` must be a unipartite igraph object")}
-    if ("weight" %in% igraph::edge_attr_names(W)) {stop("An edge weight attribute is present in `U`, but will be ignored")}
+    if (igraph::is_bipartite(U)) {stop("`U` must be an undirected unipartite igraph object")}
+    if (igraph::is_directed(U)) {stop("`U` must be an undirected unipartite igraph object")}
+    if ("weight" %in% igraph::edge_attr_names(U)) {stop("An edge weight attribute is present in `U`, but will be ignored")}
   }
 
   #Convert input to adjacency matrix
   if (methods::is(U,"matrix")) {A <- U}  #matrix --> matrix
   if (methods::is(U,"igraph")) {A <- igraph::as_adjacency_matrix(U, names = FALSE, sparse = FALSE)}
 
+  #### Compute edge scores ####
+  G <- .escore(A, escore = escore)
 
 }
