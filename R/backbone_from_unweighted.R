@@ -68,7 +68,6 @@
 #' @export
 #'
 #' @examples
-#' bb <- backbone_from_unweighted()
 backbone_from_unweighted <- function(U,
                                      model = "degree",
                                      parameter = 0.6,
@@ -129,5 +128,24 @@ backbone_from_unweighted <- function(U,
 
   #### Compute edge scores ####
   G <- .escore(A, escore = escore)
+
+  #### Apply edge score normalization ####
+  G <- .normalize(G, normalize = normalize)
+
+  #### Apply filter ####
+
+  #### Symmetrize ####  ==> REQUIRES TESTING
+  G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
+  G[upper.tri(G)] <- t(G)[upper.tri(G)]
+
+  #### Add UMST #### ==> REQUIRES TESTING
+  if (umst) {
+    tree <- igraph::graph_from_adjacency_matrix(A, mode = "undirected")  #Convert original to igraph
+    tree <- igraph::mst(tree)  #Find the UMST
+    tree <- igraph::as_adjacency_matrix(tree, sparse = FALSE)  #Convert back to matrix
+    G <- (G | tree)*1  #Include an edge if it is in either the sparsified graph or the tree
+  }
+
+  #### FOLLOW OTHER CODE AS TEMPLATE
 
 }
