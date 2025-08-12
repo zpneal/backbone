@@ -2,7 +2,7 @@
 % Please edit documentation in R/backbone_from_unweighted.R
 \name{backbone_from_unweighted}
 \alias{backbone_from_unweighted}
-\title{Extract the backbone from a weighted network}
+\title{Extract the backbone from an unweighted, undirected network}
 \usage{
 backbone_from_unweighted(
   U,
@@ -11,14 +11,13 @@ backbone_from_unweighted(
   escore,
   normalize,
   filter,
-  symmetrize,
   umst,
   narrative = TRUE,
   return = "backbone"
 )
 }
 \arguments{
-\item{U}{An unweighted network as an adjacency matrix or an unweighted unipartite \code{igraph} object}
+\item{U}{An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \code{igraph} object}
 
 \item{model}{string: backbone model}
 
@@ -29,8 +28,6 @@ backbone_from_unweighted(
 \item{normalize}{string: Method for normalizing edge scores}
 
 \item{filter}{string: Type of filter to apply}
-
-\item{symmetrize}{boolean: TRUE if the result should be symmetrized}
 
 \item{umst}{boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity}
 
@@ -44,7 +41,7 @@ is returned as an element in a list that also includes the original weighted net
 backbone models) the edgewise p-values.
 }
 \description{
-\code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted network
+\code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted, undirected network
 }
 \details{
 The \code{backbone_from_unweighted} function extracts the backbone from an unweighted unipartite network. The backbone is an
@@ -62,7 +59,7 @@ The following backbone models are available using the \code{model} parameter:
 \item \code{hyper} - Goldberg and Roth's (2003) Hypergeometric backbone
 \item \code{degree} - Hamann et al.'s (2016) Local Degree backbone
 \item \code{quadrilateral} - Nocaj et al.'s (2015) Quadrilateral Simmelian backbone
-\item \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, \code{symmetrize}, and \code{umst}
+\item \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, and \code{umst}
 }
 
 The \code{escore} parameter determines how an unweighted edge's importance is calculated.
@@ -95,9 +92,6 @@ The \code{filter} parameter determines how edges are filtered based on their (no
 \item \code{degree}: Retains each node's d^\code{s} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
 \item \code{disparity}: Applies the disparity filter using \code{\link[=disparity]{disparity()}}
 }
-
-Using \code{escore == "degree"} or \code{normalize == "rank"} can yield an assymmetric network. When \code{symmetrize == TRUE} (default),
-after applying a filter, the network is symmetrized by such that i-j if i->j or i<-j.
 }
 \examples{
 bb <- backbone_from_unweighted()
