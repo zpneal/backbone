@@ -52,7 +52,9 @@
 #' * \code{threshold}: Edges with scores >= `s` are retained in the backbone
 #' * \code{proportion}: Specifies the approximate proportion of edges to retain in the backbone
 #' * \code{degree}: Retains each node's d^`s` most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
-#' * \code{disparity}: Applies the disparity filter using [disparity()]
+#' * \code{disparity}: Applies the disparity filter using [backbone_from_weighted()]
+#' * \code{lans}: Applies locally adaptive network sparsification using [backbone_from_weighted()]
+#' * \code{mlf}: Applies the marginal likelihood filter using [backbone_from_weighted()]
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
 #' is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
@@ -102,7 +104,7 @@ backbone_from_unweighted <- function(U,
   if (model == "custom") {
     if (!(escore %in% c("random", "betweenness", "triangles", "jaccard", "dice", "quadrangles", "quadrilateral", "degree", "meetmin", "geometric" , "hypergeometric"))) {stop("`escore` must be one of: \"random\", \"betweenness\", \"triangles\", \"jaccard\", \"dice\", \"quadrangles\", \"quadrilateral\", \"degree\", \"meetmin\", \"geometric\" , \"hypergeometric\"")}
     if (!(normalize %in% c("none", "rank", "embeddedness"))) {stop("`normalize` must be one of: \"none\", \"rank\", \"embeddedness\"")}
-    if (!(filter %in% c("threshold", "proportion", "degree"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\"")}
+    if (!(filter %in% c("threshold", "proportion", "degree", "disparity", "lans", "mlf"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\", \"lans\", \"mlf\"")}
     if (!is.logical(umst)) {stop("`umst` must be either TRUE or FALSE")}
   }
 
