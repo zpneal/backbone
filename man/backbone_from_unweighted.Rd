@@ -90,7 +90,9 @@ The \code{filter} parameter determines how edges are filtered based on their (no
 \item \code{threshold}: Edges with scores >= \code{s} are retained in the backbone
 \item \code{proportion}: Specifies the approximate proportion of edges to retain in the backbone
 \item \code{degree}: Retains each node's d^\code{s} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
-\item \code{disparity}: Applies the disparity filter using \code{\link[=disparity]{disparity()}}
+\item \code{disparity}: Applies the disparity filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
+\item \code{lans}: Applies locally adaptive network sparsification using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
+\item \code{mlf}: Applies the marginal likelihood filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
 }
 }
 \references{
