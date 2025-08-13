@@ -27,9 +27,9 @@ Useful links:
 
 Other contributors:
 \itemize{
-  \item Rachel Domagalski \email{domagal9@msu.edu} [contributor]
-  \item Bruce Sagan \email{bsagan@msu.edu} [contributor]
-  \item Karl Godard \email{godardk@umich.edu} [contributor]
+  \item Rachel Domagalski [contributor]
+  \item Bruce Sagan [contributor]
+  \item Karl Godard [contributor]
 }
 
 }
