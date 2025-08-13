@@ -133,6 +133,7 @@ backbone_from_unweighted <- function(U,
   G <- .normalize(G, normalize = normalize)
 
   #### Apply filter ####
+  G <- .filter(G, filter = filter, parameter = parameter)
 
   #### Symmetrize ####  ==> REQUIRES TESTING
   G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
