@@ -4,7 +4,7 @@
 #'
 #' @param U An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \code{igraph} object
 #' @param model string: backbone model
-#' @param parameter real: parameter used to control structural backbone models
+#' @param parameter real: filtering parameter
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
