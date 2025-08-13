@@ -21,7 +21,7 @@ backbone_from_unweighted(
 
 \item{model}{string: backbone model}
 
-\item{parameter}{real: parameter used to control structural backbone models}
+\item{parameter}{real: filtering parameter}
 
 \item{escore}{string: Method for scoring edges' importance}
 
