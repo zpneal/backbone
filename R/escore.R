@@ -97,7 +97,7 @@
   if (escore == "hypergeometric") {
     triangles <- tcrossprod(W)
     W <- outer(1:nrow(W),1:ncol(W), FUN = Vectorize( function(i,j) stats::phyper(triangles[i,j]-1, sum(W[i,])-1, (nrow(W)-2)-(sum(W[i,])-1), sum(W[j,])-1, lower.tail=FALSE) ))
-    W <- W * A
+    W <- (1-W) * A  #Reverse-score so that larger weights are assigned to edges more worth keeping
   }
 
   return(W)
