@@ -81,7 +81,7 @@ Unless noted below, scores are symmetric and larger values represent more import
 The \code{normalize} parameter determines whether edge scores are normalized.
 \itemize{
 \item \code{none}: no normalization is performed
-\item \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
+\item \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (requires that \code{filter = degree})
 \item \code{embeddedness}: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 }
 
