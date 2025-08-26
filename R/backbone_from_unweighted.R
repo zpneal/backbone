@@ -45,7 +45,7 @@
 #'
 #' The \code{normalize} parameter determines whether edge scores are normalized.
 #' * \code{none}: no normalization is performed
-#' * \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (asymmetric)
+#' * \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (requires that \code{filter = degree})
 #' * \code{embeddedness}: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 #'
 #' The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores.
@@ -83,8 +83,7 @@ backbone_from_unweighted <- function(U,
   #### Check parameters ####
   #All models
   if (!(model %in% c("custom", "skeleton", "gspar", "lspar", "simmelian", "jaccard", "meetmin", "geometric", "hyper", "degree", "quadrilateral"))) {stop("`model` must be one of: \"custom\", \"skeleton\", \"gspar\", \"lspar\", \"simmelian\", \"jaccard\", \"meetmin\", \"geometric\", \"hyper\", \"degree\", \"quadrilateral\"")}
-  if (!is.numeric(parameter)) {stop("`parameter` must be a numeric value between 0 and 1")}
-  if (parameter < 0 | parameter > 1) {stop("`parameter` must be a numeric value between 0 and 1")}
+  if (!is.numeric(parameter)) {stop("`parameter` must be a numeric value")}
   if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
   if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
 
@@ -106,6 +105,8 @@ backbone_from_unweighted <- function(U,
     if (!(normalize %in% c("none", "rank", "embeddedness"))) {stop("`normalize` must be one of: \"none\", \"rank\", \"embeddedness\"")}
     if (!(filter %in% c("threshold", "proportion", "degree", "disparity", "lans", "mlf"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\", \"lans\", \"mlf\"")}
     if (!is.logical(umst)) {stop("`umst` must be either TRUE or FALSE")}
+    if (normalize=="rank" & filter!="degree") {stop("Using normalize=\"rank\" requires that filter=\"degree\"")}
+    if (normalize!="rank" & filter=="degree") {stop("Using filter=\"degree\" requires that normalize=\"rank\"")}
   }
 
   #### Check and format input ####
