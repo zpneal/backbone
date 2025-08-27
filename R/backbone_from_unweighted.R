@@ -69,9 +69,22 @@
 #' @export
 #'
 #' @examples
+#' #A dense, unweighted network with three embedded communities
+#' U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))
+#' plot(U)  #Communities are not obvious
+#'
+#' #Extract backbone using the built-in "Local Sparsification" model
+#' bb <- backbone_from_unweighted(U, model = "lspar", parameter = 0.5)
+#' plot(bb)  #Communities are clearly visible
+#'
+#' #Extract backbone using local sparification, but explicitly specifying the model steps
+#' bb <- backbone_from_unweighted(U, model = "custom", escore = "jaccard",
+#'                                normalize = "rank", filter = "degree",
+#'                                umst = FALSE, parameter = 0.5)
+#' plot(bb)  #Communities are clearly visible
 backbone_from_unweighted <- function(U,
-                                     model = "degree",
-                                     parameter = 0.6,
+                                     model = "lspar",
+                                     parameter = 0.5,
                                      escore,
                                      normalize,
                                      filter,
