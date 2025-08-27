@@ -17,7 +17,7 @@ backbone_from_bipartite(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object}
+\item{B}{An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -25,7 +25,7 @@ backbone_from_bipartite(
 
 \item{signed}{boolean: return a signed backbone}
 
-\item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
 \item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and test them for significance}
 

@@ -14,7 +14,7 @@ lans(
 )
 }
 \arguments{
-\item{W}{A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.}
+\item{W}{A positively-weighted unipartite graph as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
@@ -22,7 +22,7 @@ lans(
 
 \item{signed}{boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)}
 
-\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
 \item{narrative}{boolean: TRUE if suggested text & citations should be displayed.
 #'}

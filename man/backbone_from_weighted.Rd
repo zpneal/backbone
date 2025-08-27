@@ -17,7 +17,7 @@ backbone_from_weighted(
 )
 }
 \arguments{
-\item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \code{igraph} object}
+\item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \link[igraph]{igraph} object}
 
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 
@@ -25,7 +25,7 @@ backbone_from_weighted(
 
 \item{signed}{boolean: return a signed backbone from a statistical model}
 
-\item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.}
+\item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
 \item{parameter}{real: parameter used to control structural backbone models (see details)}
 
