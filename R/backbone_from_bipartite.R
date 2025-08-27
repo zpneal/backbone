@@ -2,11 +2,11 @@
 #'
 #' \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #' @param trials numeric: if \code{model = "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution
@@ -85,7 +85,7 @@ backbone_from_bipartite <- function(B,
     if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
   }
   if (model!="fdsm" & !is.null(trials)) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}  
+  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
   if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
 
   #### Check and format input ####

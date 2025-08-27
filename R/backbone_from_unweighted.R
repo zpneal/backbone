@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted, undirected network
 #'
-#' @param U An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \code{igraph} object
+#' @param U An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \link[igraph]{igraph} object
 #' @param model string: backbone model
 #' @param parameter real: filtering parameter
 #' @param escore string: Method for scoring edges' importance
@@ -139,11 +139,11 @@ backbone_from_unweighted <- function(U,
 
   #### Symmetrize ####
   backbone <- pmax(backbone, t(backbone))
-  
+
   #### Add UMST ####
   if (umst) {
     tree <- igraph::graph_from_adjacency_matrix(G, mode = "max", weighted = TRUE)  #Convert weighted matrix to undirected igraph
-    if (normalize!="rank") {E(tree)$weight <- E(tree)$weight*-1}  #If not using rank normalization, reverse-score weights so that mst() returns *maximum* spanning tree
+    if (normalize!="rank") {igraph::E(tree)$weight <- igraph::E(tree)$weight*-1}  #If not using rank normalization, reverse-score weights so that mst() returns *maximum* spanning tree
     tree <- igraph::mst(tree)  #Find the (union of) maximum spanning trees
     tree <- igraph::as_adjacency_matrix(tree, sparse = FALSE)  #Convert tree to matrix
     backbone <- (backbone | tree)*1  #Include an edge if it is in either the backbone or tree
@@ -153,7 +153,7 @@ backbone_from_unweighted <- function(U,
   if (narrative) {
     # First sentence (descriptive)
     text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
-    
+
     # Second sentence (model and outcome)
     if (model == "skeleton") {desc <- "Karger's (1999) Skeleton backbone"}
     if (model == "gspar") {desc <- "Satuluri et al's (2011) Global Sparsification backbone model"}
@@ -166,13 +166,13 @@ backbone_from_unweighted <- function(U,
     if (model == "degree") {desc <- "Hamann et al.'s (2016) Local Degree backbone model"}
     if (model == "quadrilateral") {desc <- "Nocaj et al.'s (2015) Quadrilateral Simmelian backbone model"}
     if (model == "custom") {desc <- "a custom backbone model specification"}
-    
+
     old <- sum(A!=0, na.rm=TRUE)  #Number of edges in original network
     new <- sum(backbone!=0)  #Number of edges in backbone
     reduced_edges <- round(((old - new) / old)*100,2)
-    
+
     text <- paste0(text, " Edges were selected for retention in the backbone using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
-    
+
     # Display
     message("")
     message("=== Suggested text and citations ===")
@@ -191,13 +191,13 @@ backbone_from_unweighted <- function(U,
     if (model == "degree") {message("Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. Social Network Analysis and Mining, 6, 22. https://doi.org/10.1007/s13278-016-0332-2")}
     if (model == "quadrilateral") {message("Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. Journal of Graph Algorithms and Applications, 19, 595-618. https://doi.org/10.7155/jgaa.00370")}
   }
-  
+
   #### Prepare backbone ####
   if (methods::is(U,"matrix")) {
     rownames(backbone) <- rownames(U)
     colnames(backbone) <- rownames(U)
   }
-  
+
   if (methods::is(U,"igraph")) {
     temp <- U  #Placeholder for backbone
     temp <- igraph::set_edge_attr(temp, "keep", value = backbone[igraph::as_edgelist(temp, names = FALSE)])  #Insert edge retention marker as attribute
@@ -205,7 +205,7 @@ backbone_from_unweighted <- function(U,
     temp <- igraph::delete_edge_attr(temp, "keep")  #Delete edge returntion marker
     backbone <- temp
   }
-  
+
   #### Return ####
   if (return == "backbone") {return(backbone)}
   if (return == "everything" & (model == "global")) {return(list(original = U, backbone = backbone, narrative = text))}

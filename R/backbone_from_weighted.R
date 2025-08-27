@@ -2,11 +2,11 @@
 #'
 #' \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
 #'
-#' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \code{igraph} object
+#' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \link[igraph]{igraph} object
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param alpha real: significance level of hypothesis test(s) in statistical models
 #' @param signed boolean: return a signed backbone from a statistical model
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param parameter real: parameter used to control structural backbone models (see details)
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
 #' @param narrative boolean: display suggested text & citations
@@ -83,9 +83,9 @@ backbone_from_weighted <- function(W,
   #All models
   if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
   if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}  
+  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
   if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
-  
+
   #Statistical models
   if (model %in% c("disparity", "lans", "mlf")) {
     if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}

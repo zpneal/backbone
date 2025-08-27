@@ -2,10 +2,10 @@
 #'
 #' \code{sdsm()} was replaced by \code{backbone_from_bipartite(model="sdsm")}.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing.as.zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #'
@@ -31,10 +31,10 @@ sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #'
 #' \code{fixedrow()} was replaced by \code{backbone_from_bipartite(model = "fixedrow")}.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing.as.zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #'
@@ -60,10 +60,10 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #'
 #' \code{fixedcol()} was replaced by \code{backbone_from_bipartite(model = "fixedcol")}.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing.as.zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #'
@@ -89,10 +89,10 @@ fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #'
 #' \code{fixedfill()} was replaced by \code{backbone_from_bipartite(model = "fixedfill")}.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing.as.zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #'
@@ -118,10 +118,10 @@ fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 #'
 #' \code{fdsm()} was replaced by \code{backbone_from_bipartite(model = "fdsm")}.
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \code{\link{igraph}} object
+#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param signed boolean: return a signed backbone
-#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing.as.zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #' @param trials numeric: the number of bipartite graphs generated using fastball to approximate the edge weight distribution
@@ -149,11 +149,11 @@ fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #'
 #' \code{disparity()} was replaced by \code{backbone_from_weighted(model = "disparity")}.
 #'
-#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param W A positively-weighted unipartite graph as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by [p.adjust()].
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #' #'
 #' @details
@@ -178,11 +178,11 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 #'
 #' \code{lans()} was replaced by \code{backbone_from_weighted(model = "lans")}.
 #'
-#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param W A positively-weighted unipartite graph as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by [p.adjust()].
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #' #'
 #' @details
@@ -207,11 +207,11 @@ lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #'
 #' \code{mlf()} was replaced by \code{backbone_from_weighted(model = "mlf")}.
 #'
-#' @param W A positively-weighted unipartite graph, as: (1) an adjacency matrix in the form of a matrix or sparse \code{\link{Matrix}}; (2) an edgelist in the form of a three-column dataframe; (3) an \code{\link{igraph}} object.
+#' @param W A positively-weighted unipartite graph as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param missing.as.zero boolean: should missing edges be treated as edges with zero weight and tested for significance
 #' @param signed boolean: TRUE for a signed backbone, FALSE for a binary backbone (see details)
-#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by \code{\link{p.adjust}}.
+#' @param mtc string: type of Multiple Test Correction to be applied; can be any method allowed by [p.adjust()].
 #' @param narrative boolean: TRUE if suggested text & citations should be displayed.
 #' #'
 #' @details
