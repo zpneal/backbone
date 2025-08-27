@@ -8,7 +8,7 @@
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
-#' @param umst boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity
+#' @param umst boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
 #' @param narrative boolean: display suggested text & citations
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'
@@ -136,18 +136,18 @@ backbone_from_unweighted <- function(U,
   G <- .normalize(G, normalize = normalize)
 
   #### Apply filter ####
-  G <- .filter(G, filter = filter, parameter = parameter)
+  bb <- .filter(G, filter = filter, parameter = parameter)
 
-  #### Symmetrize ####  ==> REQUIRES TESTING
-  G[lower.tri(G)] <- pmax(G[lower.tri(G)],t(G)[lower.tri(t(G))])
-  G[upper.tri(G)] <- t(G)[upper.tri(G)]
-
-  #### Add UMST #### ==> REQUIRES TESTING
+  #### Symmetrize ####
+  bb <- pmax(bb, t(bb))
+  
+  #### Add UMST ####
   if (umst) {
-    tree <- igraph::graph_from_adjacency_matrix(A, mode = "undirected")  #Convert original to igraph
-    tree <- igraph::mst(tree)  #Find the UMST
-    tree <- igraph::as_adjacency_matrix(tree, sparse = FALSE)  #Convert back to matrix
-    G <- (G | tree)*1  #Include an edge if it is in either the sparsified graph or the tree
+    tree <- igraph::graph_from_adjacency_matrix(G, mode = "max", weighted = TRUE)  #Convert weighted matrix to undirected igraph
+    if (normalize!="rank") {E(tree)$weight <- E(tree)$weight*-1}  #If not using rank normalization, reverse-score weights so that mst() returns *maximum* spanning tree
+    tree <- igraph::mst(tree)  #Find the (union of) maximum spanning trees
+    tree <- igraph::as_adjacency_matrix(tree, sparse = FALSE)  #Convert tree to matrix
+    bb <- (bb | tree)*1  #Include an edge if it is in either the backbone or tree
   }
 
   #### FOLLOW OTHER CODE AS TEMPLATE
