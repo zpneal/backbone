@@ -61,6 +61,7 @@
     igraph::E(W)$weight <- 0
     igraph::E(W)$weight[quads$edge] <- quads$Freq[which(quads$edgeid==quads$edge)]
     W <- igraph::as_adjacency_matrix(W, attr = "weight", sparse = FALSE)
+    W <- W * A
   }
 
   #### Neighborhood-normalized quadrangle count, from Nocaj et al. (2015) ####
@@ -81,6 +82,7 @@
     N <- tcrossprod(W)  #Shared neighbors
     D <- pmin(W*rowSums(W), t(W*rowSums(W)))  #Minimum of i's and j's degree
     W <- N/D  #Meet-min score
+    W <- W * A
     W[W==Inf | is.nan(W)] <- 0  #Fix any divide-by-zero
   }
 
