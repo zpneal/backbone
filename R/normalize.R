@@ -35,7 +35,7 @@
         } else {  #Otherwise, compute jaccard for each k, use maximum
           j <- NULL
           for (k in 1:max(list1,list2)) {j <- c(j, ((sum((list1>0 & list1<=k) & (list2>0 & list2<=k))) / (sum((list1>0 & list1<=k) | (list2>0 & list2<=k)))))}
-          scores[row1,row2] <- max(j)
+          scores[row1,row2] <- max(j, na.rm = TRUE)
         }
       }
     }
