@@ -37,8 +37,7 @@ backbone_from_unweighted(
 }
 \value{
 If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
-backbone models) the edgewise p-values.
+is returned as an element in a list that also includes the original unweighted network and a narrative description.
 }
 \description{
 \code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted, undirected network
