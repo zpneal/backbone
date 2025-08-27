@@ -29,7 +29,7 @@ backbone_from_unweighted(
 
 \item{filter}{string: Type of filter to apply}
 
-\item{umst}{boolean: TRUE if the backbone should include the union of minimum spanning trees, to ensure connectivity}
+\item{umst}{boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity}
 
 \item{narrative}{boolean: display suggested text & citations}
 
