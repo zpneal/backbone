@@ -39,7 +39,7 @@
         }
       }
     }
-    W <- scores
+    W <- scores * ((W!=0)*1)
     W[lower.tri(W)] <- t(W)[lower.tri(W)]  #Fill in rest of matrix
   }
 
