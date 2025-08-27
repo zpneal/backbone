@@ -57,8 +57,7 @@
 #' * \code{mlf}: Applies the marginal likelihood filter using [backbone_from_weighted()]
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
-#' backbone models) the edgewise p-values.
+#' is returned as an element in a list that also includes the original unweighted network and a narrative description.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
@@ -136,10 +135,10 @@ backbone_from_unweighted <- function(U,
   G <- .normalize(G, normalize = normalize)
 
   #### Apply filter ####
-  bb <- .filter(G, filter = filter, parameter = parameter)
+  backbone <- .filter(G, filter = filter, parameter = parameter)
 
   #### Symmetrize ####
-  bb <- pmax(bb, t(bb))
+  backbone <- pmax(backbone, t(backbone))
   
   #### Add UMST ####
   if (umst) {
@@ -147,9 +146,67 @@ backbone_from_unweighted <- function(U,
     if (normalize!="rank") {E(tree)$weight <- E(tree)$weight*-1}  #If not using rank normalization, reverse-score weights so that mst() returns *maximum* spanning tree
     tree <- igraph::mst(tree)  #Find the (union of) maximum spanning trees
     tree <- igraph::as_adjacency_matrix(tree, sparse = FALSE)  #Convert tree to matrix
-    bb <- (bb | tree)*1  #Include an edge if it is in either the backbone or tree
+    backbone <- (backbone | tree)*1  #Include an edge if it is in either the backbone or tree
   }
 
-  #### FOLLOW OTHER CODE AS TEMPLATE
-
+  #### Display narrative ####
+  if (narrative) {
+    # First sentence (descriptive)
+    text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
+    
+    # Second sentence (model and outcome)
+    if (model == "skeleton") {desc <- "Karger's (1999) Skeleton backbone"}
+    if (model == "gspar") {desc <- "Satuluri et al's (2011) Global Sparsification backbone model"}
+    if (model == "lspar") {desc <- "Satuluri et al's (2011) Local Sparsification backbone model"}
+    if (model == "simmelian") {desc <- "Nick et al's (2013) Simmelian backbone model"}
+    if (model == "jaccard") {desc <- "Goldberg and Roth's (2003) Jaccard backbone model"}
+    if (model == "meetmin") {desc <- "Goldberg and Roth's (2003) MeetMin backbone model"}
+    if (model == "geometric") {desc <- "Goldberg and Roth's (2003) Geometric backbone model"}
+    if (model == "hyper") {desc <- "Goldberg and Roth's (2003) Hypergeometric backbone model"}
+    if (model == "degree") {desc <- "Hamann et al.'s (2016) Local Degree backbone model"}
+    if (model == "quadrilateral") {desc <- "Nocaj et al.'s (2015) Quadrilateral Simmelian backbone model"}
+    if (model == "custom") {desc <- "a custom backbone model specification"}
+    
+    old <- sum(A!=0, na.rm=TRUE)  #Number of edges in original network
+    new <- sum(backbone!=0)  #Number of edges in backbone
+    reduced_edges <- round(((old - new) / old)*100,2)
+    
+    text <- paste0(text, " Edges were selected for retention in the backbone using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
+    
+    # Display
+    message("")
+    message("=== Suggested text and citations ===")
+    message(text)
+    message("")
+    message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
+    message("")
+    if (model == "skeleton") {message("Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. Mathematics of Operations Research, 24, 383-413. https://doi/org/10.1287/moor.24.2.383")}
+    if (model == "gspar") {message("Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). https://doi.org/10.1145/1989323.1989399")}
+    if (model == "lspar") {message("Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). https://doi.org/10.1145/1989323.1989399")}
+    if (model == "simmelian") {message("Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). https://doi.org/10.1145/2492517.2492569")}
+    if (model == "jaccard") {message("Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. Proceedings of the National Academy of Sciences, 100, 4372-4376. https://doi.org/10.1073/pnas.0735871100")}
+    if (model == "meetmin") {message("Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. Proceedings of the National Academy of Sciences, 100, 4372-4376. https://doi.org/10.1073/pnas.0735871100")}
+    if (model == "geometric") {message("Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. Proceedings of the National Academy of Sciences, 100, 4372-4376. https://doi.org/10.1073/pnas.0735871100")}
+    if (model == "hyper") {message("Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. Proceedings of the National Academy of Sciences, 100, 4372-4376. https://doi.org/10.1073/pnas.0735871100")}
+    if (model == "degree") {message("Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. Social Network Analysis and Mining, 6, 22. https://doi.org/10.1007/s13278-016-0332-2")}
+    if (model == "quadrilateral") {message("Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. Journal of Graph Algorithms and Applications, 19, 595-618. https://doi.org/10.7155/jgaa.00370")}
+  }
+  
+  #### Prepare backbone ####
+  if (methods::is(U,"matrix")) {
+    rownames(backbone) <- rownames(U)
+    colnames(backbone) <- rownames(U)
+  }
+  
+  if (methods::is(U,"igraph")) {
+    temp <- U  #Placeholder for backbone
+    temp <- igraph::set_edge_attr(temp, "keep", value = backbone[igraph::as_edgelist(temp, names = FALSE)])  #Insert edge retention marker as attribute
+    temp <- igraph::delete_edges(temp, which(igraph::E(temp)$keep==0))  #Delete any edges that should not be retained
+    temp <- igraph::delete_edge_attr(temp, "keep")  #Delete edge returntion marker
+    backbone <- temp
+  }
+  
+  #### Return ####
+  if (return == "backbone") {return(backbone)}
+  if (return == "everything" & (model == "global")) {return(list(original = U, backbone = backbone, narrative = text))}
 }
