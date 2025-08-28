@@ -437,3 +437,230 @@ expect_true(is(bb,"igraph"))                                                  #R
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
 expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+
+#### Unweighted Backbone Functions ####
+#escore
+A <- matrix(sample(c(0:1), 100, replace = TRUE),10,10)  #A binary, square, symmetric matrix
+diag(A) <- 0
+A <- pmax(A, t(A))
+
+test <- backbone:::.escore(A, "random")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "betweenness")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0))  #All values are 0 or larger
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "triangles")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test%%1==0))  #All values are integers
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "jaccard")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "dice")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "quadrangles")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test%%1==0))  #All values are integers
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "quadrilateral")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "degree")
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test%%1==0))  #All values are integers
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "meetmin")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "geometric")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.escore(A, "hypergeometric")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A == 0] == 0))  #If edge is missing in original, also missing in result
+
+#normalize
+A1 <- matrix(sample(c(0,0,0,1,2,3), 100, replace = TRUE),10,10)  #A weighted, square matrix
+diag(A1) <- 0
+A2 <- pmax(A1, t(A1))  #A weighted, square, symmetric matrix
+
+test <- backbone:::.normalize(A1, "rank")
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test%%1==0))  #All values are integers
+expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
+test <- backbone:::.normalize(A2, "rank")
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test%%1==0))  #All values are integers
+expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
+
+test <- backbone:::.normalize(A1, "embeddedness")
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
+test <- backbone:::.normalize(A2, "embeddedness")
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
+expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
+
+#filter
+A1 <- matrix(sample(c(0:10), 2500, replace = TRUE),50,50)  #A weighted, square matrix
+diag(A1) <- 0
+A2 <- A1; A2[upper.tri(A2)] <- t(A1)[upper.tri(A1)]  #Symmetrize using lower triangle
+
+test <- backbone:::.filter(A1, "threshold", 2)
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
+expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
+expect_true(all(test[A1 <= 2] == 0))  #If edge is below threshold, it is missing in result
+test <- backbone:::.filter(A2, "threshold", 2)
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
+expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
+expect_true(all(test[A2 <= 2] == 0))  #If edge is below threshold, it is missing in result
+
+test <- backbone:::.filter(A1, "proportion", .5)
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
+expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
+sum(test!=0) / sum(A1!=0)
+expect_true((sum(test!=0) / sum(A1!=0)) > 0.3 & (sum(test!=0) / sum(A1!=0)) < 0.7)  #Should keep 30-70% of original edges on average
+test <- backbone:::.filter(A2, "proportion", .5)
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
+expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
+expect_true((sum(test!=0) / sum(A2!=0)) > 0.3 & (sum(test!=0) / sum(A2!=0)) < 0.7)  #Should keep 30-70% of original edges on average
+
+test <- backbone:::.filter(A1, "degree", .5)
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
+expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
+test <- backbone:::.filter(A2, "degree", .5)
+expect_true(isSymmetric(test))  #Output is symmetric
+expect_true(all(diag(test)==0))  #Diagonal contains 0s
+expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
+expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
+
+#skeleton (no particular structure expected in backbone)
+U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
+test <- backbone_from_unweighted(U, model = "skeleton", parameter = .5, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+
+#gspar
+test <- backbone_from_unweighted(U, model = "gspar", parameter = .5, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#lspar
+test <- backbone_from_unweighted(U, model = "lspar", parameter = .5, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#simmelian
+test <- backbone_from_unweighted(U, model = "simmelian", parameter = .5, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#jaccard
+test <- backbone_from_unweighted(U, model = "jaccard", parameter = .3, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#meetmin
+test <- backbone_from_unweighted(U, model = "meetmin", parameter = .5, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#geometric
+test <- backbone_from_unweighted(U, model = "geometric", parameter = .3, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#hyper
+test <- backbone_from_unweighted(U, model = "hyper", parameter = .6, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#quadrilateral
+test <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .3, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+
+#degree
+U <- igraph::sample_pa(n = 60, m = 3, directed = FALSE)  #A dense, scale-free network
+test <- backbone_from_unweighted(U, model = "degree", parameter = .2, return = "everything")
+expect_true(length(test)==3)  #Returned object has three elements
+expect_true(is(test$narrative,"character"))  #Narrative element is character class
+expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
+expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
+expect_true(which.max(degree(U)) == which.max(degree(test$backbone)))  #Backbone preserves highest-degree node
+expect_true(cor(degree(U),degree(test$backbone)) > 0.75)  #Backbone preserves degree distribution
