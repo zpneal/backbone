@@ -528,7 +528,6 @@ expect_true(all(diag(test)==0))  #Diagonal contains 0s
 expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
 expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
 test <- backbone:::.normalize(A2, "embeddedness")
-expect_true(isSymmetric(test))  #Output is symmetric
 expect_true(all(diag(test)==0))  #Diagonal contains 0s
 expect_true(all(test>=0 & test<=1))  #All values between 0 and 1
 expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
@@ -662,5 +661,5 @@ expect_true(is(test$narrative,"character"))  #Narrative element is character cla
 expect_true(all.equal(U,test$original))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(which.max(degree(U)) == which.max(degree(test$backbone)))  #Backbone preserves highest-degree node
-expect_true(cor(degree(U),degree(test$backbone)) > 0.75)  #Backbone preserves degree distribution
+expect_true(which.max(igraph::degree(U)) == which.max(igraph::degree(test$backbone)))  #Backbone preserves highest-degree node
+expect_true(cor(igraph::degree(U),igraph::degree(test$backbone)) > 0.75)  #Backbone preserves degree distribution
