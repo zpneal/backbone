@@ -221,5 +221,5 @@ backbone_from_unweighted <- function(U,
 
   #### Return ####
   if (return == "backbone") {return(backbone)}
-  if (return == "everything" & (model == "global")) {return(list(original = U, backbone = backbone, narrative = text))}
+  if (return == "everything") {return(list(original = U, backbone = backbone, narrative = text))}
 }
