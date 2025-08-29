@@ -184,7 +184,7 @@ backbone_from_unweighted <- function(U,
     new <- sum(backbone!=0)  #Number of edges in backbone
     reduced_edges <- round(((old - new) / old)*100,2)
 
-    text <- paste0(text, " Edges were selected for retention in the backbone using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
+    text <- paste0(text, " Edges were selected for retention in the backbone using ", desc, " (filtering parameter = ", parameter,"), which reduced the number of edges by ", reduced_edges, "%.")
 
     # Display
     message("")
