@@ -27,7 +27,7 @@ backbone_from_unweighted(
 
 \item{normalize}{string: Method for normalizing edge scores}
 
-\item{filter}{string: Type of filter to apply}
+\item{filter}{string: Edge filtering method}
 
 \item{umst}{boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity}
 
@@ -36,7 +36,7 @@ backbone_from_unweighted(
 \item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+If \code{return = "backbone"}, a backbone in the same class as \code{U}. If \code{return = "everything"}, then the backbone
 is returned as an element in a list that also includes the original unweighted network and a narrative description.
 }
 \description{
@@ -46,23 +46,31 @@ is returned as an element in a list that also includes the original unweighted n
 The \code{backbone_from_unweighted} function extracts the backbone from an unweighted unipartite network. The backbone is an
 unweighted unipartite network that contains only edges preserved by a backbone model.
 
-The following backbone models are available using the \code{model} parameter:
+\strong{Existing Backbone Models}
+
+The \code{model} parameter is used to specify a backbone model that has been described in the literature. In each
+of the available models, \code{paramater} should range from 0 to 1. Smaller \code{parameter} values yield
+greater sparsification in models marked with a (-), while larger \code{parameter} values yield greater sparsification
+in models marked with a (+). The following models are available:
 \itemize{
-\item \code{skeleton} - Karger's (1999) Skeleton backbone
-\item \code{gspar} - Satuluri et al's (2011) Global Sparsification backbone
-\item \code{lspar} - Satuluri et al's (2011) Local Sparsification backbone
-\item \code{simmelian} - Nick et al's (2013) Simmelian backbone
-\item \code{jaccard} - Goldberg and Roth's (2003) Jaccard backbone
-\item \code{meetmin} - Goldberg and Roth's (2003) MeetMin backbone
-\item \code{geometric} - Goldberg and Roth's (2003) Geometric backbone
-\item \code{hyper} - Goldberg and Roth's (2003) Hypergeometric backbone
-\item \code{degree} - Hamann et al.'s (2016) Local Degree backbone
-\item \code{quadrilateral} - Nocaj et al.'s (2015) Quadrilateral Simmelian backbone
-\item \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, and \code{umst}
+\item \code{skeleton} - Karger's (1999) Skeleton backbone (-)
+\item \code{gspar} - Satuluri et al's (2011) Global Sparsification backbone (-)
+\item \code{lspar} - Satuluri et al's (2011) Local Sparsification backbone (-)
+\item \code{degree} - Hamann et al.'s (2016) Local Degree backbone (-)
+\item \code{simmelian} - Nick et al's (2013) Simmelian backbone (+)
+\item \code{quadrilateral} - Nocaj et al.'s (2015) Quadrilateral Simmelian backbone (+)
+\item \code{jaccard} - Goldberg and Roth's (2003) Jaccard backbone (+)
+\item \code{meetmin} - Goldberg and Roth's (2003) MeetMin backbone (+)
+\item \code{geometric} - Goldberg and Roth's (2003) Geometric backbone (+)
+\item \code{hyper} - Goldberg and Roth's (2003) Hypergeometric backbone (+)
 }
 
-The \code{escore} parameter determines how an unweighted edge's importance is calculated.
-Unless noted below, scores are symmetric and larger values represent more important edges.
+\strong{Custom Backbone Models}
+
+Alternatively, if \code{model = "custom"}, then a custom backbone model can be specified by a combination of
+\code{escore}, \code{normalize},\code{filter}, and \code{umst}.
+
+The \code{escore} parameter determines how an unweighted edge's importance is calculated:
 \itemize{
 \item \code{random}: a random number drawn from a uniform distribution
 \item \code{betweenness}: edge betweenness
@@ -71,27 +79,27 @@ Unless noted below, scores are symmetric and larger values represent more import
 \item \code{dice}: dice similarity coefficient of the neighborhoods of an edge's endpoints
 \item \code{quadrangles}: number of quadrangles that include the edge
 \item \code{quadrilateral}: geometric mean normalization of quadrangles
-\item \code{degree}: degree of neighbor to which an edge is adjacent (asymmetric)
+\item \code{degree}: degree of neighbor to which an edge is adjacent
 \item \code{meetmin}: triangles normalized by the smaller of the endpoints' neighborhoods' sizes
 \item \code{geometric}: triangles normalized by the product of the endpoints' neighborhoods' sizes
-\item \code{hypergeometric}: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (smaller is more important)
+\item \code{hypergeometric}: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (note: this actually returns the inverse probability so that more "important" edges have higher scores)
 }
 
-The \code{normalize} parameter determines whether edge scores are normalized.
+The \code{normalize} parameter determines whether edge scores are normalized:
 \itemize{
 \item \code{none}: no normalization is performed
 \item \code{rank}: scores are normalized by neighborhood rank, such that the strongest edge in a node's neighborhood is ranked 1 (requires that \code{filter = degree})
 \item \code{embeddedness}: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 }
 
-The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores.
+The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores:
 \itemize{
-\item \code{threshold}: Edges with scores >= \code{s} are retained in the backbone
+\item \code{threshold}: Edges with scores > \code{parameter} are retained in the backbone
 \item \code{proportion}: Specifies the approximate proportion of edges to retain in the backbone
-\item \code{degree}: Retains each node's d^\code{s} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
-\item \code{disparity}: Applies the disparity filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
-\item \code{lans}: Applies locally adaptive network sparsification using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
-\item \code{mlf}: Applies the marginal likelihood filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
+\item \code{degree}: Retains each node's d^\code{parameter} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
+\item \code{disparity}: Applies the disparity filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}, where alpha = \code{parameter}
+\item \code{lans}: Applies locally adaptive network sparsification using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}, where alpha = \code{parameter}
+\item \code{mlf}: Applies the marginal likelihood filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}, where alpha = \code{parameter}
 }
 }
 \examples{
@@ -116,11 +124,11 @@ skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network desig
 
 gspar and lspar: {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 
-simmelian: {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
-
-jaccard, meetmin, geometric, hyper: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. \emph{Proceedings of the National Academy of Sciences, 100}, 4372-4376. \doi{10.1073/pnas.0735871100}}
-
 degree: {Hamann, M., Lindner, G., Meyerhenke, H., Staudt, C. L., & Wagner, D. (2016). Structure-preserving sparsification methods for social networks. \emph{Social Network Analysis and Mining, 6}, 22. \doi{10.1007/s13278-016-0332-2}}
 
+simmelian: {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
+
 quadrilateral: {Nocaj, A., Ortmann, M., & Brandes, U. (2015). Untangling the hairballs of multi-centered, small-world online social media networks. \emph{Journal of Graph Algorithms and Applications, 19}, 595-618. \doi{10.7155/jgaa.00370}}
+
+jaccard, meetmin, geometric, hyper: {Goldberg, D. S., & Roth, F. P. (2003). Assessing experimentally derived interactions in a small world. \emph{Proceedings of the National Academy of Sciences, 100}, 4372-4376. \doi{10.1073/pnas.0735871100}}
 }
