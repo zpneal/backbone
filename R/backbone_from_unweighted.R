@@ -57,7 +57,8 @@
 #' * \code{mlf}: Applies the marginal likelihood filter using [backbone_from_weighted()]
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original unweighted network and a narrative description.
+#' is returned as an element in a list that also includes the original unweighted network, a narrative description, and the original
+#' function call.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
@@ -91,6 +92,8 @@ backbone_from_unweighted <- function(U,
                                      umst,
                                      narrative = TRUE,
                                      return = "backbone") {
+
+  call <- match.call()
 
   #### Check parameters ####
   #All models
@@ -221,5 +224,5 @@ backbone_from_unweighted <- function(U,
 
   #### Return ####
   if (return == "backbone") {return(backbone)}
-  if (return == "everything") {return(list(original = U, backbone = backbone, narrative = text))}
+  if (return == "everything") {return(list(original = U, backbone = backbone, narrative = text, call = call))}
 }

@@ -35,8 +35,8 @@
 #' and "required" edges can be represented with weight = 11.
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, narrative
-#' description, and edgewise p-values.
+#' is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, edgewise p-values,
+#' narrative description, and original function call.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
@@ -72,6 +72,8 @@ backbone_from_bipartite <- function(B,
                                     narrative = TRUE,
                                     trials = NULL,
                                     return = "backbone") {
+
+  call <- match.call()
 
   #### Check parameters ####
   if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
@@ -191,5 +193,5 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   #### Return ####
   if (return == "backbone") {return(backbone)}
-  if (return == "everything") {return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text))}
+  if (return == "everything") {return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call))}
 }

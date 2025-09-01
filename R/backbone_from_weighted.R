@@ -36,8 +36,8 @@
 #' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original weighted network, a narrative description, and (for statistical
-#' backbone models) the edgewise p-values.
+#' is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise
+#' p-values, a narrative description, and the original function call.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -78,6 +78,8 @@ backbone_from_weighted <- function(W,
                                    missing_as_zero = FALSE,
                                    narrative = TRUE,
                                    return = "backbone") {
+
+  call <- match.call()
 
   #### Check parameters ####
   #All models
@@ -187,6 +189,6 @@ backbone_from_weighted <- function(W,
 
   #### Return ####
   if (return == "backbone") {return(backbone)}
-  if (return == "everything" & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text))}
-  if (return == "everything" & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text))}
+  if (return == "everything" & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call))}
+  if (return == "everything" & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text, call = call))}
 }
