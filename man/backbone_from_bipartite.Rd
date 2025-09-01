@@ -37,8 +37,8 @@ backbone_from_bipartite(
 }
 \value{
 If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, narrative
-description, and edgewise p-values.
+is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, edgewise p-values,
+narrative description, and original function call.
 }
 \description{
 \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network.
