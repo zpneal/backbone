@@ -84,7 +84,7 @@ The primary use of the backbone package is backbone extraction, that is, identif
 
 * Depending on the type of network contained in `dat` (bipartite, weighted, unweighted), you run the applicable backbone function (`backbone_from_bipartite()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`), which returns a backbone of the same class as `dat`.
 
-The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted bipartite projections](#projection), [non-projection weighted networks](#weighted), and [unweighted networks](#unweighted). Additionally, the package some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
+The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted bipartite projections](#projection), [non-projection weighted networks](#weighted), and [unweighted networks](#unweighted). Additionally, the package contains some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
 
 ## The `narrative` parameter {#narrative}
 Each backbone extraction function includes a `narrative` parameter. When `narrative = TRUE` (the default), narrative text describing the backbone extraction will be displayed with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
