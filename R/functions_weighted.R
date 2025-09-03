@@ -19,17 +19,14 @@
   strength <- rowSums(A)
   binary <- (A>0)+0
   degree <- rowSums(binary)
-
+  
   #### Compute p-values ####
   if (isSymmetric(A)) {
     P <- A/strength
     pvalues <- (1-P)^(degree-1)
-    upper <- as.matrix(pvalues)      #Asymmetric p-values, one from the perspective of each node
-    upper <- pmin(upper,t(upper))    #From Serrano: "satisfy the above criterion for at least one of the two nodes"
+    upper <- pmin(pvalues,t(pvalues))    #From Serrano: "satisfy the above criterion for at least one of the two nodes"
     if (signed) {lower <- 1-upper}
-  }
-
-  if (!isSymmetric(A)) {
+  } else {
     outp <- A/strength
     outvalues <- (1-outp)^(degree-1)
     inp <- t(A)/(colSums(A))
@@ -37,6 +34,7 @@
     upper <- pmin(invalues,outvalues)
     if (signed) {lower <- 1-upper}
   }
+  
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
   if (!missing_as_zero) {
