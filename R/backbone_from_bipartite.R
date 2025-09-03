@@ -1,23 +1,23 @@
-#' Extract the backbone from a bipartite projection
+#' Extract the backbone from a bipartite or hypgergraph projection
 #'
-#' \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network.
+#' \code{backbone_from_bipartite()} extracts the unweighted backbone from the weighted projection of a bipartite network or hypergraph
 #'
-#' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
+#' @param B An unweighted bipartite network or hypergraph as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
-#' @param trials numeric: if \code{model = "fdsm"}, the number of bipartite graphs generated using fastball to approximate the edge weight distribution
+#' @param trials numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'
 #' @details
-#' The \code{backbone_from_bipartite} function extracts the backbone from the weighted projection of a bipartite network composed of *n* "agent"
-#' nodes and *m* "artifact" nodes. The backbone is an unweighted unipartite network of agents that contains only edges whose weights
-#' in the projection are statistically significant. When \code{signed = FALSE}, the backbone contains edges that are statistically
-#' significantly strong under a one-tailed test. When \code{signed = TRUE}, the backbone contains positive edges that are statistically
-#' significantly strong, and negative edges that are statistically significantly weak, under a two-tailed test.
+#' The \code{backbone_from_bipartite} function extracts the backbone from the weighted projection of a bipartite network or hypergraph.
+#' The backbone is an unweighted unipartite network of agents that contains only edges whose weights in the projection are statistically
+#' significant. When \code{signed = FALSE}, the backbone contains edges that are statistically significantly strong under a one-tailed test.
+#' When \code{signed = TRUE}, the backbone contains positive edges that are statistically significantly strong, and negative edges that are
+#' statistically significantly weak, under a two-tailed test.
 #'
 #' The \code{model} parameter controls the null model used to evaluate the statistical significance of edge weights. All available models
 #' are *statistical models* that are controlled by \code{alpha}, and differ in the constraints they impose on \code{B}:
@@ -27,16 +27,16 @@
 #' * \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
 #' * \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
 #'
-#' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite projection, the input \code{B} must be the
-#' bipartite network itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
+#' Although \cite{backbone_from_bipartite} extracts the backbone from a weighted bipartite or hypergraph projection, the input \code{B} must
+#' be the bipartite network or hypergraph itself, and not the weighted projection. This is necessary because the backbone models use information in the bipartite
 #' network that is missing from the projection. The "agent" nodes that appear in the projection must be represented by rows if \code{B}
 #' is an incidence matrix, or by \code{type = FALSE} nodes if \code{B} is a bipartite igraph object. In either case, the bipartite network
 #' must be binary (i.e., unweighted), unless \code{model = "sdsm"}, when "prohibited" edges can be represented with weight = 10
 #' and "required" edges can be represented with weight = 11.
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original bipartite network, raw projection, backbone, edgewise p-values,
-#' narrative description, and original function call.
+#' is returned as an element in a list that also includes the original network, raw projection, backbone, edgewise p-values, narrative
+#' description, and original function call.
 #'
 #' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
