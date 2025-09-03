@@ -6,7 +6,7 @@
 #'    * a weighted bipartite projection using [backbone_from_bipartite()]
 #'    * an unweighted network using [backbone_from_unweighted()]
 #'
-#'    For a detailed illustration of these methods, please see the vignette using [vignette("backbone")].
+#'    For a detailed illustration of these methods, please see \href{../doc/backbone.html}{the vignette} using `vignette("backbone")`.
 #'
 #' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
 #'
