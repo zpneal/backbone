@@ -15,7 +15,8 @@ License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
-Depends: R (>= 2.10)
+Depends: 
+    R (>= 3.5)
 Imports: 
     igraph,
     methods,
@@ -31,3 +32,4 @@ LinkingTo:
 VignetteBuilder: knitr
 URL: https://www.zacharyneal.com/backbone, https://github.com/zpneal/backbone
 BugReports: https://github.com/zpneal/backbone/issues
+LazyData: true
