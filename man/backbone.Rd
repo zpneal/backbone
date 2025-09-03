@@ -14,7 +14,7 @@ that contains only the most "important" edges from:
 \item an unweighted network using \code{\link[=backbone_from_unweighted]{backbone_from_unweighted()}}
 }
 
-For a detailed illustration of these methods, please see the vignette using \link{vignette("backbone")}.
+For a detailed illustration of these methods, please see \href{../doc/backbone.html}{the vignette} using \code{vignette("backbone")}.
 }
 \references{
 {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
