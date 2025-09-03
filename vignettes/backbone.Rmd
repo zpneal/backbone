@@ -38,14 +38,14 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     a. [Background](#weight-background)
     b. [Structural models](#weight-structural)
     c. [Statistical models](#weight-statistical)
-3. [Weighted bipartite projection networks](#projection)
+3. [Weighted projections](#projection)
     a. [Background](#proj-background)
     b. [Statistical models](#proj-statistical)
 4. [Unweighted networks](#unweighted)
     a. [Background](#unweight-background)
     b. [Structural models](#unweight-structural)
 5. [Advanced functions](#advanced)
-    a. [Returned objects](#advanced-return)
+    a. [Reproducibility](#advanced-reproduce)
     b. [Signed backbones](#advanced-signed)
     c. [Custom backbones](#advanced-custom)
 5. [Utility functions](#utility)
@@ -55,7 +55,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 # Introduction {#introduction}
 
 ## Welcome {#welcome}
-This vignette illustrates how to use this package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a network that contains only the most 'important' or 'significant' edges. A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. 
+This vignette illustrates how to use this package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a weighted or unweighted network that contains only the most 'important' or 'significant' edges A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. 
 
 The `backbone` package can be cited as:
 
@@ -66,7 +66,7 @@ For additional resources on the backbone package, please see [https://www.rbackb
 If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)). Please report bugs in the backbone package at [https://github.com/zpneal/backbone/issues](https://github.com/zpneal/backbone/issues).
 
 ## Loading the package {#loading}
-The backbone package can be loaded in the usual way:
+After the backbone package has been installed from CRAN using `install.packages("backbone")`, it can be loaded in the usual way:
 ```{r}
 library(backbone)
 ```
@@ -82,9 +82,9 @@ The primary use of the backbone package is backbone extraction, that is, identif
 
 * You begin with some network data `dat`, which may take the form of an an adjacency/incidence matrix or an igraph object.
 
-* Depending on the type of network contained in `dat` (bipartite, weighted, unweighted), you run the applicable backbone function (`backbone_from_bipartite()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`), which returns a backbone of the same class as `dat`.
+* Depending on the type of network contained in `dat` (weighted, bipartite, unweighted), you run the applicable backbone function (`backbone_from_bipartite()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`), which returns a backbone of the same class as `dat`.
 
-The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted bipartite projections](#projection), [non-projection weighted networks](#weighted), and [unweighted networks](#unweighted). Additionally, the package contains some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
+The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted networks](#weighted), [weighted projections](#projection), and [unweighted networks](#unweighted). Additionally, the package contains some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
 
 ## The `narrative` parameter {#narrative}
 Each backbone extraction function includes a `narrative` parameter. When `narrative = TRUE` (the default), narrative text describing the backbone extraction will be displayed with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
@@ -96,7 +96,7 @@ The functions in the backbone package support two data formats that can be used 
 
 * **igraph** - A network can be supplied to a backbone extraction function as an *igraph* object from the `igraph` package.
 
-The backbone package does not support *edgelist* formats because these can be ambiguous when isolated nodes are present. It also does not support *network* objects from the `statnet` package because these require loading many dependencies. You can convert a *network* bipartite graph into an incidence matrix using `network::as.matrix.network(graph, type = "incidence")`, and can convert a *network* unipartite graph into an adjacency matrix using `network::as.matrix.network(graph, type = "adjacency")`.
+The backbone package does not support *edgelist* formats because these can be ambiguous when isolated nodes are present. It also does not support *network* objects from the `network` package (from the `statnet` family of packages) because these require loading many dependencies. You can convert a `network` bipartite graph into an incidence matrix using `network::as.matrix.network(graph, type = "incidence")`, and can convert a `network` unipartite graph into an adjacency matrix using `network::as.matrix.network(graph, type = "adjacency")`.
 
 [back to Table of Contents](#toc)
 
@@ -120,10 +120,12 @@ W <- graph_from_adjacency_matrix(W, mode = "undirected", weighted = TRUE, diag =
 ```
 This network has strongly heterogeneous edge weights. Some edges are quite weak (10) while others are quite strong (100), which gives the network a multi-scalar character. This network might represent the number of passengers flying between each of 10 airports, where there are two hub airports (one large, one small) that each serve their local areas.
 
-Although it is possible to visualize this network by using thicker lines to represent stronger edges, in larger networks this often leads to cluttered visualizations. Additionally, many network analytic techniques (e.g., ERGM, SOAM) have not yet been extended for application to weighted. In such cases, it can be useful to focus on this network's backbone.
+Although it is possible to visualize this network by using thicker lines to represent stronger edges, in larger networks this often leads to cluttered visualizations. Additionally, many network analytic techniques (e.g., ERGM, SAOM) have not yet been extended for application to weighted. In such cases, it can be useful to focus on this network's backbone.
 ```{r}
 plot(W, edge.width = sqrt(E(W)$weight), vertex.label = NA)
 ```
+
+[back to Table of Contents](#toc)
 
 ## Structural models {#weight-structural}
 Structural models choose edges for retention based on edges' structural properties, mainly the values of their edge weights. The backbone package implements one structural model, the *Global Threshold*, which simply preserves all edges whose weights are larger than a given threshold value.
@@ -143,6 +145,8 @@ plot(bb, vertex.label = NA)
 
 The choice of a global threshold is often arbitary, but can significantly impact the structure of the backbone. Moreover, backbones extracted using a global threshold fail to preserve network structure when edge weights are heterogeneous. For this reason, global threshold backbones should generally be avoided.
 
+[back to Table of Contents](#toc)
+
 ## Statistical models {#weight-statistical}
 Statistical models choose edges to retain in the backbone by testing whether their weights are statistically significantly stronger than expected under a null model, with the stringency of the statistical test controlled by the `alpha` parameter. Among the most widely used statistical backbone model is the disparity filter [@serrano2009extracting].
 
@@ -152,13 +156,22 @@ bb <- backbone_from_weighted(W, model = "disparity", alpha = 0.05)
 plot(bb, vertex.label = NA)
 ```
 
-Two additional statistical models are also available: locally adaptive network sparsification using `model = "lans"` [@foti2011] and marginal likelihood filter using `model = "mlf"` [@dianati2016]. Despite slight differences in their null models, they operate similarly to the disparity filter.
+Two additional statistical models are also available:
 
-# Weighted bipartite projection networks {#projection}
+* locally adaptive network sparsification using `model = "lans"` [@foti2011]
+* marginal likelihood filter using `model = "mlf"` [@dianati2016]
+
+Despite differences in their null models, they operate similarly to the disparity filter. Currently there is limited guidance on model selection, however the disparity filter is the most widely known and thus is often the default choice unless there is a specific reason to choose a different model.
+
+[back to Table of Contents](#toc)
+
+# Weighted projections {#projection}
 ## Background [@neal2014backbone] {#proj-background}
-A bipartite network contains two types of nodes, which we call *agents* and *artifacts*, and edges that exist only between nodes of different types (i.e., an edge may connect an agent to an artifact, but never an agent to another agent). A bipartite network can be represented by an incidence matrix **B**, where B~ik~ = 1 if agent *i* is connected to artifact *k*, and otherwise is 0 (e.g., author *i* wrote paper *k*).
+The backbone models available using `backbone_from_weighted()` can be applied to any weighted network. However, specialized models exist for weighted networks that are the result of projecting a bipartite network or hypergraph.
 
-A bipartite projection is a network of *agents* that are connected by the fact that they share *artifacts* in common. A bipartite projection can be represented by a square symmetric matrix **P**, which is formed as **P** = **B** * **B**', where **B**' is the transpose of **B**. In **P**, P~ij~ indicates the number of artifacts *k* that are shared by agents *i* and *j*, and can be viewed as the weight of the edge connecting them in the network (e.g., the number of papers co-authored by authors *i* and *j*), however these weights can be noisy. The goal of backbone extraction from bipartite projections is to identify edges in **P** whose weights are strong and should be preserved in the backbone. 
+A *bipartite network* contains two types of nodes, which we call *agents* and *artifacts*, and edges that exist only between nodes of different types (i.e., an edge may connect an agent to an artifact, but never an agent to another agent). For example, a bipartite network may represent authors (agents) connected to the papers (artifacts) they they wrote. A *hypergraph* contains nodes that we call *agents*. Unlike an ordinary network, edges in a hypergraph (i.e., hyperedges) can connect more than two agents simultaneously. For example, a hypergraph may represent groups of authors (agents) connected by hyperedges if they all wrote the same paper. Both bipartite networks and hypergraphs can be represented by an incidence matrix **B**, where B~ik~ = 1 if agent *i* is connected to artifact *k* or if agent *i* is connected to hyperedge *k*, and otherwise is 0 (e.g., author *i* wrote paper *k*).
+
+A bipartite or hypergraph projection is a network of *agents* that are connected by the fact that they share artifacts or hyperedges in common. A projection can be represented by a square symmetric matrix **P**, which is formed as **P** = **B** * **B**', where **B**' is the transpose of **B**. In **P**, P~ij~ indicates the number of artifacts or hyperedges *k* that are shared by agents *i* and *j*, and can be viewed as the weight of the edge connecting them in the network (e.g., the number of papers co-authored by authors *i* and *j*). However, these weights can be noisy. The goal of backbone extraction from weighted projections is to identify edges in **P** whose weights are strong and should be preserved in the backbone. 
 
 In the subsections below, we illustrate backbone extraction methods in an example bipartite network `B`:
 ```{r}
@@ -186,28 +199,35 @@ plot(P, vertex.label = NA, edge.width = sqrt(E(P)$weight), edge.color = rgb(0,0,
 [back to Table of Contents](#toc)
 
 ## Statistical models {#proj-statistical}
-All of the backbone models implemented in the backbone package for bipartite projections are statistical models, which choose edges to return in the backbone by testing whether their weights are statistically significantly stronger than expected under a null model, with the stringency of the statistical test controlled by the `alpha` parameter. Among the fastest and most widely used backbone models is the Stochastic Degree Sequency Model (SDSM) [@neal2021comparing].
+All of the backbone models implemented in the backbone package for weighted projections are statistical models, which choose edges to return in the backbone by testing whether their weights are statistically significantly stronger than expected under a null model, with the stringency of the statistical test controlled by the `alpha` parameter. Among the fastest and most widely used backbone models is the Stochastic Degree Sequency Model (SDSM) [@neal2021comparing].
 
-We can extract an SDSM backbone at a conventional level of statistical significance using the `backbone_from_bipartite()` function and specifying `model = "sdsm"` and `alpha = 0.05`. Importantly, bipartite projection backbones are based on the original bipartite network, not on the weighted projection. Therefore, we supply `B` and not `P` to the `backbone_from_bipartite()` function. Because this model uses information from the original bipartite network to identify strong edges, it preserves the network's true three-community structure.
+We can extract an SDSM backbone at a conventional level of statistical significance using the `backbone_from_bipartite()` function and specifying `model = "sdsm"` and `alpha = 0.05`. Importantly, weighted projection backbones are based on the original bipartite network or hypergraph, not on the weighted projection. Therefore, we must supply `B` and not `P` to the `backbone_from_bipartite()` function. Because this model uses information from the original network to identify strong edges, it preserves the network's true three-community structure.
 ```{r}
 bb <- backbone_from_bipartite(B, model = "sdsm", alpha = 0.05)
 plot(bb, vertex.label = NA)
 ```
 
-Four additional statistical models are also available: fixed degree sequence model (FDSM) using `model = "fdsm"` [@zweig2011systematic], fixed row model using `model = "fixedrow"`, fixed column model using `model = "fixedcol"`, and fixed fill model using `model = "fixedfill"` [@neal2021comparing]. Each of these models uses different null models that constrain different features of `B` when evaluating edges' strength. The SDSM and FDSM are often most useful, but have trade-offs. The FDSM offers more statistical power, but requires computationally expensive monte carlo methods to estimate edges p-values. In contrast, the SDSM is less powerful (although this can be compensated by using a more liberal `alpha'), but can quickly compute edges' exact p-values.
+Four additional statistical models are also available:
+
+* fixed degree sequence model (FDSM) using `model = "fdsm"` [@zweig2011systematic]
+* fixed row model using `model = "fixedrow"` [@neal2021comparing]
+* fixed column model using `model = "fixedcol"` [@neal2021comparing]
+* fixed fill model using `model = "fixedfill"` [@neal2021comparing]
+
+Each of these models uses different null models that constrain different features of `B`'s incidence matrix when evaluating edges' strength. The SDSM and FDSM are often most useful, but have trade-offs. The FDSM offers more statistical power, but requires computationally expensive monte carlo methods to estimate edges p-values. In contrast, the SDSM is less powerful (although this can be compensated by using a more liberal `alpha'), but can quickly compute edges' exact p-values.
 
 [back to Table of Contents](#toc)
 
 # Unweighted networks {#unweighted}
 ## Background {#unweight-background}
-An unweighted unipartite network contains one type of node, and pairs of nodes are either connected or not. An unweighted unipartite network can be represented by an adjacency matrix **U** where U~ij~=1 if nodes *i* and *j* are connected, and otherwise is 0. Unweighted networks can be undirected (i.e., W~ij~ = W~ji~) or directed (i.e., W~ij~ != W~ji~), but currently the models implemented in the backbone package only allow undirected networks.
+An unweighted unipartite network contains one type of node, and pairs of nodes are either connected or not. An unweighted unipartite network can be represented by an adjacency matrix **U** where U~ij~=1 if nodes *i* and *j* are connected, and otherwise is 0. Unweighted networks can be undirected (i.e., U~ij~ = U~ji~) or directed (i.e., U~ij~ != U~ji~), but currently the models implemented in the backbone package only allow undirected networks.
 
 The goal of backbone extraction from an unweighted network is to identify edges in **U** that are important to the network's structure, and thus should be preserved in the backbone. Because the network is already unweighted, and the goal is simply to reduce the number of edges, this process is sometimes also called *sparsification*. The challenge is that, unlike [bipartite projections](#projection) and [weighted networks](#weighted), the edges in unweighted networks do not have weights that can be used to evaluate their importance. To overcome this challenge, backbone models designed for unweighted networks first assign each edge a score that is intended to capture its importance.
 
 [back to Table of Contents](#toc)
 
 ## Structural models {#unweight-structural}
-All of the backbone models implemented in the backbone package for unweighted networks are structural models. Sifferent models are designed to preserve or uncover different structural features of the network, but all are characterized by key decisions:
+All of the backbone models implemented in the backbone package for unweighted networks are structural models. Different models are designed to preserve or uncover different structural features of the network, but all are characterized by key decisions:
 
 * What metric is used for the edge *score*?
 * How is the edge score *normalized*?
@@ -232,12 +252,23 @@ bb <- backbone_from_unweighted(U, model = "degree", parameter = 0.5)
 plot(bb, main = "Local Degree Backbone", vertex.size = degree(bb))  #Communities are clearly visible
 ```
 
-Eight additional structural models are also available: Skeleton backbone using `model = "skeleton"` [@karger1994random], Global sparsification using `model = "gspar"` [@satuluri2011local], Simmelian backbone using `model = "simmelian"` [@nick2013simmelian], Jaccard backbone using `model = "jaccard"` [@goldberg2003assessing], Meetmin backbone using `model = "meetmin"` [@goldberg2003assessing], Geometric backbone using `model = "geometric"` [@goldberg2003assessing], hypergeometric backbone using `model = "hyper"` [@goldberg2003assessing], and Quadrillateral Simmelian backbone using `model = "quadrilateral"` [@nocaj2015untangling]. Each of these models involve different ways of scoring, normalizing, and filtering edges.
+Eight additional structural models are also available:
+
+* Skeleton backbone using `model = "skeleton"` [@karger1994random]
+* Global sparsification using `model = "gspar"` [@satuluri2011local]
+* Simmelian backbone using `model = "simmelian"` [@nick2013simmelian]
+* Jaccard backbone using `model = "jaccard"` [@goldberg2003assessing]
+* Meetmin backbone using `model = "meetmin"` [@goldberg2003assessing]
+* Geometric backbone using `model = "geometric"` [@goldberg2003assessing]
+* Hypergeometric backbone using `model = "hyper"` [@goldberg2003assessing]
+* Quadrillateral Simmelian backbone using `model = "quadrilateral"` [@nocaj2015untangling]. 
+
+Each of these models involve different ways of scoring, normalizing, and filtering edges. Currently there is limited guidance on model selection, however @hamann2016structure compared some of these models to understand how they yield different backbone.
 
 [back to Table of Contents](#toc)
 
 # Advanced functions {#advanced}
-## Returned objects {#advanced-return}
+## Reproducibility {#advanced-reproduce}
 By default, `backbone_from_` functions return a backbone in the same class (matrix or igraph) as the original network. However, to facilitate transparency and reproducibility, specifying `return = "everything"` returns a list that contains:
 
 * The backbone, in the same class as the original network
@@ -264,7 +295,7 @@ bb$call  #Function call
 ## Signed backbones {#advanced-signed}
 By default, statistical backbone models return a backbone that contains edges whose weights were statistically significantly *stronger* than expected under the corresponding null model using a one-tailed test. However, it is also possible to return a signed backbone that positive edges whose weights were statistically significantly stronger than expected, and negative edges whose weights were statistically significantly weaker than expected, using a two-tailed test. Signed backbones are obtained by setting `signed = TRUE`.
 
-Returning to the example [bipartite backbone extraction](#proj-statistical), we can compare the default non-signed backbone to a signed backbone. Signed backbone extraction relies on a two-tailed test for each edge weight, so to make the two backbones comparable in stringency, we double the `alpha` parameter (`alpha = 0.1`) to extract the signed backbone. The example network is known to contain three communities, which are clearly visible in the non-signed backbone. In the signed backbone, the communities are connected by positive (green) edges, while negative (red) edges exist between communities.
+Returning to the example [bipartite backbone extraction](#proj-statistical), we can compare the default non-signed backbone to a signed backbone. Signed backbone extraction relies on a two-tailed test for each edge weight, so to make the two backbones comparable in stringency, we double the `alpha` parameter (`alpha = 0.1`) to extract the signed backbone. The example network is known to contain three communities, which are clearly visible in the non-signed backbone. In the signed backbone, the communities are connected by positive (green) edges, while negative (red) edges exist between communities. If the original bipartite network represents authors connected to papers they have written, then the signed backbone may represent relations of collaboration (positive) and avoidance (negative).
 ```{r fig.width=8, out.width="75%"}
 par(mfrow = c(1, 2), mar = c(0,0,2,0))  #Display plots side-by-side
 B <- rbind(cbind(matrix(rbinom(250,1,.8),10),  #Incidence matrix of example bipartite network
@@ -309,6 +340,8 @@ mat <- rbind(c(1,0,0), c(0,0,1), c(0,1,1))
 mat
 fastball(mat)
 ```
+
+[back to Table of Contents](#toc)
 
 ## Bipartite Configuration Model (BiCM) {#bicm}
 Extracting a backbone from a bipartite projection using the stochastic degree sequence model with `backbone_from_bipartite(model = "sdsm")` requires determining the probability that B~ij~ = 1 in the space of all matrices with given row and column sums. For example, if the row sums of **B** are [1,1,2] and the column sums of **B** are [1,1,2], then in the space of all matrices with these row and column sums, the probability that B~ij~ = 1 is:
