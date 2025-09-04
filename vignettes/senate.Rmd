@@ -37,7 +37,7 @@ par(mar = c(0, 0, 2, 0) + 0.1)
 
 # Introduction {#introduction}
 
-This vignette uses empirical data on bill sponsorship behaviors in the 108th U.S. Senate to illustrate the use of the `backbone` package to extract sparse, unweighted networks from [weighted projections](#projection), [weighted networks](#weighted), and [unweighted networks](#unweighted). For a more general introduction to the backbone package, please see the \href{../doc/backbone.html}{Introduction to Backbone} vignette.
+This vignette uses empirical data on bill sponsorship behaviors in the 108th U.S. Senate to illustrate the use of the `backbone` package to extract sparse, unweighted networks from [weighted projections](#projection), [weighted networks](#weighted), and [unweighted networks](#unweighted). For a more general introduction to the backbone package, please see the [../doc/backbone.html](Introduction to Backbone) vignette.
 
 The `backbone` package can be cited as:
 
