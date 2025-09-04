@@ -30,7 +30,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 
 1. [Introduction](#introduction)
     a. [Welcome](#welcome)
-    b. [Loading the package](#loading)
+    b. [Installing and loading the package](#loading)
     c. [Package overview](#overview)
     d. [The narrative parameter](#narrative)
     e. [Supported data formats](#formats)
@@ -65,14 +65,16 @@ For additional resources on the backbone package, please see [https://www.rbackb
 
 If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)). Please report bugs in the backbone package at [https://github.com/zpneal/backbone/issues](https://github.com/zpneal/backbone/issues).
 
-## Loading the package {#loading}
+## Installing and loading the package {#loading}
 After the backbone package has been installed from CRAN using `install.packages("backbone")`, it can be loaded in the usual way:
 ```{r}
 library(backbone)
 ```
-Upon successful loading, a startup message will display that shows the version number, citation, ways to get help, and ways to contact me.
+Upon successful loading, a startup message will display that shows the version number, citation, ways to get help, and ways to contact me. 
 
-For ease of illustration, this vignette also makes use of functions in the `igraph` package:
+This installs and loads the current release of the package. However, the package is constantly being updated with new features and bug fixes. You can install the development version of the package using ``devtools::install_github("zpneal/backbone", ref = "devel", build_vignettes = TRUE)``. Although the development version has been tested, some new features may not yet work as intended.
+
+For ease of illustration, this vignette also makes use of functions in the `igraph` package, which can be installed from CRAN using `install.packages("igraph")` and loaded:
 ```{r}
 library(igraph)
 ```
