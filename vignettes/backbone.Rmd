@@ -55,7 +55,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 # Introduction {#introduction}
 
 ## Welcome {#welcome}
-This vignette provides an introduction to using the `backbone` package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a weighted or unweighted network that contains only the most 'important' or 'significant' edges A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. For a complete example using empirical data, please see the [../doc/senate.html](Empirical Example of Backbone Extraction) vignette.
+This vignette provides an introduction to using the `backbone` package to extract the *backbone* of a network. A backbone is a sparse and unweighted subgraph of a weighted or unweighted network that contains only the most 'important' or 'significant' edges A backbone can be useful when the original network is too dense, when edge weights are not needed, or when edge weights are difficult to interpret. For a complete example using empirical data, please see the [Empirical Example of Backbone Extraction](../doc/senate.html) vignette.
 
 The `backbone` package can be cited as:
 
