@@ -17,7 +17,7 @@ backbone_from_weighted(
 )
 }
 \arguments{
-\item{W}{A weighted network as a valued adjacency matrix or a weighted unipartite \link[igraph]{igraph} object}
+\item{W}{A weighted network as a valued adjacency matrix or \link[Matrix]{Matrix}, or a weighted unipartite \link[igraph]{igraph} object}
 
 \item{model}{string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}}
 

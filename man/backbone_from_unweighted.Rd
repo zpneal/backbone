@@ -17,7 +17,7 @@ backbone_from_unweighted(
 )
 }
 \arguments{
-\item{U}{An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \link[igraph]{igraph} object}
+\item{U}{An unweighted, undirected network as an adjacency matrix or \link[Matrix]{Matrix}, or an unweighted unipartite \link[igraph]{igraph} object}
 
 \item{model}{string: backbone model}
 

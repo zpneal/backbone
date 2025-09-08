@@ -17,7 +17,7 @@ backbone_from_projection(
 )
 }
 \arguments{
-\item{B}{An unweighted bipartite network or hypergraph as as incidence matrix or a bipartite \link[igraph]{igraph} object}
+\item{B}{An unweighted bipartite network or hypergraph as an incidence matrix or \link[Matrix]{Matrix}, or as a bipartite \link[igraph]{igraph} object}
 
 \item{alpha}{real: significance level of hypothesis test(s)}
 
