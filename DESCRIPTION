@@ -19,6 +19,7 @@ Depends:
     R (>= 3.5)
 Imports: 
     igraph,
+    Matrix,
     methods,
     stats,
     Rcpp,
