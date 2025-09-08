@@ -82,7 +82,7 @@ library(igraph)
 ## Package overview {#overview}
 The primary use of the backbone package is backbone extraction, that is, identifying and preserving only the most important edges in a network. Different types of networks require different backbone extraction methods, however the basic workflow using the backbone package is the same for all methods:
 
-* You begin with some network data `dat`, which may take the form of an an adjacency/incidence matrix or an igraph object.
+* You begin with some network data `dat`, which may take the form of an an adjacency/incidence matrix or Matrix, or an igraph object.
 
 * Depending on the type of network contained in `dat` (weighted, bipartite, unweighted), you run the applicable backbone function (`backbone_from_projection()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`), which returns a backbone of the same class as `dat`.
 
@@ -94,7 +94,7 @@ Each backbone extraction function includes a `narrative` parameter. When `narrat
 ## Supported data formats {#formats}
 The functions in the backbone package support two data formats that can be used to represent a network or graph in R:
 
-* **matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite matrix can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object. It does not support *Matrix* objects from the `Matrix` package. You can convert a *Matrix* to a *matrix* using `as.matrix()`.
+* **matrix** or **Matrix** - A bipartite network can be represented as an incidence matrix, and a unipartite network can be represented as an adjacency matrix. An incidence/adjacency matrix can be supplied to a backbone extraction function as a *matrix* object or as a *Matrix* object created by the `Matrix` package.
 
 * **igraph** - A network can be supplied to a backbone extraction function as an *igraph* object from the `igraph` package.
 
