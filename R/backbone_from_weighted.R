@@ -33,7 +33,7 @@
 #'   preserved as positive, and edges with weights above \code{min(parameter)} are preserved as negative.
 #'
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
-#' bipartite network. However, if the original bipartite network is available, it is better to use [backbone_from_bipartite()].
+#' bipartite network or hypergraph. However, if the original bipartite network is available, it is better to use [backbone_from_projection()].
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
 #' is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise

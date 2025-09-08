@@ -3,7 +3,7 @@
 #' @description Provides methods for extracting an unweighted and sparse subgraph (i.e., a backbone)
 #'    that contains only the most "important" edges from:
 #'    * a weighted network using [backbone_from_weighted()]
-#'    * a weighted bipartite projection using [backbone_from_bipartite()]
+#'    * a weighted projection of a bipartite network or hypergraph using [backbone_from_projection()]
 #'    * an unweighted network using [backbone_from_unweighted()]
 #'
 #'    For a detailed illustration of these methods, please see \href{../doc/backbone.html}{the vignette} using `vignette("backbone")`.

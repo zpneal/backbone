@@ -1,6 +1,6 @@
 #' Depricated function to extract Stochastic Degree Sequence Model (SDSM) backbone
 #'
-#' \code{sdsm()} was replaced by \code{backbone_from_bipartite(model="sdsm")}.
+#' \code{sdsm()} was replaced by \code{backbone_from_projection(model="sdsm")}.
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
@@ -14,10 +14,10 @@
 #'
 #' @export
 sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
-  .Deprecated("backbone_from_bipartite(model = \"sdsm\")")
+  .Deprecated("backbone_from_projection(model = \"sdsm\")")
 
   return(
-  backbone_from_bipartite(B,
+  backbone_from_projection(B,
                           model = "sdsm",
                           alpha = alpha,
                           signed = signed,
@@ -29,7 +29,7 @@ sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 
 #' Depricated function to extract Fixed Row backbone
 #'
-#' \code{fixedrow()} was replaced by \code{backbone_from_bipartite(model = "fixedrow")}.
+#' \code{fixedrow()} was replaced by \code{backbone_from_projection(model = "fixedrow")}.
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
@@ -43,10 +43,10 @@ sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #'
 #' @export
 fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
-  .Deprecated("backbone_from_bipartite(model = \"fixedrow\")")
+  .Deprecated("backbone_from_projection(model = \"fixedrow\")")
 
   return(
-    backbone_from_bipartite(B,
+    backbone_from_projection(B,
                             model = "fixedrow",
                             alpha = alpha,
                             signed = signed,
@@ -58,7 +58,7 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 
 #' Depricated function to extract Fixed Column backbone
 #'
-#' \code{fixedcol()} was replaced by \code{backbone_from_bipartite(model = "fixedcol")}.
+#' \code{fixedcol()} was replaced by \code{backbone_from_projection(model = "fixedcol")}.
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
@@ -72,10 +72,10 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #'
 #' @export
 fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
-  .Deprecated("backbone_from_bipartite(model = \"fixedcol\")")
+  .Deprecated("backbone_from_projection(model = \"fixedcol\")")
 
   return(
-    backbone_from_bipartite(B,
+    backbone_from_projection(B,
                             model = "fixedcol",
                             alpha = alpha,
                             signed = signed,
@@ -87,7 +87,7 @@ fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 
 #' Depricated function to extract Fixed Fill backbone
 #'
-#' \code{fixedfill()} was replaced by \code{backbone_from_bipartite(model = "fixedfill")}.
+#' \code{fixedfill()} was replaced by \code{backbone_from_projection(model = "fixedfill")}.
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
@@ -101,10 +101,10 @@ fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #'
 #' @export
 fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
-  .Deprecated("backbone_from_bipartite(model = \"fixedfill\")")
+  .Deprecated("backbone_from_projection(model = \"fixedfill\")")
 
   return(
-    backbone_from_bipartite(B,
+    backbone_from_projection(B,
                             model = "fixedfill",
                             alpha = alpha,
                             signed = signed,
@@ -116,7 +116,7 @@ fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 
 #' Depricated function to extract Fixed Degree Sequence Model (FDSM) backbone
 #'
-#' \code{fdsm()} was replaced by \code{backbone_from_bipartite(model = "fdsm")}.
+#' \code{fdsm()} was replaced by \code{backbone_from_projection(model = "fdsm")}.
 #'
 #' @param B An unweighted bipartite network as a binary incidence matrix or a binary bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
@@ -131,10 +131,10 @@ fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 #'
 #' @export
 fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE, trials = NULL){
-  .Deprecated("backbone_from_bipartite(model = \"fdsm\")")
+  .Deprecated("backbone_from_projection(model = \"fdsm\")")
 
   return(
-    backbone_from_bipartite(B,
+    backbone_from_projection(B,
                             model = "fdsm",
                             alpha = alpha,
                             signed = signed,
