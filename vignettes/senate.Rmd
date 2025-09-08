@@ -85,13 +85,13 @@ The weighted projection indicates that, for example, Akaka and Allard sponsored 
 [back to Table of Contents](#toc)
 
 # Extracting from a weighted projection {#projection}
-Because this network is a weighted projection, and the original bipartite network is available, we can extract the backbone using `backbone_from_bipartite()`. The backbone extraction models implemented in this function are powerful because they take advantage of information that is contained in the bipartite network (e.g., the row sums and column sums), but that are missing in the weighted projection itself.
+Because this network is a weighted projection, and the original bipartite network is available, we can extract the backbone using `backbone_from_projection()`. The backbone extraction models implemented in this function are powerful because they take advantage of information that is contained in the bipartite network (e.g., the row sums and column sums), but that are missing in the weighted projection itself.
 
 This function implements multiple models, but the Stochastic Degree Sequence Model (SDSM) [@neal2021comparing] offers a balance of statistical power and computational efficiency. The SDSM performs a statistical test on each edge weight, asking whether it is statistically significantly larger than expected if the indicence matrix were random, but with the same expected row and column sums. In this context, for each edge it asks: "Did these two Senators sponsor more bills together than would be espected if they each sponsors bills randomly, but if they sponsored the same number of bills on average, and if each bill received the same number of sponsors on average?"
 
 We can extract the SDSM backbone at the conventional `alpha = 0.05` level of statistical significance, then plot it:
 ```{r}
-bb1 <- backbone_from_bipartite(senate108, model = "sdsm", alpha = 0.05)
+bb1 <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.05)
 layout <- layout_nicely(bb1)  #Get layout for backbone (we'll use it later)
 plot(bb1, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.1), layout = layout, main = "SDSM Backbone")
 ```
@@ -100,7 +100,7 @@ Importantly, we must supply the original bipartite network, `senate108`, to this
 
 We can also extract a signed SDSM backbone by specifying `signed = TRUE`.
 ```{r}
-bb1_signed <- backbone_from_bipartite(senate108, model = "sdsm", alpha = 0.1, signed = TRUE)
+bb1_signed <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.1, signed = TRUE)
 E(bb1_signed)$color <- "green"  #Make all edges green
 E(bb1_signed)$color[which(E(bb1_signed)$sign == -1)] <- rgb(1,0,0,.05)  #Make negative edges transparent red
 plot(bb1_signed, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, layout = layout, main = "SDSM Signed Backbone")
@@ -152,7 +152,7 @@ Even based on the very limited information still left in this unweighted network
 # Lessons {#lessons}
 This brief empirical example illustrates the utility of the backbone package. There are a couple broad lessons to consider when extracting a network backbone:
 
-* Different backbone extraction models use different amounts of information to decide which edges to retain. Use a backbone extraction model that incorporates all of the available information. For example, if the original network is a weighted projection, then extract the backbone from the original bipartite network or hypergraph using `backbone_from_bipartite()`. Only extract a backbone using `backbone_from_unweighted()` if no information about edge weights is available.
+* Different backbone extraction models use different amounts of information to decide which edges to retain. Use a backbone extraction model that incorporates all of the available information. For example, if the original network is a weighted projection, then extract the backbone from the original bipartite network or hypergraph using `backbone_from_projection()`. Only extract a backbone using `backbone_from_unweighted()` if no information about edge weights is available.
 
 * The backbone extraction model and its specifications impact the backbone that is obtained. Therefore, clearly identify and cite the backbone model that was used, and completely describe both the original network and how the model was specified. By default, each backbone extraction function (i.e., `backbone_from_`) generates a standardized description with citations that can be used for this purpose.
 
