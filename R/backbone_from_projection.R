@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_projection()} extracts the unweighted backbone from the weighted projection of a bipartite network or hypergraph
 #'
-#' @param B An unweighted bipartite network or hypergraph as as incidence matrix or a bipartite \link[igraph]{igraph} object
+#' @param B An unweighted bipartite network or hypergraph as an incidence matrix or \link[Matrix]{Matrix}, or as a bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
 #' @param signed boolean: return a signed backbone
@@ -91,12 +91,13 @@ backbone_from_projection <- function(B,
   if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
 
   #### Check and format input ####
-  #Check that input is matrix or igraph (and if igraph, that it is bipartite)
-  if (!methods::is(B,"matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
+  #Check that input is matrix, Matrix, or igraph (and if igraph, that it is bipartite)
+  if (!methods::is(B,"matrix") & !methods::is(B,"Matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or Matrix, or a binary bipartite igraph object")}
   if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}}
 
-  #Convert input to matrix
+  #Convert input to incidence matrix
   if (methods::is(B,"matrix")) {I <- B}  #matrix --> matrix
+  if (methods::is(B,"Matrix")) {I <- as.matrix(B)}  #Matrix --> matrix
   if (methods::is(B,"igraph")) {
     if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted incidence
     if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary incidence
@@ -174,7 +175,15 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   if (methods::is(B,"matrix")) {
     rownames(backbone) <- rownames(B)
     colnames(backbone) <- rownames(B)
-    P <- B%*%t(B)  #Generate weighted projection, with any agent attributes
+    P <- tcrossprod(I)
+  }
+
+  if (methods::is(B,"Matrix")) {
+    rownames(backbone) <- rownames(B)
+    colnames(backbone) <- rownames(B)
+    backbone <- Matrix::Matrix(backbone)
+    P <- tcrossprod(I)
+    P <- Matrix::Matrix(P)
   }
 
   if (methods::is(B,"igraph")) {
@@ -193,5 +202,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   #### Return ####
   if (return == "backbone") {return(backbone)}
-  if (return == "everything") {return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call))}
+  if (return == "everything") {
+    return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call))
+    }
 }

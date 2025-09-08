@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network
 #'
-#' @param W A weighted network as a valued adjacency matrix or a weighted unipartite \link[igraph]{igraph} object
+#' @param W A weighted network as a valued adjacency matrix or \link[Matrix]{Matrix}, or a weighted unipartite \link[igraph]{igraph} object
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param alpha real: significance level of hypothesis test(s) in statistical models
 #' @param signed boolean: return a signed backbone from a statistical model
@@ -104,11 +104,11 @@ backbone_from_weighted <- function(W,
 
   #### Check and format input ####
   #Check that input is a weighted adjacency matrix or weighted unipartite igraph
-  if (!methods::is(W,"matrix") & !methods::is(W,"igraph")) {stop("`W` must be an adjacency matrix or igraph object")}
+  if (!methods::is(W,"matrix") & !methods::is(W,"Matrix") & !methods::is(W,"igraph")) {stop("`W` must be an adjacency matrix or Matrix, or an igraph object")}
 
   if (methods::is(W,"matrix")) {
-    if (dim(W)[1] != dim(W)[2]) {stop("`W` must be a square adjacency matrix")}
-    if (all(W %in% c(0,1))) {stop("The entries of `W` must represent edge weights")}
+    if (dim(as.matrix(W))[1] != dim(as.matrix(W))[2]) {stop("`W` must be a square adjacency matrix")}
+    if (all(as.matrix(W) %in% c(0,1))) {stop("The entries of `W` must represent edge weights")}
   }
 
   if (methods::is(W,"igraph")) {
@@ -118,6 +118,7 @@ backbone_from_weighted <- function(W,
 
   #Convert input to adjacency matrix
   if (methods::is(W,"matrix")) {A <- W}  #matrix --> matrix
+  if (methods::is(W,"Matrix")) {A <- as.matrix(W)}  #Matrix --> matrix
   if (methods::is(W,"igraph")) {A <- igraph::as_adjacency_matrix(W, names = FALSE, sparse = FALSE, attr = "weight")}
 
   #### Statistical Models ####
@@ -174,6 +175,12 @@ backbone_from_weighted <- function(W,
   if (methods::is(W,"matrix")) {
     rownames(backbone) <- rownames(W)
     colnames(backbone) <- rownames(W)
+  }
+
+  if (methods::is(W,"Matrix")) {
+    rownames(backbone) <- rownames(W)
+    colnames(backbone) <- rownames(W)
+    backbone <- Matrix::Matrix(backbone)
   }
 
   if (methods::is(W,"igraph")) {

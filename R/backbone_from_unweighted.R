@@ -2,7 +2,7 @@
 #'
 #' \code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted, undirected network
 #'
-#' @param U An unweighted, undirected network as an adjacency matrix or an unweighted unipartite \link[igraph]{igraph} object
+#' @param U An unweighted, undirected network as an adjacency matrix or \link[Matrix]{Matrix}, or an unweighted unipartite \link[igraph]{igraph} object
 #' @param model string: backbone model
 #' @param parameter real: filtering parameter
 #' @param escore string: Method for scoring edges' importance
@@ -126,12 +126,12 @@ backbone_from_unweighted <- function(U,
 
   #### Check and format input ####
   #Check that input is a weighted adjacency matrix or weighted unipartite igraph
-  if (!methods::is(U,"matrix") & !methods::is(U,"igraph")) {stop("`U` must be an adjacency matrix or igraph object")}
+  if (!methods::is(U,"matrix") & !methods::is(U,"Matrix") & !methods::is(U,"igraph")) {stop("`U` must be an adjacency matrix or Matrix, or an igraph object")}
 
   if (methods::is(U,"matrix")) {
-    if (dim(U)[1] != dim(U)[2]) {stop("`U` must be a symmetric adjacency matrix")}
-    if (!all(U %in% c(0,1))) {stop("The entries of `U` must be either 0 or 1")}
-    if (!isSymmetric(U)) {stop("`U` must be a symmetric adjacency matrix")}
+    if (dim(as.matrix(U))[1] != dim(as.matrix(U))[2]) {stop("`U` must be a symmetric adjacency matrix")}
+    if (!all(as.matrix(U) %in% c(0,1))) {stop("The entries of `U` must be either 0 or 1")}
+    if (!isSymmetric(as.matrix(U))) {stop("`U` must be a symmetric adjacency matrix")}
   }
 
   if (methods::is(U,"igraph")) {
@@ -142,6 +142,7 @@ backbone_from_unweighted <- function(U,
 
   #Convert input to adjacency matrix
   if (methods::is(U,"matrix")) {A <- U}  #matrix --> matrix
+  if (methods::is(U,"Matrix")) {A <- as.matrix(U)}  #Matrix --> matrix
   if (methods::is(U,"igraph")) {A <- igraph::as_adjacency_matrix(U, names = FALSE, sparse = FALSE)}
 
   #### Compute edge scores ####
@@ -212,6 +213,12 @@ backbone_from_unweighted <- function(U,
   if (methods::is(U,"matrix")) {
     rownames(backbone) <- rownames(U)
     colnames(backbone) <- rownames(U)
+  }
+  
+  if (methods::is(U,"Matrix")) {
+    rownames(backbone) <- rownames(U)
+    colnames(backbone) <- rownames(U)
+    backbone <- Matrix::Matrix(backbone)
   }
 
   if (methods::is(U,"igraph")) {
