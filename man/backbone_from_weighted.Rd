@@ -68,7 +68,7 @@ preserved as positive, and edges with weights above \code{min(parameter)} are pr
 }
 
 The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
-bipartite network. However, if the original bipartite network is available, it is better to use \code{\link[=backbone_from_bipartite]{backbone_from_bipartite()}}.
+bipartite network or hypergraph. However, if the original bipartite network is available, it is better to use \code{\link[=backbone_from_projection]{backbone_from_projection()}}.
 }
 \examples{
 #A weighted network with heterogeneous (i.e. multiscale) weights

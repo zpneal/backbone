@@ -27,7 +27,7 @@ sdsm(
 \item{narrative}{boolean: display suggested text & citations}
 }
 \description{
-\code{sdsm()} was replaced by \code{backbone_from_bipartite(model="sdsm")}.
+\code{sdsm()} was replaced by \code{backbone_from_projection(model="sdsm")}.
 }
 \details{
 See backbone v2.1.4 for original documentation

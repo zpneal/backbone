@@ -27,7 +27,7 @@ fixedcol(
 \item{narrative}{boolean: display suggested text & citations}
 }
 \description{
-\code{fixedcol()} was replaced by \code{backbone_from_bipartite(model = "fixedcol")}.
+\code{fixedcol()} was replaced by \code{backbone_from_projection(model = "fixedcol")}.
 }
 \details{
 See backbone v2.1.4 for original documentation

@@ -10,7 +10,7 @@ Provides methods for extracting an unweighted and sparse subgraph (i.e., a backb
 that contains only the most "important" edges from:
 \itemize{
 \item a weighted network using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
-\item a weighted bipartite projection using \code{\link[=backbone_from_bipartite]{backbone_from_bipartite()}}
+\item a weighted projection of a bipartite network or hypergraph using \code{\link[=backbone_from_projection]{backbone_from_projection()}}
 \item an unweighted network using \code{\link[=backbone_from_unweighted]{backbone_from_unweighted()}}
 }
 

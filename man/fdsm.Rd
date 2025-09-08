@@ -30,7 +30,7 @@ fdsm(
 \item{trials}{numeric: the number of bipartite graphs generated using fastball to approximate the edge weight distribution}
 }
 \description{
-\code{fdsm()} was replaced by \code{backbone_from_bipartite(model = "fdsm")}.
+\code{fdsm()} was replaced by \code{backbone_from_projection(model = "fdsm")}.
 }
 \details{
 See backbone v2.1.4 for original documentation
