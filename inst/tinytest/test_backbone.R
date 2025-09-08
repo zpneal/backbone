@@ -157,12 +157,21 @@ B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence mat
 
 bb <- backbone_from_projection(B, model = "sdsm", return = "everything")  #Extract SDSM matrix, return everything
 expect_equal(length(bb),6)  #Returned object contains six elements
-expect_equal(class(bb$bipartite)[1],"matrix")
-expect_equal(class(bb$projection)[1],"matrix")
-expect_equal(class(bb$backbone)[1],"matrix")
-expect_equal(class(bb$pvalues$upper)[1],"matrix")
-expect_equal(class(bb$narrative)[1],"character")
-expect_equal(class(bb$call)[1],"call")
+expect_true(is(bb$bipartite,"matrix"))
+expect_true(is(bb$projection,"matrix"))
+expect_true(is(bb$backbone,"matrix"))
+expect_true(is(bb$pvalues$upper,"matrix"))
+expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$call,"call"))
+
+bb <- backbone_from_projection(Matrix::Matrix(B), model = "sdsm", return = "everything")  #Extract SDSM Matrix, return everything
+expect_equal(length(bb),6)  #Returned object contains six elements
+expect_true(is(bb$bipartite,"Matrix"))
+expect_true(is(bb$projection,"Matrix"))
+expect_true(is(bb$backbone,"Matrix"))
+expect_true(is(bb$pvalues$upper,"matrix"))
+expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$call,"call"))
 
 bb <- backbone_from_projection(B, model = "sdsm", signed = TRUE)  #Extract SDSM matrix as signed
 expect_true(is(bb,"matrix"))         #Returns as matrix
@@ -297,11 +306,19 @@ W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
 
 bb <- backbone_from_weighted(W, model = "disparity", return = "everything")  #Extract disparity backbone, return everything
 expect_equal(length(bb),5)  #Returned object contains five elements
-expect_equal(class(bb$weighted)[1],"matrix")
-expect_equal(class(bb$backbone)[1],"matrix")
-expect_equal(class(bb$pvalues$upper)[1],"matrix")
-expect_equal(class(bb$narrative)[1],"character")
-expect_equal(class(bb$call)[1],"call")
+expect_true(is(bb$weighted,"matrix"))
+expect_true(is(bb$backbone,"matrix"))
+expect_true(is(bb$pvalues$upper,"matrix"))
+expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$call,"call"))
+
+bb <- backbone_from_weighted(Matrix::Matrix(W), model = "disparity", return = "everything")  #Extract disparity backbone, return everything
+expect_equal(length(bb),5)  #Returned object contains five elements
+expect_true(is(bb$weighted,"Matrix"))
+expect_true(is(bb$backbone,"Matrix"))
+expect_true(is(bb$pvalues$upper,"matrix"))
+expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$call,"call"))
 
 bb <- backbone_from_weighted(W, model = "disparity")  #Extract disparity backbone
 expect_true(is(bb,"matrix"))                          #Returns as matrix
@@ -578,6 +595,7 @@ expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also miss
 
 #skeleton (no particular structure expected in backbone)
 U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
+
 test <- backbone_from_unweighted(U, model = "skeleton", parameter = .5, return = "everything")
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
