@@ -166,7 +166,7 @@ backbone_from_weighted <- function(W,
   message("")
   message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
   message("")
-  if (model == "disparity") {message("Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Aciences, 106, 6483-6488. https://doi.org10.1073/pnas.0808904106")}
+  if (model == "disparity") {message("Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Aciences, 106, 6483-6488. https://doi.org/10.1073/pnas.0808904106")}
   if (model == "lans") {message("Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. PLOS One, 6, e16431. https://doi.org/10.1371/journal.pone.0016431")}
   if (model == "mlf") {message("Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93, 012304. https://doi.org/10.1103/PhysRevE.93.012304")}
   }
