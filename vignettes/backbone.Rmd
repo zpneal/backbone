@@ -249,9 +249,11 @@ Other models, such as the Local Degree model [@hamann2016structure], are designe
 ```{r fig.width=8, out.width="75%"}
 par(mfrow = c(1, 2), mar = c(0,0,2,0))  #Display plots side-by-side
 U <- sample_pa(n = 60, m = 3, directed = FALSE)  #Example unweighted network
-plot(U, main = "Original Network", vertex.size = degree(U))
-bb <- backbone_from_unweighted(U, model = "degree", parameter = 0.5)
-plot(bb, main = "Local Degree Backbone", vertex.size = degree(bb))  #Hubs are clearly visible
+V(U)$name <- ""
+V(U)$name[which(degree(U)>=sort(degree(U), decreasing = TRUE)[5])] <- LETTERS[1:5]  #Label five highest-degree nodes
+plot(U, vertex.size = degree(U), vertex.label.family = "sans", vertex.label.font = 2, main = "Original Network")
+bb <- backbone_from_unweighted(U, model = "degree", parameter = 0.25)
+plot(bb, vertex.size = degree(bb), vertex.label.family = "sans", vertex.label.font = 2, main = "Local Degree Backbone")
 ```
 
 Eight additional structural models are also available:
