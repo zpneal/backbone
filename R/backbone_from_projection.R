@@ -69,7 +69,7 @@ backbone_from_projection <- function(B,
                                      signed = FALSE,
                                      mtc = "none",
                                      missing_as_zero = FALSE,
-                                     narrative = TRUE,
+                                     narrative = FALSE,
                                      trials = NULL,
                                      return = "backbone") {
 
@@ -131,12 +131,11 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   #### Retain edges ####
   backbone <- .retain(p, alpha, mtc)
 
-  #### Display narrative ####
-  if (narrative) {
+  #### Construct narrative ####
   # First sentence (descriptive)
   if (signed) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
+  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
@@ -160,16 +159,13 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
 
   text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
 
-  # Display
-  message("")
-  message("=== Suggested text and citations ===")
-  message(text)
-  message("")
-  message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
-  message("")
-  if (model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill")) {message("Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
-  if (model == "sdsm_ec") {message("Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. International Conference on Complex Networks and Their Applications, 12, 127-136. https://doi.org/10.1007/978-3-031-53468-3_11")}
-  }
+  #References
+  text <- paste0(text, "\n\nNeal, Z. P. 2025. backbone: An R Package to Extract Network Backbones. CRAN. https://doi.org/10.32614/CRAN.package.backbone")
+  if (model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill")) {text <- paste0(text, "\n\nNeal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. Scientific Reports, 11, 23929. https://doi.org/10.1038/s41598-021-03238-3")}
+  if (model == "sdsm_ec") {text <- paste0(text, "\n\nNeal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. International Conference on Complex Networks and Their Applications, 12, 127-136. https://doi.org/10.1007/978-3-031-53468-3_11")}
+
+  #### Display narrative ####
+  if (narrative) {message(text)}
 
   #### Prepare backbone ####
   if (methods::is(B,"matrix")) {

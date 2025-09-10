@@ -76,7 +76,7 @@ backbone_from_weighted <- function(W,
                                    mtc = "none",
                                    parameter = 0,
                                    missing_as_zero = FALSE,
-                                   narrative = TRUE,
+                                   narrative = FALSE,
                                    return = "backbone") {
 
   call <- match.call()
@@ -130,13 +130,12 @@ backbone_from_weighted <- function(W,
   #### Structural Models ####
   if (model == "global") {backbone <- .global(A, missing_as_zero, parameter)}
 
-  #### Display narrative ####
-  if (narrative) {
+  #### Construct narrative ####
   # First sentence (descriptive)
   if (signed & (model == "disparity" | model == "lans" | model == "mlf")) {type <- "signed"} else {type <- "unweighted"}
   if (model == "global" & length(parameter)==2) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2022) to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
+  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
@@ -159,17 +158,14 @@ backbone_from_weighted <- function(W,
   if (model == "global" & length(parameter)==1) {text <- paste0(text, " An edge was retained in the backbone if its weight was larger than ", max(parameter), ", which reduced the number of edges by ", reduced_edges, "%.")}
   if (model == "global" & length(parameter)==2) {text <- paste0(text, " An edge was retained in the backbone as positive if its weight was larger than ", max(parameter), " and as negative if its weight was smaller than ", min(parameter), " which reduced the number of edges by ", reduced_edges, "%.")}
 
-  # Display
-  message("")
-  message("=== Suggested text and citations ===")
-  message(text)
-  message("")
-  message("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
-  message("")
-  if (model == "disparity") {message("Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Aciences, 106, 6483-6488. https://doi.org/10.1073/pnas.0808904106")}
-  if (model == "lans") {message("Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. PLOS One, 6, e16431. https://doi.org/10.1371/journal.pone.0016431")}
-  if (model == "mlf") {message("Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93, 012304. https://doi.org/10.1103/PhysRevE.93.012304")}
-  }
+  # References
+  text <- paste0(text, "\n\nNeal, Z. P. 2025. backbone: An R Package to Extract Network Backbones. CRAN. https://doi.org/10.32614/CRAN.package.backbone")
+  if (model == "disparity") {text <- paste0(text, "\n\nSerrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. Proceedings of the National Academy of Aciences, 106, 6483-6488. https://doi.org/10.1073/pnas.0808904106")}
+  if (model == "lans") {text <- paste0(text, "\n\nFoti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. PLOS One, 6, e16431. https://doi.org/10.1371/journal.pone.0016431")}
+  if (model == "mlf") {text <- paste0(text, "\n\nDianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. Physical Review E, 93, 012304. https://doi.org/10.1103/PhysRevE.93.012304")}
+
+  #### Display narrative ####
+  if (narrative) {message(text)}
 
   #### Prepare backbone ####
   if (methods::is(W,"matrix")) {
