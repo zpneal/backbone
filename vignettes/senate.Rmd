@@ -41,7 +41,7 @@ This vignette uses empirical data on bill sponsorship behaviors in the 108th U.S
 
 The `backbone` package can be cited as:
 
-**Neal, Z. P. (2022). backbone: An R package to Extract Network Backbones. *PLOS ONE, 17*. [https://doi.org/10.1371/journal.pone.0269137](https://doi.org/10.1371/journal.pone.0269137)**
+**Neal, Z. P. (2025). backbone: An R package to Extract Network Backbones. *CRAN*. [https://doi.org/10.32614/CRAN.package.backbone](https://doi.org/10.32614/CRAN.package.backbone)**
 
 The `backbone` package, and the `igraph` package that is also used in this example, can be loaded using:
 ```{r}
