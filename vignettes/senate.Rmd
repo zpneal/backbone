@@ -106,7 +106,7 @@ E(bb1_signed)$color[which(E(bb1_signed)$sign == -1)] <- rgb(1,0,0,.05)  #Make ne
 plot(bb1_signed, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, layout = layout, main = "SDSM Signed Backbone")
 ```
 
-A signed backbone retains statistically sigificantly strong edges as positive and retains statistically significantly weak edges as negative. We use `signed = 0.1` because extracting a signed backbone implies a two-tailed test; this makes the positive edges in the signed backbone comparable to the edges in a non-signed backbone extracted at the `alpha = 0.05` level earlier. The signed backbone highlights an even stronger form of polarization, illustrating not only that collaboration (green edges) exists within party, but that avoidance (red edges) occurs between parties.
+A signed backbone retains statistically significantly strong edges as positive and retains statistically significantly weak edges as negative. We use `signed = 0.1` because extracting a signed backbone implies a two-tailed test; this makes the positive edges in the signed backbone comparable to the edges in a non-signed backbone extracted at the `alpha = 0.05` level earlier. The signed backbone highlights an even stronger form of polarization, illustrating not only that collaboration (green edges) exists within party, but that avoidance (red edges) occurs between parties.
 
 [back to Table of Contents](#toc)
 
