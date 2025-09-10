@@ -12,7 +12,7 @@ backbone_from_weighted(
   mtc = "none",
   parameter = 0,
   missing_as_zero = FALSE,
-  narrative = TRUE,
+  narrative = FALSE,
   return = "backbone"
 )
 }

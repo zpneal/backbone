@@ -11,7 +11,7 @@ backbone_from_projection(
   signed = FALSE,
   mtc = "none",
   missing_as_zero = FALSE,
-  narrative = TRUE,
+  narrative = FALSE,
   trials = NULL,
   return = "backbone"
 )

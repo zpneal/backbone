@@ -12,7 +12,7 @@ backbone_from_unweighted(
   normalize,
   filter,
   umst,
-  narrative = TRUE,
+  narrative = FALSE,
   return = "backbone"
 )
 }
