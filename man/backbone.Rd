@@ -17,7 +17,7 @@ that contains only the most "important" edges from:
 For a detailed illustration of these methods, please see \href{../doc/backbone.html}{the vignette} using \code{vignette("backbone")}.
 }
 \references{
-{Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. \emph{PLOS ONE, 17}, e0269137. \doi{10.1371/journal.pone.0269137}}
+package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 }
 \seealso{
 Useful links:
