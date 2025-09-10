@@ -251,7 +251,7 @@ par(mfrow = c(1, 2), mar = c(0,0,2,0))  #Display plots side-by-side
 U <- sample_pa(n = 60, m = 3, directed = FALSE)  #Example unweighted network
 plot(U, main = "Original Network", vertex.size = degree(U))
 bb <- backbone_from_unweighted(U, model = "degree", parameter = 0.5)
-plot(bb, main = "Local Degree Backbone", vertex.size = degree(bb))  #Communities are clearly visible
+plot(bb, main = "Local Degree Backbone", vertex.size = degree(bb))  #Hubs are clearly visible
 ```
 
 Eight additional structural models are also available:
