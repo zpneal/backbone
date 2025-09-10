@@ -91,16 +91,16 @@ This function implements multiple models, but the Stochastic Degree Sequence Mod
 
 We can extract the SDSM backbone at the conventional `alpha = 0.05` level of statistical significance, then plot it:
 ```{r}
-bb1 <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.05)
+bb1 <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.05, narrative = TRUE)
 layout <- layout_nicely(bb1)  #Get layout for backbone (we'll use it later)
 plot(bb1, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.1), layout = layout, main = "SDSM Backbone")
 ```
 
-Importantly, we must supply the original bipartite network, `senate108`, to this function. Unlike the weighted projection, the SDSM backbone clearly captures the partisan polarization known to structure interactions in the U.S. Senate. Republicans (red nodes) primarily collaborate with other Republicans, and Democrats (blue nodes) primarily collaborate with other Democrats. Additionally, it illustrates that there are a few bipartisan Senators (nodes bridging the two communities), as well as a few conservative-leaning Democrats (blue nodes in the red community) and liberal-leaning Republicans (red nodes in the blue community).
+Importantly, we must supply the original bipartite network, `senate108`, to this function. Because we specified `narrative = TRUE`, this function also displays a narrative description of the backbone extraction process with the associated references; this text can be used in a manuscript to ensure a complete description. Unlike the weighted projection, the SDSM backbone clearly captures the partisan polarization known to structure interactions in the U.S. Senate. Republicans (red nodes) primarily collaborate with other Republicans, and Democrats (blue nodes) primarily collaborate with other Democrats. Additionally, it illustrates that there are a few bipartisan Senators (nodes bridging the two communities), as well as a few conservative-leaning Democrats (blue nodes in the red community) and liberal-leaning Republicans (red nodes in the blue community).
 
 We can also extract a signed SDSM backbone by specifying `signed = TRUE`.
 ```{r}
-bb1_signed <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.1, signed = TRUE)
+bb1_signed <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.1, narrative = TRUE, signed = TRUE)
 E(bb1_signed)$color <- "green"  #Make all edges green
 E(bb1_signed)$color[which(E(bb1_signed)$sign == -1)] <- rgb(1,0,0,.05)  #Make negative edges transparent red
 plot(bb1_signed, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, layout = layout, main = "SDSM Signed Backbone")
@@ -115,7 +115,7 @@ In some cases, we may have a weighted projection, but do not have access to the 
 
 This function implements multiple models, but the Disparity Filter [@serrano2009extracting] is among the most widely used, and is typically chosen as the default unless there are specific reasons to use a different model. We can extract the Disparity Filter backbone, then plot it:
 ```{r}
-bb2 <- backbone_from_weighted(projection, model = "disparity", alpha = 0.2)
+bb2 <- backbone_from_weighted(projection, model = "disparity", alpha = 0.2, narrative = TRUE)
 plot(bb2, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.1), main = "Disparity Filter Backbone")
 ```
 
@@ -141,7 +141,7 @@ plot(unweighted, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, ed
 
 The unweighted network is so dense that it would be difficult to analyze and uncover any meaningful patterns, or to visualize and see any meaningful structure. However, we can extract the L-Spar backbone from this unweighted network, then plot the backbone:
 ```{r}
-bb3 <- backbone_from_unweighted(unweighted, model = "lspar", parameter = .5)
+bb3 <- backbone_from_unweighted(unweighted, model = "lspar", parameter = .5, narrative = TRUE)
 plot(bb3, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.25), main = "L-Spar Backbone")
 ```
 
@@ -154,6 +154,6 @@ This brief empirical example illustrates the utility of the backbone package. Th
 
 * Different backbone extraction models use different amounts of information to decide which edges to retain. Use a backbone extraction model that incorporates all of the available information. For example, if the original network is a weighted projection, then extract the backbone from the original bipartite network or hypergraph using `backbone_from_projection()`. Only extract a backbone using `backbone_from_unweighted()` if no information about edge weights is available.
 
-* The backbone extraction model and its specifications impact the backbone that is obtained. Therefore, clearly identify and cite the backbone model that was used, and completely describe both the original network and how the model was specified. By default, each backbone extraction function (i.e., `backbone_from_`) generates a standardized description with citations that can be used for this purpose.
+* The backbone extraction model and its specifications impact the backbone that is obtained. Therefore, clearly identify and cite the backbone model that was used, and completely describe both the original network and how the model was specified. This is simplified by specifying `narrative = TRUE`, which automatically generates and displays such a description.
 
 # References

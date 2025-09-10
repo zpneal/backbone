@@ -89,7 +89,7 @@ The primary use of the backbone package is backbone extraction, that is, identif
 The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted networks](#weighted), [weighted projections](#projection), and [unweighted networks](#unweighted). Additionally, the package contains some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
 
 ## The `narrative` parameter {#narrative}
-Each backbone extraction function includes a `narrative` parameter. When `narrative = TRUE` (the default), narrative text describing the backbone extraction will be displayed with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
+Each backbone extraction function includes a `narrative` parameter. When `narrative = TRUE`, narrative text describing the backbone extraction will be displayed with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
 
 ## Supported data formats {#formats}
 The functions in the backbone package support two data formats that can be used to represent a network or graph in R:
