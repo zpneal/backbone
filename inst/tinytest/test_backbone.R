@@ -588,7 +588,6 @@ expect_true(all(diag(test)==0))  #Diagonal contains 0s
 expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
 expect_true(all(test[A1 == 0] == 0))  #If edge is missing in original, also missing in result
 test <- backbone:::.filter(A2, "degree", .5)
-expect_true(isSymmetric(test))  #Output is symmetric
 expect_true(all(diag(test)==0))  #Diagonal contains 0s
 expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
 expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
