@@ -9,7 +9,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references fixedfill: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @noRd
@@ -94,7 +94,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references fixedrow: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @noRd
@@ -148,7 +148,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references fixedcol: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @noRd
@@ -198,7 +198,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 #' @references sdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
@@ -253,7 +253,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
 #'
 #' @noRd
@@ -264,7 +264,7 @@
   I_unweighted[I_unweighted==10] <- 0  #Make structural 0s ordinary 0
   I_unweighted[I_unweighted==11] <- 1  #Make structural 1s ordinary 1
   P <- tcrossprod(I_unweighted)  #Projection, not considering any structural 0s or 1s
-  
+
   #### Compute probabilities with edge constraints using Logit ####
   # Prepare dyad list
   A <- data.frame(edge = as.vector(I),     #Data frame of bipartite dyads
@@ -279,11 +279,11 @@
   A$edge2[which(A$edge>1)] <- NA  #Set structural edges to NA so they're not considered in marginals
   model.estimates <- suppressWarnings(stats::glm(formula = edge2 ~ rowmarg + colmarg, family = stats::binomial(link="logit"), data=A))
   A$probs <- as.vector(suppressWarnings(stats::predict(model.estimates, newdata = A, type = "response")))
-  
+
   #Insert structural probabilities
   A$probs[which(A$edge==10)] <- 0  #Structural zeros have probability = 0
   A$probs[which(A$edge==11)] <- 1  #Structural ones have probability = 1
-  
+
   #Probability matrix
   probs <- matrix(A$probs, nrow = nrow(I), ncol = ncol(I))  #Probability matrix
   probs <- lapply(seq_len(nrow(probs)), function(i) probs[i,])  #Store probabilities as list
@@ -334,7 +334,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #' @references fastball: {Godard, K. and Neal, Z. P. (2022). fastball: A fast algorithm to randomly sample bipartite graphs with fixed degree sequences. *Journal of Complex Networks, 10*, cnac049. \doi{10.1093/comnet/cnac049}}
 #'
@@ -439,17 +439,17 @@
   pq <- p*(1-p)
   sigma <- sqrt(sum(pq))
   gamma <- sum(pq*(1-2*p))
-  
+
   #Lower tail p-value, if requested
   if (lowertail) {
     x <- (k+.5-mu)/sigma
     lower <- stats::pnorm(x)+gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x)
   } else {lower <- NA}
-  
+
   #Upper tail p-value
   x <- ((k-1)+.5-mu)/sigma
   upper <- stats::pnorm(x,lower.tail=F)-gamma/(6*sigma^3)*(1-x^2)*stats::dnorm(x)
-  
+
   #Combine, truncate, return
   prob <- c(lower,upper)
   prob[prob<0] <- 0

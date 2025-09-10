@@ -8,7 +8,7 @@
 #'
 #'    For a detailed illustration of these methods, please see \href{../doc/backbone.html}{the vignette} using `vignette("backbone")`.
 #'
-#' @references {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #'
 #' @name backbone
 "_PACKAGE"

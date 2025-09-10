@@ -1,8 +1,8 @@
 .onAttach <- function(lib,pkg) {
   local_version <- utils::packageVersion("backbone")
   packageStartupMessage(" ____   backbone v",local_version)
-  packageStartupMessage("|  _ \\  Cite: Neal, Z. P., (2022). Backbone: An R package to extract network backbones.")
-  packageStartupMessage("|#|_) |       PLOS ONE, 17, e0269137. https://doi.org/10.1371/journal.pone.0269137")
+  packageStartupMessage("|  _ \\  Cite: Neal, Z. P., (2025). backbone: An R package to extract network")
+  packageStartupMessage("|#|_) |       backbones. CRAN, https://doi.org/10.32614/CRAN.package.backbone")
   packageStartupMessage("|# _ < ")
   packageStartupMessage("|#|_) | Help: type vignette(\"backbone\"); email zpneal@msu.edu; github zpneal/backbone")
   packageStartupMessage("|____/  Beta: type devtools::install_github(\"zpneal/backbone\", ref = \"devel\")")
@@ -166,7 +166,7 @@
 #' Matrix **M** is "non-conforming" if any rows or any columns contain only zeros or only ones. If **M** is non-conforming,
 #'    then `bicm()` is slower and will only return a probability matrix.
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. *PLOS ONE, 17*, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references bicm: {Saracco, F., Di Clemente, R., Gabrielli, A., & Squartini, T. (2015). Randomizing bipartite networks: The case of the World Trade Web. *Scientific Reports, 5*, 10595. \doi{10.1038/srep10595}}
 #'
 #' @return a matrix of probabilities or a list of fitnesses
