@@ -59,7 +59,7 @@ This example uses data on bill sponsorship activity in the 108th U.S. Senate, wh
 data(senate108)
 senate108
 ```
-`senate108' is a bipartite network stored as an `igraph` object. The network contains 100 Senators (agents) and 3035 bills (artifacts), where senators are connected to the bills they sponsored. In addition to the network's structure, the object also contains attributes of both the Senators (e.g., party affilition) and bills (e.g., title).
+`senate108` is a bipartite network stored as an `igraph` object. The network contains 100 Senators (agents) and 3035 bills (artifacts), where senators are connected to the bills they sponsored. In addition to the network's structure, the object also contains attributes of both the Senators (e.g., party affilition) and bills (e.g., title).
 
 The network's indicence matrix captures which Senators sponsored which bills:
 ```{r}
