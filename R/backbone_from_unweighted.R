@@ -17,20 +17,19 @@
 #' unweighted unipartite network that contains only edges preserved by a backbone model.
 #'
 #' The following backbone models are available using the \code{model} parameter:
-#' * \code{skeleton} - Karger's (1999) Skeleton backbone
-#' * \code{gspar} - Satuluri et al's (2011) Global Sparsification backbone
-#' * \code{lspar} - Satuluri et al's (2011) Local Sparsification backbone
-#' * \code{simmelian} - Nick et al's (2013) Simmelian backbone
-#' * \code{jaccard} - Goldberg and Roth's (2003) Jaccard backbone
-#' * \code{meetmin} - Goldberg and Roth's (2003) MeetMin backbone
-#' * \code{geometric} - Goldberg and Roth's (2003) Geometric backbone
-#' * \code{hyper} - Goldberg and Roth's (2003) Hypergeometric backbone
-#' * \code{degree} - Hamann et al.'s (2016) Local Degree backbone
-#' * \code{quadrilateral} - Nocaj et al.'s (2015) Quadrilateral Simmelian backbone
-#' * \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, and \code{umst}
+#' * \code{skeleton} - Skeleton backbone (Karger, 1999) 
+#' * \code{gspar} - Global Sparsification (Satuluri et al., 2011) 
+#' * \code{lspar} - Local Sparsification (Satuluri et al., 2011)
+#' * \code{simmelian} - Simmelian backbone (Nick et al., 2013) 
+#' * \code{jaccard} - Jaccard backbone (Goldberg and Roth, 2003) 
+#' * \code{meetmin} - MeetMin backbone (Goldberg and Roth, 2003) 
+#' * \code{geometric} - Geometric backbone (Goldberg and Roth, 2003) 
+#' * \code{hyper} - Hypergeometric backbone, (Goldberg and Roth, 2003) 
+#' * \code{degree} - Local Degree backbone (Hamann et al, 2016) 
+#' * \code{quadrilateral} - Quadrilateral Simmelian backbone (Nocaj et al, 2015) 
+#' * \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize}, \code{filter}, and \code{umst}
 #'
 #' The \code{escore} parameter determines how an unweighted edge's importance is calculated.
-#' Unless noted below, scores are symmetric and larger values represent more important edges.
 #' * \code{random}: a random number drawn from a uniform distribution
 #' * \code{betweenness}: edge betweenness
 #' * \code{triangles}: number of triangles that include the edge
@@ -41,7 +40,7 @@
 #' * \code{degree}: degree of neighbor to which an edge is adjacent (asymmetric)
 #' * \code{meetmin}: triangles normalized by the smaller of the endpoints' neighborhoods' sizes
 #' * \code{geometric}: triangles normalized by the product of the endpoints' neighborhoods' sizes
-#' * \code{hypergeometric}: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (smaller is more important)
+#' * \code{hypergeometric}: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (inverted, so that larger is more important)
 #'
 #' The \code{normalize} parameter determines whether edge scores are normalized.
 #' * \code{none}: no normalization is performed
@@ -49,14 +48,14 @@
 #' * \code{embeddedness}: scores are normalized using the maximum Jaccard coefficient of the top k-ranked neighbors of each endpoint, for all k
 #'
 #' The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores.
-#' * \code{threshold}: Edges with scores >= `s` are retained in the backbone
+#' * \code{threshold}: Edges with scores > `parameter` are retained in the backbone
 #' * \code{proportion}: Specifies the approximate proportion of edges to retain in the backbone
-#' * \code{degree}: Retains each node's d^`s` most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
+#' * \code{degree}: Retains each node's d^`parameter` most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
 #' * \code{disparity}: Applies the disparity filter using [backbone_from_weighted()]
 #' * \code{lans}: Applies locally adaptive network sparsification using [backbone_from_weighted()]
 #' * \code{mlf}: Applies the marginal likelihood filter using [backbone_from_weighted()]
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+#' @return If \code{return = "backbone"}, a backbone in the same class as \code{U}. If \code{return = "everything"}, then the backbone
 #' is returned as an element in a list that also includes the original unweighted network, a narrative description, and the original
 #' function call.
 #'

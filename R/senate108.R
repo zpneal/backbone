@@ -10,5 +10,5 @@
 #'   title, legislative policy area, party affiliation of the sponsor, partisanship, and most
 #'   recent status.
 
-#' @source These data were generated using `incidence.from.congress(session = 108, types = "s", format = "igraph")`
+#' @source These data were generated using `incidentally::incidence.from.congress(session = 108, types = "s", format = "igraph")`
 "senate108"

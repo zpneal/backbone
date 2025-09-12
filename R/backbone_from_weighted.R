@@ -7,7 +7,7 @@
 #' @param alpha real: significance level of hypothesis test(s) in statistical models
 #' @param signed boolean: return a signed backbone from a statistical model
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
-#' @param parameter real: parameter used to control structural backbone models (see details)
+#' @param parameter real: parameter used to control structural backbone models
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
 #' @param narrative boolean: display suggested text & citations
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
@@ -33,7 +33,7 @@
 #'   preserved as positive, and edges with weights above \code{min(parameter)} are preserved as negative.
 #'
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
-#' bipartite network or hypergraph. However, if the original bipartite network is available, it is better to use [backbone_from_projection()].
+#' bipartite network or hypergraph. However, if the original bipartite network or hypergraph is available, it is better to use [backbone_from_projection()].
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
 #' is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise

@@ -231,14 +231,3 @@ mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = 
                            narrative = TRUE)
   )
 }
-
-#' Depricated function to extract global threshold backbone
-#'
-#' \code{global()} was replaced by \code{backbone_from_weighted(model = "global")}.
-#'
-#' @param ... arguments
-#'
-#' @details See backbone v2.1.4 for original documentation
-#'
-#' @export
-global <- function(...){.Deprecated("backbone_from_weighted(model = \"global\")")}

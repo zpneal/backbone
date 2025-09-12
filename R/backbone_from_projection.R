@@ -27,11 +27,11 @@
 #' * \code{fixedrow} - The "fixed row" model (Neal et al., 2021) exactly constrains the agent degrees (i.e., row sums)
 #' * \code{fixedcol} - The "fixed column" model (Neal et al., 2021) exactly constrains the artifact degrees (i.e., column sums)
 #'
-#' Although \cite{backbone_from_projection} extracts the backbone from the weighted projection of a bipartite network or hypergraph,
+#' Although \code{backbone_from_projection} extracts the backbone from the weighted projection of a bipartite network or hypergraph,
 #' the input \code{B} *must be the bipartite network or hypergraph itself, and not the weighted projection*. This is necessary
-#' because the backbone models use information in the bipartite network that is missing from the projection. The "agent" nodes that
+#' because these backbone models use information in the bipartite network that is missing from the projection. The "agent" nodes that
 #' appear in the projection must be represented by rows if \code{B} is an incidence matrix, or by \code{type = FALSE} nodes if \code{B}
-#' is a bipartite igraph object. In either case, the bipartite network must be binary (i.e., unweighted), unless \code{model = "sdsm"},
+#' is a bipartite igraph object. In either case, the source network must be binary (i.e., unweighted), unless \code{model = "sdsm"},
 #' when "prohibited" edges can be represented with weight = 10 and "required" edges can be represented with weight = 11.
 #'
 #' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
