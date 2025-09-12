@@ -51,6 +51,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 5. [Utility functions](#utility)
     a. [Matrix randomization](#randomization)
     b. [Bipartite Configuration Model (BiCM)](#bicm)
+6. [References](#references)
 
 # Introduction {#introduction}
 
@@ -364,4 +365,4 @@ bicm(mat)
 
 [back to Table of Contents](#toc)
 
-# References
+# References {#references}

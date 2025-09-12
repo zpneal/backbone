@@ -34,6 +34,7 @@ par(mar = c(0, 0, 2, 0) + 0.1)
 4. [Extracting from a weighted network](#weighted)
 5. [Extracting from an unweighted network](#unweighted)
 6. [Lessons](#lessons)
+7. [References](#references)
 
 # Introduction {#introduction}
 
@@ -156,4 +157,4 @@ This brief empirical example illustrates the utility of the backbone package. Th
 
 * The backbone extraction model and its specifications impact the backbone that is obtained. Therefore, clearly identify and cite the backbone model that was used, and completely describe both the original network and how the model was specified. This is simplified by specifying `narrative = TRUE`, which automatically generates and displays such a description.
 
-# References
+# References {#references}
