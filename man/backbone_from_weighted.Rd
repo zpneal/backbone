@@ -36,7 +36,7 @@ backbone_from_weighted(
 \item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+If \code{return = "backbone"}, a backbone in the same class as \code{W}. If \code{return = "everything"}, then the backbone
 is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise
 p-values, a narrative description, and the original function call.
 }
