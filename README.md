@@ -17,14 +17,13 @@ The backbone package implements methods to extract the *backbone* of a network, 
 
 In addition, the package implements some other utility functions to:
 
-* Randomize matrices while preserving the row and column sums using the `fastball` algorithm
+* Randomize matrices while preserving the row and column sums using the fastball algorithm
 * Estimate the Bipartite Configuration Model (BiCM)
 
 For more details on these functions and methods, please see:
 
 * `vignette("backbone")`
 * Neal, Z.P. (2022). backbone: An R package to extract network backbones. *PLoS ONE, 17*, e0269137. <https://doi.org/10.1371/journal.pone.0269137>
-* Neal, Z.P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. <https://doi.org/10.1038/s41598-021-03238-3>
 * [www.rbackbone.net](https://www.zacharyneal.com/backbone)
 
 ## Installation
@@ -35,8 +34,7 @@ install.packages("backbone")
 
 The /devel branch contains the working beta version of the next release of the backbone package. All the functions are documented and have undergone various levels of preliminary debugging, so they should mostly work, but there are no guarantees. Feel free to use the devel version (with caution), and let us know if you run into any problems. You can install it You can install from GitHub with:
 ``` r
-library(devtools)
-install_github("zpneal/backbone", ref = "devel", build_vignettes = TRUE)
+devtools::install_github("zpneal/backbone", ref = "devel", build_vignettes = TRUE)
 ```
 
 ## Dependencies

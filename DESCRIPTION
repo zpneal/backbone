@@ -8,8 +8,8 @@ Authors@R: c(
     person("Bruce", "Sagan", role = "ctb"),
     person("Karl", "Godard", role = "ctb")) 
 Description: An implementation of methods for extracting a sparse unweighted network (i.e. a backbone)
-    from an unweighted network (Hamann et al., 2016 <doi:10.1007/s13278-016-0332-2>), a weighted network
-    (Serrano et al., 2009 <doi:10.1073/pnas.0808904106>), or a weighted projection (Neal et al., 2021
+    from an unweighted network (e.g., Hamann et al., 2016 <doi:10.1007/s13278-016-0332-2>), a weighted network
+    (e.g., Serrano et al., 2009 <doi:10.1073/pnas.0808904106>), or a weighted projection (e.g., Neal et al., 2021
     <doi:10.1038/s41598-021-03238-3>).
 License: GPL-3
 Encoding: UTF-8

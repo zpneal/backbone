@@ -4,6 +4,7 @@ output: html_document
 ---
 ## backbone 3.0.0
 
+* all functions re-written to be modular, to facilitate future extensions
 * streamlined functions to focus on input network type, rather than backbone model
 * keep attributes of retained edges in `igraph` objects
 * functions renamed in snake_case, to match naming conventions in `igraph`
