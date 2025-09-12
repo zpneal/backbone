@@ -1,5 +1,5 @@
 ---
-title: "Empirical Example of Backbone Extraction: The 108th U.S. Senate"
+title: "Empirical Example of Backbone Extraction: The 108^th^ U.S. Senate"
 author: "Zachary Neal, Michigan State University, zpneal@msu.edu"
 output: 
   rmarkdown::html_vignette:
@@ -8,7 +8,7 @@ output:
 bibliography: backbone_bib.bib
 link-citations: yes
 vignette: >
-  %\VignetteIndexEntry{Empirical Example of Backbone Extraction: The 108th U.S. Senate}
+  %\VignetteIndexEntry{Empirical Example of Backbone Extraction: The 108^th^ U.S. Senate}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -37,7 +37,7 @@ par(mar = c(0, 0, 2, 0) + 0.1)
 
 # Introduction {#introduction}
 
-This vignette uses empirical data on bill sponsorship behaviors in the 108th U.S. Senate to illustrate the use of the `backbone` package to extract sparse, unweighted networks from [weighted projections](#projection), [weighted networks](#weighted), and [unweighted networks](#unweighted). For a more general introduction to the backbone package, please see the [Introduction to Backbone](../doc/backbone.html) vignette.
+This vignette uses empirical data on bill sponsorship behaviors in the 108^th^ U.S. Senate to illustrate the use of the `backbone` package to extract sparse, unweighted networks from [weighted projections](#projection), [weighted networks](#weighted), and [unweighted networks](#unweighted). For a more general introduction to the backbone package, please see the [Introduction to Backbone](../doc/backbone.html) vignette.
 
 The `backbone` package can be cited as:
 
@@ -54,7 +54,7 @@ library(igraph)
 # Data {#data}
 In the U.S. Congress, the first step in the passage of new legislation is the introduction of a bill in the chamber. When a bill is introduced, it has one or more legislators who act as "sponsors" and express their initial support. Examining bill sponsorship is useful because although formal votes are taken on only a few bills, all bills have sponsors. Patterns of co-sponsorship (i.e., legislators who sponsor bills together) can provide insight into the structure of collaboration and political alliances [@neal2014backbone].
 
-This example uses data on bill sponsorship activity in the 108th U.S. Senate, which ran from 3 January 2003 until 3 January 2005. The data was generated using `incidentally::incidence.from.congress(session = 108, types = "s", format = "igraph")' [@neal2022constructing]. It is bundled with the backbone package and can be loaded and described using:
+This example uses data on bill sponsorship activity in the 108^th^ U.S. Senate, which ran from 3 January 2003 until 3 January 2005. The data was generated using `incidentally::incidence.from.congress(session = 108, types = "s", format = "igraph")` [@neal2022constructing]. It is bundled with the backbone package and can be loaded and described using:
 ```{r}
 data(senate108)
 senate108
@@ -70,7 +70,7 @@ For example, Senators Akaka and Baucus both sponsored S.144, while Senators Alla
 rowSums(as_biadjacency_matrix(senate108))[1:5]
 colSums(as_biadjacency_matrix(senate108))[1:5]
 ```
-The row sums represent the Senator degrees, and thus indicate the number of bills that each Senator sponsored. The column sums represent the bill degrees, and thus indicate the number of of sponsors on each bill.
+The row sums represent the Senator degrees, and thus indicate the number of bills that each Senator sponsored. For example, Sen. Allen sponsored more than twice as many bills as Sen. Alexander. The column sums represent the bill degrees, and thus indicate the number of of sponsors on each bill. For example, bill S1379 was quite popular with 76 sponsors, while bill S1612 was unpopular with only 11 sponsors.
 
 From these data, it is possible to construct a weighted projection, which is a unipartite network in which Senators are connected to each other if they co-sponsored bills together, where the edge weights record the number of bills they co-sponsored:
 ```{r}
@@ -80,14 +80,14 @@ as_adjacency_matrix(projection, attr = "weight")[1:5,1:5]
 plot(projection, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.width = E(projection)$weight^.1, edge.color = rgb(0,0,0,.1), main = "Weighted Projection")
 ```
 
-The weighted projection indicates that, for example, Akaka and Allard sponsored 14 of the same bills, while Allard and Allen sponsored 41. Although these edge weights may provide some information into the frequency of collaboration between Senators, or the strength of their alliance, the density and weights make this network difficult to analyze and visualize. Thus, it can be useful to instead focus on a backbone, which retains only the most "important" edges in a sparser unweighted network.
+The weighted projection indicates that, for example, Allard and Allen sponsored 41 bills together, while Akaka and Allard sponsored only 14 bills together. Although these edge weights may provide some information into the frequency of collaboration between Senators, or the strength of their alliance, the density and weights make this network difficult to analyze and visualize. Thus, it can be useful to instead focus on a backbone, which retains only the most "important" edges in a sparser unweighted network.
 
 [back to Table of Contents](#toc)
 
 # Extracting from a weighted projection {#projection}
 Because this network is a weighted projection, and the original bipartite network is available, we can extract the backbone using `backbone_from_projection()`. The backbone extraction models implemented in this function are powerful because they take advantage of information that is contained in the bipartite network (e.g., the row sums and column sums), but that are missing in the weighted projection itself.
 
-This function implements multiple models, but the Stochastic Degree Sequence Model (SDSM) [@neal2021comparing] offers a balance of statistical power and computational efficiency. The SDSM performs a statistical test on each edge weight, asking whether it is statistically significantly larger than expected if the indicence matrix were random, but with the same expected row and column sums. In this context, for each edge it asks: "Did these two Senators sponsor more bills together than would be espected if they each sponsors bills randomly, but if they sponsored the same number of bills on average, and if each bill received the same number of sponsors on average?"
+This function implements multiple models, but the Stochastic Degree Sequence Model (SDSM) [@neal2021comparing] offers a balance of statistical power and computational efficiency. The SDSM performs a statistical test on each edge weight, asking whether it is statistically significantly larger than expected if the indicence matrix were random, but with the same expected row and column sums. In this context, for each edge it asks: "Did these two Senators sponsor more bills together than would be expected if they each sponsors bills randomly, but if they sponsored the same number of bills on average, and if each bill received the same number of sponsors on average?"
 
 We can extract the SDSM backbone at the conventional `alpha = 0.05` level of statistical significance, then plot it:
 ```{r}
@@ -111,7 +111,7 @@ A signed backbone retains statistically significantly strong edges as positive a
 [back to Table of Contents](#toc)
 
 # Extracting from a weighted network {#weighted}
-In some cases, we may have a weighted projection, but do not have access to the original bipartite data. In other cases, we may have a weighted network where the edge weights were measured directly, and were not generated via bipartite projection. In these cases, we can extract the backbone using `backbone_from_weighted()`. The backbone extraction models implemented in this function consider local variation in degrees and edge weights, and thereby can preserve key structural features even in networks where edge weights heterogeneous or multi-scalar.
+In some cases, we may have a weighted projection, but do not have access to the original bipartite data. In other cases, we may have a weighted network where the edge weights were measured directly, and were not generated via projection. In these cases, we can extract the backbone using `backbone_from_weighted()`. The backbone extraction models implemented in this function consider local variation in degrees and edge weights, and thereby can preserve key structural features even in networks where edge weights heterogeneous or multi-scalar.
 
 This function implements multiple models, but the Disparity Filter [@serrano2009extracting] is among the most widely used, and is typically chosen as the default unless there are specific reasons to use a different model. We can extract the Disparity Filter backbone, then plot it:
 ```{r}
@@ -121,7 +121,7 @@ plot(bb2, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.colo
 
 Notably, we supply the weighted network `projection` (not the bipartite network `senate108`) to this function. Because the weighted network is missing information that was contained in the original bipartite network (i.e., the Senator and bill degrees), it is more difficult for the Disparity Filter to identify important edges. To adjust for this, we use a more liberal `alpha = 0.2` level of statistical significance.
 
-The Disparity Filter backbone also captures the partisan polarization in the U.S. Senate. Here, it is reflected in a dense community of collaborating Democrats, and a more diffuse community of collaborating Republicans. In the 108th U.S. Senate, Republicans held the majority. Thus, this pattern is consistent with prior findings that members of the majority can stake out more extreme positions and exhibit "strategic disloyalty", while members of the minority party must "circle the wagons" to maximize their power [@kirkland2017ideology;@neal2020sign].
+The Disparity Filter backbone also captures the partisan polarization in the U.S. Senate. Here, it is reflected in a dense community of collaborating Democrats, and a more diffuse community of collaborating Republicans. In the 108^th^ U.S. Senate, Republicans held the majority. Thus, this pattern is consistent with prior findings that members of the majority can stake out more extreme positions and exhibit "strategic disloyalty", while members of the minority party must "circle the wagons" to consolidate their power [@kirkland2017ideology;@neal2020sign].
 
 [back to Table of Contents](#toc)
 
@@ -130,7 +130,7 @@ In some cases, we might only have an unweighted network, but one that is too den
 
 This function implements multiple models, but the Local Sparsification (L-Spar) model [@satuluri2011local] is one option that is designed to preserve clustering, which we suspect exists in the U.S. Senate in the form of partisan polarization. This model scores edges using the Jaccard coefficient of its endpoints' neighborhoods, normalizes these scores by ranking them from the perspective of each node, then chooses edges to retain based on the degree of each node and a sparisfication `parameter'.
 
-Suppose we did not have the weighted projection, but only had an unweighted network in which Senators were connected if they sponsored 25 or more of the same bills:
+Suppose we did not have the weighted projection, but instead only had an unweighted network in which Senators were connected if they sponsored 25 or more of the same bills:
 ```{r}
 unweighted <- delete_edges(projection, which(E(projection)$weight < 25))  #Delete low-weight edges
 unweighted <- delete_edge_attr(unweighted, "weight")  #Delete edge weights to obtain an unweighted network
