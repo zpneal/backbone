@@ -16,7 +16,7 @@ recent status.
 }
 }
 \source{
-These data were generated using \code{incidence.from.congress(session = 108, types = "s", format = "igraph")}
+These data were generated using \code{incidentally::incidence.from.congress(session = 108, types = "s", format = "igraph")}
 }
 \usage{
 senate108

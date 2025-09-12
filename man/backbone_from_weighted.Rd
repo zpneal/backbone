@@ -27,7 +27,7 @@ backbone_from_weighted(
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
-\item{parameter}{real: parameter used to control structural backbone models (see details)}
+\item{parameter}{real: parameter used to control structural backbone models}
 
 \item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
 
@@ -68,7 +68,7 @@ preserved as positive, and edges with weights above \code{min(parameter)} are pr
 }
 
 The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
-bipartite network or hypergraph. However, if the original bipartite network is available, it is better to use \code{\link[=backbone_from_projection]{backbone_from_projection()}}.
+bipartite network or hypergraph. However, if the original bipartite network or hypergraph is available, it is better to use \code{\link[=backbone_from_projection]{backbone_from_projection()}}.
 }
 \examples{
 #A weighted network with heterogeneous (i.e. multiscale) weights

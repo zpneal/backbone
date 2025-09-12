@@ -36,7 +36,7 @@ backbone_from_unweighted(
 \item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
+If \code{return = "backbone"}, a backbone in the same class as \code{U}. If \code{return = "everything"}, then the backbone
 is returned as an element in a list that also includes the original unweighted network, a narrative description, and the original
 function call.
 }
@@ -49,21 +49,20 @@ unweighted unipartite network that contains only edges preserved by a backbone m
 
 The following backbone models are available using the \code{model} parameter:
 \itemize{
-\item \code{skeleton} - Karger's (1999) Skeleton backbone
-\item \code{gspar} - Satuluri et al's (2011) Global Sparsification backbone
-\item \code{lspar} - Satuluri et al's (2011) Local Sparsification backbone
-\item \code{simmelian} - Nick et al's (2013) Simmelian backbone
-\item \code{jaccard} - Goldberg and Roth's (2003) Jaccard backbone
-\item \code{meetmin} - Goldberg and Roth's (2003) MeetMin backbone
-\item \code{geometric} - Goldberg and Roth's (2003) Geometric backbone
-\item \code{hyper} - Goldberg and Roth's (2003) Hypergeometric backbone
-\item \code{degree} - Hamann et al.'s (2016) Local Degree backbone
-\item \code{quadrilateral} - Nocaj et al.'s (2015) Quadrilateral Simmelian backbone
-\item \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize},\code{filter}, and \code{umst}
+\item \code{skeleton} - Skeleton backbone (Karger, 1999)
+\item \code{gspar} - Global Sparsification (Satuluri et al., 2011)
+\item \code{lspar} - Local Sparsification (Satuluri et al., 2011)
+\item \code{simmelian} - Simmelian backbone (Nick et al., 2013)
+\item \code{jaccard} - Jaccard backbone (Goldberg and Roth, 2003)
+\item \code{meetmin} - MeetMin backbone (Goldberg and Roth, 2003)
+\item \code{geometric} - Geometric backbone (Goldberg and Roth, 2003)
+\item \code{hyper} - Hypergeometric backbone, (Goldberg and Roth, 2003)
+\item \code{degree} - Local Degree backbone (Hamann et al, 2016)
+\item \code{quadrilateral} - Quadrilateral Simmelian backbone (Nocaj et al, 2015)
+\item \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize}, \code{filter}, and \code{umst}
 }
 
 The \code{escore} parameter determines how an unweighted edge's importance is calculated.
-Unless noted below, scores are symmetric and larger values represent more important edges.
 \itemize{
 \item \code{random}: a random number drawn from a uniform distribution
 \item \code{betweenness}: edge betweenness
@@ -75,7 +74,7 @@ Unless noted below, scores are symmetric and larger values represent more import
 \item \code{degree}: degree of neighbor to which an edge is adjacent (asymmetric)
 \item \code{meetmin}: triangles normalized by the smaller of the endpoints' neighborhoods' sizes
 \item \code{geometric}: triangles normalized by the product of the endpoints' neighborhoods' sizes
-\item \code{hypergeometric}: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (smaller is more important)
+\item \code{hypergeometric}: probability of the edge being included at least as many triangles if edges were random, given the size of the endpoints' neighborhoods (inverted, so that larger is more important)
 }
 
 The \code{normalize} parameter determines whether edge scores are normalized.
@@ -87,9 +86,9 @@ The \code{normalize} parameter determines whether edge scores are normalized.
 
 The \code{filter} parameter determines how edges are filtered based on their (normalized) edge scores.
 \itemize{
-\item \code{threshold}: Edges with scores >= \code{s} are retained in the backbone
+\item \code{threshold}: Edges with scores > \code{parameter} are retained in the backbone
 \item \code{proportion}: Specifies the approximate proportion of edges to retain in the backbone
-\item \code{degree}: Retains each node's d^\code{s} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
+\item \code{degree}: Retains each node's d^\code{parameter} most important edges, where d is the node's degree (requires that \code{normalize = "rank"})
 \item \code{disparity}: Applies the disparity filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
 \item \code{lans}: Applies locally adaptive network sparsification using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
 \item \code{mlf}: Applies the marginal likelihood filter using \code{\link[=backbone_from_weighted]{backbone_from_weighted()}}
