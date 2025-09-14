@@ -32,8 +32,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     a. [Welcome](#welcome)
     b. [Installing and loading the package](#loading)
     c. [Package overview](#overview)
-    d. [The narrative parameter](#narrative)
-    e. [Supported data formats](#formats)
+    d. [Supported data formats](#formats)
 2. [Weighted networks](#weighted)
     a. [Background](#weight-background)
     b. [Structural models](#weight-structural)
@@ -87,10 +86,11 @@ The primary use of the backbone package is backbone extraction, that is, identif
 
 * Depending on the type of network contained in `dat` (e.g., weighted, bipartite, unweighted), you run the applicable backbone function (`backbone_from_projection()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`), which returns a backbone of the same class as `dat`.
 
+* Each of these functions includes a `narrative` parameter. Setting `narrative = TRUE` displays narrative text describing the backbone extraction with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
+
 The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted networks](#weighted), [weighted projections](#projection), and [unweighted networks](#unweighted). Additionally, the package contains some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
 
-## The `narrative` parameter {#narrative}
-Each backbone extraction function includes a `narrative` parameter. When `narrative = TRUE`, narrative text describing the backbone extraction will be displayed with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
+**New in Version 3.0.0 -- ** In older versions, each backbone extraction model required a different function. For example, you'd use `disparity()` to extract a backbone using the disparity filter, and `mlf()` to extract it using the marginal likelihood filter. Now all models for a specific type of network are accessible in a single function. For example, you can use `backbone_from_weighted(model = "disparity")` to use the disparity filter, and `backbone_from_weighted(model = "mlf")` to use the marginal likelihood filter.
 
 ## Supported data formats {#formats}
 The functions in the backbone package support three data formats that can be used to represent a network or graph in R:
