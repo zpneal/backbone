@@ -18,10 +18,6 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", width = 80)
 knitr::opts_knit$set(global.par = TRUE)
 ```
 
-```{r, echo = FALSE}
-set.seed(5)
-```
-
 # Table of Contents {#toc}
 
 1. [Introduction](#introduction)
@@ -43,7 +39,7 @@ set.seed(5)
 
 # Introduction {#introduction}
 
-The "vignette" is designed solely to display the automated unit tests used to evaluate the `backbone` package. To identify any failed unit tests, search in the vignette for the word "failed".
+The "vignette" is designed solely to display the automated unit tests used to check the `backbone` package during development. To identify any failed unit tests, search in the vignette for the word "failed".
 
 For a general introduction to the backbone package, please see the [Introduction to Backbone](../doc/backbone.html) vignette. Or, for a complete example using empirical data, please see the [Empirical Example of Backbone Extraction](../doc/senate.html) vignette.
 
