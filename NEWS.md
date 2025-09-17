@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 3.0.1
+
+* 
+
 ## backbone 3.0.0
 
 * all functions re-written to be modular, to facilitate future extensions
