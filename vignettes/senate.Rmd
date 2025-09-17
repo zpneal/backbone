@@ -1,0 +1,160 @@
+---
+title: "Empirical Example of Backbone Extraction: The 108^th^ U.S. Senate"
+author: "Zachary Neal, Michigan State University, zpneal@msu.edu"
+output: 
+  rmarkdown::html_vignette:
+  toc: true
+  
+bibliography: backbone_bib.bib
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Empirical Example of Backbone Extraction: The 108^th^ U.S. Senate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", width = 80)
+knitr::opts_knit$set(global.par = TRUE)
+```
+
+```{r, echo = FALSE}
+set.seed(5)
+oldmar <- par()$mar
+par(mar = c(0, 0, 2, 0) + 0.1)
+```
+
+# Table of Contents {#toc}
+
+[<img src='../man/figures/logo.png' align="right" height="250" />](https://www.zacharyneal.com/backbone)
+
+1. [Introduction](#introduction)
+2. [Data](#data)
+3. [Extracting from a weighted projection](#projection)
+4. [Extracting from a weighted network](#weighted)
+5. [Extracting from an unweighted network](#unweighted)
+6. [Lessons](#lessons)
+7. [References](#references)
+
+# Introduction {#introduction}
+
+This vignette uses empirical data on bill sponsorship behaviors in the 108^th^ U.S. Senate to illustrate the use of the `backbone` package to extract sparse, unweighted networks from [weighted projections](#projection), [weighted networks](#weighted), and [unweighted networks](#unweighted). For a more general introduction to the backbone package, please see the [Introduction to Backbone](../doc/backbone.html) vignette.
+
+The `backbone` package can be cited as:
+
+**Neal, Z. P. (2025). backbone: An R package to Extract Network Backbones. *CRAN*. [https://doi.org/10.32614/CRAN.package.backbone](https://doi.org/10.32614/CRAN.package.backbone)**
+
+The `backbone` package, and the `igraph` package that is also used in this example, can be loaded using:
+```{r}
+library(backbone)
+library(igraph)
+```
+
+[back to Table of Contents](#toc)
+
+# Data {#data}
+In the U.S. Congress, the first step in the passage of new legislation is the introduction of a bill in the chamber. When a bill is introduced, it has one or more legislators who act as "sponsors" and express their initial support. Examining bill sponsorship is useful because although formal votes are taken on only a few bills, all bills have sponsors. Patterns of co-sponsorship (i.e., legislators who sponsor bills together) can provide insight into the structure of collaboration and political alliances [@neal2014backbone].
+
+This example uses data on bill sponsorship activity in the 108^th^ U.S. Senate, which ran from 3 January 2003 until 3 January 2005. The data was generated using `incidentally::incidence.from.congress(session = 108, types = "s", format = "igraph")` [@neal2022constructing]. It is bundled with the backbone package and can be loaded and described using:
+```{r}
+data(senate108)
+senate108
+```
+`senate108` is a bipartite network stored as an `igraph` object. The network contains 100 Senators (agents) and 3035 bills (artifacts), where senators are connected to the bills they sponsored. In addition to the network's structure, the object also contains attributes of both the Senators (e.g., party affilition) and bills (e.g., title).
+
+The network's indicence matrix captures which Senators sponsored which bills:
+```{r}
+as_biadjacency_matrix(senate108)[1:5,1:5]
+```
+For example, Senators Akaka and Baucus both sponsored S.144, while Senators Allard, Allen, and Alexander did not. Two features of the indicence matrix -- the row sums and column sums -- are particularly important:
+```{r}
+rowSums(as_biadjacency_matrix(senate108))[1:5]
+colSums(as_biadjacency_matrix(senate108))[1:5]
+```
+The row sums represent the Senator degrees, and thus indicate the number of bills that each Senator sponsored. For example, Sen. Allen sponsored more than twice as many bills as Sen. Alexander. The column sums represent the bill degrees, and thus indicate the number of of sponsors on each bill. For example, bill S1379 was quite popular with 76 sponsors, while bill S1612 was unpopular with only 11 sponsors.
+
+From these data, it is possible to construct a weighted projection, which is a unipartite network in which Senators are connected to each other if they co-sponsored bills together, where the edge weights record the number of bills they co-sponsored:
+```{r}
+projection <- bipartite_projection(senate108, which = "false")
+V(projection)$name <- V(projection)$last #Use only last names as node labels
+as_adjacency_matrix(projection, attr = "weight")[1:5,1:5]
+plot(projection, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.width = E(projection)$weight^.1, edge.color = rgb(0,0,0,.1), main = "Weighted Projection")
+```
+
+The weighted projection indicates that, for example, Allard and Allen sponsored 41 bills together, while Akaka and Allard sponsored only 14 bills together. Although these edge weights may provide some information into the frequency of collaboration between Senators, or the strength of their alliance, the density and weights make this network difficult to analyze and visualize. Thus, it can be useful to instead focus on a backbone, which retains only the most "important" edges in a sparser unweighted network.
+
+[back to Table of Contents](#toc)
+
+# Extracting from a weighted projection {#projection}
+Because this network is a weighted projection, and the original bipartite network is available, we can extract the backbone using `backbone_from_projection()`. The backbone extraction models implemented in this function are powerful because they take advantage of information that is contained in the bipartite network (e.g., the row sums and column sums), but that are missing in the weighted projection itself.
+
+This function implements multiple models, but the Stochastic Degree Sequence Model (SDSM) [@neal2021comparing] offers a balance of statistical power and computational efficiency. The SDSM performs a statistical test on each edge weight, asking whether it is statistically significantly larger than expected if the indicence matrix were random, but with the same expected row and column sums. In this context, for each edge it asks: "Did these two Senators sponsor more bills together than would be expected if they each sponsors bills randomly, but if they sponsored the same number of bills on average, and if each bill received the same number of sponsors on average?"
+
+We can extract the SDSM backbone at the conventional `alpha = 0.05` level of statistical significance, then plot it:
+```{r}
+bb1 <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.05, narrative = TRUE)
+layout <- layout_nicely(bb1)  #Get layout for backbone (we'll use it later)
+plot(bb1, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.1), layout = layout, main = "SDSM Backbone")
+```
+
+Importantly, we must supply the original bipartite network, `senate108`, to this function. Because we specified `narrative = TRUE`, this function also displays a narrative description of the backbone extraction process with the associated references; this text can be used in a manuscript to ensure a complete description. Unlike the weighted projection, the SDSM backbone clearly captures the partisan polarization known to structure interactions in the U.S. Senate. Republicans (red nodes) primarily collaborate with other Republicans, and Democrats (blue nodes) primarily collaborate with other Democrats. Additionally, it illustrates that there are a few bipartisan Senators (nodes bridging the two communities), as well as a few conservative-leaning Democrats (blue nodes in the red community) and liberal-leaning Republicans (red nodes in the blue community).
+
+We can also extract a signed SDSM backbone by specifying `signed = TRUE`.
+```{r}
+bb1_signed <- backbone_from_projection(senate108, model = "sdsm", alpha = 0.1, narrative = TRUE, signed = TRUE)
+E(bb1_signed)$color <- "green"  #Make all edges green
+E(bb1_signed)$color[which(E(bb1_signed)$sign == -1)] <- rgb(1,0,0,.05)  #Make negative edges transparent red
+plot(bb1_signed, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, layout = layout, main = "SDSM Signed Backbone")
+```
+
+A signed backbone retains statistically significantly strong edges as positive and retains statistically significantly weak edges as negative. We use `signed = 0.1` because extracting a signed backbone implies a two-tailed test; this makes the positive edges in the signed backbone comparable to the edges in a non-signed backbone extracted at the `alpha = 0.05` level earlier. The signed backbone highlights an even stronger form of polarization, illustrating not only that collaboration (green edges) exists within party, but that avoidance (red edges) occurs between parties.
+
+[back to Table of Contents](#toc)
+
+# Extracting from a weighted network {#weighted}
+In some cases, we may have a weighted projection, but do not have access to the original bipartite data. In other cases, we may have a weighted network where the edge weights were measured directly, and were not generated via projection. In these cases, we can extract the backbone using `backbone_from_weighted()`. The backbone extraction models implemented in this function consider local variation in degrees and edge weights, and thereby can preserve key structural features even in networks where edge weights heterogeneous or multi-scalar.
+
+This function implements multiple models, but the Disparity Filter [@serrano2009extracting] is among the most widely used, and is typically chosen as the default unless there are specific reasons to use a different model. We can extract the Disparity Filter backbone, then plot it:
+```{r}
+bb2 <- backbone_from_weighted(projection, model = "disparity", alpha = 0.2, narrative = TRUE)
+plot(bb2, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.1), main = "Disparity Filter Backbone")
+```
+
+Notably, we supply the weighted network `projection` (not the bipartite network `senate108`) to this function. Because the weighted network is missing information that was contained in the original bipartite network (i.e., the Senator and bill degrees), it is more difficult for the Disparity Filter to identify important edges. To adjust for this, we use a more liberal `alpha = 0.2` level of statistical significance.
+
+The Disparity Filter backbone also captures the partisan polarization in the U.S. Senate. Here, it is reflected in a dense community of collaborating Democrats, and a more diffuse community of collaborating Republicans. In the 108^th^ U.S. Senate, Republicans held the majority. Thus, this pattern is consistent with prior findings that members of the majority can stake out more extreme positions and exhibit "strategic disloyalty", while members of the minority party must "circle the wagons" to consolidate their power [@kirkland2017ideology;@neal2020sign].
+
+[back to Table of Contents](#toc)
+
+# Extracting from an unweighted network {#unweighted}
+In some cases, we might only have an unweighted network, but one that is too dense to analyze or visualize. In these cases, we can extract the backbone using `backbone_from_unweighted()`. The backbone extraction models implemented in this function follow a "recipe" of first assigning each edge a score based on their role in the structure, normalizing those edge scores, then filtering based on the scores. 
+
+This function implements multiple models, but the Local Sparsification (L-Spar) model [@satuluri2011local] is one option that is designed to preserve clustering, which we suspect exists in the U.S. Senate in the form of partisan polarization. This model scores edges using the Jaccard coefficient of its endpoints' neighborhoods, normalizes these scores by ranking them from the perspective of each node, then chooses edges to retain based on the degree of each node and a sparisfication `parameter'.
+
+Suppose we did not have the weighted projection, but instead only had an unweighted network in which Senators were connected if they sponsored 25 or more of the same bills:
+```{r}
+unweighted <- delete_edges(projection, which(E(projection)$weight < 25))  #Delete low-weight edges
+unweighted <- delete_edge_attr(unweighted, "weight")  #Delete edge weights to obtain an unweighted network
+unweighted <- delete_vertices(unweighted, which(degree(unweighted) < 1))  #Delete isolated nodes
+edge_density(unweighted)  #Compute density
+plot(unweighted, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.25), main = "Unweighted Network")
+```
+
+The unweighted network is so dense that it would be difficult to analyze and uncover any meaningful patterns, or to visualize and see any meaningful structure. However, we can extract the L-Spar backbone from this unweighted network, then plot the backbone:
+```{r}
+bb3 <- backbone_from_unweighted(unweighted, model = "lspar", parameter = .5, narrative = TRUE)
+plot(bb3, vertex.label = NA, vertex.frame.color = NA, vertex.size = 3, edge.color = rgb(0,0,0,.25), main = "L-Spar Backbone")
+```
+
+Even based on the very limited information still left in this unweighted network (after the bipartite original has been lost, and the weights in the projection have been lost), the L-Spar backbone still captures the partisan structure of the U.S. Senate.
+
+[back to Table of Contents](#toc)
+
+# Lessons {#lessons}
+This brief empirical example illustrates the utility of the backbone package. There are a couple broad lessons to consider when extracting a network backbone:
+
+* Different backbone extraction models use different amounts of information to decide which edges to retain. Use a backbone extraction model that incorporates all of the available information. For example, if the original network is a weighted projection, then extract the backbone from the original bipartite network or hypergraph using `backbone_from_projection()`. Only extract a backbone using `backbone_from_unweighted()` if no information about edge weights is available.
+
+* The backbone extraction model and its specifications impact the backbone that is obtained. Therefore, clearly identify and cite the backbone model that was used, and completely describe both the original network and how the model was specified. This is simplified by specifying `narrative = TRUE`, which automatically generates and displays such a description.
+
+# References {#references}

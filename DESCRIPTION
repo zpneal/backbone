@@ -1,0 +1,36 @@
+Package: backbone
+Type: Package
+Title: Extracts the Backbone from Networks
+Version: 3.0.0
+Authors@R: c(
+    person("Zachary", "Neal", email = "zpneal@msu.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3076-4995")),
+    person("Rachel", "Domagalski", role = "ctb"), 
+    person("Bruce", "Sagan", role = "ctb"),
+    person("Karl", "Godard", role = "ctb")) 
+Description: An implementation of methods for extracting a sparse unweighted network (i.e. a backbone)
+    from an unweighted network (e.g., Hamann et al., 2016 <doi:10.1007/s13278-016-0332-2>), a weighted network
+    (e.g., Serrano et al., 2009 <doi:10.1073/pnas.0808904106>), or a weighted projection (e.g., Neal et al., 2021
+    <doi:10.1038/s41598-021-03238-3>).
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
+Depends: 
+    R (>= 3.5)
+Imports: 
+    igraph,
+    Matrix,
+    methods,
+    stats,
+    Rcpp,
+    utils,
+Suggests:
+    knitr,
+    rmarkdown,
+    tinytest
+LinkingTo: 
+    Rcpp
+VignetteBuilder: knitr
+URL: https://www.zacharyneal.com/backbone, https://github.com/zpneal/backbone
+BugReports: https://github.com/zpneal/backbone/issues
+LazyData: true
