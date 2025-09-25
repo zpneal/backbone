@@ -107,7 +107,7 @@
     upper <- matrix(NA, nrow(A), ncol(A))
     if (signed) {lower <- matrix(NA, nrow(A), ncol(A))}
     T <- sum(rowSums(A))/2
-    p <- (rowSums(A) %*% t(rowSums(A))) / (2 * (T^2))
+    p <- tcrossprod(rowSums(A)) / (2 * (T^2))
     for (col in 1:ncol(A)) {  #Loop over lower triangle
       for (row in col:nrow(A)) {
 
@@ -131,7 +131,7 @@
     upper <- matrix(NA, nrow(A), ncol(A))
     if (signed) {lower <- matrix(NA, nrow(A), ncol(A))}
     T <- sum(rowSums(A))
-    p <- (rowSums(A) %*% t(colSums(A))) / (T^2)
+    p <- tcrossprod(rowSums(A)) / (T^2)
     for (col in 1:ncol(A)) {  #Loop over full matrix
       for (row in 1:nrow(A)) {
 
