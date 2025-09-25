@@ -12,6 +12,7 @@
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_projection(model = \"sdsm\")")
@@ -41,6 +42,7 @@ sdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_projection(model = \"fixedrow\")")
@@ -70,6 +72,7 @@ fixedrow <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_projection(model = \"fixedcol\")")
@@ -99,6 +102,7 @@ fixedcol <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, m
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_projection(model = \"fixedfill\")")
@@ -129,6 +133,7 @@ fixedfill <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE, trials = NULL){
   .Deprecated("backbone_from_projection(model = \"fdsm\")")
@@ -159,6 +164,7 @@ fdsm <- function(B, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_weighted(model = \"disparity\")")
@@ -188,6 +194,7 @@ disparity <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, 
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_weighted(model = \"lans\")")
@@ -217,6 +224,7 @@ lans <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc =
 #' @details
 #' See backbone v2.1.4 for original documentation
 #'
+#' @keywords internal
 #' @export
 mlf <- function(W, alpha = 0.05, missing.as.zero = FALSE, signed = FALSE, mtc = "none", narrative = FALSE){
   .Deprecated("backbone_from_weighted(model = \"mlf\")")
