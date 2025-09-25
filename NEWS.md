@@ -5,6 +5,7 @@ output: html_document
 ## backbone 3.0.1
 
 * omit deprecated functions from manual
+* replace all remaining `%*%` with `(t)crossprod()`
 
 ## backbone 3.0.0
 
