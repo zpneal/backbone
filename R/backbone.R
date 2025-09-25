@@ -1,16 +1,22 @@
-#' backbone: Extracts the Backbone from Graphs
+#' The backbone package
 #'
-#' @description Provides methods for extracting an unweighted and sparse subgraph (i.e., a backbone)
-#'    that contains only the most "important" edges from:
+#' backbone is an R package for extracting network backbones.
+#' 
+#' @name backbone-package
+#' @keywords internal
+#' @aliases backbone-package backbone
+#'
+#' @description The backbone package implements methods for extracting an unweighted and sparse network
+#'    (i.e., a backbone) that contains only the most "important" edges from:
 #'    * a weighted network using [backbone_from_weighted()]
 #'    * a weighted projection of a bipartite network or hypergraph using [backbone_from_projection()]
 #'    * an unweighted network using [backbone_from_unweighted()]
 #'
-#'    For a detailed illustration of these methods, please see \href{../doc/backbone.html}{the vignette} using `vignette("backbone")`.
+#'    For an overview of the package with examples, please see the \href{../doc/backbone.html}{Introduction to Backbone}
+#'    using `vignette("backbone")`. For a detailed empirical example, please see the \href{../doc/senate.html}{U.S. Senate Example}
+#'    using `vignette("senate108")`.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
-#'
-#' @name backbone
 "_PACKAGE"
 NULL
 
