@@ -81,45 +81,16 @@ backbone_from_weighted <- function(W,
 
   call <- match.call()
 
-  #### Check parameters ####
-  #All models
+  #### Check parameters and input ####
+  if (methods::is(W,"igraph")) {if(igraph::is_bipartite(W)) {stop("`B` must be a unipartite network")}}
   if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
-  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
-  if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
-
-  #Statistical models
-  if (model %in% c("disparity", "lans", "mlf")) {
-    if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
-    if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
-    if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
-    if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
-  }
-
-  #Structural models
   if (model %in% c("global")) {
     if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
     if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
   }
-
-  #### Check and format input ####
-  #Check that input is a weighted adjacency matrix or weighted unipartite igraph
-  if (!methods::is(W,"matrix") & !methods::is(W,"Matrix") & !methods::is(W,"igraph")) {stop("`W` must be an adjacency matrix or Matrix, or an igraph object")}
-
-  if (methods::is(W,"matrix")) {
-    if (dim(as.matrix(W))[1] != dim(as.matrix(W))[2]) {stop("`W` must be a square adjacency matrix")}
-    if (all(as.matrix(W) %in% c(0,1))) {stop("The entries of `W` must represent edge weights")}
-  }
-
-  if (methods::is(W,"igraph")) {
-    if (igraph::is_bipartite(W)) {stop("`W` must be a unipartite igraph object")}
-    if (!"weight" %in% igraph::edge_attr_names(W)) {stop("`W` must contain an edge weight attribute")}
-    }
-
-  #Convert input to adjacency matrix
-  if (methods::is(W,"matrix")) {A <- W}  #matrix --> matrix
-  if (methods::is(W,"Matrix")) {A <- as.matrix(W)}  #Matrix --> matrix
-  if (methods::is(W,"igraph")) {A <- igraph::as_adjacency_matrix(W, names = FALSE, sparse = FALSE, attr = "weight")}
+  A <- .check_and_coerce(N = W, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, return = return)
+  if (dim(as.matrix(A))[1] != dim(as.matrix(A))[2]) {stop("`W` must represent a unipartite network")}
+  if (all(as.matrix(A) %in% c(0,1))) {stop("The entries of `W` must represent a weighted network")}
 
   #### Statistical Models ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}

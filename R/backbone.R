@@ -33,22 +33,8 @@
 backbone <- function(N, ...) {
 
   #Check input
-  if (!methods::is(N,"matrix") & !methods::is(N,"Matrix") & !methods::is(N,"igraph")) {stop("`N` must be a matrix, Matrix, or igraph object")}
-
-  #Convert input to matrix
-  if (methods::is(N,"matrix")) {X <- N}  #matrix --> matrix
-  if (methods::is(N,"Matrix")) {X <- as.matrix(N)}  #Matrix --> matrix
-  if (methods::is(N,"igraph")) {
-    if (igraph::is_bipartite(N)) {
-      if ("weight" %in% igraph::edge_attr_names(N)) {X <- igraph::as_biadjacency_matrix(N, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted incidence
-      if (!("weight" %in% igraph::edge_attr_names(N))) {X <- igraph::as_biadjacency_matrix(N, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary incidence
-    }
-    if (!igraph::is_bipartite(N)) {
-      if ("weight" %in% igraph::edge_attr_names(N)) {X <- igraph::as_adjacency_matrix(N, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted adjacency
-      if (!("weight" %in% igraph::edge_attr_names(N))) {X <- igraph::as_adjacency_matrix(N, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary adjacency
-    }
-  }
-
+  X <- .check_and_coerce(N = N)
+  
   #Detect and extract backbone
   if (is.numeric(X) & dim(X)[1]==dim(X)[2] & all(X %in% c(0,1))) {  #Numeric, square, binary
     return(backbone_from_unweighted(N, narrative = TRUE, ...))

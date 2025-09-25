@@ -75,48 +75,25 @@ backbone_from_projection <- function(B,
 
   call <- match.call()
 
-  #### Check parameters ####
-  if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
-  if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
+  #### Check parameters and input ####
+  if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a bipartite network")}}
   if (!(model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
-  if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
-  if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
-  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (model=="fdsm" & !is.null(trials)) {  #If FDSM and `trials` is supplied, check it
-    if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
-    if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
-  }
-  if (model!="fdsm" & !is.null(trials)) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
-  if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
-
-  #### Check and format input ####
-  #Check that input is matrix, Matrix, or igraph (and if igraph, that it is bipartite)
-  if (!methods::is(B,"matrix") & !methods::is(B,"Matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or Matrix, or a binary bipartite igraph object")}
-  if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}}
-
-  #Convert input to incidence matrix
-  if (methods::is(B,"matrix")) {I <- B}  #matrix --> matrix
-  if (methods::is(B,"Matrix")) {I <- as.matrix(B)}  #Matrix --> matrix
-  if (methods::is(B,"igraph")) {
-    if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted incidence
-    if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary incidence
-  }
-
+  I <- .check_and_coerce(N = B, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, return = return)
+  
   #Check if input may be a weighted projection
   if (!all(I %in% c(0,1)) &    #The entries are not binary, and
       isSymmetric(I) &         #The matrix is symmetric, and
       all(I%%1==0)) {          #The entries are all integers
       stop("
 `B` looks like it may be a weighted bipartite projection. The input to backbone_from_projection()
-must be the original bipartite network, not its weighted projection. If you only have the weighted
-bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
+must be the original bipartite network or hypergraph, not its weighted projection. If you only have
+the weighted projection, cautiously consider using backbone_from_weighted() instead.")}
 
-  #Check that input is binary, or contains structural values and model=SDSM
-  if (model!="sdsm" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
+  #Check that input is either binary, or contains structural values and model=SDSM
+  if (model!="sdsm" & !all(I %in% c(0,1))) {stop("`B` must represent an unweighted bipartite network or hypergraph")}
 
-  if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
-                                                        where required edges have weight 10 and prohibited edges have weight 11")}
+  if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must represent an unweighted bipartite network or hypergraph,
+                                                        but can include required edges with weight = 10 and prohibited edges with weight = 11")}
 
   if (model=="sdsm") {if (all(I %in% c(0,1))) {model <- "sdsm"} else {model <- "sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
 
