@@ -4,7 +4,7 @@ output: html_document
 ---
 ## backbone 3.0.1
 
-* 
+* omit deprecated functions from manual
 
 ## backbone 3.0.0
 
