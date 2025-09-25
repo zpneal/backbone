@@ -3,7 +3,7 @@
 \docType{data}
 \name{senate108}
 \alias{senate108}
-\title{Bill Sponsorship in the 108th U.S. Senate}
+\title{Bill sponsorship in the 108th U.S. Senate}
 \format{
 \subsection{\code{senate108}}{
 
