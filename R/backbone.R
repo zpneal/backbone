@@ -32,15 +32,26 @@
 #'
 backbone <- function(N, ...) {
 
-  #Check input
-  X <- .check_and_coerce(N = N)
-  
+  #### Coerce input to matrix ####
+  if (methods::is(N,"matrix")) {mat <- N}  #matrix --> matrix
+  if (methods::is(N,"Matrix")) {mat <- as.matrix(N)}  #Matrix --> matrix
+  if (methods::is(N,"igraph")) {
+    if (igraph::is_bipartite(N)) {
+      if ("weight" %in% igraph::edge_attr_names(N)) {mat <- igraph::as_biadjacency_matrix(N, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted bipartite igraph --> weighted incidence matrix
+      if (!("weight" %in% igraph::edge_attr_names(N))) {mat <- igraph::as_biadjacency_matrix(N, names = FALSE, sparse = FALSE)}  #unweighted bipartite igraph --> binary incidence
+    }
+    if (!igraph::is_bipartite(N)) {
+      if ("weight" %in% igraph::edge_attr_names(N)) {mat <- igraph::as_adjacency_matrix(N, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted unipartite igraph --> weighted adjacency
+      if (!("weight" %in% igraph::edge_attr_names(N))) {mat <- igraph::as_adjacency_matrix(N, names = FALSE, sparse = FALSE)}  #unweighted unipartite igraph --> binary adjacency
+    }
+  }
+
   #Detect and extract backbone
-  if (is.numeric(X) & dim(X)[1]==dim(X)[2] & all(X %in% c(0,1))) {  #Numeric, square, binary
+  if (is.numeric(mat) & dim(mat)[1]==dim(mat)[2] & all(mat %in% c(0,1))) {  #Numeric, square, binary
     return(backbone_from_unweighted(N, narrative = TRUE, ...))
-  } else if (is.numeric(X) & dim(X)[1]==dim(X)[2] & !all(X %in% c(0,1))) {  #Numeric, square, valued
+  } else if (is.numeric(mat) & dim(mat)[1]==dim(mat)[2] & !all(mat %in% c(0,1))) {  #Numeric, square, valued
       return(backbone_from_weighted(N, narrative = TRUE, ...))
-  } else if (is.numeric(X) & dim(X)[1]!=dim(X)[2] & all(X %in% c(0,1))) {  #Numeric, non-square, binary
+  } else if (is.numeric(mat) & dim(mat)[1]!=dim(mat)[2] & all(mat %in% c(0,1))) {  #Numeric, non-square, binary
       return(backbone_from_projection(N, narrative = TRUE, ...))
   } else {stop("`N` does not seem to contain a supported type of network.")}
 

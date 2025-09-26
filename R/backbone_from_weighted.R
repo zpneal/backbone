@@ -82,15 +82,7 @@ backbone_from_weighted <- function(W,
   call <- match.call()
 
   #### Check parameters and input ####
-  if (methods::is(W,"igraph")) {if(igraph::is_bipartite(W)) {stop("`B` must be a unipartite network")}}
-  if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
-  if (model %in% c("global")) {
-    if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
-    if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
-  }
-  A <- .check_and_coerce(N = W, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, return = return)
-  if (dim(as.matrix(A))[1] != dim(as.matrix(A))[2]) {stop("`W` must represent a unipartite network")}
-  if (all(as.matrix(A) %in% c(0,1))) {stop("The entries of `W` must represent a weighted network")}
+  A <- .check_and_coerce(N = W, source = "weighted", model = model, alpha = alpha, parameter = parameter, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, return = return)
 
   #### Statistical Models ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}

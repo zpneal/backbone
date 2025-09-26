@@ -95,10 +95,6 @@ backbone_from_unweighted <- function(U,
   call <- match.call()
 
   #### Check parameters and input ####
-  if (methods::is(U,"igraph")) {if(igraph::is_bipartite(U)) {stop("`U` must be a unipartite network")}}
-  if (!(model %in% c("custom", "skeleton", "gspar", "lspar", "simmelian", "jaccard", "meetmin", "geometric", "hyper", "degree", "quadrilateral"))) {stop("`model` must be one of: \"custom\", \"skeleton\", \"gspar\", \"lspar\", \"simmelian\", \"jaccard\", \"meetmin\", \"geometric\", \"hyper\", \"degree\", \"quadrilateral\"")}
-  if (!is.numeric(parameter) & length(parameter)==1) {stop("`parameter` must be a single numeric value")}
-
   #If existing model specification, set model parameters
   if (model == "skeleton") {escore <- "random"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
   if (model == "gspar") {escore <- "jaccard"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
@@ -110,12 +106,7 @@ backbone_from_unweighted <- function(U,
   if (model == "hyper") {escore <- "hypergeometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
   if (model == "degree") {escore <- "degree"; normalize <- "rank"; filter <- "degree"; umst <- FALSE}
   if (model == "quadrilateral") {escore <- "quadrilateral"; normalize <- "embeddedness"; filter <- "threshold"; umst <- TRUE}
-
-  A <- .check_and_coerce(N = U, escore = escore, normalize = normalize, filter = filter, umst = umst, narrative = narrative, return = return)
-  if (normalize=="rank" & filter!="degree") {stop("Using normalize=\"rank\" requires that filter=\"degree\"")}
-  if (normalize!="rank" & filter=="degree") {stop("Using filter=\"degree\" requires that normalize=\"rank\"")}
-  if (!all(A %in% c(0,1))) {stop("`U` must represent an unweighted network")}
-  if (!isSymmetric(A)) {stop("`U` must represent an undirected network")}
+  A <- .check_and_coerce(N = U, source = "unweighted", model = model, parameter = parameter, escore = escore, normalize = normalize, filter = filter, umst = umst, narrative = narrative, return = return)
 
   #### Compute edge scores ####
   G <- .escore(A, escore = escore)

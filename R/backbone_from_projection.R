@@ -76,26 +76,8 @@ backbone_from_projection <- function(B,
   call <- match.call()
 
   #### Check parameters and input ####
-  if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a bipartite network")}}
-  if (!(model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
-  I <- .check_and_coerce(N = B, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, return = return)
-  
-  #Check if input may be a weighted projection
-  if (!all(I %in% c(0,1)) &    #The entries are not binary, and
-      isSymmetric(I) &         #The matrix is symmetric, and
-      all(I%%1==0)) {          #The entries are all integers
-      stop("
-`B` looks like it may be a weighted bipartite projection. The input to backbone_from_projection()
-must be the original bipartite network or hypergraph, not its weighted projection. If you only have
-the weighted projection, cautiously consider using backbone_from_weighted() instead.")}
-
-  #Check that input is either binary, or contains structural values and model=SDSM
-  if (model!="sdsm" & !all(I %in% c(0,1))) {stop("`B` must represent an unweighted bipartite network or hypergraph")}
-
-  if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must represent an unweighted bipartite network or hypergraph,
-                                                        but can include required edges with weight = 10 and prohibited edges with weight = 11")}
-
-  if (model=="sdsm") {if (all(I %in% c(0,1))) {model <- "sdsm"} else {model <- "sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
+  I <- .check_and_coerce(N = B, source = "projection", model = model, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, return = return)
+  if (model == "sdsm" & any(I %in% c(10,11))) {model <- "sdsm_ec"}
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
