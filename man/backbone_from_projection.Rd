@@ -84,8 +84,8 @@ B <- igraph::graph_from_biadjacency_matrix(B)
 P <- igraph::bipartite_projection(B, which = "true")  #An ordinary weighted projection...
 plot(P)                                               #...is a dense hairball
 
-backbone <- backbone_from_projection(B)  #A backbone...
-plot(backbone)                           #...is sparse with clear communities
+bb <- backbone_from_projection(B)  #A backbone...
+plot(bb)                           #...is sparse with clear communities
 }
 \references{
 package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
