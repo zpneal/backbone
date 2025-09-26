@@ -23,15 +23,15 @@ backbone_from_weighted(
 
 \item{alpha}{real: significance level of hypothesis test(s) in statistical models}
 
-\item{signed}{boolean: return a signed backbone from a statistical model}
+\item{signed}{logical: return a signed backbone from a statistical model}
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
 \item{parameter}{real: parameter used to control structural backbone models}
 
-\item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
+\item{missing_as_zero}{logical: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
 
-\item{narrative}{boolean: display suggested text & citations}
+\item{narrative}{logical: display suggested text & citations}
 
 \item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
 }

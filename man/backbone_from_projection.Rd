@@ -23,13 +23,13 @@ backbone_from_projection(
 
 \item{model}{string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}}
 
-\item{signed}{boolean: return a signed backbone}
+\item{signed}{logical: return a signed backbone}
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
-\item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and test them for significance}
+\item{missing_as_zero}{logical: treat missing edges as edges with zero weight and test them for significance}
 
-\item{narrative}{boolean: display suggested text & citations}
+\item{narrative}{logical: display suggested text & citations}
 
 \item{trials}{numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution}
 
