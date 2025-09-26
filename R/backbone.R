@@ -15,6 +15,11 @@
 #'    * If `N` is a bipartite network or hypergraph, [backbone_from_projection()]
 #'    * If `N` is an unweighted network, [backbone_from_unweighted()]
 #'
+#'    Designed as a user-friendly wrapper, `backbone()` uses the defaults for the underlying functions,
+#'    which should work in many cases, and which can be modified by passing optional arguments. Unlike
+#'    the underlying functions, by default `backbone()` displays narrative text describing what it did
+#'    so that you know.
+#'
 #'    For details about the backbone models, see the documentation for the underlying functions above. For
 #'    an overview of the package with examples, please see the \href{../doc/backbone.html}{Introduction to
 #'    Backbone} using `vignette("backbone")`. For a detailed empirical example, please see the
