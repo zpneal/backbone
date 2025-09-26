@@ -415,7 +415,7 @@ fastball <- function(M, trades = 5 * nrow(M)) {
 #' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative boolean: display suggested text & citations
 #' @param trials numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
@@ -434,7 +434,7 @@ fastball <- function(M, trades = 5 * nrow(M)) {
                               missing_as_zero = NULL,
                               narrative = NULL,
                               trials = NULL,
-                              return = NULL,
+                              backbone_only = NULL,
                               escore = NULL,
                               normalize = NULL,
                               filter = NULL,
@@ -447,7 +447,7 @@ fastball <- function(M, trades = 5 * nrow(M)) {
   if (!is.null(signed)) {if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}}
   if (!is.null(mtc)) {if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}}
   if (!is.null(missing_as_zero)) {if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}}
-  if (!is.null(return)) {if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}}
+  if (!is.null(backbone_only)) {if (!is.logical(backbone_only)) {stop("`backbone_only` must be either TRUE or FALSE")}}
 
   #### Check function-specific arguments ####
   if (source == "projection") {

@@ -10,7 +10,7 @@
 #' @param missing_as_zero logical: treat missing edges as edges with zero weight and test them for significance
 #' @param narrative logical: display suggested text & citations
 #' @param trials numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #'
 #' @details
 #' The \code{backbone_from_projection} function extracts the backbone from the weighted projection of a bipartite network or hypergraph.
@@ -34,9 +34,7 @@
 #' is a bipartite igraph object. In either case, the source network must be binary (i.e., unweighted), unless \code{model = "sdsm"},
 #' when "prohibited" edges can be represented with weight = 10 and "required" edges can be represented with weight = 11.
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original network, raw projection, backbone, edgewise p-values, narrative
-#' description, and original function call.
+#' @return A backbone in the same class as \code{B}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
@@ -71,12 +69,12 @@ backbone_from_projection <- function(B,
                                      missing_as_zero = FALSE,
                                      narrative = FALSE,
                                      trials = NULL,
-                                     return = "backbone") {
+                                     backbone_only = TRUE) {
 
   call <- match.call()
 
   #### Check parameters and input ####
-  I <- .check_and_coerce(N = B, source = "projection", model = model, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, return = return)
+  I <- .check_and_coerce(N = B, source = "projection", model = model, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, backbone_only = backbone_only)
   if (model == "sdsm" & any(I %in% c(10,11))) {model <- "sdsm_ec"}
 
   #### Compute p-values ####
@@ -160,8 +158,8 @@ backbone_from_projection <- function(B,
     }
 
   #### Return ####
-  if (return == "backbone") {return(backbone)}
-  if (return == "everything") {
+  if (backbone_only) {return(backbone)}
+  if (!backbone_only) {
     return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call))
     }
 }

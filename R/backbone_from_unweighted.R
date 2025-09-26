@@ -10,7 +10,7 @@
 #' @param filter string: Type of filter to apply
 #' @param umst logical: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
 #' @param narrative logical: display suggested text & citations
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #'
 #' @details
 #' The \code{backbone_from_unweighted} function extracts the backbone from an unweighted unipartite network. The backbone is an
@@ -55,9 +55,7 @@
 #' * \code{lans}: Applies locally adaptive network sparsification using [backbone_from_weighted()]
 #' * \code{mlf}: Applies the marginal likelihood filter using [backbone_from_weighted()]
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{U}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original unweighted network, a narrative description, and the original
-#' function call.
+#' @return A backbone in the same class as \code{U}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
@@ -90,7 +88,7 @@ backbone_from_unweighted <- function(U,
                                      filter,
                                      umst,
                                      narrative = FALSE,
-                                     return = "backbone") {
+                                     backbone_only = TRUE) {
 
   call <- match.call()
 
@@ -106,7 +104,7 @@ backbone_from_unweighted <- function(U,
   if (model == "hyper") {escore <- "hypergeometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
   if (model == "degree") {escore <- "degree"; normalize <- "rank"; filter <- "degree"; umst <- FALSE}
   if (model == "quadrilateral") {escore <- "quadrilateral"; normalize <- "embeddedness"; filter <- "threshold"; umst <- TRUE}
-  A <- .check_and_coerce(N = U, source = "unweighted", model = model, parameter = parameter, escore = escore, normalize = normalize, filter = filter, umst = umst, narrative = narrative, return = return)
+  A <- .check_and_coerce(N = U, source = "unweighted", model = model, parameter = parameter, escore = escore, normalize = normalize, filter = filter, umst = umst, narrative = narrative, backbone_only = backbone_only)
 
   #### Compute edge scores ####
   G <- .escore(A, escore = escore)
@@ -189,6 +187,6 @@ backbone_from_unweighted <- function(U,
   }
 
   #### Return ####
-  if (return == "backbone") {return(backbone)}
-  if (return == "everything") {return(list(original = U, backbone = backbone, narrative = text, call = call))}
+  if (backbone_only) {return(backbone)}
+  if (!backbone_only) {return(list(original = U, backbone = backbone, narrative = text, call = call))}
 }

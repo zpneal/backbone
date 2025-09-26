@@ -10,7 +10,7 @@
 #' @param parameter real: parameter used to control structural backbone models
 #' @param missing_as_zero logical: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
 #' @param narrative logical: display suggested text & citations
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #'
 #' @details
 #' The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
@@ -35,9 +35,7 @@
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network or hypergraph. However, if the original bipartite network or hypergraph is available, it is better to use [backbone_from_projection()].
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{W}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise
-#' p-values, a narrative description, and the original function call.
+#' @return A backbone in the same class as \code{W}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -77,12 +75,12 @@ backbone_from_weighted <- function(W,
                                    parameter = 0,
                                    missing_as_zero = FALSE,
                                    narrative = FALSE,
-                                   return = "backbone") {
+                                   backbone_only = TRUE) {
 
   call <- match.call()
 
   #### Check parameters and input ####
-  A <- .check_and_coerce(N = W, source = "weighted", model = model, alpha = alpha, parameter = parameter, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, return = return)
+  A <- .check_and_coerce(N = W, source = "weighted", model = model, alpha = alpha, parameter = parameter, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, backbone_only = backbone_only)
 
   #### Statistical Models ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}
@@ -158,7 +156,7 @@ backbone_from_weighted <- function(W,
   }
 
   #### Return ####
-  if (return == "backbone") {return(backbone)}
-  if (return == "everything" & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call))}
-  if (return == "everything" & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text, call = call))}
+  if (backbone_only) {return(backbone)}
+  if (!backbone_only & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call))}
+  if (!backbone_only & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text, call = call))}
 }
