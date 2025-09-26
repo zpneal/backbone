@@ -146,7 +146,7 @@
 #' `bicm` estimates cell probabilities under the bipartite configuration model
 #'
 #' @param M matrix: a binary matrix
-#' @param fitness boolean: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only
+#' @param fitness logical: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only
 #' @param tol numeric, tolerance of algorithm
 #' @param max_steps numeric, number of times to run .loglikelihood_prime_bicm algorithm
 #' @param ... optional arguments

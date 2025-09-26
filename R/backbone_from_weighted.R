@@ -5,11 +5,11 @@
 #' @param W A weighted network as a valued adjacency matrix or \link[Matrix]{Matrix}, or a weighted unipartite \link[igraph]{igraph} object
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param alpha real: significance level of hypothesis test(s) in statistical models
-#' @param signed boolean: return a signed backbone from a statistical model
+#' @param signed logical: return a signed backbone from a statistical model
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param parameter real: parameter used to control structural backbone models
-#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
-#' @param narrative boolean: display suggested text & citations
+#' @param missing_as_zero logical: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
+#' @param narrative logical: display suggested text & citations
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'
 #' @details

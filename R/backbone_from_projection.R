@@ -5,10 +5,10 @@
 #' @param B An unweighted bipartite network or hypergraph as an incidence matrix or \link[Matrix]{Matrix}, or as a bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
-#' @param signed boolean: return a signed backbone
+#' @param signed logical: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
-#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
-#' @param narrative boolean: display suggested text & citations
+#' @param missing_as_zero logical: treat missing edges as edges with zero weight and test them for significance
+#' @param narrative logical: display suggested text & citations
 #' @param trials numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'

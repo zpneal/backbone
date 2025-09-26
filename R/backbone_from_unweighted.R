@@ -8,8 +8,8 @@
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
-#' @param umst boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
-#' @param narrative boolean: display suggested text & citations
+#' @param umst logical: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
+#' @param narrative logical: display suggested text & citations
 #' @param return string: return either only the \code{"backbone"} or \code{"everything"}
 #'
 #' @details
