@@ -714,3 +714,46 @@ expect_true(which.max(igraph::degree(U)) == which.max(igraph::degree(test$backbo
 expect_true(cor(igraph::degree(U),igraph::degree(test$backbone)) > 0.75)  #Backbone preserves degree distribution
 test2 <- backbone_from_unweighted(U, model = "degree", parameter = .2, return = "everything")
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
+
+#### Wrapper Function ####
+#When input is bipartite
+trace <- function(x){sum(diag(x))}
+matcube <- function(x){x%*%x%*%x}
+triangle_index <- function(x){(trace(matcube(x)) + trace(matcube(abs(x))))/(2 * trace(matcube(abs(x))))}
+B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence matrix
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10)))
+bb <- backbone(B, signed = TRUE)  #Extract signed backbone using defaults
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
+
+#When input is weighted
+W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
+              10,0,1,1,1,0,0,0,0,0,
+              10,1,0,1,1,0,0,0,0,0,
+              10,1,1,0,1,0,0,0,0,0,
+              10,1,1,1,0,0,0,0,0,0,
+              75,0,0,0,0,0,100,100,100,100,
+              0,0,0,0,0,100,0,10,10,10,
+              0,0,0,0,0,100,10,0,10,10,
+              0,0,0,0,0,100,10,10,0,10,
+              0,0,0,0,0,100,10,10,10,0),10)
+bb <- backbone(W)  #Extract backbone using defaults
+expect_true(is(bb,"matrix"))                          #Returns as matrix
+bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
+expect_true(igraph::is_tree(bb))                      #Backbone is a tree
+
+#When input is unweighted
+U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
+bb <- backbone(U)  #Extract backbone using defaults
+expect_true(igraph::modularity(bb, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
