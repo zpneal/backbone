@@ -599,7 +599,7 @@ test <- backbone_from_unweighted(U, model = "skeleton", parameter = .5, backbone
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 test2 <- backbone_from_unweighted(U, model = "skeleton", parameter = .3, backbone_only = FALSE)
@@ -610,7 +610,7 @@ test <- backbone_from_unweighted(U, model = "gspar", parameter = .5, backbone_on
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -622,7 +622,7 @@ test <- backbone_from_unweighted(U, model = "lspar", parameter = .5, backbone_on
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -634,7 +634,7 @@ test <- backbone_from_unweighted(U, model = "simmelian", parameter = .5, backbon
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -646,7 +646,7 @@ test <- backbone_from_unweighted(U, model = "jaccard", parameter = .3, backbone_
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -658,7 +658,7 @@ test <- backbone_from_unweighted(U, model = "meetmin", parameter = .5, backbone_
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -670,7 +670,7 @@ test <- backbone_from_unweighted(U, model = "geometric", parameter = .3, backbon
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -682,7 +682,7 @@ test <- backbone_from_unweighted(U, model = "hyper", parameter = .6, backbone_on
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -694,7 +694,7 @@ test <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .3, bac
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
@@ -707,7 +707,7 @@ test <- backbone_from_unweighted(U, model = "degree", parameter = .5, backbone_o
 expect_true(length(test)==4)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(which.max(igraph::degree(U)) == which.max(igraph::degree(test$backbone)))  #Backbone preserves highest-degree node
