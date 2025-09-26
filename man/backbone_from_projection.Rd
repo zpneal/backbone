@@ -13,7 +13,7 @@ backbone_from_projection(
   missing_as_zero = FALSE,
   narrative = FALSE,
   trials = NULL,
-  return = "backbone"
+  backbone_only = TRUE
 )
 }
 \arguments{
@@ -33,12 +33,10 @@ backbone_from_projection(
 
 \item{trials}{numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution}
 
-\item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
+\item{backbone_only}{logical: return just the backbone (default), or a detailed backbone object}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-is returned as an element in a list that also includes the original network, raw projection, backbone, edgewise p-values, narrative
-description, and original function call.
+A backbone in the same class as \code{B}, or if \code{backbone_only = FALSE}, then a backbone object.
 }
 \description{
 \code{backbone_from_projection()} extracts the unweighted backbone from the weighted projection of a bipartite network or hypergraph
