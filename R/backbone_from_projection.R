@@ -61,8 +61,8 @@
 #' P <- igraph::bipartite_projection(B, which = "true")  #An ordinary weighted projection...
 #' plot(P)                                               #...is a dense hairball
 #'
-#' backbone <- backbone_from_projection(B)  #A backbone...
-#' plot(backbone)                           #...is sparse with clear communities
+#' bb <- backbone_from_projection(B)  #A backbone...
+#' plot(bb)                           #...is sparse with clear communities
 backbone_from_projection <- function(B,
                                      alpha = 0.05,
                                      model = "sdsm",
@@ -153,6 +153,10 @@ backbone_from_projection <- function(B,
     tempP <- igraph::delete_edges(tempP, which(igraph::E(tempP)$sign==0))  #Delete any edges that should not be retained
     if (!signed) {tempP <- igraph::delete_edge_attr(tempP, "sign")}  #If backbone is not signed, remove edge retention marker
     backbone <- tempP
+    if (!is.null(backbone$name)) {backbone$name <- paste0(model, " backbone of ", backbone$name)}
+    if (is.null(backbone$name)) {backbone$name <- paste0(model, " backbone")}
+    backbone$call <- call
+    backbone$narrative <- text
     }
 
   #### Return ####

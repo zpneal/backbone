@@ -182,6 +182,10 @@ backbone_from_unweighted <- function(U,
     temp <- igraph::delete_edges(temp, which(igraph::E(temp)$keep==0))  #Delete any edges that should not be retained
     temp <- igraph::delete_edge_attr(temp, "keep")  #Delete edge returntion marker
     backbone <- temp
+    if (!is.null(backbone$name)) {backbone$name <- paste0(model, " backbone of ", backbone$name)}
+    if (is.null(backbone$name)) {backbone$name <- paste0(model, " backbone")}
+    backbone$call <- call
+    backbone$narrative <- text
   }
 
   #### Return ####

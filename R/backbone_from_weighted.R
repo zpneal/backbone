@@ -151,6 +151,10 @@ backbone_from_weighted <- function(W,
     if (!signed & (model == "disparity" | model == "lans" | model == "mlf")) {temp <- igraph::delete_edge_attr(temp, "sign")}  #If backbone is not signed, remove edge retention marker
     if (length(parameter)!=2 & (model == "global")) {temp <- igraph::delete_edge_attr(temp, "sign")}  #If backbone is not signed, remove edge retention marker
     backbone <- temp
+    if (!is.null(backbone$name)) {backbone$name <- paste0(model, " backbone of ", backbone$name)}
+    if (is.null(backbone$name)) {backbone$name <- paste0(model, " backbone")}
+    backbone$call <- call
+    backbone$narrative <- text
   }
 
   #### Return ####
