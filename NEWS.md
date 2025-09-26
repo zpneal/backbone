@@ -4,8 +4,11 @@ output: html_document
 ---
 ## backbone 3.0.1
 
-* omit deprecated functions from manual
+* remove deprecated functions from manual
 * replace all remaining `%*%` with `(t)crossprod()`
+* include backbone details as graph attributes when input is an `igraph` object
+* add `backbone()` wrapper function for all input network types
+* speed-ups to `.fixedfill()` null model
 
 ## backbone 3.0.0
 
