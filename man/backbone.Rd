@@ -29,6 +29,11 @@ using the appropriate \verb{backbone_from_*()} function:
 \item If \code{N} is an unweighted network, \code{\link[=backbone_from_unweighted]{backbone_from_unweighted()}}
 }
 
+Designed as a user-friendly wrapper, \code{backbone()} uses the defaults for the underlying functions,
+which should work in many cases, and which can be modified by passing optional arguments. Unlike
+the underlying functions, by default \code{backbone()} displays narrative text describing what it did
+so that you know.
+
 For details about the backbone models, see the documentation for the underlying functions above. For
 an overview of the package with examples, please see the \href{../doc/backbone.html}{Introduction to
 Backbone} using \code{vignette("backbone")}. For a detailed empirical example, please see the
