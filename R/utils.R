@@ -525,3 +525,9 @@ have the weighted projection, cautiously consider using backbone_from_weighted()
   }
 
 }
+
+print.backbone <- function(x, ...) {
+  cat("--- Backbone Object ---\n")
+  cat(x$narrative)
+  invisible(x)
+}

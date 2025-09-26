@@ -159,7 +159,5 @@ backbone_from_projection <- function(B,
 
   #### Return ####
   if (backbone_only) {return(backbone)}
-  if (!backbone_only) {
-    return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call))
-    }
+  if (!backbone_only) {return(structure(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call), class = "backbone"))}
 }

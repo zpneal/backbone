@@ -157,6 +157,6 @@ backbone_from_weighted <- function(W,
 
   #### Return ####
   if (backbone_only) {return(backbone)}
-  if (!backbone_only & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call))}
-  if (!backbone_only & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text, call = call))}
+  if (!backbone_only & (model == "disparity" | model == "lans" | model == "mlf")) {return(structure(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call), class = "backbone"))}
+  if (!backbone_only & (model == "global")) {return(structure(list(weighted = W, backbone = backbone, narrative = text, call = call), class = "backbone"))}
 }
