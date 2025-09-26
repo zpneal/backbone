@@ -10,7 +10,7 @@
 
 #' @export
 print.backbone <- function(x, ...) {
-  cat("--- Backbone Object ---\n")
+  cat("=== Backbone Object ===\n")
   cat(x$narrative)
   invisible(x)
 }

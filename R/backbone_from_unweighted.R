@@ -188,5 +188,5 @@ backbone_from_unweighted <- function(U,
 
   #### Return ####
   if (backbone_only) {return(backbone)}
-  if (!backbone_only) {return(structure(list(original = U, backbone = backbone, narrative = text, call = call), class = "backbone"))}
+  if (!backbone_only) {return(structure(list(unweighted = U, backbone = backbone, narrative = text, call = call), class = "backbone"))}
 }
