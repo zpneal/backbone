@@ -285,25 +285,13 @@ Each of these models involve different ways of scoring, normalizing, and filteri
 
 # Advanced functions {#advanced}
 ## Reproducibility {#advanced-reproduce}
-By default, `backbone_from_` functions return a backbone in the same class (matrix, Matrix, or igraph) as the original network. However, to facilitate transparency and reproducibility, specifying `return = "everything"` returns a list that contains:
-
-* The backbone, in the same class as the original network
-* The original network
-* The weighted projection (for `backbone_from_projection()`)
-* Edgewise p-values (for statistical backbone models)
-* A narrative description of what the function did
-* The function call
+By default, `backbone_from_` functions return a backbone in the same class (matrix, Matrix, or igraph) as the original network. However, to facilitate transparency and reproducibility, specifying `backbone_only = FALSE` returns a `backbone`-class object that can be fully described using `print()`.
 
 For example:
 ```{r}
 B <- matrix(sample(c(0,1), 48, replace = TRUE), 6, 8)  #A simple incidence matrix
-bb <- backbone_from_projection(B, model = "sdsm", alpha = 0.05, backbone_only = FALSE)  #Extract backbone, return everything
-bb$bipartite  #The original bipartite network
-bb$projection  #The weighted projection
-bb$pvalues  #The edgewise p-values
-bb$backbone  #The backbone (as a matrix)
-bb$narrative  #Narrative description
-bb$call  #Function call
+bb <- backbone(B, backbone_only = FALSE)  #Extract backbone, return backbone object
+bb
 ```
 
 [back to Table of Contents](#toc)
