@@ -92,7 +92,7 @@ backbone_from_projection <- function(B,
   # First sentence (descriptive)
   if (signed) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
+  text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
@@ -159,5 +159,5 @@ backbone_from_projection <- function(B,
 
   #### Return ####
   if (backbone_only) {return(backbone)}
-  if (!backbone_only) {return(structure(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call), class = "backbone"))}
+  if (!backbone_only) {return(structure(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, model = model, alpha = alpha, call = call), class = "backbone"))}
 }

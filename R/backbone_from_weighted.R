@@ -96,7 +96,7 @@ backbone_from_weighted <- function(W,
   if (signed & (model == "disparity" | model == "lans" | model == "mlf")) {type <- "signed"} else {type <- "unweighted"}
   if (model == "global" & length(parameter)==2) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
+  text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
@@ -157,6 +157,6 @@ backbone_from_weighted <- function(W,
 
   #### Return ####
   if (backbone_only) {return(backbone)}
-  if (!backbone_only & (model == "disparity" | model == "lans" | model == "mlf")) {return(structure(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call), class = "backbone"))}
-  if (!backbone_only & (model == "global")) {return(structure(list(weighted = W, backbone = backbone, narrative = text, call = call), class = "backbone"))}
+  if (!backbone_only & (model == "disparity" | model == "lans" | model == "mlf")) {return(structure(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, model = model, alpha = alpha, call = call), class = "backbone"))}
+  if (!backbone_only & (model == "global")) {return(structure(list(weighted = W, backbone = backbone, narrative = text, model = model, parameter = parameter, call = call), class = "backbone"))}
 }

@@ -129,7 +129,7 @@ backbone_from_unweighted <- function(U,
 
   #### Construct narrative ####
   # First sentence (descriptive)
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
+  text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
 
   # Second sentence (model and outcome)
   if (model == "skeleton") {desc <- "Karger's (1999) Skeleton backbone"}
@@ -188,5 +188,5 @@ backbone_from_unweighted <- function(U,
 
   #### Return ####
   if (backbone_only) {return(backbone)}
-  if (!backbone_only) {return(structure(list(unweighted = U, backbone = backbone, narrative = text, call = call), class = "backbone"))}
+  if (!backbone_only) {return(structure(list(unweighted = U, backbone = backbone, narrative = text, model = model, parameter = parameter, call = call), class = "backbone"))}
 }
