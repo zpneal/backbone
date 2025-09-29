@@ -9,6 +9,7 @@ output: html_document
 * include backbone details as graph attributes when input is an `igraph` object
 * add `backbone()` wrapper function for all input network types
 * speed-ups to `.fixedfill()` null model
+* specifying `backbone_only = FALSE` returns a `backbone`-class object that can be described using `print()`
 
 ## backbone 3.0.0
 
