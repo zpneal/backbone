@@ -29,8 +29,8 @@ print.backbone <- function(x, ...) {
   if ("bipartite" %in% names(x)) {cat(projection,"\n\n")}
 
   #Backbone
-  if (methods::is(x$backbone, "matrix") | methods::is(x$backbone, "Matrix")) {if (isSymmetric(x$backbone)) {backbone <- paste0("BACKBONE:   Unweighted: ", nrow(x$backbone), " nodes and ", sum(x$backbone)/2, " edges")}}
-  if (methods::is(x$backbone, "matrix") | methods::is(x$backbone, "Matrix")) {if (!isSymmetric(x$backbone)) {backbone <- paste0("BACKBONE:   Unweighted: ", nrow(x$backbone), " nodes and ", sum(x$backbone), " edges")}}
+  if (methods::is(x$backbone, "matrix") | methods::is(x$backbone, "Matrix")) {if (isSymmetric(x$backbone)) {backbone <- paste0("BACKBONE:   Unweighted: ", nrow(x$backbone), " nodes and ", sum(x$backbone!=0)/2, " edges")}}
+  if (methods::is(x$backbone, "matrix") | methods::is(x$backbone, "Matrix")) {if (!isSymmetric(x$backbone)) {backbone <- paste0("BACKBONE:   Unweighted: ", nrow(x$backbone), " nodes and ", sum(x$backbone!=0), " edges")}}
   if (methods::is(x$backbone, "igraph")) {backbone <- paste0("BACKBONE:   Unweighted: ", igraph::gorder(x$backbone), " nodes and ", igraph::gsize(x$backbone), " edges")}
   cat(backbone,"\n")
 
