@@ -155,22 +155,26 @@ B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence mat
                  matrix(rbinom(250,1,.15),10),
                  matrix(rbinom(250,1,.85),10)))
 
-bb <- backbone_from_projection(B, model = "sdsm", return = "everything")  #Extract SDSM matrix, return everything
-expect_equal(length(bb),6)  #Returned object contains six elements
+bb <- backbone_from_projection(B, model = "sdsm", backbone_only = FALSE)  #Extract SDSM matrix, return everything
+expect_equal(length(bb),8)  #Returned object contains eight elements
 expect_true(is(bb$bipartite,"matrix"))
 expect_true(is(bb$projection,"matrix"))
 expect_true(is(bb$backbone,"matrix"))
 expect_true(is(bb$pvalues$upper,"matrix"))
 expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$model,"character"))
+expect_true(is(bb$alpha,"numeric"))
 expect_true(is(bb$call,"call"))
 
-bb <- backbone_from_projection(Matrix::Matrix(B), model = "sdsm", return = "everything")  #Extract SDSM Matrix, return everything
-expect_equal(length(bb),6)  #Returned object contains six elements
+bb <- backbone_from_projection(Matrix::Matrix(B), model = "sdsm", backbone_only = FALSE)  #Extract SDSM Matrix, return everything
+expect_equal(length(bb),8)  #Returned object contains eight elements
 expect_true(is(bb$bipartite,"Matrix"))
 expect_true(is(bb$projection,"Matrix"))
 expect_true(is(bb$backbone,"Matrix"))
 expect_true(is(bb$pvalues$upper,"matrix"))
 expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$model,"character"))
+expect_true(is(bb$alpha,"numeric"))
 expect_true(is(bb$call,"call"))
 
 bb <- backbone_from_projection(B, model = "sdsm", signed = TRUE)  #Extract SDSM matrix as signed
@@ -241,8 +245,8 @@ B <- igraph::graph_from_biadjacency_matrix(B)          #Convert to igraph
 igraph::V(B)$agent_attrib <- c(c(1:30),rep(NA,75))     #Add agent attribute
 igraph::V(B)$artifact_attrib <- c(rep(NA,30),c(1:75))  #Add artifact attribute
 
-bb <- backbone_from_projection(B, model = "sdsm", return = "everything")  #Extract SDSM igraph, return everything
-expect_equal(length(bb),6)  #Returned object contains six elements
+bb <- backbone_from_projection(B, model = "sdsm", backbone_only = FALSE)  #Extract SDSM igraph, return everything
+expect_equal(length(bb),8)  #Returned object contains eight elements
 expect_equal(class(bb$bipartite)[1],"igraph")
 expect_true(igraph::is_bipartite(bb$bipartite))
 expect_equal(class(bb$projection)[1],"igraph")
@@ -251,6 +255,8 @@ expect_equal(class(bb$backbone)[1],"igraph")
 expect_false(igraph::is_directed(bb$backbone))
 expect_equal(class(bb$pvalues$upper)[1],"matrix")
 expect_equal(class(bb$narrative)[1],"character")
+expect_true(is(bb$model,"character"))
+expect_true(is(bb$alpha,"numeric"))
 expect_equal(class(bb$call)[1],"call")
 
 bb <- backbone_from_projection(B, model = "sdsm")                              #Extract SDSM igraph with defaults
@@ -304,21 +310,25 @@ W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
               0,0,0,0,0,100,10,10,0,10,
               0,0,0,0,0,100,10,10,10,0),10)
 
-bb <- backbone_from_weighted(W, model = "disparity", return = "everything")  #Extract disparity backbone, return everything
-expect_equal(length(bb),5)  #Returned object contains five elements
+bb <- backbone_from_weighted(W, model = "disparity", backbone_only = FALSE)  #Extract disparity backbone, return everything
+expect_equal(length(bb),7)  #Returned object contains seven elements
 expect_true(is(bb$weighted,"matrix"))
 expect_true(is(bb$backbone,"matrix"))
 expect_true(is(bb$pvalues$upper,"matrix"))
 expect_true(is(bb$narrative,"character"))
+expect_true(is(bb$model,"character"))
+expect_true(is(bb$alpha,"numeric"))
 expect_true(is(bb$call,"call"))
 
-bb <- backbone_from_weighted(Matrix::Matrix(W), model = "disparity", return = "everything")  #Extract disparity backbone, return everything
-expect_equal(length(bb),5)  #Returned object contains five elements
+bb <- backbone_from_weighted(Matrix::Matrix(W), model = "disparity", backbone_only = FALSE)  #Extract disparity backbone, return everything
+expect_equal(length(bb),7)  #Returned object contains seven elements
 expect_true(is(bb$weighted,"Matrix"))
 expect_true(is(bb$backbone,"Matrix"))
 expect_true(is(bb$pvalues$upper,"matrix"))
 expect_true(is(bb$narrative,"character"))
 expect_true(is(bb$call,"call"))
+expect_true(is(bb$model,"character"))
+expect_true(is(bb$alpha,"numeric"))
 
 bb <- backbone_from_weighted(W, model = "disparity")  #Extract disparity backbone
 expect_true(is(bb,"matrix"))                          #Returns as matrix
@@ -426,13 +436,15 @@ W <- igraph::graph_from_biadjacency_matrix(W)
 W <- igraph::bipartite_projection(W, which = "false")
 igraph::V(W)$agent_attrib <- c(c(1:30))     #Add agent attribute
 
-bb <- backbone_from_weighted(W, model = "disparity", return = "everything")  #Extract disparity igraph, return everything
-expect_equal(length(bb),5)  #Returned object contains five elements
+bb <- backbone_from_weighted(W, model = "disparity", backbone_only = FALSE)  #Extract disparity igraph, return everything
+expect_equal(length(bb),7)  #Returned object contains seven elements
 expect_equal(class(bb$weighted)[1],"igraph")
 expect_equal(class(bb$backbone)[1],"igraph")
 expect_equal(class(bb$pvalues$upper)[1],"matrix")
 expect_equal(class(bb$narrative)[1],"character")
 expect_equal(class(bb$call)[1],"call")
+expect_true(is(bb$model,"character"))
+expect_true(is(bb$alpha,"numeric"))
 
 bb <- backbone_from_weighted(W, model = "disparity", alpha = 0.25)            #Extract unweighted disparity igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
@@ -595,122 +607,185 @@ expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also miss
 #skeleton (no particular structure expected in backbone)
 U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
 
-test <- backbone_from_unweighted(U, model = "skeleton", parameter = .5, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "skeleton", parameter = .5, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-test2 <- backbone_from_unweighted(U, model = "skeleton", parameter = .3, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "skeleton", parameter = .3, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
 
 #gspar
-test <- backbone_from_unweighted(U, model = "gspar", parameter = .5, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "gspar", parameter = .5, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "gspar", parameter = .3, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "gspar", parameter = .3, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
 
 #lspar
-test <- backbone_from_unweighted(U, model = "lspar", parameter = .5, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "lspar", parameter = .5, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "lspar", parameter = .3, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "lspar", parameter = .3, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
 
 #simmelian
-test <- backbone_from_unweighted(U, model = "simmelian", parameter = .5, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "simmelian", parameter = .5, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "simmelian", parameter = .7, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "simmelian", parameter = .7, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
 #jaccard
-test <- backbone_from_unweighted(U, model = "jaccard", parameter = .3, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "jaccard", parameter = .3, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "jaccard", parameter = .5, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "jaccard", parameter = .5, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
 #meetmin
-test <- backbone_from_unweighted(U, model = "meetmin", parameter = .5, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "meetmin", parameter = .5, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "meetmin", parameter = .7, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "meetmin", parameter = .7, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
 #geometric
-test <- backbone_from_unweighted(U, model = "geometric", parameter = .3, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "geometric", parameter = .3, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "geometric", parameter = .5, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "geometric", parameter = .5, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
 #hyper
-test <- backbone_from_unweighted(U, model = "hyper", parameter = .6, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "hyper", parameter = .6, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "hyper", parameter = .8, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "hyper", parameter = .8, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
 #quadrilateral
-test <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .3, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .3, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
-test2 <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .5, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .5, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
 #degree
 U <- igraph::sample_pa(n = 60, m = 3, directed = FALSE)  #A dense, scale-free network
-test <- backbone_from_unweighted(U, model = "degree", parameter = .5, return = "everything")
-expect_true(length(test)==4)  #Returned object has four elements
+test <- backbone_from_unweighted(U, model = "degree", parameter = .5, backbone_only = FALSE)
+expect_true(length(test)==6)  #Returned object has six elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
-expect_true(all.equal(U,test$original))  #Original element matches starting graph
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
+expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(which.max(igraph::degree(U)) == which.max(igraph::degree(test$backbone)))  #Backbone preserves highest-degree node
 expect_true(cor(igraph::degree(U),igraph::degree(test$backbone)) > 0.75)  #Backbone preserves degree distribution
-test2 <- backbone_from_unweighted(U, model = "degree", parameter = .2, return = "everything")
+test2 <- backbone_from_unweighted(U, model = "degree", parameter = .2, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
+
+#### Wrapper Function ####
+#When input is bipartite
+trace <- function(x){sum(diag(x))}
+matcube <- function(x){x%*%x%*%x}
+triangle_index <- function(x){(trace(matcube(x)) + trace(matcube(abs(x))))/(2 * trace(matcube(abs(x))))}
+B <- rbind(cbind(matrix(rbinom(250,1,.85),10),   #An example block incidence matrix
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10),
+                 matrix(rbinom(250,1,.15),10)),
+           cbind(matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.15),10),
+                 matrix(rbinom(250,1,.85),10)))
+bb <- backbone(B, signed = TRUE)  #Extract signed backbone using defaults
+expect_true(is(bb,"matrix"))         #Returns as matrix
+expect_true(all(bb %in% c(-1,0,1)))  #Contains only -1, 0, 1
+expect_true(any(bb %in% c(-1)))      #Contains some negative edges
+expect_true(any(bb %in% c(0)))       #Contains some missing edges
+expect_true(any(bb %in% c(1)))       #Contains some positive edges
+expect_true(triangle_index(bb)>.8)   #Is nearly balanced
+
+#When input is weighted
+W <- matrix(c(0,10,10,10,10,75,0,0,0,0,
+              10,0,1,1,1,0,0,0,0,0,
+              10,1,0,1,1,0,0,0,0,0,
+              10,1,1,0,1,0,0,0,0,0,
+              10,1,1,1,0,0,0,0,0,0,
+              75,0,0,0,0,0,100,100,100,100,
+              0,0,0,0,0,100,0,10,10,10,
+              0,0,0,0,0,100,10,0,10,10,
+              0,0,0,0,0,100,10,10,0,10,
+              0,0,0,0,0,100,10,10,10,0),10)
+bb <- backbone(W)  #Extract backbone using defaults
+expect_true(is(bb,"matrix"))                          #Returns as matrix
+bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
+expect_true(igraph::is_tree(bb))                      #Backbone is a tree
+
+#When input is unweighted
+U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
+bb <- backbone(U)  #Extract backbone using defaults
+expect_true(igraph::modularity(bb, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity

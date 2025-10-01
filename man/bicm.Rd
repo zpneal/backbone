@@ -9,7 +9,7 @@ bicm(M, fitness = FALSE, tol = 1e-08, max_steps = 200, ...)
 \arguments{
 \item{M}{matrix: a binary matrix}
 
-\item{fitness}{boolean: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only}
+\item{fitness}{logical: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only}
 
 \item{tol}{numeric, tolerance of algorithm}
 

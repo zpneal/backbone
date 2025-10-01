@@ -5,12 +5,12 @@
 #' @param W A weighted network as a valued adjacency matrix or \link[Matrix]{Matrix}, or a weighted unipartite \link[igraph]{igraph} object
 #' @param model string: backbone model, one of: \code{"disparity"}, \code{"lans"}, \code{"mlf"}, or \code{"global"}
 #' @param alpha real: significance level of hypothesis test(s) in statistical models
-#' @param signed boolean: return a signed backbone from a statistical model
+#' @param signed logical: return a signed backbone from a statistical model
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
 #' @param parameter real: parameter used to control structural backbone models
-#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
-#' @param narrative boolean: display suggested text & citations
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param missing_as_zero logical: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone
+#' @param narrative logical: display suggested text & citations
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #'
 #' @details
 #' The \code{backbone_from_weighted} function extracts the backbone from a weighted unipartite network. The backbone is an unweighted
@@ -35,9 +35,7 @@
 #' The models implemented in \code{backbone_from_weighted()} can be applied to a weighted network that was obtained by projecting a
 #' bipartite network or hypergraph. However, if the original bipartite network or hypergraph is available, it is better to use [backbone_from_projection()].
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{W}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise
-#' p-values, a narrative description, and the original function call.
+#' @return A backbone in the same class as \code{W}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
@@ -77,49 +75,12 @@ backbone_from_weighted <- function(W,
                                    parameter = 0,
                                    missing_as_zero = FALSE,
                                    narrative = FALSE,
-                                   return = "backbone") {
+                                   backbone_only = TRUE) {
 
   call <- match.call()
 
-  #### Check parameters ####
-  #All models
-  if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
-  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
-  if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
-
-  #Statistical models
-  if (model %in% c("disparity", "lans", "mlf")) {
-    if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
-    if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
-    if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
-    if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
-  }
-
-  #Structural models
-  if (model %in% c("global")) {
-    if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
-    if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
-  }
-
-  #### Check and format input ####
-  #Check that input is a weighted adjacency matrix or weighted unipartite igraph
-  if (!methods::is(W,"matrix") & !methods::is(W,"Matrix") & !methods::is(W,"igraph")) {stop("`W` must be an adjacency matrix or Matrix, or an igraph object")}
-
-  if (methods::is(W,"matrix")) {
-    if (dim(as.matrix(W))[1] != dim(as.matrix(W))[2]) {stop("`W` must be a square adjacency matrix")}
-    if (all(as.matrix(W) %in% c(0,1))) {stop("The entries of `W` must represent edge weights")}
-  }
-
-  if (methods::is(W,"igraph")) {
-    if (igraph::is_bipartite(W)) {stop("`W` must be a unipartite igraph object")}
-    if (!"weight" %in% igraph::edge_attr_names(W)) {stop("`W` must contain an edge weight attribute")}
-    }
-
-  #Convert input to adjacency matrix
-  if (methods::is(W,"matrix")) {A <- W}  #matrix --> matrix
-  if (methods::is(W,"Matrix")) {A <- as.matrix(W)}  #Matrix --> matrix
-  if (methods::is(W,"igraph")) {A <- igraph::as_adjacency_matrix(W, names = FALSE, sparse = FALSE, attr = "weight")}
+  #### Check parameters and input ####
+  A <- .check_and_coerce(N = W, source = "weighted", model = model, alpha = alpha, parameter = parameter, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, backbone_only = backbone_only)
 
   #### Statistical Models ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}
@@ -135,7 +96,7 @@ backbone_from_weighted <- function(W,
   if (signed & (model == "disparity" | model == "lans" | model == "mlf")) {type <- "signed"} else {type <- "unweighted"}
   if (model == "global" & length(parameter)==2) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
+  text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the ", type, " backbone of a weighted network containing ", nrow(A), " nodes.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
@@ -188,10 +149,14 @@ backbone_from_weighted <- function(W,
     if (!signed & (model == "disparity" | model == "lans" | model == "mlf")) {temp <- igraph::delete_edge_attr(temp, "sign")}  #If backbone is not signed, remove edge retention marker
     if (length(parameter)!=2 & (model == "global")) {temp <- igraph::delete_edge_attr(temp, "sign")}  #If backbone is not signed, remove edge retention marker
     backbone <- temp
+    if (!is.null(backbone$name)) {backbone$name <- paste0(model, " backbone of ", backbone$name)}
+    if (is.null(backbone$name)) {backbone$name <- paste0(model, " backbone")}
+    backbone$call <- call
+    backbone$narrative <- text
   }
 
   #### Return ####
-  if (return == "backbone") {return(backbone)}
-  if (return == "everything" & (model == "disparity" | model == "lans" | model == "mlf")) {return(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, call = call))}
-  if (return == "everything" & (model == "global")) {return(list(weighted = W, backbone = backbone, narrative = text, call = call))}
+  if (backbone_only) {return(backbone)}
+  if (!backbone_only & (model == "disparity" | model == "lans" | model == "mlf")) {return(structure(list(weighted = W, backbone = backbone, pvalues = p, narrative = text, model = model, alpha = alpha, call = call), class = "backbone"))}
+  if (!backbone_only & (model == "global")) {return(structure(list(weighted = W, backbone = backbone, narrative = text, model = model, parameter = parameter, call = call), class = "backbone"))}
 }

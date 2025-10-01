@@ -8,25 +8,25 @@
 #' @param escore string: Method for scoring edges' importance
 #' @param normalize string: Method for normalizing edge scores
 #' @param filter string: Type of filter to apply
-#' @param umst boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
-#' @param narrative boolean: display suggested text & citations
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param umst logical: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
+#' @param narrative logical: display suggested text & citations
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #'
 #' @details
 #' The \code{backbone_from_unweighted} function extracts the backbone from an unweighted unipartite network. The backbone is an
 #' unweighted unipartite network that contains only edges preserved by a backbone model.
 #'
 #' The following backbone models are available using the \code{model} parameter:
-#' * \code{skeleton} - Skeleton backbone (Karger, 1999) 
-#' * \code{gspar} - Global Sparsification (Satuluri et al., 2011) 
+#' * \code{skeleton} - Skeleton backbone (Karger, 1999)
+#' * \code{gspar} - Global Sparsification (Satuluri et al., 2011)
 #' * \code{lspar} - Local Sparsification (Satuluri et al., 2011)
-#' * \code{simmelian} - Simmelian backbone (Nick et al., 2013) 
-#' * \code{jaccard} - Jaccard backbone (Goldberg and Roth, 2003) 
-#' * \code{meetmin} - MeetMin backbone (Goldberg and Roth, 2003) 
-#' * \code{geometric} - Geometric backbone (Goldberg and Roth, 2003) 
-#' * \code{hyper} - Hypergeometric backbone, (Goldberg and Roth, 2003) 
-#' * \code{degree} - Local Degree backbone (Hamann et al, 2016) 
-#' * \code{quadrilateral} - Quadrilateral Simmelian backbone (Nocaj et al, 2015) 
+#' * \code{simmelian} - Simmelian backbone (Nick et al., 2013)
+#' * \code{jaccard} - Jaccard backbone (Goldberg and Roth, 2003)
+#' * \code{meetmin} - MeetMin backbone (Goldberg and Roth, 2003)
+#' * \code{geometric} - Geometric backbone (Goldberg and Roth, 2003)
+#' * \code{hyper} - Hypergeometric backbone, (Goldberg and Roth, 2003)
+#' * \code{degree} - Local Degree backbone (Hamann et al, 2016)
+#' * \code{quadrilateral} - Quadrilateral Simmelian backbone (Nocaj et al, 2015)
 #' * \code{custom} - A custom backbone model specified by \code{escore}, \code{normalize}, \code{filter}, and \code{umst}
 #'
 #' The \code{escore} parameter determines how an unweighted edge's importance is calculated.
@@ -55,9 +55,7 @@
 #' * \code{lans}: Applies locally adaptive network sparsification using [backbone_from_weighted()]
 #' * \code{mlf}: Applies the marginal likelihood filter using [backbone_from_weighted()]
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{U}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original unweighted network, a narrative description, and the original
-#' function call.
+#' @return A backbone in the same class as \code{U}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
@@ -90,17 +88,11 @@ backbone_from_unweighted <- function(U,
                                      filter,
                                      umst,
                                      narrative = FALSE,
-                                     return = "backbone") {
+                                     backbone_only = TRUE) {
 
   call <- match.call()
 
-  #### Check parameters ####
-  #All models
-  if (!(model %in% c("custom", "skeleton", "gspar", "lspar", "simmelian", "jaccard", "meetmin", "geometric", "hyper", "degree", "quadrilateral"))) {stop("`model` must be one of: \"custom\", \"skeleton\", \"gspar\", \"lspar\", \"simmelian\", \"jaccard\", \"meetmin\", \"geometric\", \"hyper\", \"degree\", \"quadrilateral\"")}
-  if (!is.numeric(parameter)) {stop("`parameter` must be a numeric value")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
-  if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
-
+  #### Check parameters and input ####
   #If existing model specification, set model parameters
   if (model == "skeleton") {escore <- "random"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
   if (model == "gspar") {escore <- "jaccard"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
@@ -112,37 +104,7 @@ backbone_from_unweighted <- function(U,
   if (model == "hyper") {escore <- "hypergeometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
   if (model == "degree") {escore <- "degree"; normalize <- "rank"; filter <- "degree"; umst <- FALSE}
   if (model == "quadrilateral") {escore <- "quadrilateral"; normalize <- "embeddedness"; filter <- "threshold"; umst <- TRUE}
-
-  #If custom model specification, check model parameters
-  if (model == "custom") {
-    if (!(escore %in% c("random", "betweenness", "triangles", "jaccard", "dice", "quadrangles", "quadrilateral", "degree", "meetmin", "geometric" , "hypergeometric"))) {stop("`escore` must be one of: \"random\", \"betweenness\", \"triangles\", \"jaccard\", \"dice\", \"quadrangles\", \"quadrilateral\", \"degree\", \"meetmin\", \"geometric\" , \"hypergeometric\"")}
-    if (!(normalize %in% c("none", "rank", "embeddedness"))) {stop("`normalize` must be one of: \"none\", \"rank\", \"embeddedness\"")}
-    if (!(filter %in% c("threshold", "proportion", "degree", "disparity", "lans", "mlf"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\", \"lans\", \"mlf\"")}
-    if (!is.logical(umst)) {stop("`umst` must be either TRUE or FALSE")}
-    if (normalize=="rank" & filter!="degree") {stop("Using normalize=\"rank\" requires that filter=\"degree\"")}
-    if (normalize!="rank" & filter=="degree") {stop("Using filter=\"degree\" requires that normalize=\"rank\"")}
-  }
-
-  #### Check and format input ####
-  #Check that input is a weighted adjacency matrix or weighted unipartite igraph
-  if (!methods::is(U,"matrix") & !methods::is(U,"Matrix") & !methods::is(U,"igraph")) {stop("`U` must be an adjacency matrix or Matrix, or an igraph object")}
-
-  if (methods::is(U,"matrix")) {
-    if (dim(as.matrix(U))[1] != dim(as.matrix(U))[2]) {stop("`U` must be a symmetric adjacency matrix")}
-    if (!all(as.matrix(U) %in% c(0,1))) {stop("The entries of `U` must be either 0 or 1")}
-    if (!isSymmetric(as.matrix(U))) {stop("`U` must be a symmetric adjacency matrix")}
-  }
-
-  if (methods::is(U,"igraph")) {
-    if (igraph::is_bipartite(U)) {stop("`U` must be an undirected unipartite igraph object")}
-    if (igraph::is_directed(U)) {stop("`U` must be an undirected unipartite igraph object")}
-    if ("weight" %in% igraph::edge_attr_names(U)) {stop("An edge weight attribute is present in `U`, but will be ignored")}
-  }
-
-  #Convert input to adjacency matrix
-  if (methods::is(U,"matrix")) {A <- U}  #matrix --> matrix
-  if (methods::is(U,"Matrix")) {A <- as.matrix(U)}  #Matrix --> matrix
-  if (methods::is(U,"igraph")) {A <- igraph::as_adjacency_matrix(U, names = FALSE, sparse = FALSE)}
+  A <- .check_and_coerce(N = U, source = "unweighted", model = model, parameter = parameter, escore = escore, normalize = normalize, filter = filter, umst = umst, narrative = narrative, backbone_only = backbone_only)
 
   #### Compute edge scores ####
   G <- .escore(A, escore = escore)
@@ -167,7 +129,7 @@ backbone_from_unweighted <- function(U,
 
   #### Construct narrative ####
   # First sentence (descriptive)
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
+  text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
 
   # Second sentence (model and outcome)
   if (model == "skeleton") {desc <- "Karger's (1999) Skeleton backbone"}
@@ -218,9 +180,13 @@ backbone_from_unweighted <- function(U,
     temp <- igraph::delete_edges(temp, which(igraph::E(temp)$keep==0))  #Delete any edges that should not be retained
     temp <- igraph::delete_edge_attr(temp, "keep")  #Delete edge returntion marker
     backbone <- temp
+    if (!is.null(backbone$name)) {backbone$name <- paste0(model, " backbone of ", backbone$name)}
+    if (is.null(backbone$name)) {backbone$name <- paste0(model, " backbone")}
+    backbone$call <- call
+    backbone$narrative <- text
   }
 
   #### Return ####
-  if (return == "backbone") {return(backbone)}
-  if (return == "everything") {return(list(original = U, backbone = backbone, narrative = text, call = call))}
+  if (backbone_only) {return(backbone)}
+  if (!backbone_only) {return(structure(list(unweighted = U, backbone = backbone, narrative = text, model = model, parameter = parameter, call = call), class = "backbone"))}
 }

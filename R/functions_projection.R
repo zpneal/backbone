@@ -16,29 +16,6 @@
 .fixedfill <- function(I, missing_as_zero, signed){
 
   #### Define helper functions ####
-  # Compute log of k! ##
-  logsum <- function(k){
-    if (k==0){
-      return(0)
-    }
-    return(sum(log(1:k)))
-  }
-
-  # Compute log of (n choose k) ##
-  logbinom <- function(n,k){
-    if (k == 0){
-      return(0)
-    }
-    else if (k == 1){
-      return(log(n))
-    }
-    else {
-      x <- sum(log(n:(n-k+1)))
-      y <- sum(log(k:1))
-      return(x-y)
-    }
-  }
-
   prob_log <- function(k) {
     lb <- max(0, n + k - f)
     ub <- min(n - k, (m - 1) * n + k - f)
@@ -46,7 +23,7 @@
     logvalues <- matrix(0, nrow = 1, ncol = length(range))
     i = 1
     for (r in range){
-      logvalues[i] <- (log(2^(n-k-r))+logsum(n)-logsum(k)-logsum(r)-logsum(n-k-r)+logbinom((m-2)*n,f-n-k+r)-logbinom(m*n,f))
+      logvalues[i] <- (log(2^(n-k-r))+lfactorial(n)-lfactorial(k)-lfactorial(r)-lfactorial(n-k-r)+lchoose((m-2)*n,f-n-k+r)-lchoose(m*n,f))
       i <- i+1
     }
     return(sum((exp(logvalues))))
@@ -71,7 +48,7 @@
   if (signed) {
     lower <- apply(P, c(1,2), FUN = function(k)sum(probs[1:(k+1)]))  #Sum of probabilities 0 <= k <= Pij
     diag(lower) <- NA
-    }
+  }
 
   #### If missing edges should *not* be treated as having zero weight, remove p-value and do not consider for backbone ####
   if (!missing_as_zero) {
@@ -81,7 +58,7 @@
 
   if (signed) {return(list(lower = lower, upper = upper))}
   if (!signed) {return(list(upper = upper))}
-  }
+}
 
 #' Compute edgewise p-values under the Fixed Row Model
 #'

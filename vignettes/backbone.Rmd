@@ -33,24 +33,25 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     b. [Installing and loading the package](#loading)
     c. [Package overview](#overview)
     d. [Supported data formats](#formats)
-2. [Weighted networks](#weighted)
+2. [tl;dr (the `backbone()` wrapper)](#tldr)
+3. [Weighted networks](#weighted)
     a. [Background](#weight-background)
     b. [Structural models](#weight-structural)
     c. [Statistical models](#weight-statistical)
-3. [Weighted projections](#projection)
+4. [Weighted projections](#projection)
     a. [Background](#proj-background)
     b. [Statistical models](#proj-statistical)
-4. [Unweighted networks](#unweighted)
+5. [Unweighted networks](#unweighted)
     a. [Background](#unweight-background)
     b. [Structural models](#unweight-structural)
-5. [Advanced functions](#advanced)
+6. [Advanced functions](#advanced)
     a. [Reproducibility](#advanced-reproduce)
     b. [Signed backbones](#advanced-signed)
     c. [Custom backbones](#advanced-custom)
-5. [Utility functions](#utility)
+7. [Utility functions](#utility)
     a. [Matrix randomization](#randomization)
     b. [Bipartite Configuration Model (BiCM)](#bicm)
-6. [References](#references)
+8. [References](#references)
 
 # Introduction {#introduction}
 
@@ -84,9 +85,9 @@ The primary use of the backbone package is backbone extraction, that is, identif
 
 * You begin with some network data `dat`, which may take the form of an an adjacency/incidence matrix or Matrix, or an igraph object.
 
-* Depending on the type of network contained in `dat` (e.g., weighted, bipartite, unweighted), you run the applicable backbone function (`backbone_from_projection()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`), which returns a backbone of the same class as `dat`.
+* You can run `backbone()`, which will detect your type of network and extract the backbone using an appropriate model and reasonable defaults. Or, depending on the type of network contained in `dat` (e.g., weighted, bipartite, unweighted), you can run the applicable underlying backbone function (`backbone_from_projection()`, `backbone_from_weighted()`, or `backbone_from_unweighted()`). In all cases, these functions return a backbone of the same class as `dat`, so your workflow isn't interrupted.
 
-* Each of these functions includes a `narrative` parameter. Setting `narrative = TRUE` displays narrative text describing the backbone extraction with the relevant citations. This text is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
+* By default, `backbone()` displays narrative text describing the backbone extraction with the relevant citations. This narrative is also available optionally from the other functions using `narrative = TRUE`. It is suitable for use in manuscripts, and ensures complete and consistent reporting of the backbone extraction.
 
 The sections below describe and illustrate the backbone functions applicable to different types of networks, including [weighted networks](#weighted), [weighted projections](#projection), and [unweighted networks](#unweighted). Additionally, the package contains some [utility functions](#utility) that are used by the backbone methods, but may also have independent applications.
 
@@ -102,6 +103,17 @@ The functions in the backbone package support three data formats that can be use
 The backbone package does not support *edgelist* formats because these can be ambiguous when isolated nodes are present. It also does not support *network* objects from the `network` package (from the `statnet` family of packages) because these require loading many dependencies. You can convert a `network` bipartite graph into an incidence matrix using `network::as.matrix.network(graph, type = "incidence")`, and can convert a `network` unipartite graph into an adjacency matrix using `network::as.matrix.network(graph, type = "adjacency")`.
 
 [back to Table of Contents](#toc)
+
+# tl;dr (the `backbone()` wrapper) {#tldr}
+OK, so you just want to extract the backbone from a network. This is possible using the `backbone()` wrapper.
+```{r}
+my_network <- sample_gnp(100, .5)  #A random network
+my_network
+backbone <- backbone(my_network)  #Extract the backbone
+backbone
+```
+
+Given a network called `my_network`, running `backbone()` will extract the backbone using some reasonable defaults and will display a description of what it did.
 
 # Weighted networks {#weighted}
 ## Background {#weight-background}
@@ -273,25 +285,13 @@ Each of these models involve different ways of scoring, normalizing, and filteri
 
 # Advanced functions {#advanced}
 ## Reproducibility {#advanced-reproduce}
-By default, `backbone_from_` functions return a backbone in the same class (matrix, Matrix, or igraph) as the original network. However, to facilitate transparency and reproducibility, specifying `return = "everything"` returns a list that contains:
-
-* The backbone, in the same class as the original network
-* The original network
-* The weighted projection (for `backbone_from_projection()`)
-* Edgewise p-values (for statistical backbone models)
-* A narrative description of what the function did
-* The function call
+By default, `backbone_from_` functions return a backbone in the same class (matrix, Matrix, or igraph) as the original network. However, to facilitate transparency and reproducibility, specifying `backbone_only = FALSE` returns a `backbone`-class object that can be fully described using `print()`.
 
 For example:
 ```{r}
-B <- matrix(sample(c(0,1), 18, replace = TRUE), 3, 6)  #A simple incidence matrix
-bb <- backbone_from_projection(B, model = "sdsm", alpha = 0.05, return = "everything")  #Extract backbone, return everything
-bb$bipartite  #The original bipartite network
-bb$projection  #The weighted projection
-bb$pvalues  #The edgewise p-values
-bb$backbone  #The backbone (as a matrix)
-bb$narrative  #Narrative description
-bb$call  #Function call
+B <- matrix(sample(c(0,1), 48, replace = TRUE), 6, 8)  #A simple incidence matrix
+bb <- backbone(B, backbone_only = FALSE)  #Extract backbone, return backbone object
+bb
 ```
 
 [back to Table of Contents](#toc)

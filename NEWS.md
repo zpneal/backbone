@@ -2,6 +2,15 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 3.0.1
+
+* remove deprecated functions from manual
+* replace all remaining `%*%` with `(t)crossprod()`
+* include backbone details as graph attributes when input is an `igraph` object
+* add `backbone()` wrapper function for all input network types
+* speed-ups to `.fixedfill()` null model
+* specifying `backbone_only = FALSE` returns a `backbone`-class object that can be described using `print()`
+
 ## backbone 3.0.0
 
 * all functions re-written to be modular, to facilitate future extensions

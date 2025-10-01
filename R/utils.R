@@ -8,6 +8,69 @@
   packageStartupMessage("|____/  Beta: type devtools::install_github(\"zpneal/backbone\", ref = \"devel\")")
 }
 
+#' @export
+print.backbone <- function(x, ...) {
+  #Header
+  cat("\n=== SUMMARY OF BACKBONE OBJECT ===\n")
+
+  #Source network
+  if ("bipartite" %in% names(x) & (methods::is(x$bipartite, "matrix") | methods::is(x$bipartite, "Matrix"))) {source <- paste0("ORIGINAL:   Bipartite with ", nrow(x$bipartite), " agents, ", ncol(x$bipartite), " artifacts, and ", sum(x$bipartite), " edges")}
+  if ("bipartite" %in% names(x) & (methods::is(x$bipartite, "igraph"))) {source <- paste0("ORIGINAL:   Bipartite with ", as.numeric(table(igraph::V(x$bipartite)$type)[1]), " agents, ", as.numeric(table(igraph::V(x$bipartite)$type)[2]), " artifacts, and ", igraph::gsize(x$bipartite), " edges")}
+  if ("weighted" %in% names(x) & (methods::is(x$weighted, "matrix") | methods::is(x$weighted, "Matrix"))) {if (isSymmetric(x$weighted)) {source <- paste0("ORIGINAL:   Weighted with ", nrow(x$weighted), " nodes and ", sum(x$weighted > 0)/2, " edges (weights: ", round(min(x$weighted[which(x$weighted!=0)]),2), " - ", round(max(x$weighted[which(x$weighted!=0)]),2), ")")}}
+  if ("weighted" %in% names(x) & (methods::is(x$weighted, "matrix") | methods::is(x$weighted, "Matrix"))) {if (!isSymmetric(x$weighted)) {source <- paste0("ORIGINAL:   Weighted with ", nrow(x$weighted), " nodes and ", sum(x$weighted > 0), " edges (weights: ", round(min(x[which(x$weighted!=0)]),2), " - ", round(max(x$weighted[which(x$weighted!=0)]),2), ")")}}
+  if ("weighted" %in% names(x) & (methods::is(x$weighted, "igraph"))) {source <- paste0("ORIGINAL:   Weighted with ", igraph::gorder(x$weighted), " nodes and ", igraph::gsize(x$weighted), " edges (weights: ", round(min(igraph::E(x$weighted)$weight),2), " - ", round(max(igraph::E(x$weighted)$weight),2), ")")}
+  if ("unweighted" %in% names(x) & (methods::is(x$unweighted, "matrix") | methods::is(x$unweighted, "Matrix"))) {source <- paste0("ORIGINAL:   Unweighted with ", nrow(x$unweighted), " nodes and ", sum(x$unweighted > 0), " edges")}
+  if ("unweighted" %in% names(x) & (methods::is(x$unweighted, "igraph"))) {source <- paste0("ORIGINAL:   Unweighted with ", igraph::gorder(x$unweighted), " nodes and ", igraph::gsize(x$unweighted), " edges")}
+  cat(source,"\n\n")
+
+  #Projection (if present)
+  if ("bipartite" %in% names(x) & (methods::is(x$bipartite, "matrix") | methods::is(x$bipartite, "Matrix"))) {projection <- paste0("PROJECTION: Weighted with ", nrow(x$projection), " nodes and ", sum(x$projection > 0)/2, " edges (weights: ", round(min(x$projection[which(x$projection!=0)]),2), " - ", round(max(x$projection[which(x$projection!=0)]),2), ")")}
+  if ("bipartite" %in% names(x) & (methods::is(x$bipartite, "igraph"))) {projection <- paste0("PROJECTION: Weighted with ", igraph::gorder(x$projection), " nodes and ", igraph::gsize(x$projection), " edges (weights: ", round(min(igraph::E(x$projection)$weight),2), " - ", round(max(igraph::E(x$projection)$weight),2), ")")}
+  if ("bipartite" %in% names(x)) {cat(projection,"\n\n")}
+
+  #Backbone
+  if ("lower" %in% names(x$pvalues)) {type <- "Signed with "} else {type <- "Unweighted with "}
+  if (methods::is(x$backbone, "matrix") | methods::is(x$backbone, "Matrix")) {if (isSymmetric(x$backbone)) {backbone <- paste0("BACKBONE:   ", type, nrow(x$backbone), " nodes and ", sum(x$backbone!=0)/2, " edges")}}
+  if (methods::is(x$backbone, "matrix") | methods::is(x$backbone, "Matrix")) {if (!isSymmetric(x$backbone)) {backbone <- paste0("BACKBONE:   ", type, nrow(x$backbone), " nodes and ", sum(x$backbone!=0), " edges")}}
+  if (methods::is(x$backbone, "igraph")) {backbone <- paste0("BACKBONE:   ", type, igraph::gorder(x$backbone), " nodes and ", igraph::gsize(x$backbone), " edges")}
+  cat(backbone,"\n")
+
+  #Model
+  if (x$model == "sdsm") {model <- paste0("   Model:   Stochastic Degree Sequence with alpha = ", x$alpha)}
+  if (x$model == "fdsm") {model <- paste0("   Model:   Fixed Degree Sequence with alpha = ", x$alpha)}
+  if (x$model == "fixedrow") {model <- paste0("   Model:   Fixed Row with alpha = ", x$alpha)}
+  if (x$model == "fixedcol") {model <- paste0("   Model:   Fixed Column with alpha = ", x$alpha)}
+  if (x$model == "fixedfill") {model <- paste0("   Model:   Fixed Fill with alpha = ", x$alpha)}
+  if (x$model == "disparity") {model <- paste0("   Model:   Disparity Filter with alpha = ", x$alpha)}
+  if (x$model == "lans") {model <- paste0("   Model:   Locally Adaptive Network Sparsification with alpha = ", x$alpha)}
+  if (x$model == "mlf") {model <- paste0("   Model:   Marginal Likelihood Filter with alpha = ", x$alpha)}
+  if (x$model == "global") {model <- paste0("   Model:   Global Threshold with threshold = ", x$parameter)}
+  if (x$model == "skeleton") {model <- paste0("   Model:   Skeleton with parameter = ", x$parameter)}
+  if (x$model == "lspar") {model <- paste0("   Model:   Local Sparsification with parameter = ", x$parameter)}
+  if (x$model == "gspar") {model <- paste0("   Model:   Global Sparsification with parameter = ", x$parameter)}
+  if (x$model == "simmelian") {model <- paste0("   Model:   Simmelian with parameter = ", x$parameter)}
+  if (x$model == "jaccard") {model <- paste0("   Model:   Jaccard with parameter = ", x$parameter)}
+  if (x$model == "meetmin") {model <- paste0("   Model:   Meetmin with parameter = ", x$parameter)}
+  if (x$model == "geometric") {model <- paste0("   Model:   Geometric with parameter = ", x$parameter)}
+  if (x$model == "hyper") {model <- paste0("   Model:   Hypergeometric with parameter = ", x$parameter)}
+  if (x$model == "degree") {model <- paste0("   Model:   Local Degree with parameter = ", x$parameter)}
+  if (x$model == "quadrilateral") {model <- paste0("   Model:   Quadrilateral Simmelian with parameter = ", x$parameter)}
+  if (x$model == "custom") {model <- paste0("   Model:   Custom unweighted backbone with parameter = ", x$parameter)}
+  cat(model,"\n")
+
+  #Call
+  call <- paste0("    Call:   ", deparse(x$call, width.cutoff = 500L))
+  cat(call,"\n\n")
+
+  #Narrative
+  cat("DESCRIPTION -\n")
+  cat(x$narrative,"\n")
+
+  #Footer
+  cat("==================================")
+  invisible(x)
+}
+
 #' Choose edges to retain in a backbone network
 #'
 #' @param p edgewise p-values generated by a backbone model
@@ -146,7 +209,7 @@
 #' `bicm` estimates cell probabilities under the bipartite configuration model
 #'
 #' @param M matrix: a binary matrix
-#' @param fitness boolean: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only
+#' @param fitness logical: FALSE returns a matrix of probabilities, TRUE returns a list of row and column fitnesses only
 #' @param tol numeric, tolerance of algorithm
 #' @param max_steps numeric, number of times to run .loglikelihood_prime_bicm algorithm
 #' @param ... optional arguments
@@ -240,7 +303,7 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
       fitnesses <- list(rowfit = row_fitness, colfit = col_fitness)
       return(fitnesses)
     } else {
-      x <- row_fitness %*% t(col_fitness)
+      x <- tcrossprod(row_fitness)
       probs <- x/(x+1)
       return(probs)
     }
@@ -401,4 +464,127 @@ fastball <- function(M, trades = 5 * nrow(M)) {
     for (row in 1:nrow(Mrand)) {Mrand[row,Lrand[[row]]] <- 1L}
     return(Mrand)
   } else {return(fastball_cpp(M, 5 * length(M)))}
+}
+
+#' Check arguments and coerce input to matrix
+#'
+#' @param N input
+#' @param source string: calling function
+#' @param model string: backbone model
+#' @param alpha real: significance level of hypothesis test(s)
+#' @param parameter real: parameter used to control structural backbone models
+#' @param signed boolean: return a signed backbone
+#' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
+#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
+#' @param narrative boolean: display suggested text & citations
+#' @param trials numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
+#' @param escore string: Method for scoring edges' importance
+#' @param normalize string: Method for normalizing edge scores
+#' @param filter string: Type of filter to apply
+#' @param umst boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity
+#'
+#' @return matrix
+#'
+#' @noRd
+.check_and_coerce <- function(N,
+                              source,
+                              model = NULL,
+                              alpha = NULL,
+                              parameter = NULL,
+                              signed = NULL,
+                              mtc = NULL,
+                              missing_as_zero = NULL,
+                              narrative = NULL,
+                              trials = NULL,
+                              backbone_only = NULL,
+                              escore = NULL,
+                              normalize = NULL,
+                              filter = NULL,
+                              umst = NULL) {
+
+  #### Check generic arguments ####
+  if (!methods::is(N,"matrix") & !methods::is(N,"Matrix") & !methods::is(N,"igraph")) {stop("The input network must be a matrix, Matrix, or igraph object")}
+  if (!is.null(narrative)) {if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}}
+  if (!is.null(alpha)) {if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}}
+  if (!is.null(signed)) {if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}}
+  if (!is.null(mtc)) {if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}}
+  if (!is.null(missing_as_zero)) {if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}}
+  if (!is.null(backbone_only)) {if (!is.logical(backbone_only)) {stop("`backbone_only` must be either TRUE or FALSE")}}
+
+  #### Check function-specific arguments ####
+  if (source == "projection") {
+    if (methods::is(N,"igraph")) {if(!igraph::is_bipartite(N)) {stop("`B` must be a bipartite network")}}
+    if (!(model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
+    if (!is.null(trials)) {if (model!="fdsm") {warning("`trials` is only used when `model = \"fdsm\" and will be ignored")}}
+    if (!is.null(trials)) {if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}}
+    if (!is.null(trials)) {if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}}
+  }
+
+  if (source == "weighted") {
+    if (methods::is(N,"igraph")) {if(igraph::is_bipartite(N)) {stop("`B` must be a unipartite network")}}
+    if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
+    if (model %in% c("global")) {
+      if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
+      if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
+    }
+  }
+
+  if (source == "unweighted") {
+    if (methods::is(N,"igraph")) {if(igraph::is_bipartite(N)) {stop("`U` must be a unipartite network")}}
+    if (!(model %in% c("custom", "skeleton", "gspar", "lspar", "simmelian", "jaccard", "meetmin", "geometric", "hyper", "degree", "quadrilateral"))) {stop("`model` must be one of: \"custom\", \"skeleton\", \"gspar\", \"lspar\", \"simmelian\", \"jaccard\", \"meetmin\", \"geometric\", \"hyper\", \"degree\", \"quadrilateral\"")}
+    if (model=="custom") {if (!(escore %in% c("random", "betweenness", "triangles", "jaccard", "dice", "quadrangles", "quadrilateral", "degree", "meetmin", "geometric" , "hypergeometric"))) {stop("`escore` must be one of: \"random\", \"betweenness\", \"triangles\", \"jaccard\", \"dice\", \"quadrangles\", \"quadrilateral\", \"degree\", \"meetmin\", \"geometric\" , \"hypergeometric\"")}}
+    if (model=="custom") {if (!(normalize %in% c("none", "rank", "embeddedness"))) {stop("`normalize` must be one of: \"none\", \"rank\", \"embeddedness\"")}}
+    if (model=="custom") {if (!(filter %in% c("threshold", "proportion", "degree", "disparity", "lans", "mlf"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\", \"lans\", \"mlf\"")}}
+    if (model=="custom") {if (!is.logical(umst)) {stop("`umst` must be either TRUE or FALSE")}}
+    if (normalize=="rank" & filter!="degree") {stop("Using normalize=\"rank\" requires that filter=\"degree\"")}
+    if (normalize!="rank" & filter=="degree") {stop("Using filter=\"degree\" requires that normalize=\"rank\"")}
+    if (!is.numeric(parameter) | length(parameter)!=1) {stop("`parameter` must be a single numeric value")}
+  }
+
+  #### Coerce input to matrix ####
+  if (methods::is(N,"matrix")) {mat <- N}  #matrix --> matrix
+  if (methods::is(N,"Matrix")) {mat <- as.matrix(N)}  #Matrix --> matrix
+  if (methods::is(N,"igraph")) {
+    if (igraph::is_bipartite(N)) {
+      if ("weight" %in% igraph::edge_attr_names(N)) {mat <- igraph::as_biadjacency_matrix(N, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted bipartite igraph --> weighted incidence matrix
+      if (!("weight" %in% igraph::edge_attr_names(N))) {mat <- igraph::as_biadjacency_matrix(N, names = FALSE, sparse = FALSE)}  #unweighted bipartite igraph --> binary incidence
+    }
+    if (!igraph::is_bipartite(N)) {
+      if ("weight" %in% igraph::edge_attr_names(N)) {mat <- igraph::as_adjacency_matrix(N, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted unipartite igraph --> weighted adjacency
+      if (!("weight" %in% igraph::edge_attr_names(N))) {mat <- igraph::as_adjacency_matrix(N, names = FALSE, sparse = FALSE)}  #unweighted unipartite igraph --> binary adjacency
+    }
+  }
+
+  #### Function-specific input checks ####
+  if (source == "projection") {
+    #Check if input may be a weighted projection
+    if (!all(mat %in% c(0,1)) &    #The entries are not binary, and
+        isSymmetric(mat) &         #The matrix is symmetric, and
+        all(mat%%1==0)) {          #The entries are all integers
+      stop("
+It looks like `B` may be a weighted projection. The input to backbone_from_projection() must
+be the original bipartite network or hypergraph, not its weighted projection. If you only
+have the weighted projection, cautiously consider using backbone_from_weighted() instead.")}
+
+    #Check that input is either binary, or contains structural values and model=SDSM
+    if (model!="sdsm" & !all(mat %in% c(0,1))) {stop("`B` must represent an unweighted bipartite network or hypergraph")}
+
+    if (model=="sdsm" & !all(mat %in% c(0,1,10,11))) {stop("`B` must represent an unweighted bipartite network or hypergraph,
+                                                            where required edges have weight = 10 and prohibited edges have weight = 11")}
+  return(mat)
+  }
+
+  if (source == "weighted") {
+    if (dim(mat)[1] != dim(mat)[2]) {stop("`W` must represent a unipartite network")}
+    if (all(mat %in% c(0,1))) {stop("The entries of `W` must represent a weighted network")}
+    return(mat)
+  }
+
+  if (source == "unweighted") {
+    if (!all(mat %in% c(0,1))) {stop("`U` must represent an unweighted network")}
+    if (!isSymmetric(mat)) {stop("`U` must represent an undirected network")}
+    return(mat)
+  }
+
 }

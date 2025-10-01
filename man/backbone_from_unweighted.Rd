@@ -13,7 +13,7 @@ backbone_from_unweighted(
   filter,
   umst,
   narrative = FALSE,
-  return = "backbone"
+  backbone_only = TRUE
 )
 }
 \arguments{
@@ -29,16 +29,14 @@ backbone_from_unweighted(
 
 \item{filter}{string: Type of filter to apply}
 
-\item{umst}{boolean: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity}
+\item{umst}{logical: TRUE if the backbone should include the union of maximum spanning trees, to ensure connectivity}
 
-\item{narrative}{boolean: display suggested text & citations}
+\item{narrative}{logical: display suggested text & citations}
 
-\item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
+\item{backbone_only}{logical: return just the backbone (default), or a detailed backbone object}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{U}. If \code{return = "everything"}, then the backbone
-is returned as an element in a list that also includes the original unweighted network, a narrative description, and the original
-function call.
+A backbone in the same class as \code{U}, or if \code{backbone_only = FALSE}, then a backbone object.
 }
 \description{
 \code{backbone_from_unweighted()} extracts the unweighted backbone from an unweighted, undirected network

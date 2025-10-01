@@ -13,7 +13,7 @@ backbone_from_weighted(
   parameter = 0,
   missing_as_zero = FALSE,
   narrative = FALSE,
-  return = "backbone"
+  backbone_only = TRUE
 )
 }
 \arguments{
@@ -23,22 +23,20 @@ backbone_from_weighted(
 
 \item{alpha}{real: significance level of hypothesis test(s) in statistical models}
 
-\item{signed}{boolean: return a signed backbone from a statistical model}
+\item{signed}{logical: return a signed backbone from a statistical model}
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
 \item{parameter}{real: parameter used to control structural backbone models}
 
-\item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
+\item{missing_as_zero}{logical: treat missing edges as edges with zero weight and consider them for inclusion/exclusion in backbone}
 
-\item{narrative}{boolean: display suggested text & citations}
+\item{narrative}{logical: display suggested text & citations}
 
-\item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
+\item{backbone_only}{logical: return just the backbone (default), or a detailed backbone object}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{W}. If \code{return = "everything"}, then the backbone
-is returned as an element in a list that also includes the original weighted network, (for statistical backbone models) the edgewise
-p-values, a narrative description, and the original function call.
+A backbone in the same class as \code{W}, or if \code{backbone_only = FALSE}, then a backbone object.
 }
 \description{
 \code{backbone_from_weighted()} extracts the unweighted backbone from a weighted network

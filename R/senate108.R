@@ -1,4 +1,4 @@
-#' Bill Sponsorship in the 108th U.S. Senate
+#' Bill sponsorship in the 108th U.S. Senate
 #'
 #' A bipartite network describing bill sponsorship in the 108th U.S. Senate
 #'

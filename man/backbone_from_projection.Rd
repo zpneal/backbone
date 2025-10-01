@@ -13,7 +13,7 @@ backbone_from_projection(
   missing_as_zero = FALSE,
   narrative = FALSE,
   trials = NULL,
-  return = "backbone"
+  backbone_only = TRUE
 )
 }
 \arguments{
@@ -23,22 +23,20 @@ backbone_from_projection(
 
 \item{model}{string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}}
 
-\item{signed}{boolean: return a signed backbone}
+\item{signed}{logical: return a signed backbone}
 
 \item{mtc}{string: type of Multiple Test Correction, either \code{"none"} or a method allowed by \code{\link[=p.adjust]{p.adjust()}}.}
 
-\item{missing_as_zero}{boolean: treat missing edges as edges with zero weight and test them for significance}
+\item{missing_as_zero}{logical: treat missing edges as edges with zero weight and test them for significance}
 
-\item{narrative}{boolean: display suggested text & citations}
+\item{narrative}{logical: display suggested text & citations}
 
 \item{trials}{numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution}
 
-\item{return}{string: return either only the \code{"backbone"} or \code{"everything"}}
+\item{backbone_only}{logical: return just the backbone (default), or a detailed backbone object}
 }
 \value{
-If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-is returned as an element in a list that also includes the original network, raw projection, backbone, edgewise p-values, narrative
-description, and original function call.
+A backbone in the same class as \code{B}, or if \code{backbone_only = FALSE}, then a backbone object.
 }
 \description{
 \code{backbone_from_projection()} extracts the unweighted backbone from the weighted projection of a bipartite network or hypergraph
@@ -84,8 +82,8 @@ B <- igraph::graph_from_biadjacency_matrix(B)
 P <- igraph::bipartite_projection(B, which = "true")  #An ordinary weighted projection...
 plot(P)                                               #...is a dense hairball
 
-backbone <- backbone_from_projection(B)  #A backbone...
-plot(backbone)                           #...is sparse with clear communities
+bb <- backbone_from_projection(B)  #A backbone...
+plot(bb)                           #...is sparse with clear communities
 }
 \references{
 package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}

@@ -5,12 +5,12 @@
 #' @param B An unweighted bipartite network or hypergraph as an incidence matrix or \link[Matrix]{Matrix}, or as a bipartite \link[igraph]{igraph} object
 #' @param alpha real: significance level of hypothesis test(s)
 #' @param model string: backbone model, one of: \code{"sdsm"}, \code{"fdsm"}, \code{"fixedrow"}, \code{"fixedcol"}, or \code{"fixedfill"}
-#' @param signed boolean: return a signed backbone
+#' @param signed logical: return a signed backbone
 #' @param mtc string: type of Multiple Test Correction, either \code{"none"} or a method allowed by [p.adjust()].
-#' @param missing_as_zero boolean: treat missing edges as edges with zero weight and test them for significance
-#' @param narrative boolean: display suggested text & citations
+#' @param missing_as_zero logical: treat missing edges as edges with zero weight and test them for significance
+#' @param narrative logical: display suggested text & citations
 #' @param trials numeric: if \code{model = "fdsm"}, the number of graphs generated using fastball to approximate the edge weight distribution
-#' @param return string: return either only the \code{"backbone"} or \code{"everything"}
+#' @param backbone_only logical: return just the backbone (default), or a detailed backbone object
 #'
 #' @details
 #' The \code{backbone_from_projection} function extracts the backbone from the weighted projection of a bipartite network or hypergraph.
@@ -34,9 +34,7 @@
 #' is a bipartite igraph object. In either case, the source network must be binary (i.e., unweighted), unless \code{model = "sdsm"},
 #' when "prohibited" edges can be represented with weight = 10 and "required" edges can be represented with weight = 11.
 #'
-#' @return If \code{return = "backbone"}, a backbone in the same class as \code{B}. If \code{return = "everything"}, then the backbone
-#' is returned as an element in a list that also includes the original network, raw projection, backbone, edgewise p-values, narrative
-#' description, and original function call.
+#' @return A backbone in the same class as \code{B}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
 #' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
@@ -61,8 +59,8 @@
 #' P <- igraph::bipartite_projection(B, which = "true")  #An ordinary weighted projection...
 #' plot(P)                                               #...is a dense hairball
 #'
-#' backbone <- backbone_from_projection(B)  #A backbone...
-#' plot(backbone)                           #...is sparse with clear communities
+#' bb <- backbone_from_projection(B)  #A backbone...
+#' plot(bb)                           #...is sparse with clear communities
 backbone_from_projection <- function(B,
                                      alpha = 0.05,
                                      model = "sdsm",
@@ -71,54 +69,13 @@ backbone_from_projection <- function(B,
                                      missing_as_zero = FALSE,
                                      narrative = FALSE,
                                      trials = NULL,
-                                     return = "backbone") {
+                                     backbone_only = TRUE) {
 
   call <- match.call()
 
-  #### Check parameters ####
-  if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
-  if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
-  if (!(model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
-  if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
-  if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
-  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
-  if (model=="fdsm" & !is.null(trials)) {  #If FDSM and `trials` is supplied, check it
-    if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
-    if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
-  }
-  if (model!="fdsm" & !is.null(trials)) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
-  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
-  if (!(return %in% c("backbone", "everything"))) {stop("`return` must be one of: \"backbone\", \"everything\"")}
-
-  #### Check and format input ####
-  #Check that input is matrix, Matrix, or igraph (and if igraph, that it is bipartite)
-  if (!methods::is(B,"matrix") & !methods::is(B,"Matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or Matrix, or a binary bipartite igraph object")}
-  if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}}
-
-  #Convert input to incidence matrix
-  if (methods::is(B,"matrix")) {I <- B}  #matrix --> matrix
-  if (methods::is(B,"Matrix")) {I <- as.matrix(B)}  #Matrix --> matrix
-  if (methods::is(B,"igraph")) {
-    if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted incidence
-    if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary incidence
-  }
-
-  #Check if input may be a weighted projection
-  if (!all(I %in% c(0,1)) &    #The entries are not binary, and
-      isSymmetric(I) &         #The matrix is symmetric, and
-      all(I%%1==0)) {          #The entries are all integers
-      stop("
-`B` looks like it may be a weighted bipartite projection. The input to backbone_from_projection()
-must be the original bipartite network, not its weighted projection. If you only have the weighted
-bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
-
-  #Check that input is binary, or contains structural values and model=SDSM
-  if (model!="sdsm" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
-
-  if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
-                                                        where required edges have weight 10 and prohibited edges have weight 11")}
-
-  if (model=="sdsm") {if (all(I %in% c(0,1))) {model <- "sdsm"} else {model <- "sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
+  #### Check parameters and input ####
+  I <- .check_and_coerce(N = B, source = "projection", model = model, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, backbone_only = backbone_only)
+  if (model == "sdsm" & any(I %in% c(10,11))) {model <- "sdsm_ec"}
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}
@@ -135,7 +92,7 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
   # First sentence (descriptive)
   if (signed) {type <- "signed"} else {type <- "unweighted"}
 
-  text <- paste0("We used the backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
+  text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the ", type, " backbone of the weighted projection of a bipartite network containing ", nrow(I), " agents and ", ncol(I), " artifacts.")
 
   # Second sentence (model and outcome)
   if (mtc == "none") {correction <- ""}
@@ -194,11 +151,13 @@ bipartite projection, cautiously consider using backbone_from_weighted() instead
     tempP <- igraph::delete_edges(tempP, which(igraph::E(tempP)$sign==0))  #Delete any edges that should not be retained
     if (!signed) {tempP <- igraph::delete_edge_attr(tempP, "sign")}  #If backbone is not signed, remove edge retention marker
     backbone <- tempP
+    if (!is.null(backbone$name)) {backbone$name <- paste0(model, " backbone of ", backbone$name)}
+    if (is.null(backbone$name)) {backbone$name <- paste0(model, " backbone")}
+    backbone$call <- call
+    backbone$narrative <- text
     }
 
   #### Return ####
-  if (return == "backbone") {return(backbone)}
-  if (return == "everything") {
-    return(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, call = call))
-    }
+  if (backbone_only) {return(backbone)}
+  if (!backbone_only) {return(structure(list(bipartite = B, projection = P, backbone = backbone, pvalues = p, narrative = text, model = model, alpha = alpha, call = call), class = "backbone"))}
 }
