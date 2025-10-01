@@ -629,9 +629,11 @@ expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$bac
 
 #gspar
 test <- backbone_from_unweighted(U, model = "gspar", parameter = .5, backbone_only = FALSE)
-expect_true(length(test)==4)  #Returned object has four elements
+expect_true(length(test)==6)  #Returned object has four elements
 expect_true(is(test$narrative,"character"))  #Narrative element is character class
 expect_true(is(test$call,"call"))  #Call element is call class
+expect_true(is(test$model,"character"))
+expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
