@@ -4,7 +4,8 @@ output: html_document
 ---
 ## backbone 3.0.2
 
-* 
+* minor updates to unit tests
+* remove vignette of unit tests to eliminate dependency on `tinytest` for most users
 
 ## backbone 3.0.1
 
