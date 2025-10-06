@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 3.0.2
+
+* minor updates to unit tests
+
 ## backbone 3.0.1
 
 * remove deprecated functions from manual

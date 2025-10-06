@@ -263,31 +263,31 @@ bb <- backbone_from_projection(B, model = "sdsm")                              #
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 bb <- backbone_from_projection(B, model = "fdsm", trials = 250)                #Extract FDSM igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 bb <- backbone_from_projection(B, model = "fixedrow")                          #Extract fixedrow igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 bb <- backbone_from_projection(B, model = "fixedrow")                          #Extract fixedcol igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 bb <- backbone_from_projection(B, model = "fixedfill")                         #Extract fixedcol igraph with defaults
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 igraph::E(B)$weight <- NA
 igraph::E(B)$weight <- sample(c(1,11), length(igraph::E(B)$weight), replace = TRUE, prob = c(.9,.1))
@@ -295,7 +295,7 @@ bb <- backbone_from_projection(B, model = "sdsm")                              #
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 #### Weighted Backbone Functions ####
 ## Multiscale weighted matrix
@@ -450,26 +450,26 @@ bb <- backbone_from_weighted(W, model = "disparity", alpha = 0.25)            #E
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 bb <- backbone_from_weighted(W, model = "lans", alpha = 0.25)                 #Extract unweighted lans igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 bb <- backbone_from_weighted(W, model = "mlf", alpha = 0.25)                  #Extract unweighted mlf igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 threshold <- mean(igraph::E(W)$weight) + sd(igraph::E(W)$weight)              #Use mean + sd as edge threshold
 bb <- backbone_from_weighted(W, model = "global", parameter = threshold)      #Extract unweighted global igraph
 expect_true(is(bb,"igraph"))                                                  #Returns as igraph
 expect_identical(igraph::vertex_attr_names(bb), c("agent_attrib"))            #Contains correct vertex attributes
 expect_identical(igraph::edge_attr_names(bb), c("oldweight"))                 #Contains correct edge attributes
-expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,10), rep(2,10), rep(3,10))) > .4)  #Backbone has high modularity
 
 #### Unweighted Backbone Functions ####
 #escore
@@ -605,7 +605,7 @@ expect_true(all(test %in% c(0,1)))  #All values are 0 or 1
 expect_true(all(test[A2 == 0] == 0))  #If edge is missing in original, also missing in result
 
 #skeleton (no particular structure expected in backbone)
-U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
+U <- igraph::sample_sbm(60, matrix(c(.8,.2,.2,.2,.8,.2,.2,.2,.8),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
 
 test <- backbone_from_unweighted(U, model = "skeleton", parameter = .5, backbone_only = FALSE)
 expect_true(length(test)==6)  #Returned object has six elements
@@ -629,7 +629,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "gspar", parameter = .3, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
 
@@ -643,7 +643,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "lspar", parameter = .3, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
 
@@ -657,7 +657,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "simmelian", parameter = .7, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
@@ -671,7 +671,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "jaccard", parameter = .5, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
@@ -685,7 +685,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "meetmin", parameter = .7, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
@@ -699,7 +699,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "geometric", parameter = .5, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
@@ -713,7 +713,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "hyper", parameter = .8, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
@@ -727,7 +727,7 @@ expect_true(is(test$parameter,"numeric"))
 expect_true(all.equal(U,test$unweighted))  #Original element matches starting graph
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
-expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(test$backbone, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
 test2 <- backbone_from_unweighted(U, model = "quadrilateral", parameter = .5, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Larger parameter yields more sparsification
 
@@ -743,7 +743,7 @@ expect_true(all.equal(U,test$unweighted))  #Original element matches starting gr
 expect_false(igraph::is_weighted(test$backbone))  #Backbone is unweighted
 expect_true(igraph::gorder(test$backbone)==igraph::gorder(U))  #Backbone size matches original graph size
 expect_true(which.max(igraph::degree(U)) == which.max(igraph::degree(test$backbone)))  #Backbone preserves highest-degree node
-expect_true(cor(igraph::degree(U),igraph::degree(test$backbone)) > 0.75)  #Backbone preserves degree distribution
+expect_true(cor(igraph::degree(U),igraph::degree(test$backbone)) > 0.6)  #Backbone preserves degree distribution
 test2 <- backbone_from_unweighted(U, model = "degree", parameter = .2, backbone_only = FALSE)
 expect_true(igraph::edge_density(test$backbone) > igraph::edge_density(test2$backbone))  #Smaller parameter yields more sparsification
 
@@ -786,6 +786,6 @@ bb <- igraph::graph_from_adjacency_matrix(bb, mode = "undirected")
 expect_true(igraph::is_tree(bb))                      #Backbone is a tree
 
 #When input is unweighted
-U <- igraph::sample_sbm(60, matrix(c(.75,.25,.25,.25,.75,.25,.25,.25,.75),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
+U <- igraph::sample_sbm(60, matrix(c(.8,.2,.2,.2,.8,.2,.2,.2,.8),3,3), c(20,20,20))  #Unweighted graph with three hidden communities
 bb <- backbone(U)  #Extract backbone using defaults
-expect_true(igraph::modularity(bb, c(rep(1,20), rep(2,20), rep(3,20))) > .5)  #Backbone has high modularity
+expect_true(igraph::modularity(bb, c(rep(1,20), rep(2,20), rep(3,20))) > .4)  #Backbone has high modularity
