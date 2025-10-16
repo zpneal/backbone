@@ -91,7 +91,7 @@ summary.backbone <- function(object, ...) {
     diag(projection) <- 0
     type <- "Weighted"
     nodes <- dim(projection)[1]
-    edges1 <- sum(projection)/2
+    edges1 <- sum(projection!=0)/2
     min <- round(min(projection[projection!=0]),2)
     max <- round(max(projection[projection!=0]),2)
     cat(sprintf("%10s", "Projection"), sprintf("%10s", type), sprintf("%11s", nodes), sprintf("%10i", edges1), sprintf("%7s", min), sprintf("%7s", max), "\n")
@@ -134,7 +134,11 @@ summary.backbone <- function(object, ...) {
 
   #Edge reduction
   change <- round(((edges1 - edges2) / edges1) * 100,1)
-  cat(paste0(edges1 - edges2, " (", change, "%) edges removed\n"))
+  cat(paste0(edges1 - edges2, " (", change, "%) edges removed\n\n"))
+
+  #Narrative
+  cat("NARRATIVE SUMMARY -\n")
+  cat(object$narrative)
 
   invisible(object)
 }
