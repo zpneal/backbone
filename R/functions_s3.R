@@ -1,11 +1,11 @@
 #' @export
 print.backbone <- function(x, ...) {
-  
+
   #Call
   cat("Call -\n")
-  cat(deparse(x$call, width.cutoff = 500L)))
+  cat(deparse(x$call, width.cutoff = 500L))
   cat("\n\n")
-  
+
   #Source
   if ("bipartite" %in% names(x) & (methods::is(x$bipartite, "matrix"))) {source <- paste0("Source: matrix-class bipartite network")}
   if ("bipartite" %in% names(x) & (methods::is(x$bipartite, "Matrix"))) {source <- paste0("Source: Matrix-class bipartite network")}
@@ -17,13 +17,13 @@ print.backbone <- function(x, ...) {
   if ("unweighted" %in% names(x) & (methods::is(x$bipartite, "Matrix"))) {source <- paste0("Source: matrix-class unweighted network")}
   if ("unweighted" %in% names(x) & (methods::is(x$bipartite, "igraph"))) {source <- paste0("Source: igraph-class unweighted network")}
   cat(source,"\n")
-  
+
   #Result
   if (methods::is(x$backbone, "matrix")) {result <- paste0("Source: matrix-class unweighted network")}
   if (methods::is(x$backbone, "Matrix")) {result <- paste0("Source: Matrix-class unweighted network")}
   if (methods::is(x$backbone, "igraph")) {result <- paste0("Source: igraph-class unweighted network")}
   cat(source,"\n")
-  
+
   #Model
   if (x$model == "sdsm") {model <- paste0("Backbone Model: Stochastic Degree Sequence Model")}
   if (x$model == "fdsm") {model <- paste0("Backbone Model: Fixed Degree Sequence Model")}
@@ -46,6 +46,6 @@ print.backbone <- function(x, ...) {
   if (x$model == "quadrilateral") {model <- paste0("Backbone Model: Quadrilateral Simmelian Sparsification")}
   if (x$model == "custom") {model <- paste0("Backbone Model: Custom unweighted sparsification model")}
   cat(model,"\n\n")
-  
+
   invisible(x)
 }
