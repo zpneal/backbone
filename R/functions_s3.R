@@ -146,18 +146,18 @@ summary.backbone <- function(object, ...) {
 #' @export
 #' @importFrom graphics plot
 plot.backbone <- function(x, ...) {
-  mfrow <- par("mfrow")  #Save existing plot settings
-  par(mfrow = c(1, 2))  #Plot side-by-side
+  mfrow <- graphics::par("mfrow")  #Save existing plot settings
+  graphics::par(mfrow = c(1, 2))  #Plot side-by-side
 
   #Get original network
   if (!is.null(x$projection)) {original <- x$projection}
   if (!is.null(x$weighted)) {original <- x$weighted}
   if (!is.null(x$unweighted)) {original <- x$unweighted}
-  if (is(original, "matrix") | is(original, "Matrix")) {original <- igraph::graph_from_adjacency_matrix(original, weighted = TRUE, diag = FALSE, mode = "undirected")}
-  
+  if (methods::is(original, "matrix") | methods::is(original, "Matrix")) {original <- igraph::graph_from_adjacency_matrix(original, weighted = TRUE, diag = FALSE, mode = "undirected")}
+
   #Get backbone network
   backbone <- x$backbone
-  if (is(backbone, "matrix") | is(backbone, "Matrix")) {backbone <- igraph::graph_from_adjacency_matrix(backbone, weighted = FALSE, diag = FALSE, mode = "undirected")}
+  if (methods::is(backbone, "matrix") | methods::is(backbone, "Matrix")) {backbone <- igraph::graph_from_adjacency_matrix(backbone, weighted = FALSE, diag = FALSE, mode = "undirected")}
 
   #Plot original network
   plot(original, main = "Original", ...)
@@ -165,5 +165,5 @@ plot.backbone <- function(x, ...) {
   #Plot backbone network
   plot(backbone, main = "Backbone", ...)
 
-  par(mfrow = mfrow)  #Restore plot settings
+  graphics::par(mfrow = mfrow)  #Restore plot settings
 }
