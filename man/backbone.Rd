@@ -4,10 +4,12 @@
 \alias{backbone}
 \title{Extract the backbone from a network}
 \usage{
-backbone(N, ...)
+backbone(N, narrative = TRUE, ...)
 }
 \arguments{
 \item{N}{A network represented as a matrix, \link[Matrix]{Matrix}, or \link[igraph]{igraph} object}
+
+\item{narrative}{logical: display suggested text & citations}
 
 \item{...}{Optional arguments}
 }
