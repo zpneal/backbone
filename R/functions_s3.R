@@ -153,11 +153,11 @@ plot.backbone <- function(x, ...) {
   if (!is.null(x$projection)) {original <- x$projection}
   if (!is.null(x$weighted)) {original <- x$weighted}
   if (!is.null(x$unweighted)) {original <- x$unweighted}
-  if (is(original, "matrix") | is(original, "Matrix")) {original <- igraph::graph_from_adjacency_matrix(original, weighted = TRUE, diag = FALSE)}
-
+  if (is(original, "matrix") | is(original, "Matrix")) {original <- igraph::graph_from_adjacency_matrix(original, weighted = TRUE, diag = FALSE, mode = "undirected")}
+  
   #Get backbone network
   backbone <- x$backbone
-  if (is(backbone, "matrix") | is(backbone, "Matrix")) {backbone <- igraph::graph_from_adjacency_matrix(backbone, weighted = FALSE, diag = FALSE)}
+  if (is(backbone, "matrix") | is(backbone, "Matrix")) {backbone <- igraph::graph_from_adjacency_matrix(backbone, weighted = FALSE, diag = FALSE, mode = "undirected")}
 
   #Plot original network
   #igraph::plot.igraph(original)
