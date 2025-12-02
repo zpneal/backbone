@@ -144,6 +144,7 @@ summary.backbone <- function(object, ...) {
 }
 
 #' @export
+#' @importFrom graphics plot
 plot.backbone <- function(x, ...) {
   op <- par()  #Save existing plot settings
   par(mfrow = c(1, 2))  #Plot side-by-side
