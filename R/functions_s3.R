@@ -142,3 +142,29 @@ summary.backbone <- function(object, ...) {
 
   invisible(object)
 }
+
+#' @export
+plot.backbone <- function(x, ...) {
+  op <- par()  #Save existing plot settings
+  par(mfrow = c(1, 2))  #Plot side-by-side
+
+  #Get original network
+  if (!is.null(x$projection)) {original <- x$projection}
+  if (!is.null(x$weighted)) {original <- x$weighted}
+  if (!is.null(x$unweighted)) {original <- x$unweighted}
+  if (is(original, "matrix") | is(original, "Matrix")) {original <- igraph::graph_from_adjacency_matrix(original, weighted = TRUE, diag = FALSE)}
+
+  #Get backbone network
+  backbone <- x$backbone
+  if (is(backbone, "matrix") | is(backbone, "Matrix")) {backbone <- igraph::graph_from_adjacency_matrix(backbone, weighted = FALSE, diag = FALSE)}
+
+  #Plot original network
+  #igraph::plot.igraph(original)
+  plot(original)
+
+  #Plot backbone network
+  #igraph::plot.igraph(backbone)
+  plot(backbone)
+
+  par(op)  #Restore plot settings
+}
