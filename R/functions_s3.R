@@ -160,12 +160,10 @@ plot.backbone <- function(x, ...) {
   if (is(backbone, "matrix") | is(backbone, "Matrix")) {backbone <- igraph::graph_from_adjacency_matrix(backbone, weighted = FALSE, diag = FALSE, mode = "undirected")}
 
   #Plot original network
-  #igraph::plot.igraph(original)
-  plot(original, ...)
+  plot(original, main = "Original", ...)
 
   #Plot backbone network
-  #igraph::plot.igraph(backbone)
-  plot(backbone, ...)
+  plot(backbone, main = "Backbone", ...)
 
   par(mfrow = mfrow)  #Restore plot settings
 }
