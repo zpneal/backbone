@@ -146,7 +146,7 @@ summary.backbone <- function(object, ...) {
 #' @export
 #' @importFrom graphics plot
 plot.backbone <- function(x, ...) {
-  op <- par()  #Save existing plot settings
+  mfrow <- par("mfrow")  #Save existing plot settings
   par(mfrow = c(1, 2))  #Plot side-by-side
 
   #Get original network
@@ -161,11 +161,11 @@ plot.backbone <- function(x, ...) {
 
   #Plot original network
   #igraph::plot.igraph(original)
-  plot(original)
+  plot(original, ...)
 
   #Plot backbone network
   #igraph::plot.igraph(backbone)
-  plot(backbone)
+  plot(backbone, ...)
 
-  par(op)  #Restore plot settings
+  par(mfrow = mfrow)  #Restore plot settings
 }
