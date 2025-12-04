@@ -139,6 +139,7 @@ summary.backbone <- function(object, ...) {
   #Narrative
   cat("NARRATIVE SUMMARY -\n")
   cat(object$narrative)
+  cat("\n")
 
   invisible(object)
 }
