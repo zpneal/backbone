@@ -4,7 +4,8 @@ output: html_document
 ---
 ## backbone 3.0.3
 
-* 
+* Updated/added generic `print()`, `summary()` and `plot()` functions for backbone objects
+* Corrected p-values in asymmetric marginal likelihood filter (h/t @florian-huber)
 
 ## backbone 3.0.2
 
