@@ -240,7 +240,7 @@ bicm <- function(M, fitness = FALSE, tol = 1e-8, max_steps = 200, ...){
       fitnesses <- list(rowfit = row_fitness, colfit = col_fitness)
       return(fitnesses)
     } else {
-      x <- tcrossprod(row_fitness)
+      x <- outer(row_fitness, col_fitness)
       probs <- x/(x+1)
       return(probs)
     }
