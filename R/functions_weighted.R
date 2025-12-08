@@ -130,8 +130,10 @@
   if (!isSymmetric(A)) {
     upper <- matrix(NA, nrow(A), ncol(A))
     if (signed) {lower <- matrix(NA, nrow(A), ncol(A))}
-    T <- sum(rowSums(A))
-    p <- tcrossprod(rowSums(A)) / (T^2)
+    kout <- rowSums(A)  #Thanks to @florian-huber for this implementation
+    kin <- colSums(A)
+    T <- sum(kout)
+    p <- outer(kout, kin) / (T^2)
     for (col in 1:ncol(A)) {  #Loop over full matrix
       for (row in 1:nrow(A)) {
 

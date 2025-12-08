@@ -3,6 +3,7 @@
 #' \code{backbone()} extracts the backbone from a weighted or unweighted network
 #'
 #' @param N A network represented as a matrix, \link[Matrix]{Matrix}, or \link[igraph]{igraph} object
+#' @param narrative logical: display suggested text & citations
 #' @param ... Optional arguments
 #'
 #' @details Given a weighted and/or dense network, the backbone is an sparse and unweighted subgraph
@@ -35,7 +36,7 @@
 #' N <- igraph::sample_gnp(100, .3)  #A random unweighted network
 #' backbone(N)
 #'
-backbone <- function(N, ...) {
+backbone <- function(N, narrative = TRUE, ...) {
 
   #### Coerce input to matrix ####
   if (methods::is(N,"matrix")) {mat <- N}  #matrix --> matrix
@@ -53,11 +54,11 @@ backbone <- function(N, ...) {
 
   #Detect and extract backbone
   if (is.numeric(mat) & dim(mat)[1]==dim(mat)[2] & all(mat %in% c(0,1))) {  #Numeric, square, binary
-    return(backbone_from_unweighted(N, narrative = TRUE, ...))
+    return(backbone_from_unweighted(N, narrative = narrative, ...))
   } else if (is.numeric(mat) & dim(mat)[1]==dim(mat)[2] & !all(mat %in% c(0,1))) {  #Numeric, square, valued
-      return(backbone_from_weighted(N, narrative = TRUE, ...))
+      return(backbone_from_weighted(N, narrative = narrative, ...))
   } else if (is.numeric(mat) & dim(mat)[1]!=dim(mat)[2] & all(mat %in% c(0,1))) {  #Numeric, non-square, binary
-      return(backbone_from_projection(N, narrative = TRUE, ...))
+      return(backbone_from_projection(N, narrative = narrative, ...))
   } else {stop("`N` does not seem to contain a supported type of network.")}
 
 }

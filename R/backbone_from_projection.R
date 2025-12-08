@@ -112,9 +112,9 @@ backbone_from_projection <- function(B,
 
   old <- sum(p$upper!=0, na.rm=TRUE)  #Number of edges in projection (i.e., number of edges tested, and that have an upper-tail p-value)
   new <- sum(backbone!=0)  #Number of edges in backbone
-  reduced_edges <- round(((old - new) / old)*100,2)
+  reduced_edges <- round(((old - new) / old)*100,1)
 
-  text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")
+  text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which removed ", reduced_edges, "% of the edges.")
 
   #References
   text <- paste0(text, "\n\nNeal, Z. P. 2025. backbone: An R Package to Extract Network Backbones. CRAN. https://doi.org/10.32614/CRAN.package.backbone")

@@ -113,11 +113,11 @@ backbone_from_weighted <- function(W,
 
   old <- sum(A!=0, na.rm=TRUE)  #Number of edges in weighted network
   new <- sum(backbone!=0)  #Number of edges in backbone
-  reduced_edges <- round(((old - new) / old)*100,2)
+  reduced_edges <- round(((old - new) / old)*100,1)
 
-  if (model == "disparity" | model == "lans" | model == "mlf") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which reduced the number of edges by ", reduced_edges, "%.")}
-  if (model == "global" & length(parameter)==1) {text <- paste0(text, " An edge was retained in the backbone if its weight was larger than ", max(parameter), ", which reduced the number of edges by ", reduced_edges, "%.")}
-  if (model == "global" & length(parameter)==2) {text <- paste0(text, " An edge was retained in the backbone as positive if its weight was larger than ", max(parameter), " and as negative if its weight was smaller than ", min(parameter), " which reduced the number of edges by ", reduced_edges, "%.")}
+  if (model == "disparity" | model == "lans" | model == "mlf") {text <- paste0(text, " An edge was retained in the backbone if its weight was statistically significant (alpha = ", alpha, correction, ") using ", desc, ", which removed ", reduced_edges, "% of the edges.")}
+  if (model == "global" & length(parameter)==1) {text <- paste0(text, " An edge was retained in the backbone if its weight was larger than ", max(parameter), ", which removed ", reduced_edges, "% of the edges.")}
+  if (model == "global" & length(parameter)==2) {text <- paste0(text, " An edge was retained in the backbone as positive if its weight was larger than ", max(parameter), " and as negative if its weight was smaller than ", min(parameter), " which removed ", reduced_edges, "% of the edges.")}
 
   # References
   text <- paste0(text, "\n\nNeal, Z. P. 2025. backbone: An R Package to Extract Network Backbones. CRAN. https://doi.org/10.32614/CRAN.package.backbone")

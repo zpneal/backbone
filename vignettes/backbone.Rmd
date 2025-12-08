@@ -45,7 +45,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
     a. [Background](#unweight-background)
     b. [Structural models](#unweight-structural)
 6. [Advanced functions](#advanced)
-    a. [Reproducibility](#advanced-reproduce)
+    a. [Backbone objects](#advanced-objects)
     b. [Signed backbones](#advanced-signed)
     c. [Custom backbones](#advanced-custom)
 7. [Utility functions](#utility)
@@ -108,9 +108,7 @@ The backbone package does not support *edgelist* formats because these can be am
 OK, so you just want to extract the backbone from a network. This is possible using the `backbone()` wrapper.
 ```{r}
 my_network <- sample_gnp(100, .5)  #A random network
-my_network
 backbone <- backbone(my_network)  #Extract the backbone
-backbone
 ```
 
 Given a network called `my_network`, running `backbone()` will extract the backbone using some reasonable defaults and will display a description of what it did.
@@ -284,14 +282,35 @@ Each of these models involve different ways of scoring, normalizing, and filteri
 [back to Table of Contents](#toc)
 
 # Advanced functions {#advanced}
-## Reproducibility {#advanced-reproduce}
-By default, `backbone_from_` functions return a backbone in the same class (matrix, Matrix, or igraph) as the original network. However, to facilitate transparency and reproducibility, specifying `backbone_only = FALSE` returns a `backbone`-class object that can be fully described using `print()`.
+## Backbone objects {#advanced-objects}
+By default, `backbone_from_` functions return a backbone in the same class as the original network. However, specifying `backbone_only = FALSE` instead returns a `backbone`-class `S3` object that contains the original network, backbone network, and details about the backbone extraction process. To illustrate, consider a `backbone`-class object created by the backbone extraction illustrated above in the [weighted projection](#projection) example.
 
-For example:
 ```{r}
-B <- matrix(sample(c(0,1), 48, replace = TRUE), 6, 8)  #A simple incidence matrix
-bb <- backbone(B, backbone_only = FALSE)  #Extract backbone, return backbone object
-bb
+B <- rbind(cbind(matrix(rbinom(250,1,.8),10),
+                 matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.2),10)),
+           cbind(matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.8),10),
+                 matrix(rbinom(250,1,.2),10)),
+           cbind(matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.2),10),
+                 matrix(rbinom(250,1,.8),10)))
+bb <- backbone_from_projection(B, backbone_only = FALSE)  #Return backbone-class object
+```
+
+This object can be described using the `print`
+```{r}
+print(bb)
+```
+
+and `summary` functions
+```{r}
+summary(bb)
+```
+
+and can be plotted using the `plot` function.
+```{r}
+plot(bb, vertex.label = NA)
 ```
 
 [back to Table of Contents](#toc)

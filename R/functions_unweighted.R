@@ -89,7 +89,8 @@
   #### Geometric, from Goldberg & Roth (2003) ####
   if (escore == "geometric") {
     N <- tcrossprod(W)^2  #Shared neighbors, squared
-    D <- rowSums(W)%*%t(rowSums(W))
+    #D <- rowSums(W)%*%t(rowSums(W))
+    D <- tcrossprod(rowSums(W))
     W <- N/D  #Geometric score
     W[W==Inf | is.nan(W)] <- 0  #Fix any divide-by-zero
     W <- W * A

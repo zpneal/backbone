@@ -132,23 +132,23 @@ backbone_from_unweighted <- function(U,
   text <- paste0("The backbone package for R (v", utils::packageVersion("backbone"), "; Neal, 2025) was used to extract the unweighted backbone of an unweighted network containing ", nrow(A), " nodes.")
 
   # Second sentence (model and outcome)
-  if (model == "skeleton") {desc <- "Karger's (1999) Skeleton backbone"}
-  if (model == "gspar") {desc <- "Satuluri et al's (2011) Global Sparsification backbone model"}
-  if (model == "lspar") {desc <- "Satuluri et al's (2011) Local Sparsification backbone model"}
-  if (model == "simmelian") {desc <- "Nick et al's (2013) Simmelian backbone model"}
-  if (model == "jaccard") {desc <- "Goldberg and Roth's (2003) Jaccard backbone model"}
-  if (model == "meetmin") {desc <- "Goldberg and Roth's (2003) MeetMin backbone model"}
-  if (model == "geometric") {desc <- "Goldberg and Roth's (2003) Geometric backbone model"}
-  if (model == "hyper") {desc <- "Goldberg and Roth's (2003) Hypergeometric backbone model"}
-  if (model == "degree") {desc <- "Hamann et al.'s (2016) Local Degree backbone model"}
-  if (model == "quadrilateral") {desc <- "Nocaj et al.'s (2015) Quadrilateral Simmelian backbone model"}
-  if (model == "custom") {desc <- "a custom backbone model specification"}
+  if (model == "skeleton") {desc <- "a Skeleton backbone (Karger, 1999)"}
+  if (model == "gspar") {desc <- "Global Sparsification (Satuluri, Parthasarathy, and Ruan, 2011)"}
+  if (model == "lspar") {desc <- "Local Sparsification (Satuluri, Parthasarathy, and Ruan, 2011)"}
+  if (model == "simmelian") {desc <- "Simmelian sparsification (Nick et al., 2013)"}
+  if (model == "jaccard") {desc <- "Jaccard sparsification (Goldberg and Roth, 2003)"}
+  if (model == "meetmin") {desc <- "MeetMin sparsification (Goldberg and Roth, 2003)"}
+  if (model == "geometric") {desc <- "Geometric sparsification (Goldberg and Roth, 2003)"}
+  if (model == "hyper") {desc <- "Hypergeometric sparsification (Goldberg and Roth, 2003)"}
+  if (model == "degree") {desc <- "Local Degree (Hamann et al., 2016) "}
+  if (model == "quadrilateral") {desc <- "Quadrilateral Simmelian sparsification (Nocaj, Ortmann, and Brandes, 2015) "}
+  if (model == "custom") {desc <- "a custom sparsification model"}
 
   old <- sum(A!=0, na.rm=TRUE)  #Number of edges in original network
   new <- sum(backbone!=0)  #Number of edges in backbone
-  reduced_edges <- round(((old - new) / old)*100,2)
+  reduced_edges <- round(((old - new) / old)*100,1)
 
-  text <- paste0(text, " Edges were selected for retention in the backbone using ", desc, " (filtering parameter = ", parameter,"), which reduced the number of edges by ", reduced_edges, "%.")
+  text <- paste0(text, " Edges were selected for retention in the backbone using ", desc, " with filtering parameter = ", parameter,", which removed ", reduced_edges, "% of the edges.")
 
   #References
   text <- paste0(text, "\n\nNeal, Z. P. 2025. backbone: An R Package to Extract Network Backbones. CRAN. https://doi.org/10.32614/CRAN.package.backbone")
