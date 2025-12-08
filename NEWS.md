@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 3.0.4
+
+* 
+
 ## backbone 3.0.3
 
 * Updated/added generic `print()`, `summary()` and `plot()` functions for backbone objects
