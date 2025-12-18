@@ -86,7 +86,7 @@ bb <- backbone_from_projection(B)  #A backbone...
 plot(bb)                           #...is sparse with clear communities
 }
 \references{
-package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. PLOS One, 17, e0269137. \doi{10.1371/journal.pone.0269137}}
 
 sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. \emph{International Conference on Complex Networks and Their Applications, 12}, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
 

@@ -47,5 +47,5 @@ backbone(N)
 
 }
 \references{
-package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. PLOS One, 17, e0269137. \doi{10.1371/journal.pone.0269137}}
 }
