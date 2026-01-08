@@ -32,6 +32,6 @@ Suggests:
 LinkingTo: 
     Rcpp
 VignetteBuilder: knitr
-URL: https://www.zacharyneal.com/backbone, https://github.com/zpneal/backbone
+URL: https://www.rbackbone.net
 BugReports: https://github.com/zpneal/backbone/issues
 LazyData: true
