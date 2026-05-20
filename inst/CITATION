@@ -3,10 +3,10 @@ rref <- bibentry(
    title = "backbone: An R Package to Extract Network Backbones",
    author = person("Zachary P Neal", email = "zpneal@msu.edu"),
    journal  = "PLOS ONE",
-   year     = "2022",
-   volume   = "17",
+   year     = "2026",
+   volume   = "21",
    number   = "5",
-   pages    = "e0269137",
-   doi      = "10.1371/journal.pone.0269137",
-   textVersion = paste("Neal, Z. P. 2022. backbone: An R Package to Extract Network Backbones. PLOS ONE. https://doi.org/10.1371/journal.pone.0269137")
+   pages    = "e0349258",
+   doi      = "10.1371/journal.pone.0349258",
+   textVersion = paste("Neal, Z. P. 2026. backbone: An R Package to Extract Network Backbones. PLOS ONE, 21, e0349258. https://doi.org/10.1371/journal.pone.0349258")
 )
