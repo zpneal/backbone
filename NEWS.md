@@ -5,6 +5,7 @@ output: html_document
 ## backbone 3.0.4
 
 * perform parameter/input checks inside each `backbone_from_` function
+* updated citation
 
 ## backbone 3.0.3
 
