@@ -28,7 +28,7 @@
 #'
 #' @return A backbone in the same class as `N`
 #'
-#' @references package: {Neal, Z. P. (2022). backbone: An R Package to Extract Network Backbones. PLOS One, 17, e0269137. \doi{10.1371/journal.pone.0269137}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #'
 #' @export
 #'
