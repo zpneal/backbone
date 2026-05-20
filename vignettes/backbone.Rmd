@@ -26,7 +26,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 
 # Table of Contents {#toc}
 
-[<img src='../man/figures/logo.png' align="right" height="250" />](https://www.zacharyneal.com/backbone)
+[<img src='../man/figures/logo.png' align="right" height="250" />](https://rbackbone.net)
 
 1. [Introduction](#introduction)
     a. [Welcome](#welcome)
