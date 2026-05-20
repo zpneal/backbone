@@ -23,8 +23,8 @@ In addition, the package implements some other utility functions to:
 For more details on these functions and methods, please see:
 
 * `vignette("backbone")`
-* Neal, Z.P. (2022). backbone: An R package to extract network backbones. *PLoS ONE, 17*, e0269137. <https://doi.org/10.1371/journal.pone.0269137>
-* [www.rbackbone.net](https://www.zacharyneal.com/backbone)
+* Neal, Z.P. (2026). backbone: An R package to extract network backbones. *PLoS ONE, 21*, e0349258. <https://doi.org/10.1371/journal.pone.0349258>
+* [www.rbackbone.net](https://www.rbackbone.net)
 
 ## Installation
 The /release branch contains the current CRAN release of the backbone package. You can install it from [CRAN](https://CRAN.R-project.org) with:
