@@ -5,7 +5,7 @@
 [![Downloads](https://cranlogs.r-pkg.org/badges/backbone?color=orange)](https://CRAN.R-project.org/package=backbone)
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/backbone?color=orange)](https://CRAN.R-project.org/package=backbone)
 [![status](https://tinyverse.netlify.app/badge/backbone)](https://CRAN.R-project.org/package=backbone)
-[![DOI:10.1371/journal.pone.0269137](http://img.shields.io/badge/DOI-10.1371/journal.pone.0269137-B31B1B.svg)](https://doi.org/10.1371/journal.pone.0269137)
+[![DOI:10.1371/journal.pone.0349258](http://img.shields.io/badge/DOI-10.1371/journal.pone.0349258-B31B1B.svg)](https://doi.org/10.1371/journal.pone.0349258)
 <!-- badges: end -->
 
 ## Welcome
