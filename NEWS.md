@@ -2,6 +2,10 @@
 title: "NEWS"
 output: html_document
 ---
+## backbone 3.0.5
+
+* 
+
 ## backbone 3.0.4
 
 * perform parameter/input checks inside each `backbone_from_` function
