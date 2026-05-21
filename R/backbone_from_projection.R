@@ -36,7 +36,7 @@
 #'
 #' @return A backbone in the same class as \code{B}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
 #' @references all other models: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
@@ -73,9 +73,50 @@ backbone_from_projection <- function(B,
 
   call <- match.call()
 
-  #### Check parameters and input ####
-  I <- .check_and_coerce(N = B, source = "projection", model = model, alpha = alpha, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, trials = trials, backbone_only = backbone_only)
-  if (model == "sdsm" & any(I %in% c(10,11))) {model <- "sdsm_ec"}
+  #### Check parameters ####
+  if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
+  if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
+  if (!(model %in% c("sdsm", "fdsm", "fixedrow", "fixedcol", "fixedfill"))) {stop("`model` must be one of: \"sdsm\", \"fdsm\", \"fixedrow\", \"fixedcol\", or \"fixedfill\"")}
+  if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
+  if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
+  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
+  if (model=="fdsm" & !is.null(trials)) {  #If FDSM and `trials` is supplied, check it
+    if (!is.numeric(trials)) {stop("`trials` must be a positive integer")}
+    if (trials%%1!=0 | trials < 1) {stop("`trials` must be a positive integer")}
+  }
+  if (model!="fdsm" & !is.null(trials)) {message("The `trials` argument is only used when `model = \"fdsm\"`. It is being ignored.")}
+  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
+  if (!is.logical(backbone_only)) {stop("`backbone_only` must be either TRUE or FALSE")}
+
+  #### Check and format input ####
+  #Check that input is matrix, Matrix, or igraph (and if igraph, that it is bipartite)
+  if (!methods::is(B,"matrix") & !methods::is(B,"Matrix") & !methods::is(B,"igraph")) {stop("`B` must be a binary incidence matrix or Matrix, or a binary bipartite igraph object")}
+  if (methods::is(B,"igraph")) {if(!igraph::is_bipartite(B)) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}}
+
+  #Convert input to incidence matrix
+  if (methods::is(B,"matrix")) {I <- B}  #matrix --> matrix
+  if (methods::is(B,"Matrix")) {I <- as.matrix(B)}  #Matrix --> matrix
+  if (methods::is(B,"igraph")) {
+    if ("weight" %in% igraph::edge_attr_names(B)) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE, attr = "weight")}  #weighted igraph --> weighted incidence
+    if (!("weight" %in% igraph::edge_attr_names(B))) {I <- igraph::as_biadjacency_matrix(B, names = FALSE, sparse = FALSE)}  #unweighted igraph --> binary incidence
+  }
+
+  #Check if input may be a weighted projection
+  if (!all(I %in% c(0,1)) &    #The entries are not binary, and
+      isSymmetric(I) &         #The matrix is symmetric, and
+      all(I%%1==0)) {          #The entries are all integers
+    stop("
+`B` looks like it may be a weighted bipartite projection. The input to backbone_from_projection()
+must be the original bipartite network, not its weighted projection. If you only have the weighted
+bipartite projection, cautiously consider using backbone_from_weighted() instead.")}
+
+  #Check that input is binary, or contains structural values and model=SDSM
+  if (model!="sdsm" & !all(I %in% c(0,1))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object")}
+
+  if (model=="sdsm" & !all(I %in% c(0,1,10,11))) {stop("`B` must be a binary incidence matrix or binary bipartite igraph object,
+                                                        where required edges have weight 10 and prohibited edges have weight 11")}
+
+  if (model=="sdsm") {if (all(I %in% c(0,1))) {model <- "sdsm"} else {model <- "sdsm_ec"}}  #If SDSM requested and structural values present, use sdsm_ec
 
   #### Compute p-values ####
   if (model == "sdsm") {p <- .sdsm(I, missing_as_zero, signed)}

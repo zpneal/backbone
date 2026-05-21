@@ -9,7 +9,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references fixedfill: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @noRd
@@ -71,7 +71,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references fixedrow: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @noRd
@@ -125,7 +125,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references fixedcol: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
 #' @noRd
@@ -175,7 +175,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references sdsm: {Neal, Z. P. (2014). The backbone of bipartite projections: Inferring relationships from co-authorship, co-sponsorship, co-attendance, and other co-behaviors. *Social Networks, 39*, 84-97. \doi{10.1016/j.socnet.2014.06.001}}
 #' @references sdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #'
@@ -230,7 +230,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references sdsm-ec model: {Neal, Z. P. and Neal, J. W. (2023). Stochastic Degree Sequence Model with Edge Constraints (SDSM-EC) for Backbone Extraction. *International Conference on Complex Networks and Their Applications, 12*, 127-136. \doi{10.1007/978-3-031-53468-3_11}}
 #'
 #' @noRd
@@ -311,7 +311,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references fdsm: {Neal, Z. P., Domagalski, R., and Sagan, B. (2021). Comparing Alternatives to the Fixed Degree Sequence Model for Extracting the Backbone of Bipartite Projections. *Scientific Reports, 11*, 23929. \doi{10.1038/s41598-021-03238-3}}
 #' @references fastball: {Godard, K. and Neal, Z. P. (2022). fastball: A fast algorithm to randomly sample bipartite graphs with fixed degree sequences. *Journal of Complex Networks, 10*, cnac049. \doi{10.1093/comnet/cnac049}}
 #'

@@ -28,7 +28,7 @@
 #'
 #' @return A backbone in the same class as `N`
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #'
 #' @export
 #'

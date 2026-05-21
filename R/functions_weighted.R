@@ -9,7 +9,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references disparity filter: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
 #'
 #' @noRd
@@ -57,7 +57,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references lans: {Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. *PLOS One, 6*, e16431. \doi{10.1371/journal.pone.0016431}}
 #'
 #' @noRd
@@ -96,7 +96,7 @@
 #'
 #' If `signed = TRUE` a list containing a matrix of lower-tail and upper-tail p-values
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references mlf: {Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. *Physical Review E, 93*, 012304. \doi{10.1103/PhysRevE.93.012304}}
 #'
 #' @noRd
@@ -165,7 +165,7 @@
 #' If \code{length(parameter)==1}, an unweighted backbone as a matrix
 #' If \code{length(parameter)==2}, a signed backbone as a matrix
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #'
 #' @noRd
 .global <- function(A, missing_as_zero, parameter){

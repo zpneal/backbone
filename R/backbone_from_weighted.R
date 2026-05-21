@@ -37,7 +37,7 @@
 #'
 #' @return A backbone in the same class as \code{W}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references disparity: {Serrano, M. A., Boguna, M., & Vespignani, A. (2009). Extracting the multiscale backbone of complex weighted networks. *Proceedings of the National Academy of Sciences, 106*, 6483-6488. \doi{10.1073/pnas.0808904106}}
 #' @references lans: {Foti, N. J., Hughes, J. M., & Rockmore, D. N. (2011). Nonparametric sparsification of complex multiscale networks. *PLOS One, 6*, e16431. \doi{10.1371/journal.pone.0016431}}
 #' @references mlf: {Dianati, N. (2016). Unwinding the hairball graph: Pruning algorithms for weighted complex networks. *Physical Review E, 93*, 012304. \doi{10.1103/PhysRevE.93.012304}}
@@ -79,8 +79,45 @@ backbone_from_weighted <- function(W,
 
   call <- match.call()
 
-  #### Check parameters and input ####
-  A <- .check_and_coerce(N = W, source = "weighted", model = model, alpha = alpha, parameter = parameter, signed = signed, mtc = mtc, missing_as_zero = missing_as_zero, narrative = narrative, backbone_only = backbone_only)
+  #### Check parameters ####
+  #All models
+  if (!(model %in% c("disparity", "lans", "mlf", "global"))) {stop("`model` must be one of: \"disparity\", \"lans\", \"mlf\", or \"global\"")}
+  if (!is.logical(missing_as_zero)) {stop("`missing_as_zero` must be either TRUE or FALSE")}
+  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
+  if (!is.logical(backbone_only)) {stop("`backbone_only` must be either TRUE or FALSE")}
+
+  #Statistical models
+  if (model %in% c("disparity", "lans", "mlf")) {
+    if (!is.numeric(alpha)) {stop("`alpha` must be a numeric value between 0 and 1")}
+    if (alpha < 0 | alpha > 1) {stop("`alpha` must be a numeric value between 0 and 1")}
+    if (!is.logical(signed)) {stop("`signed` must be either TRUE or FALSE")}
+    if (!(mtc %in% c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"))) {stop("`mtc` must be one of: \"none\", \"holm\", \"hochberg\", \"hommel\", \"bonferroni\", \"BH\", \"BY\", or \"fdr\"")}
+  }
+
+  #Structural models
+  if (model %in% c("global")) {
+    if (!is.numeric(parameter)) {stop("parameter must be a numeric vector of length 1 or 2")}
+    if (length(parameter)<1 | length(parameter)>2) {stop("parameter must be a numeric vector of length 1 or 2")}
+  }
+
+  #### Check and format input ####
+  #Check that input is a weighted adjacency matrix or weighted unipartite igraph
+  if (!methods::is(W,"matrix") & !methods::is(W,"Matrix") & !methods::is(W,"igraph")) {stop("`W` must be an adjacency matrix or Matrix, or an igraph object")}
+
+  if (methods::is(W,"matrix")) {
+    if (dim(as.matrix(W))[1] != dim(as.matrix(W))[2]) {stop("`W` must be a square adjacency matrix")}
+    if (all(as.matrix(W) %in% c(0,1))) {stop("The entries of `W` must represent edge weights")}
+  }
+
+  if (methods::is(W,"igraph")) {
+    if (igraph::is_bipartite(W)) {stop("`W` must be a unipartite igraph object")}
+    if (!"weight" %in% igraph::edge_attr_names(W)) {stop("`W` must contain an edge weight attribute")}
+  }
+
+  #Convert input to adjacency matrix
+  if (methods::is(W,"matrix")) {A <- W}  #matrix --> matrix
+  if (methods::is(W,"Matrix")) {A <- as.matrix(W)}  #Matrix --> matrix
+  if (methods::is(W,"igraph")) {A <- igraph::as_adjacency_matrix(W, names = FALSE, sparse = FALSE, attr = "weight")}
 
   #### Statistical Models ####
   if (model == "disparity") {p <- .disparity(A, missing_as_zero, signed)}

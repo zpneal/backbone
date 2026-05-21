@@ -5,7 +5,7 @@
 [![Downloads](https://cranlogs.r-pkg.org/badges/backbone?color=orange)](https://CRAN.R-project.org/package=backbone)
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/backbone?color=orange)](https://CRAN.R-project.org/package=backbone)
 [![status](https://tinyverse.netlify.app/badge/backbone)](https://CRAN.R-project.org/package=backbone)
-[![DOI:10.1371/journal.pone.0269137](http://img.shields.io/badge/DOI-10.1371/journal.pone.0269137-B31B1B.svg)](https://doi.org/10.1371/journal.pone.0269137)
+[![DOI:10.1371/journal.pone.0349258](http://img.shields.io/badge/DOI-10.1371/journal.pone.0349258-B31B1B.svg)](https://doi.org/10.1371/journal.pone.0349258)
 <!-- badges: end -->
 
 ## Welcome
@@ -23,8 +23,8 @@ In addition, the package implements some other utility functions to:
 For more details on these functions and methods, please see:
 
 * `vignette("backbone")`
-* Neal, Z.P. (2022). backbone: An R package to extract network backbones. *PLoS ONE, 17*, e0269137. <https://doi.org/10.1371/journal.pone.0269137>
-* [www.rbackbone.net](https://www.zacharyneal.com/backbone)
+* Neal, Z.P. (2026). backbone: An R package to extract network backbones. *PLoS ONE, 21*, e0349258. <https://doi.org/10.1371/journal.pone.0349258>
+* [rbackbone.net](https://rbackbone.net)
 
 ## Installation
 The /release branch contains the current CRAN release of the backbone package. You can install it from [CRAN](https://CRAN.R-project.org) with:

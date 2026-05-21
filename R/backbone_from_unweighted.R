@@ -57,7 +57,7 @@
 #'
 #' @return A backbone in the same class as \code{U}, or if \code{backbone_only = FALSE}, then a backbone object.
 #'
-#' @references package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+#' @references package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 #' @references skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. *Mathematics of Operations Research, 24*, 383-413. \doi{10.1287/moor.24.2.383}}
 #' @references gspar and lspar: {Satuluri, V., Parthasarathy, S., & Ruan, Y. (2011, June). Local graph sparsification for scalable clustering. In Proceedings of the 2011 ACM SIGMOD International Conference on Management of data (pp. 721-732). \doi{10.1145/1989323.1989399}}
 #' @references simmelian: {Nick, B., Lee, C., Cunningham, P., & Brandes, U. (2013, August). Simmelian backbones: Amplifying hidden homophily in facebook networks. In Proceedings of the 2013 IEEE/ACM international conference on advances in social networks analysis and mining (pp. 525-532). \doi{10.1145/2492517.2492569}}
@@ -92,7 +92,13 @@ backbone_from_unweighted <- function(U,
 
   call <- match.call()
 
-  #### Check parameters and input ####
+  #### Check parameters ####
+  #All models
+  if (!(model %in% c("custom", "skeleton", "gspar", "lspar", "simmelian", "jaccard", "meetmin", "geometric", "hyper", "degree", "quadrilateral"))) {stop("`model` must be one of: \"custom\", \"skeleton\", \"gspar\", \"lspar\", \"simmelian\", \"jaccard\", \"meetmin\", \"geometric\", \"hyper\", \"degree\", \"quadrilateral\"")}
+  if (!is.numeric(parameter)) {stop("`parameter` must be a numeric value")}
+  if (!is.logical(narrative)) {stop("`narrative` must be either TRUE or FALSE")}
+  if (!is.logical(backbone_only)) {stop("`backbone_only` must be either TRUE or FALSE")}
+
   #If existing model specification, set model parameters
   if (model == "skeleton") {escore <- "random"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
   if (model == "gspar") {escore <- "jaccard"; normalize <- "none"; filter <- "proportion"; umst <- FALSE}
@@ -104,7 +110,37 @@ backbone_from_unweighted <- function(U,
   if (model == "hyper") {escore <- "hypergeometric"; normalize <- "none"; filter <- "threshold"; umst <- FALSE}
   if (model == "degree") {escore <- "degree"; normalize <- "rank"; filter <- "degree"; umst <- FALSE}
   if (model == "quadrilateral") {escore <- "quadrilateral"; normalize <- "embeddedness"; filter <- "threshold"; umst <- TRUE}
-  A <- .check_and_coerce(N = U, source = "unweighted", model = model, parameter = parameter, escore = escore, normalize = normalize, filter = filter, umst = umst, narrative = narrative, backbone_only = backbone_only)
+
+  #If custom model specification, check model parameters
+  if (model == "custom") {
+    if (!(escore %in% c("random", "betweenness", "triangles", "jaccard", "dice", "quadrangles", "quadrilateral", "degree", "meetmin", "geometric" , "hypergeometric"))) {stop("`escore` must be one of: \"random\", \"betweenness\", \"triangles\", \"jaccard\", \"dice\", \"quadrangles\", \"quadrilateral\", \"degree\", \"meetmin\", \"geometric\" , \"hypergeometric\"")}
+    if (!(normalize %in% c("none", "rank", "embeddedness"))) {stop("`normalize` must be one of: \"none\", \"rank\", \"embeddedness\"")}
+    if (!(filter %in% c("threshold", "proportion", "degree", "disparity", "lans", "mlf"))) {stop("`filter` must be one of: \"threshold\", \"proportion\", \"degree\", \"lans\", \"mlf\"")}
+    if (!is.logical(umst)) {stop("`umst` must be either TRUE or FALSE")}
+    if (normalize=="rank" & filter!="degree") {stop("Using normalize=\"rank\" requires that filter=\"degree\"")}
+    if (normalize!="rank" & filter=="degree") {stop("Using filter=\"degree\" requires that normalize=\"rank\"")}
+  }
+
+  #### Check and format input ####
+  #Check that input is a weighted adjacency matrix or weighted unipartite igraph
+  if (!methods::is(U,"matrix") & !methods::is(U,"Matrix") & !methods::is(U,"igraph")) {stop("`U` must be an adjacency matrix or Matrix, or an igraph object")}
+
+  if (methods::is(U,"matrix")) {
+    if (dim(as.matrix(U))[1] != dim(as.matrix(U))[2]) {stop("`U` must be a symmetric adjacency matrix")}
+    if (!all(as.matrix(U) %in% c(0,1))) {stop("The entries of `U` must be either 0 or 1")}
+    if (!isSymmetric(as.matrix(U))) {stop("`U` must be a symmetric adjacency matrix")}
+  }
+
+  if (methods::is(U,"igraph")) {
+    if (igraph::is_bipartite(U)) {stop("`U` must be an undirected unipartite igraph object")}
+    if (igraph::is_directed(U)) {stop("`U` must be an undirected unipartite igraph object")}
+    if ("weight" %in% igraph::edge_attr_names(U)) {stop("An edge weight attribute is present in `U`, but will be ignored")}
+  }
+
+  #Convert input to adjacency matrix
+  if (methods::is(U,"matrix")) {A <- U}  #matrix --> matrix
+  if (methods::is(U,"Matrix")) {A <- as.matrix(U)}  #Matrix --> matrix
+  if (methods::is(U,"igraph")) {A <- igraph::as_adjacency_matrix(U, names = FALSE, sparse = FALSE)}
 
   #### Compute edge scores ####
   G <- .escore(A, escore = escore)

@@ -8,7 +8,7 @@ output:
 bibliography: backbone_bib.bib
 link-citations: yes
 vignette: >
-  %\VignetteIndexEntry{Empirical Example of Backbone Extraction: The 108^th^ U.S. Senate}
+  %\VignetteIndexEntry{Empirical Example of Backbone Extraction: The 108th U.S. Senate}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,7 +26,7 @@ par(mar = c(0, 0, 2, 0) + 0.1)
 
 # Table of Contents {#toc}
 
-[<img src='../man/figures/logo.png' align="right" height="250" />](https://www.zacharyneal.com/backbone)
+[<img src='../man/figures/logo.png' align="right" height="250" />](https://rbackbone.net)
 
 1. [Introduction](#introduction)
 2. [Data](#data)
@@ -42,7 +42,7 @@ This vignette uses empirical data on bill sponsorship behaviors in the 108^th^ U
 
 The `backbone` package can be cited as:
 
-**Neal, Z. P. (2025). backbone: An R package to Extract Network Backbones. *CRAN*. [https://doi.org/10.32614/CRAN.package.backbone](https://doi.org/10.32614/CRAN.package.backbone)**
+**Neal, Z. P. (2026). backbone: An R package to Extract Network Backbones. *PLOS One, 21*, e0349258. [https://doi.org/10.1371/journal.pone.0349258](https://doi.org/10.1371/journal.pone.0349258)**
 
 The `backbone` package, and the `igraph` package that is also used in this example, can be loaded using:
 ```{r}

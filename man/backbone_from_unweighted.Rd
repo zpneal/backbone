@@ -108,7 +108,7 @@ bb <- backbone_from_unweighted(U, model = "custom", escore = "jaccard",
 plot(bb)  #Communities are clearly visible
 }
 \references{
-package: {Neal, Z. P. (2025). backbone: An R Package to Extract Network Backbones. CRAN. \doi{10.32614/CRAN.package.backbone}}
+package: {Neal, Z. P. (2026). backbone: An R Package to Extract Network Backbones. PLOS One, 21, e0349258. \doi{10.1371/journal.pone.0349258}}
 
 skeleton: {Karger, D. R. (1999). Random sampling in cut, flow, and network design problems. \emph{Mathematics of Operations Research, 24}, 383-413. \doi{10.1287/moor.24.2.383}}
 

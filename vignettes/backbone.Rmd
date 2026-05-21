@@ -26,7 +26,7 @@ par(mar = c(0, 0, 0, 0) + 0.1)
 
 # Table of Contents {#toc}
 
-[<img src='../man/figures/logo.png' align="right" height="250" />](https://www.zacharyneal.com/backbone)
+[<img src='../man/figures/logo.png' align="right" height="250" />](https://rbackbone.net)
 
 1. [Introduction](#introduction)
     a. [Welcome](#welcome)
@@ -60,9 +60,9 @@ This vignette provides an introduction to using the `backbone` package to extrac
 
 The `backbone` package can be cited as:
 
-**Neal, Z. P. (2025). backbone: An R package to Extract Network Backbones. *CRAN*. [https://doi.org/10.32614/CRAN.package.backbone](https://doi.org/10.32614/CRAN.package.backbone)**
+**Neal, Z. P. (2026). backbone: An R package to Extract Network Backbones. *PLOS One, 21*,  e0349258. [https://doi.org/10.1371/journal.pone.0349258](https://doi.org/10.1371/journal.pone.0349258)**
 
-For additional resources on the backbone package, please see [https://www.rbackbone.net/](https://www.zacharyneal.com/backbone).
+For additional resources on the backbone package, please see [https://rbackbone.net/](https://rbackbone.net).
 
 If you have questions about the backbone package or would like a backbone hex sticker, please contact the maintainer Zachary Neal by email ([zpneal\@msu.edu](mailto:zpneal@msu.edu)). Please report bugs in the backbone package at [https://github.com/zpneal/backbone/issues](https://github.com/zpneal/backbone/issues).
 
